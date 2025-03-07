@@ -1,0 +1,481 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'Create_Store_Data/CreateStore.dart';
+import 'Inventory_data/Inventory.dart';
+import 'Manage_store_Data/ManageStores.dart';
+import 'Orders_Data/Oders.dart';
+import 'Upload_Data/Upload.dart';
+import 'User_setting/Profile.dart';
+import 'User_setting/YourAccount.dart';
+
+class SellerDashboard extends StatefulWidget {
+  const SellerDashboard({super.key});
+
+  @override
+  State<SellerDashboard> createState() => _SellerDashboardState();
+}
+
+class _SellerDashboardState extends State<SellerDashboard> {
+  List<Map<String, String?>> categories = [];
+  List<Map<String, String>> subcategories = [];
+  bool isLoading = true;
+  String? selectedCategory;
+  String? selectedSubcategory;
+  String? selectedCategoryName;
+  String? email;
+  String? password;
+  String? accessToken;
+
+  @override
+  @override
+  void initState() {
+    super.initState();
+    _initializeData(); // Call the async function
+  }
+
+  Future<void> _initializeData() async {
+    await _loadUserCredentials();
+    await fetchParentCategories();
+  }
+
+  Future<void> _saveSelectedCategory(
+      String categoryId, String selectedCategory) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("selectedCategoryId", categoryId);
+    await prefs.setString("selectedCategoryName", selectedCategory);
+    log("Saved selected category ID: $categoryId");
+    log("Saved selected category NAme: $selectedCategory");
+  }
+
+  Future<void> _saveSelectedSubcategory(
+      String subcategoryId, String subcategoryName) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("selectedSubcategoryId", subcategoryId);
+    await prefs.setString("selectedSubcategoryName", subcategoryName);
+    log("Saved selected subcategory ID: $subcategoryId");
+    log("Saved selected subcategory Name: $subcategoryName");
+  }
+
+  Future<void> _loadUserCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? savedEmail = prefs.getString("email");
+    String? savedPassword = prefs.getString("password");
+    String? savedaccessToken = prefs.getString("userToken");
+
+    log("Retrieved Email: $savedEmail");
+    log("Retrieved Password: $savedPassword");
+    log("Retrieved acesstoken: $savedaccessToken");
+
+    setState(() {
+      email = savedEmail ?? "No Email Found";
+      password = savedPassword ?? "No Password Found";
+      accessToken = savedaccessToken ?? "No accesstoken";
+    });
+  }
+
+  /// Fetch Parent Categories (Where `parent_category_id` is null)
+  Future<void> fetchParentCategories() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://admin.uthix.com/api/all-categories'),
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $accessToken"
+        },
+      );
+
+      log("API Response: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData.containsKey('categories') &&
+            jsonData['categories'] is List) {
+          setState(() {
+            categories = List<Map<String, String>>.from(
+              jsonData['categories']
+                  .where((item) =>
+                      item['parent_category_id'] == null) // Fetch only parents
+                  .map((item) => {
+                        "id": item['id'].toString(),
+                        "cat_title": item['cat_title'].toString(),
+                        "parent_category_id":
+                            "", // Parent categories have no parent
+                      }),
+            );
+            isLoading = false;
+          });
+
+          log("Fetched Parent Categories: $categories");
+        } else {
+          log("Categories key not found.");
+          setState(() => isLoading = false);
+        }
+      } else {
+        log("API request failed: ${response.statusCode}");
+        setState(() => isLoading = false);
+      }
+    } catch (e) {
+      log("Error: $e");
+      setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> fetchSubcategories(int parentId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://admin.uthix.com/api/all-categories'),
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $accessToken"
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        if (jsonData.containsKey('categories') &&
+            jsonData['categories'] is List) {
+          setState(() {
+            subcategories = List<Map<String, String>>.from(
+              jsonData['categories']
+                  .where((item) =>
+                      item['parent_category_id'] ==
+                      parentId) // Fetch subcategories
+                  .map((item) => {
+                        "id": item['id'].toString(),
+                        "cat_title": item['cat_title'].toString(),
+                        "parent_category_id":
+                            item['parent_category_id'].toString(),
+                      }),
+            );
+          });
+
+          log("Fetched Subcategories for Parent ID $parentId: $subcategories");
+
+          // Ensure widget is still mounted before calling the dialog
+          if (mounted) {
+            showSubcategoryMenu(
+                context, parentId.toString(), 'Parent Category Name');
+          }
+        } else {
+          log("Subcategories key not found.");
+        }
+      } else {
+        log("API request failed: ${response.statusCode}");
+      }
+    } catch (e) {
+      log("Error: $e");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Text(
+            "Seller Dashboard",
+            style: TextStyle(
+              fontSize: 20,
+              fontFamily: 'Urbanist',
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF605F5F),
+            ),
+          ),
+        ),
+        elevation: 0,
+      ),
+      backgroundColor: Colors.white,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Divider(color: Colors.grey, thickness: 1),
+          buildTopBar(),
+          const SizedBox(height: 10),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/instructor/background.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: GridView.count(
+                padding: const EdgeInsets.only(top: 60, left: 20, right: 20),
+                crossAxisCount: 2,
+                crossAxisSpacing: 12.0,
+                mainAxisSpacing: 10.0,
+                childAspectRatio: 0.99,
+                children: [
+                  buildGridItem(context, 'Upload',
+                      'assets/Seller_dashboard_images/upload.png', null),
+                  buildGridItem(
+                      context,
+                      'Inventory',
+                      'assets/Seller_dashboard_images/inventory.png',
+                      InventoryData()),
+                  buildGridItem(
+                      context,
+                      'Create Store',
+                      'assets/Seller_dashboard_images/create_store.png',
+                      CreateStore()),
+                  buildGridItem(
+                      context,
+                      'Manage Stores',
+                      'assets/Seller_dashboard_images/manage_stores.png',
+                      ManageStoreData()),
+                  buildGridItem(
+                      context,
+                      'My Profile',
+                      'assets/Seller_dashboard_images/my_profile.png',
+                      Profile()),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildTopBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      height: 50,
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const YourAccount()));
+                },
+                child: Image.asset('assets/icons/Ellipse.png', height: 40),
+              ),
+              const SizedBox(width: 5),
+              const Text(
+                "Revantaha Stationers",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF605F5F),
+                ),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              const Text(
+                "Orders",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF605F5F),
+                ),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ManageOrders()));
+                },
+                child: Image.asset('assets/icons/orderIcon.png', height: 35),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildGridItem(BuildContext context, String title, String imagePath,
+      Widget? nextScreen) {
+    return GestureDetector(
+      onTap: () {
+        if (title == 'Upload') {
+          showUploadMenu(context);
+        } else if (nextScreen != null) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => nextScreen));
+        }
+      },
+      child: Card(
+        color: Colors.white,
+        elevation: 5,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: const BorderSide(color: Color(0xFFD2D2D2), width: 2),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Column(
+            children: [
+              Image.asset(imagePath, height: 135, fit: BoxFit.cover),
+              const SizedBox(height: 2),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF605F5F),
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showUploadMenu(BuildContext context) {
+    if (categories.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No categories available")),
+      );
+      return;
+    }
+
+    selectedCategory = null;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setDialogState) {
+            return AlertDialog(
+              title: const Text("Select a Category"),
+              content: SizedBox(
+                width: double.maxFinite, // Ensures dialog width is adaptive
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: categories.map((category) {
+                      final categoryName = category['cat_title'];
+                      final categoryId = category['id'].toString();
+
+                      return ListTile(
+                        title: Text(categoryName ?? "Unknown"),
+                        trailing: Radio<String>(
+                          value: categoryId,
+                          groupValue: selectedCategory,
+                          onChanged: (value) async {
+                            setDialogState(() {
+                              selectedCategory = value;
+                              selectedCategoryName = categoryName ?? "Unknown";
+                            });
+
+                            Navigator.pop(context);
+                            _saveSelectedCategory(categoryId, categoryName!);
+
+                            await fetchSubcategories(int.parse(categoryId));
+
+                            if (subcategories.isNotEmpty) {
+                              showSubcategoryMenu(
+                                  context, categoryId, categoryName);
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UploadData(),
+                                ),
+                              );
+                            }
+                          },
+                          activeColor: const Color.fromRGBO(43, 96, 116, 1),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void showSubcategoryMenu(
+      BuildContext context, String parentId, String parentName) async {
+    if (subcategories.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("No subcategories available for $parentName")),
+        );
+      }
+      return;
+    }
+
+    // Delay the dialog to be shown after the current frame is completed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setDialogState) {
+              return AlertDialog(
+                title: Text("Select a Subcategory for $parentName"),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: subcategories.map((subcategory) {
+                    final subcategoryName =
+                        subcategory['cat_title'] ?? "Unknown";
+                    final subcategoryId = subcategory['id'].toString();
+
+                    return ListTile(
+                      title: Text(subcategoryName),
+                      trailing: Radio<String>(
+                        value: subcategoryId,
+                        groupValue: selectedCategory,
+                        onChanged: (value) {
+                          setDialogState(() {
+                            selectedCategory = value;
+                            selectedCategoryName = subcategoryName;
+                          });
+
+                          // After selection, navigate to UploadData screen
+                          Navigator.pop(context); // Close the dialog
+                          _saveSelectedSubcategory(
+                              subcategoryId, subcategoryName);
+
+                          // Navigate to UploadData screen with the selected subcategory ID and name
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UploadData(),
+                            ),
+                          );
+                        },
+                        activeColor: const Color.fromRGBO(43, 96, 116, 1),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              );
+            },
+          );
+        },
+      );
+    });
+  }
+}
