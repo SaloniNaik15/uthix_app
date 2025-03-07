@@ -9,17 +9,36 @@ class StudentProfile extends StatefulWidget {
 }
 
 class _StudentProfileState extends State<StudentProfile> {
-
   final List<Map<String, dynamic>> profileData = [
     {'icon': Icons.person, 'label': 'Name', 'hint': 'Enter your name'},
     {'icon': Icons.phone, 'label': 'Phone', 'hint': 'Enter your phone number'},
     {'icon': Icons.email, 'label': 'Email', 'hint': 'Enter your email'},
-    {'icon': Icons.lock, 'label': 'Password', 'hint': 'Enter your password'}, // Password field
+    {
+      'icon': Icons.lock,
+      'label': 'Password',
+      'hint': 'Enter your password'
+    }, // Password field
     {'icon': Icons.female, 'label': 'Gender', 'hint': 'Select your gender'},
-    {'icon': Icons.location_on, 'label': 'Current Address', 'hint': 'Enter your current address'},
-    {'icon': Icons.school, 'label': 'University', 'hint': 'Enter your university'},
-    {'icon': Icons.location_on, 'label': 'Permanent Address', 'hint': 'Enter your permanent address'},
-    {'icon': Icons.school, 'label': 'Student ID', 'hint': 'Enter your student ID'},
+    {
+      'icon': Icons.location_on,
+      'label': 'Current Address',
+      'hint': 'Enter your current address'
+    },
+    {
+      'icon': Icons.school,
+      'label': 'University',
+      'hint': 'Enter your university'
+    },
+    {
+      'icon': Icons.location_on,
+      'label': 'Permanent Address',
+      'hint': 'Enter your permanent address'
+    },
+    {
+      'icon': Icons.school,
+      'label': 'Student ID',
+      'hint': 'Enter your student ID'
+    },
   ];
   @override
   Widget build(BuildContext context) {
@@ -49,7 +68,8 @@ class _StudentProfileState extends State<StudentProfile> {
         width: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/Seller_dashboard_images/ManageStoreBackground.png'),
+            image: AssetImage(
+                'assets/Seller_dashboard_images/ManageStoreBackground.png'),
             fit: BoxFit.cover,
           ),
         ),
@@ -158,7 +178,8 @@ class ProfileField extends StatefulWidget {
   final String label;
   final String hint;
 
-  ProfileField({required this.icon, required this.label, required this.hint});
+  const ProfileField(
+      {super.key, required this.icon, required this.label, required this.hint});
 
   @override
   _ProfileFieldState createState() => _ProfileFieldState();
@@ -201,7 +222,8 @@ class _ProfileFieldState extends State<ProfileField> {
                   hintText: widget.hint, // Display hint text
                   border: InputBorder.none,
                 ),
-                style: TextStyle(fontSize: 16, fontFamily: "Urbanist", color: Colors.black),
+                style: TextStyle(
+                    fontSize: 16, fontFamily: "Urbanist", color: Colors.black),
               ),
             ),
             if (isPasswordField)
@@ -228,6 +250,4 @@ class _ProfileFieldState extends State<ProfileField> {
       ),
     );
   }
-
-
 }

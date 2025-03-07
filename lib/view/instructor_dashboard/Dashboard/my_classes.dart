@@ -14,7 +14,7 @@ class _MyClassesState extends State<MyClasses> {
   final TextEditingController _emailController = TextEditingController();
   final Dio _dio = Dio();
   final String apiUrl = "https://admin.uthix.com/api/manage-classes";
-  final String token = "3|SkCLy7WfUwBHDUD0B2KSBi6JiGmji7aqbQDhr7Oa0f78c8bf";
+  final String token = "129|R7THr97G2ycwBYljdixjLa6EIUNMYZZ4tzAuU5Esbe4f2409";
   List<dynamic> classes = [];
 
   @override

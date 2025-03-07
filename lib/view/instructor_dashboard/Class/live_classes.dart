@@ -19,6 +19,7 @@ class _LiveClassesState extends State<LiveClasses> {
     final announcementProvider =
         Provider.of<AnnouncementProvider>(context); // ✅
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           Padding(

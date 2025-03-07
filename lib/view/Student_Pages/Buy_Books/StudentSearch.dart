@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
@@ -11,8 +10,7 @@ class StudentSearch extends StatefulWidget {
 
 class _StudentSearchState extends State<StudentSearch> {
   final TextEditingController searchController = TextEditingController();
-  List<dynamic> allProducts = []; // Store all products
-  List<dynamic> searchResults = []; // Filtered results
+  List<dynamic> searchResults = [];
   bool isLoading = false;
   int selectedIndex = 0;
 
@@ -21,54 +19,55 @@ class _StudentSearchState extends State<StudentSearch> {
     'Subject',
     'Books',
     'Stationary',
-    'Lab Equipments'
+    'Lab Equipments',
   ];
 
-  Future<void> fetchProducts() async {
+  Future<void> searchCategories(String query) async {
+    if (query.isEmpty) return;
+
     setState(() => isLoading = true);
     try {
       final dio = Dio();
-      final response =
-          await dio.get('https://admin.uthix.com/api/categories/2/products');
+      final response = await dio.get(
+        'https://admin.uthix.com/api/categories/1/products',
+        queryParameters: {'search': query},
+      );
 
-      if (response.statusCode == 200 && response.data.containsKey('products')) {
-        setState(() {
-          allProducts = response.data['products']; // Store all products
-          searchResults = allProducts; // Show all products initially
-        });
-      } else {
-        setState(() => searchResults = []);
+      print("API Response: ${response.data}");
+
+      if (response.statusCode == 200) {
+        final jsonData = response.data;
+        if (jsonData.containsKey('products') && jsonData['products'] is List) {
+          final List products = jsonData['products'];
+          print("Products found: $products");
+
+          final queryLower = query.toLowerCase();
+          setState(() {
+            searchResults = products.where((product) {
+              final title = product['title']?.toString().toLowerCase() ?? '';
+              final author = product['author']?.toString().toLowerCase() ?? '';
+              final language = product['language']?.toString().toLowerCase() ?? '';
+
+              print("Filtering product: $title");
+
+              return title.contains(queryLower) ||
+                  author.contains(queryLower) ||
+                  language.contains(queryLower);
+            }).toList();
+          });
+
+          print("Filtered Results: $searchResults");
+        } else {
+          print("No products found in response.");
+          setState(() => searchResults = []);
+        }
       }
     } catch (e) {
+      print("Error: $e");
       setState(() => searchResults = []);
     } finally {
       setState(() => isLoading = false);
     }
-  }
-
-  void searchCategories(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        searchResults = allProducts;
-        return;
-      }
-
-      final queryLower = query.toLowerCase();
-      searchResults = allProducts.where((product) {
-        final title = (product['title'] ?? '').toLowerCase();
-        final author = (product['author'] ?? '').toLowerCase();
-        final language = (product['language'] ?? '').toLowerCase();
-        return title.contains(queryLower) ||
-            author.contains(queryLower) ||
-            language.contains(queryLower);
-      }).toList();
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchProducts();
   }
 
   Widget buildFilterTabs() {
@@ -87,23 +86,18 @@ class _StudentSearchState extends State<StudentSearch> {
                 });
               },
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 margin: const EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.grey, width: 1),
-                  color: selectedIndex == index
-                      ? const Color(0xFF2B5C74)
-                      : Colors.transparent,
+                  color: selectedIndex == index ? const Color(0xFF2B5C74) : Colors.transparent,
                 ),
                 child: Text(
                   filters[index],
                   style: TextStyle(
                     color: selectedIndex == index ? Colors.white : Colors.grey,
-                    fontWeight: selectedIndex == index
-                        ? FontWeight.w700
-                        : FontWeight.w400,
+                    fontWeight: selectedIndex == index ? FontWeight.w700 : FontWeight.w400,
                   ),
                 ),
               ),
@@ -116,58 +110,44 @@ class _StudentSearchState extends State<StudentSearch> {
 
   Widget buildSearchResults() {
     return Expanded(
-      child: searchResults.isEmpty
-          ? const Center(
-              child: Text("No results found",
-                  style: TextStyle(color: Colors.grey)))
-          : ListView.builder(
-              itemCount: searchResults.length,
-              itemBuilder: (context, index) {
-                final product = searchResults[index];
+      child: ListView.builder(
+        itemCount: searchResults.length,
+        itemBuilder: (context, index) {
+          final product = searchResults[index];
 
-                return Card(
-                  color: const Color(0xFFD6D6D6),
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  elevation: 2,
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(12),
-                    leading: product['thumbnail_img'] != null
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: CachedNetworkImage(
-                              imageUrl: product[
-                                  'thumbnail_img'], // Use full URL from API
-                              width: 60,
-                              height: 60,
-                              fit: BoxFit.cover,
-                              errorWidget: (context, url, error) => const Icon(
-                                  Icons.image_not_supported,
-                                  size: 50,
-                                  color: Colors.grey),
-                            ),
-                          )
-                        : const Icon(Icons.image_not_supported,
-                            size: 50, color: Colors.grey),
-                    title: Text(
-                      product['title'] ?? 'No title',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Author: ${product['author'] ?? 'Unknown'}"),
-                        Text(
-                            "Language: ${product['language'] ?? 'Not specified'}"),
-                        Text("Price: ₹${product['price'] ?? 'N/A'}"),
-                      ],
-                    ),
-                  ),
-                );
-              },
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 2,
+            child: ListTile(
+              contentPadding: const EdgeInsets.all(12),
+              leading: product['thumbnail_img'] != null
+                  ? ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  'https://admin.uthix.com/storage/image/products/${product['thumbnail_img']}',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
+              )
+                  : const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+              title: Text(
+                product['title'] ?? 'No title',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Author: ${product['author'] ?? 'Unknown'}"),
+                  Text("Language: ${product['language'] ?? 'Not specified'}"),
+                  Text("Price: ₹${product['price'] ?? 'N/A'}"),
+                ],
+              ),
             ),
+          );
+        },
+      ),
     );
   }
 
@@ -198,7 +178,7 @@ class _StudentSearchState extends State<StudentSearch> {
           children: [
             TextField(
               controller: searchController,
-              onChanged: (value) => searchCategories(value),
+              onChanged: (value) => searchCategories(value), // Auto-search when typing
               decoration: InputDecoration(
                 hintText: 'Search by title, author, or language',
                 prefixIcon: const Icon(Icons.search, color: Color(0xFFAFAFAF)),
@@ -215,6 +195,8 @@ class _StudentSearchState extends State<StudentSearch> {
             const SizedBox(height: 16.0),
             isLoading
                 ? const Center(child: CircularProgressIndicator())
+                : searchResults.isEmpty
+                ? const Center(child: Text("No results found", style: TextStyle(color: Colors.grey)))
                 : buildSearchResults(),
           ],
         ),

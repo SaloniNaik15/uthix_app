@@ -5,9 +5,7 @@ import 'AdressSelection.dart';
 import 'PaymentProcessing.dart';
 
 class Studentcart extends StatefulWidget {
-  const Studentcart({
-    super.key,
-  });
+  const Studentcart({super.key, required List<Map<String, dynamic>> cartItems,});
 
   @override
   State<Studentcart> createState() => _StudentcartState();
@@ -22,7 +20,7 @@ class _StudentcartState extends State<Studentcart> {
   int selectedAddressId = 0;
 
   final Dio dio = Dio();
-  final String token = "98|q4pMTma28DC2Ux7aYc42zOKaTD9ZhwkGo7gIHfGo63a49e1e";
+  final String token = "9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64";
 
   @override
   void initState() {
@@ -30,10 +28,9 @@ class _StudentcartState extends State<Studentcart> {
     fetchCartItems();
   }
 
-  // 🔹 Fetch Cart Items API Call
 
   Future<void> fetchCartItems() async {
-    const String apiUrl = "https://admin.uthix.com/api/cart";
+    const String apiUrl = "https://admin.uthix.com/api/view-cart";
 
     try {
       final response = await dio.get(
@@ -41,26 +38,28 @@ class _StudentcartState extends State<Studentcart> {
         options: Options(headers: {"Authorization": "Bearer $token"}),
       );
 
-      if (response.statusCode == 200) {
+      print("Cart API Response: ${response.data}");
+
+      if (response.statusCode == 200 && response.data["status"] == true) {
         setState(() {
-          cartItems = List<Map<String, dynamic>>.from(response.data['cart']);
+          cartItems = List<Map<String, dynamic>>.from(response.data['cart']['items'] ?? []);
           isLoading = false;
         });
       } else {
-        print("Failed to load cart items");
+        print("Failed to load cart items: ${response.statusCode}");
         setState(() => isLoading = false);
       }
     } catch (e) {
-      print("1API Error: $e");
+      print("API Error: $e");
       setState(() => isLoading = false);
     }
   }
 
-  // 🔹 Calculate Total Price
+
   double get totalAmount {
     double total = cartItems.fold(0.0, (sum, item) {
-      double price = ((item['product']['discount_price'] ??
-              item['product']['price']) as num)
+      double price = ((item['product']['price'] ??
+              item['product']['discount_price']) as num)
           .toDouble();
       int quantity = item['quantity'];
 
@@ -69,52 +68,46 @@ class _StudentcartState extends State<Studentcart> {
     return total + shippingCost - discount;
   }
 
-  void updateQuantity(int cartId, int newQuantity) {
-    if (newQuantity < 1) {
-      removeItem(cartId); // Remove item if quantity < 1
-    } else {
-      setState(() {
-        var itemIndex = cartItems.indexWhere((item) => item['id'] == cartId);
-        if (itemIndex != -1) {
-          cartItems[itemIndex]['quantity'] = newQuantity;
-        }
-      });
-    }
-  }
-
-  // Remove Item from Cart API Call (Permanent Deletion)
-  Future<void> removeItem(int cartId) async {
-    const String deleteUrl = "https://admin.uthix.com/api/remove";
-
-    try {
-      final response = await dio.delete(
-        deleteUrl,
-        options: Options(headers: {"Authorization": "Bearer $token"}),
-        data: {"cart_id": cartId},
-      );
-
-      if (response.statusCode == 200) {
-        setState(() {
-          cartItems.removeWhere(
-              (item) => item['id'] == cartId); // Remove from UI permanently
-        });
-      } else {
-        print("Failed to remove item from cart");
-      }
-    } catch (e) {
-      print("API Error: $e");
-    }
-  }
-
   Future<void> placeOrder() async {
     const String orderApiUrl = "https://admin.uthix.com/api/orders";
 
+    if (cartItems.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("⚠️ Cart is empty. Please add items to proceed.")),
+      );
+      return;
+    }
+
+    if (selectedAddressId == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("⚠️ Please select a delivery address.")),
+      );
+      return;
+    }
+
+    List<Map<String, dynamic>> orderItems = cartItems.map((item) {
+      double price = (item['product']['discount_price'] ?? item['product']['price']).toDouble();
+      int quantity = item['quantity'];
+      return {
+        "product_id": item['product']['id'],
+        "quantity": quantity,
+        "price": price,
+        "total_price": (price * quantity).toStringAsFixed(2),
+      };
+    }).toList();
+
+    double subtotal = cartItems.fold(0.0, (sum, item) {
+      double price = (item['product']['discount_price'] ?? item['product']['price']).toDouble();
+      return sum + (item['quantity'] * price);
+    });
+
+    double totalPrice = subtotal + shippingCost - discount;
+
     final orderData = {
-      "address_id": 1,
-      "items": [
-        {"product_id": 1, "quantity": 1, "price": 150}
-      ],
-      "shipping_charge": 50,
+      "address_id": selectedAddressId,
+      "items": orderItems,
+      "total_amount": totalPrice.toStringAsFixed(2),
+      "shipping_charge": shippingCost.toStringAsFixed(2),
       "payment_method": "cod"
     };
 
@@ -130,8 +123,11 @@ class _StudentcartState extends State<Studentcart> {
         data: orderData,
       );
 
-      if (response.statusCode == 201 &&
-          response.data['message'] == "Order placed successfully") {
+      print("API Response: ${response.data}");
+
+      if (response.statusCode == 201 && response.data['message'] == "Order placed successfully") {
+        print("✅ Order Successfully Placed!");
+
         if (context.mounted) {
           Navigator.pushReplacement(
             context,
@@ -139,30 +135,65 @@ class _StudentcartState extends State<Studentcart> {
               builder: (context) => PaymentScreen(
                 orderId: response.data['order_id'],
                 orderNumber: response.data['order_number'],
-                totalPrice: 200, // 150 + 50 shipping
-                addressId: 1,
+                totalPrice: totalPrice.toInt(),
+                addressId: selectedAddressId,
               ),
             ),
           );
         }
       } else {
+        print("❌ API Error: ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-                "Failed to place order: ${response.data['message'] ?? 'Unknown error'}"),
+            content: Text("Failed to place order: ${response.data['message'] ?? 'Unknown error'}"),
           ),
         );
       }
     } catch (e) {
+      print("Exception: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error placing order: ${e.toString()}")),
+        SnackBar(content: Text("❌ Error placing order: ${e.toString()}")),
       );
     }
   }
 
+
+
+  void removeFromCart(int cartId) async {
+    final String apiUrl = "https://admin.uthix.com/api/remove-from-cart/$cartId";
+
+    try {
+      final response = await dio.delete(
+        apiUrl,
+        options: Options(headers: {"Authorization": "Bearer $token"}),
+      );
+
+      print("Remove API Response: ${response.data}"); // Debugging
+
+      if (response.statusCode == 200 && response.data["status"] == true) {
+        setState(() {
+          cartItems.removeWhere((item) => item["id"] == cartId);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Item removed from cart!")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to remove item: ${response.data['message']}")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
+      );
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("My Cart",
             style: TextStyle(
@@ -181,7 +212,17 @@ class _StudentcartState extends State<Studentcart> {
           },
         ),
       ),
-      body: Container(
+      body: isLoading ?
+          const Center(child:CircularProgressIndicator())
+      :cartItems.isEmpty?
+          const Center(
+            child:
+            Text("Cart is Empty",
+              style:
+              const TextStyle(fontSize: 18, fontFamily: "Urbanist"),
+            ),
+          ):
+      Container(
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -189,51 +230,41 @@ class _StudentcartState extends State<Studentcart> {
             children: <Widget>[
               //  Address Section
               Container(
-                padding: const EdgeInsets.all(5),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFD9D9D9)),
-                    color: const Color(0xFFF6F6F6)),
+                  border: Border.all(color: const Color(0xFFD9D9D9)),
+                  color: const Color(0xFFF6F6F6),
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "Deliver to this address: $selectedAddress",
-                      style:
-                          const TextStyle(fontSize: 14, fontFamily: "Urbanist"),
+                    Expanded(
+                      child: Text(
+                        selectedAddress.isNotEmpty ? "Deliver to: $selectedAddress" : "Select a delivery address",
+                        style: const TextStyle(fontSize: 14, fontFamily: "Urbanist"),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                     TextButton(
-                      onPressed: () async {
-                        final result = await showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.vertical(top: Radius.circular(20)),
-                          ),
-                          backgroundColor: Colors.transparent,
-                          builder: (context) {
-                            return AddressSelectionSheet(
-                                dio: dio, token: token);
-                          },
-                        );
-                        if (result != null) {
-                          setState(() {
-                            selectedAddress = result;
-                          });
-                        }
+                      onPressed: () {
+                        showAddressBottomSheet(context);
                       },
                       child: const Text(
                         "Change",
                         style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: "Urbanist",
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2B5C74)),
+                          fontSize: 14,
+                          fontFamily: "Urbanist",
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2B5C74),
+                        ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
+
+
+
               const SizedBox(height: 10),
 
               //  Cart Items List (Fetched from API)
@@ -243,30 +274,33 @@ class _StudentcartState extends State<Studentcart> {
                     : cartItems.isEmpty
                         ? const Center(child: Text("Your cart is empty."))
                         : ListView.builder(
-                            itemCount: cartItems.length,
-                            itemBuilder: (context, index) {
-                              final item = cartItems[index];
-                              final product = item['product'];
-                              final int cartId = item['id'];
-                              int quantity = item['quantity'];
-                              final String title = product['title'];
+                  itemCount: cartItems.length,
+                  itemBuilder: (context, index) {
+                    final item = cartItems[index];
+                    final product = item['product'];
+                    final int cartId = item['id'];
 
-                              // ✅ Convert price safely to double
-                              final double price =
-                                  ((product['discount_price'] ??
-                                          product['price']) as num)
-                                      .toDouble();
+                    int quantity = (item['quantity'] != null) ? (item['quantity'] as num).toInt() : 1;
 
-                              final String imageUrl = product[
-                                          'thumbnail_img'] !=
-                                      null
-                                  ? 'https://admin.uthix.com/storage/image/products/${product['thumbnail_img']}'
-                                  : "";
+                    final String title = product['title'];
+                    final double price = (product['price']).toDouble();
+                    final String imageUrl = (product['first_image'] != null && product['first_image']['image_path'] != null)
+                        ? 'https://admin.uthix.com/storage/image/products/${product['first_image']['image_path']}'
+                        : "https://via.placeholder.com/150";
 
-                              return buildCartItem(
-                                  cartId, title, imageUrl, price, quantity);
-                            },
-                          ),
+                    return buildCartItem(
+                        cartId,
+                        title,
+                        product['description'] ?? "No description available", // ✅ Pass Description
+                        imageUrl,
+                        price,
+                        quantity
+                    );
+                  },
+
+
+                ),
+
               ),
 
               // Discount Code Section
@@ -354,48 +388,94 @@ class _StudentcartState extends State<Studentcart> {
   }
 
   // 🔹 Build Cart Item
-  Widget buildCartItem(
-      int cartId, String title, String imageUrl, double price, int quantity) {
-    return Card(
-      elevation: 3,
-      margin: const EdgeInsets.symmetric(vertical: 5),
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            Image.network(imageUrl, width: 70, height: 90, fit: BoxFit.cover),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+  Widget buildCartItem(int cartId, String title, String description, String imageUrl, double price, int quantity) {
+    int quantity = 1;
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Color(0xFFF6F6F6),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 5,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Book Image
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  imageUrl,
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    width: 100,
+                    height: 100,
+                    color: Colors.white,
+                    child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 12), // Spacing
+
+              // Book Details + Quantity Controls
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    // Book Title (Blue)
+                    Text(
+                      title,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     const SizedBox(height: 5),
-                    Text("₹${price.toStringAsFixed(2)}",
-                        style: const TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold)),
 
-                    // 📌 Quantity Control Buttons (No API Calls)
+                    // Book Description
+                    Text(
+                      description,
+                      style: const TextStyle(fontSize: 12, color: Colors.black87),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.remove_circle_outline),
+                          icon: const Icon(Icons.remove_circle_outline, color: Colors.black),
                           onPressed: () {
-                            updateQuantity(cartId, quantity - 1);
+                            if (quantity > 1) {
+                              setState(() {
+                                quantity--;
+                              });
+                            } else {
+                              removeFromCart(cartId);
+                            }
                           },
                         ),
-                        Text("$quantity",
-                            style: const TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.bold)),
+                        Text(
+                          "$quantity",
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
                         IconButton(
-                          icon: const Icon(Icons.add_circle_outline),
+                          icon: const Icon(Icons.add_circle_outline, color: Colors.black),
                           onPressed: () {
-                            updateQuantity(cartId, quantity + 1);
+                            setState(() {
+                              quantity++;
+                            });
                           },
                         ),
                       ],
@@ -403,17 +483,32 @@ class _StudentcartState extends State<Studentcart> {
                   ],
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: () => updateQuantity(
-                  cartId, 0), // ✅ Clicking delete sets quantity to 0
-            ),
-          ],
-        ),
-      ),
+
+
+              Column(
+               crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.black),
+                    onPressed: () {
+                      removeFromCart(cartId);
+                    },
+                  ),
+                  Text(
+                    "₹${price.toInt()}",
+                    style: const TextStyle(fontSize: 16, fontFamily: "Urbanist",fontWeight: FontWeight.w400),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
+
+
 
   Widget buildPriceRow(String title, String value, {bool isBold = false}) {
     return Padding(
@@ -448,10 +543,21 @@ class _StudentcartState extends State<Studentcart> {
         return AddressSelectionSheet(dio: dio, token: token);
       },
     );
-    if (result != null) {
+
+
+    if (result != null && result is Map<String, dynamic> && result.containsKey("data")) {
+      final addressData = result["data"];
+
       setState(() {
-        selectedAddress = result;
+        selectedAddress = "${addressData['street']}, ${addressData['city']}";
+        selectedAddressId = addressData["id"]; // ✅ Save Address ID
       });
+
+      print("✅ Address Selected: $selectedAddress");
+      print("✅ Address ID Updated: $selectedAddressId");
+    } else {
+      print("⚠️ Address selection was canceled or invalid data received.");
     }
   }
+
 }

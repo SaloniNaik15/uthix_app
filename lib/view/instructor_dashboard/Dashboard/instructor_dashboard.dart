@@ -2,14 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uthix_app/modal/navbarWidgetInstructor.dart';
-import 'package:uthix_app/modal/navbarWidgetInstructor.dart';
-import 'package:uthix_app/view/instructor_dashboard/calender/calender.dart';
-
 import 'package:uthix_app/view/instructor_dashboard/Chat/chat.dart';
-import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
-import 'package:uthix_app/view/instructor_dashboard/Dashboard/my_classes.dart';
 import 'package:uthix_app/view/instructor_dashboard/Class/newclass.dart';
+import 'package:uthix_app/view/instructor_dashboard/Dashboard/my_classes.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/profile_account.dart';
+import 'package:uthix_app/view/instructor_dashboard/calender/calender.dart';
+import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
 
 class InstructorDashboard extends StatefulWidget {
   const InstructorDashboard({super.key});
@@ -66,7 +64,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
 
   final Dio _dio = Dio();
   final String apiUrl = "https://admin.uthix.com/api/classroom";
-  final String token = "3|SkCLy7WfUwBHDUD0B2KSBi6JiGmji7aqbQDhr7Oa0f78c8bf";
+  final String token = "129|R7THr97G2ycwBYljdixjLa6EIUNMYZZ4tzAuU5Esbe4f2409";
 
   List<Map<String, dynamic>> subjects = [];
   int? selectedSubjectId;
@@ -212,7 +210,10 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   Future<void> _fetchSubjects() async {
     try {
       Response response = await _dio.get("https://admin.uthix.com/api/subject",
-          options: Options(headers: {"Authorization": "Bearer $token"}));
+          options: Options(headers: {
+            "Authorization":
+                "Bearer 27|aUCqamch2YylbeJhdTWp7UWsWORc2DcBonSoscPw79712c20"
+          }));
       if (response.statusCode == 200) {
         setState(() {
           subjects = List<Map<String, dynamic>>.from(response.data["subjects"]);

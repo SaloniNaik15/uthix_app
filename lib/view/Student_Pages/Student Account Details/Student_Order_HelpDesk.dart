@@ -96,7 +96,6 @@ class _StudentOrderHelpdeskState extends State<StudentOrderHelpdesk> {
               const Divider(height: 1),
               const SizedBox(height: 20),
               BookList(books: books),
-
               const SizedBox(height: 10),
               const Divider(height: 1),
               const SizedBox(height: 20),
@@ -120,7 +119,8 @@ class _StudentOrderHelpdeskState extends State<StudentOrderHelpdesk> {
                   BrowseCard(icon: Icons.person, text: "Account"),
                   BrowseCard(icon: Icons.sync, text: "Returns and Exchange"),
                   BrowseCard(icon: Icons.local_offer, text: "Offers"),
-                  BrowseCard(icon: Icons.credit_card, text: "Cancellation and Charge"),
+                  BrowseCard(
+                      icon: Icons.credit_card, text: "Cancellation and Charge"),
                 ],
               ),
             ],
@@ -135,8 +135,7 @@ class BrowseCard extends StatelessWidget {
   final IconData icon;
   final String text;
 
-  const BrowseCard({Key? key, required this.icon, required this.text})
-      : super(key: key);
+  const BrowseCard({super.key, required this.icon, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +156,8 @@ class BrowseCard extends StatelessWidget {
             Expanded(
               child: Text(
                 text,
-                style: const TextStyle(fontSize: 16,fontFamily: "Urbanist",color: Colors.black),
+                style: const TextStyle(
+                    fontSize: 16, fontFamily: "Urbanist", color: Colors.black),
               ),
             ),
           ],
@@ -170,7 +170,7 @@ class BrowseCard extends StatelessWidget {
 class BookList extends StatelessWidget {
   final List<Map<String, dynamic>> books;
 
-  const BookList({Key? key, required this.books}) : super(key: key);
+  const BookList({super.key, required this.books});
 
   @override
   Widget build(BuildContext context) {
@@ -203,6 +203,8 @@ class BookList extends StatelessWidget {
 }
 
 class OrderStatusRow extends StatelessWidget {
+  const OrderStatusRow({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -248,7 +250,7 @@ class OrderStatusRow extends StatelessWidget {
 class BookCard extends StatelessWidget {
   final Map<String, dynamic> book;
 
-  const BookCard({Key? key, required this.book}) : super(key: key);
+  const BookCard({super.key, required this.book});
 
   @override
   Widget build(BuildContext context) {
@@ -325,4 +327,3 @@ class BookCard extends StatelessWidget {
     );
   }
 }
-

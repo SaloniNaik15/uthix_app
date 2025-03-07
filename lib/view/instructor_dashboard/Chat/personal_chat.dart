@@ -33,6 +33,7 @@ class _PersonalChatState extends State<PersonalChat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFFF3F4F6),
       body: Column(
         children: [
           // Header Section

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class StudentHelpdesk extends StatefulWidget {
@@ -99,12 +98,12 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
                   hintText: "Start typing...",
                   filled: true,
                   hintStyle:
-                  const TextStyle(fontFamily: "Urbanist", fontSize: 16),
+                      const TextStyle(fontFamily: "Urbanist", fontSize: 16),
                   fillColor: const Color(0xFFF6F6F6),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide:
-                      const BorderSide(color: Color(0xFFD2D2D2), width: 1)),
+                          const BorderSide(color: Color(0xFFD2D2D2), width: 1)),
                 ),
               ),
               const SizedBox(
@@ -126,11 +125,11 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
                   filled: true,
                   fillColor: const Color(0xFFF6F6F6),
                   hintStyle:
-                  const TextStyle(fontFamily: "Urbanist", fontSize: 16),
+                      const TextStyle(fontFamily: "Urbanist", fontSize: 16),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide:
-                      const BorderSide(color: Color(0xFFD2D2D2), width: 1)),
+                          const BorderSide(color: Color(0xFFD2D2D2), width: 1)),
                 ),
                 textAlign: TextAlign.left,
                 textAlignVertical: TextAlignVertical.top,
@@ -159,8 +158,7 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                               // Rounded corners
-                            )
-                        ),
+                            )),
                         onPressed: () {
                           print("Outlined Button Pressed!");
                         },

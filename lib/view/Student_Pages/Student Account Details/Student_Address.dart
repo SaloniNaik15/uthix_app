@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'Student_Add_Address.dart';
 
+
 class StudentAddress extends StatefulWidget {
   const StudentAddress({super.key});
 
@@ -45,6 +46,7 @@ class _StudentAddressState extends State<StudentAddress> {
       print("Error fetching addresses: $e");
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -104,115 +106,113 @@ class _StudentAddressState extends State<StudentAddress> {
             child: addresses.isEmpty
                 ? Center(child: CircularProgressIndicator())
                 : ListView.builder(
-                    itemCount: addresses.length,
-                    itemBuilder: (context, index) {
-                      final address = addresses[index];
+              itemCount: addresses.length,
+              itemBuilder: (context, index) {
+                final address = addresses[index];
 
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (index == 0 ||
-                              addresses[index - 1]["address_type"] !=
-                                  address["address_type"])
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                address["address_type"] ?? "Other Addresses",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: "Urbanist",
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            ),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (index == 0 ||
+                        addresses[index - 1]["address_type"] !=
+                            address["address_type"])
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          address["address_type"] ?? "Other Addresses",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: "Urbanist",
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
 
-                          // Address Card
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedAddressIndex = index;
-                              });
-                            },
-                            child: Container(
-                              width: double.infinity,
-                              padding: EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: selectedAddressIndex == index
-                                    ? Colors.white
-                                    : Color(0xFFF6F6F6),
-                                border: Border.all(color: Colors.grey.shade300),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    address["name"] ?? "N/A",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(address["area"] ?? "N/A"),
-                                  Text(address["street"] ?? ""),
-                                  Text(address["city"] ?? ""),
-                                  Text(address["postal_code"] ?? ""),
-                                  Text(
-                                      "Mobile Number: ${address["phone"] ?? "N/A"}"),
-                                ],
-                              ),
+                    // Address Card
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedAddressIndex = index;
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: selectedAddressIndex == index
+                              ? Colors.white
+                              : Color(0xFFF6F6F6),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              address["name"] ?? "N/A",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600),
                             ),
+                            SizedBox(height: 4),
+                            Text(address["area"] ?? "N/A"),
+                            Text(address["street"] ?? ""),
+                            Text(address["city"] ?? ""),
+                            Text(address["postal_code"] ?? ""),
+                            Text("Mobile Number: ${address["phone"] ?? "N/A"}"),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // Edit & Remove Buttons (Visible only if selected)
+                    if (selectedAddressIndex == index)
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border(
+                            top: BorderSide(color: Colors.grey.shade300),
                           ),
-
-                          // Edit & Remove Buttons (Visible only if selected)
-                          if (selectedAddressIndex == index)
-                            Container(
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border(
-                                  top: BorderSide(color: Colors.grey.shade300),
-                                ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Edit Address
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.grey),
+                                padding:
+                                EdgeInsets.symmetric(horizontal: 40),
                               ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      // Handle Edit Address
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white,
-                                      side: BorderSide(color: Colors.grey),
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 40),
-                                    ),
-                                    child: Text("Edit",
-                                        style: TextStyle(color: Colors.black)),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      await _deleteAddress(address["id"]);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white,
-                                      side: BorderSide(color: Colors.grey),
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 40),
-                                    ),
-                                    child: Text("Remove",
-                                        style: TextStyle(
-                                            fontFamily: "Urbanist",
-                                            color: Colors.black)),
-                                  ),
-                                ],
-                              ),
+                              child: Text("Edit",
+                                  style: TextStyle(color: Colors.black)),
                             ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                await _deleteAddress(address["id"]);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.grey),
+                                padding:
+                                EdgeInsets.symmetric(horizontal: 40),
+                              ),
+                              child: Text("Remove",
+                                  style: TextStyle(
+                                      fontFamily: "Urbanist",
+                                      color: Colors.black)),
+                            ),
+                          ],
+                        ),
+                      ),
 
-                          SizedBox(height: 16), // Spacing
-                        ],
-                      );
-                    },
-                  ),
+                    SizedBox(height: 16), // Spacing
+                  ],
+                );
+              },
+            ),
           ),
         ],
       ),

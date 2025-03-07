@@ -49,6 +49,8 @@ class _OrderProcessingState extends State<OrderProcessing> {
 
 //  Single Card for Order Details + Tracking
 class OrderAndTrackingCard extends StatelessWidget {
+  const OrderAndTrackingCard({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -150,7 +152,8 @@ class TrackingStep extends StatelessWidget {
   final String? date;
   final bool completed;
 
-  TrackingStep({required this.title, this.date, required this.completed});
+  const TrackingStep(
+      {super.key, required this.title, this.date, required this.completed});
 
   @override
   Widget build(BuildContext context) {
@@ -193,6 +196,8 @@ class TrackingStep extends StatelessWidget {
 
 //  Separate Address Section
 class AddressSection extends StatelessWidget {
+  const AddressSection({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -218,6 +223,8 @@ class AddressSection extends StatelessWidget {
 
 //  Separate Price Details Section
 class PriceDetailsSection extends StatelessWidget {
+  const PriceDetailsSection({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Card(

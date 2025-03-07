@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+
+import 'package:google_fonts/google_fonts.dart';
 import 'package:uthix_app/modal/navbarWidgetStudent.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
 import 'package:uthix_app/view/Student_Pages/Files/files.dart';
 import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
 import 'package:uthix_app/view/Student_Pages/Student_Chat/stud_chat.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../Buy_Books/Coupons.dart';
 import '../Buy_Books/Wishlist.dart';

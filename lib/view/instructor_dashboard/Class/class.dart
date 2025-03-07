@@ -5,9 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:uthix_app/view/instructor_dashboard/Class/announcement.dart';
 import 'package:uthix_app/view/instructor_dashboard/Class/live_classes.dart';
 
-import 'package:uthix_app/view/instructor_dashboard/Class/new_announcement.dart';
-import 'package:uthix_app/view/instructor_dashboard/submission/submission.dart';
-
 class InstructorClass extends StatefulWidget {
   const InstructorClass({super.key});
 
@@ -19,7 +16,7 @@ class _InstructorClassState extends State<InstructorClass> {
   List<dynamic> classData = [];
   bool isLoading = true;
   int currentIndex = 0;
-  final String token = "3|SkCLy7WfUwBHDUD0B2KSBi6JiGmji7aqbQDhr7Oa0f78c8bf";
+  final String token = "129|R7THr97G2ycwBYljdixjLa6EIUNMYZZ4tzAuU5Esbe4f2409";
 
   @override
   void initState() {
@@ -29,7 +26,7 @@ class _InstructorClassState extends State<InstructorClass> {
 
   Future<void> fetchClassData() async {
     try {
-      print("Fetching class data..."); // Debugging
+      print("Fetching class data...");
 
       var response = await Dio().get(
         'https://admin.uthix.com/api/subject-classes/1',

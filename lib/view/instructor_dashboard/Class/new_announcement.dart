@@ -16,6 +16,7 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -57,8 +58,7 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
                     if (announcementText.isNotEmpty) {
                       Provider.of<AnnouncementProvider>(context, listen: false)
                           .updateAnnouncement(announcementText);
-                      Navigator.pop(context,
-                          announcementText); // ✅ Send data back to `class.dart`
+                      Navigator.pop(context, announcementText);
                     }
                   },
                   child: Container(

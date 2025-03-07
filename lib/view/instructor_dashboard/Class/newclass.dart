@@ -16,7 +16,7 @@ class _NewclassState extends State<Newclass> {
   TimeOfDay? _selectTime;
   final Dio _dio = Dio();
   final String apiUrl = "https://admin.uthix.com/api/class-chapter";
-  final String token = "3|SkCLy7WfUwBHDUD0B2KSBi6JiGmji7aqbQDhr7Oa0f78c8bf";
+  final String token = "129|R7THr97G2ycwBYljdixjLa6EIUNMYZZ4tzAuU5Esbe4f2409";
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   bool sendReminder = false;
@@ -35,8 +35,7 @@ class _NewclassState extends State<Newclass> {
       "classroom_id": 2,
       "title": titleController.text.trim(),
       "date": DateFormat('yyyy-MM-dd').format(_selectdate!),
-      "time":
-          "${_selectTime!.hour.toString().padLeft(2, '0')}:${_selectTime!.minute.toString().padLeft(2, '0')}:00",
+      "time": "${_selectTime!.hour.toString().padLeft(2, '0')}:${_selectTime!.minute.toString().padLeft(2, '0')}:00",
       "timezone": "IST",
       "description": descriptionController.text.trim(),
     };
@@ -86,6 +85,7 @@ class _NewclassState extends State<Newclass> {
     }
   }
 
+
   Future<void> _pickDatefunc() async {
     DateTime? pickdate = await showDatePicker(
       context: context,
@@ -129,39 +129,22 @@ class _NewclassState extends State<Newclass> {
               ),
               const SizedBox(height: 16),
               Text("Start a New Class",
-                  style: GoogleFonts.urbanist(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black)),
+                  style: GoogleFonts.urbanist(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.black)),
               const SizedBox(height: 8),
               TextField(
                 controller: titleController,
                 decoration: InputDecoration(
                   hintText: "Add Title",
-                  hintStyle: GoogleFonts.urbanist(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey),
+                  hintStyle: GoogleFonts.urbanist(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.grey),
                   border: InputBorder.none,
                 ),
               ),
               const SizedBox(height: 20),
-              _buildOptionRow(
-                  Icons.calendar_today,
-                  "Pick a Date",
-                  _selectdate != null
-                      ? DateFormat('EEE, dd MMM, yyyy').format(_selectdate!)
-                      : "",
-                  _pickDatefunc),
+              _buildOptionRow(Icons.calendar_today, "Pick a Date",
+                  _selectdate != null ? DateFormat('EEE, dd MMM, yyyy').format(_selectdate!) : "", _pickDatefunc),
               const SizedBox(height: 20),
-              _buildOptionRow(
-                  Icons.access_time,
-                  "Pick a Time",
-                  _selectTime != null
-                      ? DateFormat('hh:mm a').format(DateTime(
-                          2025, 1, 1, _selectTime!.hour, _selectTime!.minute))
-                      : "",
-                  _selectTimefunc),
+              _buildOptionRow(Icons.access_time, "Pick a Time",
+                  _selectTime != null ? DateFormat('hh:mm a').format(DateTime(2025, 1, 1, _selectTime!.hour, _selectTime!.minute)) : "", _selectTimefunc),
               const SizedBox(height: 20),
               _buildOptionRow(Icons.public, "Indian Standard Time", ""),
               const SizedBox(height: 20),
@@ -183,15 +166,11 @@ class _NewclassState extends State<Newclass> {
                           sendReminder = value!;
                         });
                       },
-                      activeColor: Color(0xFF2B5C74),
+                      activeColor:Color(0xFF2B5C74),
                     ),
                     Expanded(
-                      child: Text(
-                          "Send Class Reminder to everyone in the Class",
-                          style: GoogleFonts.urbanist(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFF605F5F))),
+                      child: Text("Send Class Reminder to everyone in the Class",
+                          style: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400, color: Color(0xFF605F5F))),
                     ),
                   ],
                 ),
@@ -212,10 +191,7 @@ class _NewclassState extends State<Newclass> {
                     ),
                     child: Center(
                       child: Text("SAVE",
-                          style: GoogleFonts.urbanist(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white)),
+                          style: GoogleFonts.urbanist(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
                     ),
                   ),
                 ),
@@ -228,26 +204,17 @@ class _NewclassState extends State<Newclass> {
     );
   }
 
-  Widget _buildOptionRow(IconData icon, String title, String value,
-      [VoidCallback? onTap]) {
+  Widget _buildOptionRow(IconData icon, String title, String value, [VoidCallback? onTap]) {
     return GestureDetector(
       onTap: onTap,
       child: Row(
         children: [
           Icon(icon, color: Colors.black, size: 22),
           const SizedBox(width: 12),
-          Text(title,
-              style: GoogleFonts.urbanist(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black)),
+          Text(title, style: GoogleFonts.urbanist(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
           const Spacer(),
           if (value.isNotEmpty)
-            Text(value,
-                style: GoogleFonts.urbanist(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.blue)),
+            Text(value, style: GoogleFonts.urbanist(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.blue)),
         ],
       ),
     );
@@ -262,10 +229,7 @@ class _NewclassState extends State<Newclass> {
             const Icon(Icons.description, color: Colors.black, size: 22),
             const SizedBox(width: 12),
             Text("Add Description",
-                style: GoogleFonts.urbanist(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black)),
+                style: GoogleFonts.urbanist(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black)),
           ],
         ),
         const SizedBox(height: 8),
@@ -274,8 +238,7 @@ class _NewclassState extends State<Newclass> {
           maxLines: 3,
           decoration: InputDecoration(
             hintText: "Enter class description...",
-            hintStyle: GoogleFonts.urbanist(
-                fontSize: 14, fontWeight: FontWeight.w400, color: Colors.grey),
+            hintStyle: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.grey),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           ),
         ),

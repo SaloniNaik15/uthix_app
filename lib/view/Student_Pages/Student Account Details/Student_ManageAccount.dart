@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class StudentManageAccount extends StatefulWidget {
@@ -41,7 +40,8 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
               // Profile Image
               CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage("assets/Seller_dashboard_images/ManageStoreBackground.png"), // Replace with network image if needed
+                backgroundImage: AssetImage(
+                    "assets/Seller_dashboard_images/ManageStoreBackground.png"), // Replace with network image if needed
               ),
               const SizedBox(height: 10),
               const Text(
@@ -50,13 +50,16 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
                   fontSize: 16,
                   fontFamily: "Urbanist",
                   fontWeight: FontWeight.bold,
-                  color:  Color(0xFF2B5C74),
+                  color: Color(0xFF2B5C74),
                 ),
               ),
               const Text(
                 "Class X B\nDelhi Public School, New Delhi\n+91 XXXXXX XXXXX",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, fontFamily: "Urbanist",fontWeight: FontWeight.w400),
+                style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: "Urbanist",
+                    fontWeight: FontWeight.w400),
               ),
               const SizedBox(height: 20),
 
@@ -80,7 +83,10 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
                       ),
                       child: Text(
                         "Log out",
-                        style: TextStyle(color: Colors.red,fontFamily: "Urbanist", fontSize: 16),
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontFamily: "Urbanist",
+                            fontSize: 16),
                       ),
                     ),
                   ),
@@ -98,7 +104,10 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
                       ),
                       child: Text(
                         "Add Account",
-                        style: TextStyle(color: Colors.black, fontFamily: "Urbanist",fontSize: 16),
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontFamily: "Urbanist",
+                            fontSize: 16),
                       ),
                     ),
                   ),
@@ -121,25 +130,25 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
           fillColor: Color(0xFFFCFCFC),
           prefixIcon: Icon(
             icon,
-            color:  Colors.grey,
+            color: Colors.grey,
           ),
           hintText: text,
           hintStyle: TextStyle(
-            color:  Color(0xFF605F5F),
+            color: Color(0xFF605F5F),
             fontWeight: FontWeight.w500,
           ),
           enabled: false,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide(
-              color:  Color(0xFFD2D2D2),
+              color: Color(0xFFD2D2D2),
               width: 2,
             ),
           ),
           disabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide(
-              color:  Color(0xFFD2D2D2),
+              color: Color(0xFFD2D2D2),
               width: 1,
             ),
           ),
@@ -147,5 +156,4 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
       ),
     );
   }
-
 }

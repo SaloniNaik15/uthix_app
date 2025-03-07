@@ -10,7 +10,7 @@ class StudentFaq extends StatefulWidget {
 
 class _StudentFaqState extends State<StudentFaq> {
   // List to store the expanded state for each list item
-  List<bool> _expandedStates = List.filled(8, false);
+  final List<bool> _expandedStates = List.filled(8, false);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +25,7 @@ class _StudentFaqState extends State<StudentFaq> {
               leading: IconButton(
                 icon: const Icon(
                   Icons.arrow_back_ios_outlined,
-                  color:Color(0xFF605F5F),
+                  color: Color(0xFF605F5F),
                 ),
                 onPressed: () {
                   Navigator.pop(context);
@@ -40,14 +40,15 @@ class _StudentFaqState extends State<StudentFaq> {
                 width: 80, // Adjust the size as needed
                 height: 80,
               ),
-
             ),
           ],
         ),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15,),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 15,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -72,7 +73,7 @@ class _StudentFaqState extends State<StudentFaq> {
                         _buildListTile(
                           index: index,
                           title:
-                          "What is the required time duration for an order to get delivered?",
+                              "What is the required time duration for an order to get delivered?",
                         ),
                         if (_expandedStates[index])
                           const Padding(
@@ -97,6 +98,7 @@ class _StudentFaqState extends State<StudentFaq> {
       ),
     );
   }
+
   Widget _buildListTile({
     required int index,
     required String title,
@@ -121,7 +123,7 @@ class _StudentFaqState extends State<StudentFaq> {
       onTap: () {
         setState(() {
           _expandedStates[index] = !_expandedStates[
-          index]; // Toggle the expansion state for the selected item
+              index]; // Toggle the expansion state for the selected item
         });
       },
     );

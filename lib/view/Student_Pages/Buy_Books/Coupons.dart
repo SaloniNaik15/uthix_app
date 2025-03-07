@@ -21,17 +21,31 @@ class _CouponsScreenState extends State<CouponsScreen> {
   }
 
   Future<void> fetchCoupons() async {
+    const String apiUrl = "https://admin.uthix.com/api/manage-coupon";
+    const String token = "9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64"; // Your API token
+
     try {
-      var response = await Dio().get('https://admin.uthix.com/api/coupons');
+      final response = await Dio().get(
+        apiUrl,
+        options: Options(
+          headers: {"Authorization": "Bearer $token"}, // Include Token
+        ),
+      );
+
+      print("Coupons API Response: ${response.data}");
+
       if (response.statusCode == 200 && response.data['status'] == true) {
         setState(() {
           coupons = response.data['coupons'];
         });
+      } else {
+        print("Failed to fetch coupons: ${response.statusCode}");
       }
     } catch (e) {
       print("Error fetching coupons: $e");
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -96,26 +110,28 @@ class _CouponsScreenState extends State<CouponsScreen> {
                           selectedTab = index;
                         });
                       },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 5),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 33, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          border: Border.all(
+                      child: SingleChildScrollView(
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 5),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            border: Border.all(
+                                color: selectedTab == index
+                                    ? const Color(0xFF2B5C74)
+                                    : Colors.grey),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            tabs[index],
+                            style: TextStyle(
                               color: selectedTab == index
                                   ? const Color(0xFF2B5C74)
-                                  : Colors.grey),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          tabs[index],
-                          style: TextStyle(
-                            color: selectedTab == index
-                                ? const Color(0xFF2B5C74)
-                                : Colors.grey,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Urbanist',
+                                  : Colors.grey,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Urbanist',
+                            ),
                           ),
                         ),
                       ),

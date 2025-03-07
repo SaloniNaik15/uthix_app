@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:uthix_app/view/Student_Pages/Buy_Books/Buybookspages.dart';
+import 'package:uthix_app/view/Student_Pages/Buy_Books/BuyBooksPages.dart';
 import 'StudentSearch.dart';
 
 class BuyTextBooks extends StatefulWidget {
@@ -66,10 +66,19 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
         preferredSize: const Size.fromHeight(70),
         child: AppBar(
           backgroundColor: const Color(0xFF2B5C74),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           title: const Text(
             "Buy Textbooks",
             style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
           centerTitle: false,
           actions: [
@@ -88,15 +97,15 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
                     ),
                   ],
                 ),
-                child: IconButton(
-                  icon: const Icon(Icons.search, color: Colors.black),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => StudentSearch()),
-                    );
-                  },
-                ),
+                // child: IconButton(
+                //   icon: const Icon(Icons.search, color: Colors.black),
+                //   onPressed: () {
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(builder: (context) => StudentSearch()),
+                //     );
+                //   },
+                // ),
               ),
             ),
           ],
@@ -121,9 +130,9 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              crossAxisSpacing: 2.0,
-                              mainAxisSpacing: 1.0,
-                              childAspectRatio: 1.20,
+                              crossAxisSpacing: 1.0,
+                              mainAxisSpacing: 0.5,
+                              childAspectRatio: 1.3,
                             ),
                             itemCount: categories.length,
                             itemBuilder: (context, index) {

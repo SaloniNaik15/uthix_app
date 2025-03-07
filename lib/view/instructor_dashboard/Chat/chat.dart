@@ -5,9 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:uthix_app/modal/navbarWidgetInstructor.dart';
 import 'package:uthix_app/view/instructor_dashboard/Chat/new_chat.dart';
 import 'package:uthix_app/view/instructor_dashboard/Chat/personal_chat.dart';
-import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
 import 'package:uthix_app/view/instructor_dashboard/Dashboard/instructor_dashboard.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/profile_account.dart';
+import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
 
 class Chat extends StatefulWidget {
   const Chat({super.key});
@@ -54,6 +54,7 @@ class _ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -137,7 +138,7 @@ class _ChatState extends State<Chat> {
               ),
               const SizedBox(height: 10),
               SizedBox(
-                height: 605,
+                height: 580,
                 child: ListView.builder(
                   itemCount: 10,
                   itemBuilder: (context, index) {
@@ -239,7 +240,7 @@ class _ChatState extends State<Chat> {
                   },
                 ),
               ),
-              // const SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
           Positioned(
@@ -271,7 +272,7 @@ class _ChatState extends State<Chat> {
             ),
           ),
           Positioned(
-            bottom: 20,
+            bottom: 30,
             left: 0,
             right: 0,
             child: Center(

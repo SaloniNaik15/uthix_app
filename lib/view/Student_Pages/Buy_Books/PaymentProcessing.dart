@@ -91,7 +91,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         Uri.parse('https://admin.uthix.com/api/update-payment-status'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': '5|pKDOSuu1c2ouMpCV6BJsuiwohmpwIOd5zxMTGMUy0effabee',
+          'Authorization': '98|q4pMTma28DC2Ux7aYc42zOKaTD9ZhwkGo7gIHfGo63a49e1e',
         },
         body: jsonEncode({
           'order_id': widget.orderId,

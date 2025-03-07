@@ -120,7 +120,7 @@ class OrderCard extends StatelessWidget {
   final VoidCallback onUpdateStatus;
 
   const OrderCard({
-    Key? key,
+    super.key,
     required this.orderStatus,
     required this.orderDate,
     required this.bookName,
@@ -128,7 +128,7 @@ class OrderCard extends StatelessWidget {
     required this.price,
     required this.imagePath,
     required this.onUpdateStatus,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
