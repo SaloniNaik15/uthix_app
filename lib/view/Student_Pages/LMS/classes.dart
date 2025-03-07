@@ -95,7 +95,7 @@ class _ClassesState extends State<Classes> {
                   Row(
                     children: [
                       Text(
-                        "Mathematics",
+                        "Maths",
                         style: GoogleFonts.urbanist(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
