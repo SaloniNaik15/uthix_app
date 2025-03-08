@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/homeRegistration/mailIdPage.dart';
 import 'package:uthix_app/view/homeRegistration/successPage.dart';
 import 'package:uthix_app/view/homeRegistration/successPhone.dart';
+import 'package:uthix_app/view/login/start_login.dart';
 
 class Registration extends StatefulWidget {
   const Registration({super.key});
@@ -125,7 +126,12 @@ class _RegistrationState extends State<Registration> {
                     ),
                     const SizedBox(height: 20),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => StartLogin()));
+                      },
                       child: Container(
                         height: 50,
                         width: 277,
