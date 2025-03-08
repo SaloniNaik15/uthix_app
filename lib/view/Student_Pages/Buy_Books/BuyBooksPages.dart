@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+ import 'package:shared_preferences/shared_preferences.dart';
 import 'BookDetails.dart';
 import 'StudentCart.dart';
 import 'StudentSearch.dart';
@@ -56,7 +57,8 @@ class _BuybookspagesState extends State<Buybookspages> {
   }
 
   //  Add to Cart API Call
-  Future<void> addToCart(BuildContext context, Map<String, dynamic> product, int quantity) async {
+  Future<void> addToCart(
+      BuildContext context, Map<String, dynamic> product, int quantity) async {
     const String token = "9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64";
     const String apiUrl = "https://admin.uthix.com/api/add-to-cart";
 
@@ -106,7 +108,9 @@ class _BuybookspagesState extends State<Buybookspages> {
       } else {
         print("API Error: ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to add to cart: ${response.data['message'] ?? 'Unknown error'}")),
+          SnackBar(
+              content: Text(
+                  "Failed to add to cart: ${response.data['message'] ?? 'Unknown error'}")),
         );
       }
     } catch (e) {
@@ -116,8 +120,6 @@ class _BuybookspagesState extends State<Buybookspages> {
       );
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -132,16 +134,22 @@ class _BuybookspagesState extends State<Buybookspages> {
         actions: [
           _iconButton(
               Icons.search,
-              () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => StudentSearch()))),
+              () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => StudentSearch(categoryId: null)))),
           _iconButton(
               Icons.favorite_border,
               () => Navigator.push(context,
                   MaterialPageRoute(builder: (context) => Wishlist()))),
           _iconButton(
               Icons.shopping_bag_outlined,
-              () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Studentcart(cartItems: [],)))),
+              () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Studentcart(
+                            cartItems: [],
+                          )))),
         ],
         elevation: 0,
       ),
@@ -168,8 +176,6 @@ class _BuybookspagesState extends State<Buybookspages> {
                           addToCart: addToCart,
                         ),
                       ),
-
-
                     ],
                   ),
                 ),
@@ -203,7 +209,10 @@ class SortByButton extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 15),
             child: const Text("Sort by",
-                style: TextStyle(fontSize: 18,fontFamily: 'Urbanist', fontWeight: FontWeight.w500)),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'Urbanist',
+                    fontWeight: FontWeight.w500)),
           ),
           const Divider(),
           _sortOption(context, "Relevance"),
@@ -219,7 +228,11 @@ class SortByButton extends StatelessWidget {
 
   Widget _sortOption(BuildContext context, String title) {
     return ListTile(
-      title: Text(title, style: const TextStyle(fontSize: 16,fontFamily: 'Urbanist',)),
+      title: Text(title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontFamily: 'Urbanist',
+          )),
       onTap: () => Navigator.pop(context),
     );
   }
@@ -249,28 +262,51 @@ class SortByButton extends StatelessWidget {
 
 class BookItemsList extends StatefulWidget {
   final List<Map<String, dynamic>> books;
-  final Future<void> Function(BuildContext, Map<String, dynamic>, int) addToCart;
+  final Future<void> Function(BuildContext, Map<String, dynamic>, int)
+      addToCart;
 
   const BookItemsList({
-    super.key,
+    Key? key,
     required this.books,
     required this.addToCart,
-  });
+  }) : super(key: key);
 
   @override
   _BookItemsListState createState() => _BookItemsListState();
 }
 
-
 class _BookItemsListState extends State<BookItemsList> {
   Set<int> wishlist = {};
 
+  @override
+  void initState() {
+    super.initState();
+    loadWishlist();
+  }
+
+  // Load the wishlist from persistent storage.
+  Future<void> loadWishlist() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String>? wishlistStrings = prefs.getStringList("wishlist");
+    if (wishlistStrings != null) {
+      setState(() {
+        wishlist = wishlistStrings.map((e) => int.tryParse(e) ?? 0).toSet();
+      });
+    }
+  }
+
+  // Persist the wishlist state.
+  Future<void> updateWishlist() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> wishlistStrings = wishlist.map((id) => id.toString()).toList();
+    await prefs.setStringList("wishlist", wishlistStrings);
+  }
+
+  // API call to add/remove item from wishlist.
   Future<void> addToWishlist(BuildContext context, Map<String, dynamic> book) async {
     final String token = "9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64";
-
     try {
       bool isInWishlist = wishlist.contains(book['id']);
-
       final String imageUrl = book['first_image'] != null
           ? 'https://admin.uthix.com/storage/image/products/${book['first_image']['image_path']}'
           : "https://via.placeholder.com/150";
@@ -296,15 +332,19 @@ class _BookItemsListState extends State<BookItemsList> {
 
       if (response.statusCode == 200) {
         setState(() {
-          isInWishlist ? wishlist.remove(book['id']) : wishlist.add(book['id']);
+          // Toggle the wishlist state.
+          if (isInWishlist) {
+            wishlist.remove(book['id']);
+          } else {
+            wishlist.add(book['id']);
+          }
         });
-
+        // Save the updated wishlist.
+        await updateWishlist();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              isInWishlist ? "Book removed from wishlist!" : "Book added to wishlist!",
-            ),
-            backgroundColor: isInWishlist ? Colors.red : Colors.green,
+            content: Text(isInWishlist ? "Book removed from wishlist!" : "Book added to wishlist!"),
+            backgroundColor: isInWishlist ? const Color(0xFF2B5C74) : const Color(0xFF2B5C50),
           ),
         );
       } else {
@@ -337,6 +377,7 @@ class _BookItemsListState extends State<BookItemsList> {
                 itemCount: widget.books.length,
                 itemBuilder: (context, index) {
                   final book = widget.books[index];
+                  // Check if book is in wishlist.
                   final bool isInWishlist = wishlist.contains(book['id']);
                   final String title = book['title'] ?? "No Title";
                   final String author = book['author'] ?? "Unknown Author";
@@ -346,9 +387,9 @@ class _BookItemsListState extends State<BookItemsList> {
                       ? 'https://admin.uthix.com/storage/image/products/${book['first_image']['image_path']}'
                       : "https://via.placeholder.com/150";
 
-
                   return GestureDetector(
                     onTap: () {
+                      // Navigate to the Bookdetails page.
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => Bookdetails(product: book)),
@@ -357,7 +398,7 @@ class _BookItemsListState extends State<BookItemsList> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Book Image with Rating
+                        // Book image with rating overlay.
                         Container(
                           padding: const EdgeInsets.all(10.0),
                           decoration: BoxDecoration(
@@ -418,7 +459,7 @@ class _BookItemsListState extends State<BookItemsList> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        // Book Title
+                        // Book Title.
                         Text(
                           title,
                           textAlign: TextAlign.left,
@@ -431,7 +472,7 @@ class _BookItemsListState extends State<BookItemsList> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
-                        // Author Name
+                        // Author Name.
                         Text(
                           "Author: $author",
                           textAlign: TextAlign.left,
@@ -445,7 +486,7 @@ class _BookItemsListState extends State<BookItemsList> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 8),
-                        // Book Price
+                        // Book Price.
                         Text(
                           "₹$price",
                           textAlign: TextAlign.left,
@@ -457,25 +498,23 @@ class _BookItemsListState extends State<BookItemsList> {
                           ),
                         ),
                         const SizedBox(height: 5),
-                        // Wishlist and Add to Cart Buttons
+                        // Wishlist and Add to Cart buttons.
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             IconButton(
                               icon: Icon(
                                 isInWishlist ? Icons.favorite : Icons.favorite_border,
-                                color: isInWishlist ? Color(0xFF2B5C74) : Color(0xFF2B5C74),
+                                color: isInWishlist ? const Color(0xFF2B5C74) : const Color(0xFF2B5C74),
                               ),
                               onPressed: () => addToWishlist(context, book),
                             ),
                             ElevatedButton.icon(
                               onPressed: () async {
                                 int quantity = 1;
-
                                 if (book.isNotEmpty) {
                                   await widget.addToCart(context, book, quantity);
                                 } else {
-                                  print("Error: Book data is empty!");
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text("Book data is missing!")),
                                   );
@@ -484,7 +523,6 @@ class _BookItemsListState extends State<BookItemsList> {
                               label: const Text('Add to Bag', style: TextStyle(color: Colors.white)),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF2B5C74),
-                                foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -492,9 +530,6 @@ class _BookItemsListState extends State<BookItemsList> {
                               ),
                               icon: const Icon(Icons.shopping_bag_outlined, size: 16, color: Colors.white),
                             ),
-
-
-
                           ],
                         ),
                       ],

@@ -61,7 +61,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => orderConfirmed(
+        builder: (context) => OrderConfirmed(
           orderId: widget.orderId,
           orderNumber: widget.orderNumber,
         ),
@@ -91,7 +91,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         Uri.parse('https://admin.uthix.com/api/update-payment-status'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': '98|q4pMTma28DC2Ux7aYc42zOKaTD9ZhwkGo7gIHfGo63a49e1e',
+          'Authorization': '9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64',
         },
         body: jsonEncode({
           'order_id': widget.orderId,
@@ -130,11 +130,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
         Uri.parse('https://admin.uthix.com/api/create-payment'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': '5|pKDOSuu1c2ouMpCV6BJsuiwohmpwIOd5zxMTGMUy0effabee',
+          'Authorization': '9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64'
         },
         body: jsonEncode({
           'order_id': widget.orderId,
-          'amount': (widget.totalPrice + 40) * 100,
+          'amount': widget.totalPrice,
           'currency': 'INR',
           'payment_method': 'UPI',
         }),
@@ -197,12 +197,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   void _handlePayment() {
     if (paymentMethods[selectedPaymentIndex] == "COD") {
-      // Using _updatePaymentStatus, not updatePaymentStatus
       _updatePaymentStatus("success", "COD").then((_) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => orderConfirmed(
+            builder: (context) => OrderConfirmed(
               orderId: widget.orderId,
               orderNumber: widget.orderNumber,
             ),
@@ -219,12 +218,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
           builder: (context) => CardPaymentScreen(
             orderId: widget.orderId,
             orderNumber: widget.orderNumber,
-            totalPrice: widget.totalPrice + 40,
+            totalPrice: widget.totalPrice,
           ),
         ),
       );
     }
   }
+
 
   @override
   void dispose() {
@@ -330,10 +330,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 Text("₹${widget.totalPrice}")
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [Text("Shipping"), Text("₹40")],
-            ),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: const [Text("Shipping"), Text("₹40")],
+            // ),
             const SizedBox(height: 20),
             const Divider(),
             const SizedBox(height: 20),
@@ -343,7 +343,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 const Text("Total",
                     style: TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold)),
-                Text("₹${widget.totalPrice + 40}",
+                Text("₹${widget.totalPrice }",
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold)),
               ],

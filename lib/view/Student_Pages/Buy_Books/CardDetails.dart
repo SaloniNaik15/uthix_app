@@ -24,7 +24,7 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
       });
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => orderConfirmed(orderId: 1, orderNumber: '',)),
+        MaterialPageRoute(builder: (context) => OrderConfirmed(orderId: 1, orderNumber: '',)),
       );
     });
   }

@@ -1,10 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/BuyBooksPages.dart';
+
 import 'StudentSearch.dart';
 
 class BuyTextBooks extends StatefulWidget {
-  const BuyTextBooks({super.key});
+  // Make categoryId optional.
+  final int? categoryId;
+  const BuyTextBooks({Key? key, this.categoryId}) : super(key: key);
 
   @override
   State<BuyTextBooks> createState() => _BuyTextBooksState();
