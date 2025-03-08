@@ -28,7 +28,7 @@ class _YourClasroomState extends State<YourClasroom> {
   bool isLoading = true; // For loading indicator
   bool hasError = false; // Error state
 
-  List<Map<String, String>> classList = [];
+  List<Map<String, dynamic>> classList = [];
 
   @override
   void initState() {
@@ -116,23 +116,26 @@ class _YourClasroomState extends State<YourClasroom> {
             return;
           }
 
-          List<Map<String, String>> classrooms = [];
+          List<Map<String, dynamic>> classrooms = [];
 
           for (var student in students) {
             final classroom = student["classroom"] ?? {};
             final instructor = classroom["instructor"]?["user"] ?? {};
 
+            int? classroomId = classroom["id"]; // Store classroom_id
             String className = classroom["class_name"] ?? "Default Class";
             String section = classroom["section"] ?? "Default Section";
             String instructorName = instructor["name"] ?? "Unknown Instructor";
 
+            log("Classroom ID: $classroomId");
             log("Class Name: $className");
             log("Section: $section");
             log("Instructor Name: $instructorName");
             print("---------------------------");
 
-            if (classroom.isNotEmpty) {
+            if (classroom.isNotEmpty && classroomId != null) {
               classrooms.add({
+                "classroomId": classroomId, // Store classroom_id
                 "className": className,
                 "section": section,
                 "instructor": instructorName,
@@ -452,7 +455,8 @@ class _YourClasroomState extends State<YourClasroom> {
                                     child: GestureDetector(
                                       onTap: () {
                                         int classroomId =
-                                            int.parse(classData["id"]!);
+                                            classData["classroomId"];
+
                                         log("SALONI:$classroomId");
                                         Navigator.push(
                                           context,
