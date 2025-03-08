@@ -1,8 +1,50 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'Order_Processing.dart';
+import 'Order_Processing.dart'; // Your order processing screen
 
-class OrdersTrackingPage extends StatelessWidget {
-  const OrdersTrackingPage({super.key});
+class OrdersTrackingPage extends StatefulWidget {
+  final int? orderId; // Make it nullable if needed
+
+  const OrdersTrackingPage({Key? key, this.orderId}) : super(key: key);
+
+  @override
+  _OrdersTrackingPageState createState() => _OrdersTrackingPageState();
+}
+
+class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
+  List orders = [];
+  bool isLoading = true;
+
+  final Dio _dio = Dio(BaseOptions(
+    baseUrl: 'https://admin.uthix.com/api/orders',
+    headers: {
+      'Authorization': 'Bearer 9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64'
+    },
+  ));
+
+  @override
+  void initState() {
+    super.initState();
+    fetchOrders();
+  }
+
+  Future<void> fetchOrders() async {
+    try {
+      final response = await _dio.get('');
+      if (response.statusCode == 200) {
+        setState(() {
+          orders = response.data['orders'] ?? [];
+          isLoading = false;
+        });
+      } else {
+        print('Failed to load orders: ${response.statusCode}');
+        setState(() => isLoading = false);
+      }
+    } catch (e) {
+      print('Error fetching orders: $e');
+      setState(() => isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,9 +54,7 @@ class OrdersTrackingPage extends StatelessWidget {
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           "Orders and Tracking",
@@ -26,12 +66,17 @@ class OrdersTrackingPage extends StatelessWidget {
           ),
         ),
       ),
-      body: SingleChildScrollView(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : orders.isEmpty
+          ? const Center(child: Text("No orders found."))
+          : SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Search bar (optional)
               Row(
                 children: [
                   Expanded(
@@ -47,16 +92,16 @@ class OrdersTrackingPage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: TextField(
+                      child: const TextField(
                         decoration: InputDecoration(
                           hintText: "Search in orders",
-                          prefixIcon: const Icon(
+                          prefixIcon: Icon(
                             Icons.search,
                             color: Color(0xFF605F5F),
                           ),
                           border: InputBorder.none,
-                          contentPadding:
-                              const EdgeInsets.symmetric(vertical: 14),
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 14),
                         ),
                       ),
                     ),
@@ -75,33 +120,67 @@ class OrdersTrackingPage extends StatelessWidget {
                       ],
                     ),
                     child: IconButton(
-                      icon: const Icon(Icons.tune, color: Color(0xFF605F5F)),
+                      icon: const Icon(Icons.tune,
+                          color: Color(0xFF605F5F)),
                       onPressed: () {
-                        // Handle filter button tap
+                        // Handle filter button tap if needed.
                       },
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 15),
-              Divider(color: Color(0xFF605F5F), thickness: 2),
-              SizedBox(height: 20),
-              OrderCard(
-                orderStatus: "Order is in Processing",
-                orderDate: "2nd Feb",
-                bookName: "Book Name",
-                description: "Description",
-                price: "₹1500",
-                imagePath: "assets/Seller_dashboard_images/book.jpg",
-                onUpdateStatus: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => OrderProcessing()),
+              const SizedBox(height: 15),
+              const Divider(color: Color(0xFF605F5F), thickness: 2),
+              const SizedBox(height: 20),
+              // List of orders.
+              ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: orders.length,
+                itemBuilder: (context, index) {
+                  final order = orders[index];
+
+                  // Extract order status and date.
+                  final orderStatus = order['status'] ?? 'In Process';
+                  final orderDate = order['created_at'] != null
+                      ? order['created_at'].substring(0, 10)
+                      : "N/A";
+
+                  // Extract details of the first order item.
+                  final items = order['order_items'] ?? [];
+                  final firstItem = items.isNotEmpty ? items[0] : null;
+                  final bookName = firstItem != null &&
+                      firstItem['product'] != null
+                      ? firstItem['product']['title'] ?? 'Book Name'
+                      : 'Book Name';
+                  final description = firstItem != null &&
+                      firstItem['product'] != null
+                      ? firstItem['product']['description'] ??
+                      'Description'
+                      : 'Description';
+                  final price = "₹${order['total_amount'] ?? '0'}";
+
+                  return OrderCard(
+                    orderStatus: orderStatus,
+                    orderDate: orderDate,
+                    bookName: bookName,
+                    description: description,
+                    price: price,
+                    imagePath:
+                    'assets/Seller_dashboard_images/book.jpg',
+                    onUpdateStatus: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderProcessing(
+                            orderId: order['id'],
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
-              SizedBox(height: 15),
-              Divider(color: Color(0xFF605F5F), thickness: 2),
             ],
           ),
         ),
@@ -120,7 +199,7 @@ class OrderCard extends StatelessWidget {
   final VoidCallback onUpdateStatus;
 
   const OrderCard({
-    super.key,
+    Key? key,
     required this.orderStatus,
     required this.orderDate,
     required this.bookName,
@@ -128,24 +207,24 @@ class OrderCard extends StatelessWidget {
     required this.price,
     required this.imagePath,
     required this.onUpdateStatus,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Order status row.
         Row(
           children: [
             Image.asset('assets/icons/orderIcon.png', height: 40),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   orderStatus,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontFamily: 'Urbanist',
                     fontWeight: FontWeight.bold,
@@ -154,7 +233,7 @@ class OrderCard extends StatelessWidget {
                 ),
                 Text(
                   orderDate,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     fontFamily: 'Urbanist',
                     fontWeight: FontWeight.w300,
@@ -165,12 +244,13 @@ class OrderCard extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: 15),
+        const SizedBox(height: 15),
+        // Order details card.
         SizedBox(
           height: 380,
-          width: 400,
+          width: double.infinity,
           child: Card(
-            color: Color(0xFFFCFCFC),
+            color: const Color(0xFFFCFCFC),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
               side: const BorderSide(
@@ -179,13 +259,13 @@ class OrderCard extends StatelessWidget {
               ),
             ),
             elevation: 4,
-            margin: EdgeInsets.all(10),
+            margin: const EdgeInsets.all(10),
             child: Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -202,20 +282,21 @@ class OrderCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
+                      // Book details.
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               bookName,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontFamily: 'Urbanist',
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
                               description,
                               style: TextStyle(
@@ -223,10 +304,10 @@ class OrderCard extends StatelessWidget {
                                 fontFamily: 'Urbanist',
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
                               price,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'Urbanist',
@@ -235,31 +316,36 @@ class OrderCard extends StatelessWidget {
                           ],
                         ),
                       ),
+                      // Forward arrow button.
                       IconButton(
                         onPressed: onUpdateStatus,
-                        icon: Icon(Icons.arrow_forward_ios,
-                            size: 18, color: Colors.grey),
-                      )
+                        icon: const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 18,
+                          color: Colors.grey,
+                        ),
+                      ),
                     ],
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Divider(color: Colors.grey[300], thickness: 1),
-                  SizedBox(height: 12),
+                  const SizedBox(height: 12),
+                  // Return/Exchange buttons.
                   Row(
                     children: [
                       Expanded(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            side: BorderSide(
-                                color: Color(0xFFAFAFAF)), // Single border
+                            side: const BorderSide(color: Color(0xFFAFAFAF)),
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(5), // Rounded corners
+                              borderRadius: BorderRadius.circular(5),
                             ),
                           ),
-                          onPressed: () {},
-                          child: Text(
+                          onPressed: () {
+                            // Handle Return.
+                          },
+                          child: const Text(
                             "Return",
                             style: TextStyle(
                               color: Colors.black,
@@ -268,20 +354,20 @@ class OrderCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            side: BorderSide(
-                                color: Color(0xFFAFAFAF)), // Single border
+                            side: const BorderSide(color: Color(0xFFAFAFAF)),
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(5), // Rounded corners
+                              borderRadius: BorderRadius.circular(5),
                             ),
                           ),
-                          onPressed: () {},
-                          child: Text(
+                          onPressed: () {
+                            // Handle Exchange.
+                          },
+                          child: const Text(
                             "Exchange",
                             style: TextStyle(
                               color: Colors.black,
@@ -292,24 +378,27 @@ class OrderCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 5),
+                  const SizedBox(height: 5),
                   Divider(color: Colors.grey[300], thickness: 1),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
+                  // Star rating and feedback.
                   Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: List.generate(
                           5,
-                          (index) => Icon(Icons.star_border_outlined, size: 28),
+                              (index) => const Icon(Icons.star_border_outlined, size: 28),
                         ),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           TextButton(
-                            onPressed: () {},
-                            child: Text(
+                            onPressed: () {
+                              // Handle feedback.
+                            },
+                            child: const Text(
                               "Give feedback and Earn Credit",
                               style: TextStyle(
                                 fontSize: 14,

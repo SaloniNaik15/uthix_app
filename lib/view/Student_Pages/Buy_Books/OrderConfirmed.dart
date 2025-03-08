@@ -1,71 +1,103 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
-// ignore: camel_case_types
-class orderConfirmed extends StatefulWidget {
-  const orderConfirmed({super.key, required int orderId, required String orderNumber});
+import '../Student Account Details/Order_Tracking.dart';
+class OrderConfirmed extends StatefulWidget {
+  final int orderId;
+  final String orderNumber;
+  const OrderConfirmed({
+    Key? key,
+    required this.orderId,
+    required this.orderNumber,
+  }) : super(key: key);
 
   @override
-  State<orderConfirmed> createState() => _orderConfirmedState();
+  State<OrderConfirmed> createState() => _OrderConfirmedState();
 }
 
-// ignore: camel_case_types
-class _orderConfirmedState extends State<orderConfirmed> {
+class _OrderConfirmedState extends State<OrderConfirmed> {
+  @override
+  void initState() {
+    super.initState();
+    // After 5 seconds, redirect to the OrderTracking page.
+    Timer(const Duration(seconds: 5), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OrdersTrackingPage(orderId: widget.orderId),
+        ),
+      );
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        body: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(
-                  'assets/Seller_dashboard_images/ManageStoreBackground.png'),
-              fit: BoxFit.cover,
-            ),
+      backgroundColor: Colors.white,
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/Seller_dashboard_images/ManageStoreBackground.png'),
+            fit: BoxFit.cover,
           ),
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min, // Centers content vertically
-              crossAxisAlignment:
-                  CrossAxisAlignment.center, // Centers text horizontally
-              children: [
-                Text(
-                  "Payment Successful",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    fontFamily: "Urbanist",
+        ),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Centers content vertically
+            crossAxisAlignment: CrossAxisAlignment.center, // Centers text horizontally
+            children: [
+              const Text(
+                "Payment Successful",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  fontFamily: "Urbanist",
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Order Confirmed",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      color: const Color(0xFF2B5C74),
+                      fontFamily: "Urbanist",
+                    ),
                   ),
-                ),
-                SizedBox(height: 20), // Space between the texts
-                Row(
-                  mainAxisSize: MainAxisSize.min, // Wrap content
-                  children: [
-                    Text(
-                      "Order Confirmed",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                        color: Color(0xFF2B5C74),
-                        fontFamily: "Urbanist",
-                      ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      color: Colors.blueAccent,
+                      shape: BoxShape.circle,
                     ),
-                    SizedBox(width: 6), // Space between text and icon
-                    Container(
-                      padding: EdgeInsets.all(6), // Padding inside the red box
-                      decoration: BoxDecoration(
-                        color: Colors.blueAccent, // Red background for the icon
-                        shape: BoxShape.circle, // Circular background
-                      ),
-                      child: Icon(Icons.check,
-                          color: Colors.white,
-                          size: 18), // Icon inside red background
+                    child: const Icon(
+                      Icons.check,
+                      color: Colors.white,
+                      size: 18,
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "Order Number: ${widget.orderNumber}",
+                style: const TextStyle(fontSize: 16, fontFamily: "Urbanist"),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "Redirecting to order tracking...",
+                style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+              ),
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

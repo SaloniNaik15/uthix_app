@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 class StudentSearch extends StatefulWidget {
-  const StudentSearch({super.key});
+  // Make categoryId optional (nullable)
+  final int? categoryId;
+  const StudentSearch({Key? key, this.categoryId}) : super(key: key);
 
   @override
   State<StudentSearch> createState() => _StudentSearchState();
@@ -28,8 +30,12 @@ class _StudentSearchState extends State<StudentSearch> {
     setState(() => isLoading = true);
     try {
       final dio = Dio();
+      // Use provided categoryId; if null, default to 1.
+      final String url = widget.categoryId != null
+          ? 'https://admin.uthix.com/api/categories/${widget.categoryId}/products'
+          : 'https://admin.uthix.com/api/categories/1/products';
       final response = await dio.get(
-        'https://admin.uthix.com/api/categories/1/products',
+        url,
         queryParameters: {'search': query},
       );
 
@@ -178,7 +184,7 @@ class _StudentSearchState extends State<StudentSearch> {
           children: [
             TextField(
               controller: searchController,
-              onChanged: (value) => searchCategories(value), // Auto-search when typing
+              onChanged: (value) => searchCategories(value),
               decoration: InputDecoration(
                 hintText: 'Search by title, author, or language',
                 prefixIcon: const Icon(Icons.search, color: Color(0xFFAFAFAF)),
