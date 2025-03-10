@@ -33,16 +33,32 @@ class _PersonalDetailsState extends State<PersonalDetails> {
 
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? savedEmail = prefs.getString("userEmail"); // ✅ Correct key
+    String? savedPassword = prefs.getString("password"); // ✅ Password now saved
+    String? savedaccessToken = prefs.getString("userToken");
+
+    log("Retrieved Email: $savedEmail");
+    log("Retrieved Password: $savedPassword");
+    log("Retrieved acesstoken: $savedaccessToken");
+
     setState(() {
-      email = prefs.getString("email") ?? "No Email Found";
-      password = prefs.getString("password") ?? "No Password Found";
-      accessToken = prefs.getString("userToken") ?? "No Access Token";
+      email = savedEmail ?? "No Email Found";
+      password = savedPassword ?? "No Password Found";
+      accessToken = savedaccessToken ?? "No accesstoken";
     });
+  }
+
+  Future<void> _savePersonalDetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("userName", _nameController.text);
+    await prefs.setString("userMobile", _phoneController.text);
+    log("Personal details saved: Name - ${_nameController.text}, Mobile - ${_phoneController.text}");
   }
 
   Future<void> _submitData() async {
     if (!mounted) return;
     setState(() => isSubmitting = true);
+    await _savePersonalDetails();
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? storeDataJson = prefs.getString("storeData");

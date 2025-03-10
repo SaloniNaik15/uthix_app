@@ -62,8 +62,8 @@ class _SellerDashboardState extends State<SellerDashboard> {
 
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? savedEmail = prefs.getString("email");
-    String? savedPassword = prefs.getString("password");
+    String? savedEmail = prefs.getString("userEmail"); // ✅ Correct key
+    String? savedPassword = prefs.getString("password"); // ✅ Password now saved
     String? savedaccessToken = prefs.getString("userToken");
 
     log("Retrieved Email: $savedEmail");

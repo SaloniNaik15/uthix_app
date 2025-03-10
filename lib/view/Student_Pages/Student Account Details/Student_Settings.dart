@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+
 
 class StudentSettings extends StatefulWidget {
   const StudentSettings({super.key});
@@ -10,6 +13,7 @@ class StudentSettings extends StatefulWidget {
 class _StudentSettingsState extends State<StudentSettings> {
   bool isNotificationsEnabled = false;
   bool isOptimizedExperienceEnabled = false;
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -53,11 +57,17 @@ class _StudentSettingsState extends State<StudentSettings> {
             child: CheckboxListTile(
               title: const Text(
                 "Notifications",
-                style: TextStyle(fontSize: 16, fontFamily: "Urbanist",fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: "Urbanist",
+                    fontWeight: FontWeight.w600),
               ),
               subtitle: const Text(
                 "This will not affect any order updates",
-                style: TextStyle(fontSize: 14, fontFamily: "Urbanist",fontWeight: FontWeight.w400),
+                style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: "Urbanist",
+                    fontWeight: FontWeight.w400),
               ),
               value: isNotificationsEnabled,
               onChanged: (bool? newValue) {
@@ -78,11 +88,17 @@ class _StudentSettingsState extends State<StudentSettings> {
             child: CheckboxListTile(
               title: const Text(
                 "Optimized Experience",
-                style: TextStyle(fontSize: 16,fontFamily: "Urbanist",fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: "Urbanist",
+                    fontWeight: FontWeight.w600),
               ),
               subtitle: const Text(
                 "For optimized connection quality",
-                style: TextStyle(fontSize: 14,  fontFamily: "Urbanist",fontWeight: FontWeight.w400),
+                style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: "Urbanist",
+                    fontWeight: FontWeight.w400),
               ),
               value: isOptimizedExperienceEnabled,
               onChanged: (bool? newValue) {

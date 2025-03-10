@@ -1,4 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:uthix_app/view/homeRegistration/registration.dart';
 
 class StudentManageAccount extends StatefulWidget {
   const StudentManageAccount({super.key});
@@ -8,6 +14,64 @@ class StudentManageAccount extends StatefulWidget {
 }
 
 class _StudentManageAccountState extends State<StudentManageAccount> {
+  String? accessLoginToken;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    await _loadUserCredentials();
+  }
+
+  Future<void> _loadUserCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('access_token'); // Retrieve token
+    log("Retrieved Token: $token"); // Log token for verification
+
+    setState(() {
+      accessLoginToken = token;
+    });
+  }
+
+  Future<void> logoutUser() async {
+    final url = Uri.parse("https://admin.uthix.com/api/logout");
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Authorization": "Bearer $accessLoginToken",
+          "Content-Type": "application/json",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        log("Logout successful");
+
+        // Clear shared preferences
+        await prefs.clear();
+        log("SharedPreferences cleared successfully");
+
+        // Navigate to RegistrationPage
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Registration()),
+          );
+        }
+      } else {
+        log("Logout failed: ${response.body}");
+      }
+    } catch (e) {
+      log("Error logging out: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,7 +140,9 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        logoutUser();
+                      },
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: Colors.red),
                         padding: EdgeInsets.symmetric(vertical: 14),

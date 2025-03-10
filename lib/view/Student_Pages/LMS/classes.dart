@@ -227,7 +227,7 @@ class _ClassesState extends State<Classes> {
                                   ["subject"]["name"] ??
                               "Unknown",
                           mentor: classData[currentIndex]["classroom"]
-                                  ["instructor"]["user"]["name"] ??
+                                  ["instructor"]["bio"] ??
                               "No Mentor",
                           schedule:
                               "${classData[currentIndex]["time"]} | ${classData[currentIndex]["repeat_days"]}",
@@ -352,8 +352,8 @@ class _ClassesState extends State<Classes> {
 
                   return CommentCard(
                     profileImage: "assets/login/profile.jpeg",
-                    name: announcement["classroom"]["instructor"]["user"]
-                        ["name"],
+                    //name: announcement["classroom"]["instructor"]["user"]["name"],
+                    name: "instructor",
                     timestamp: announcement["created_at"],
                     comment: announcement["title"],
                   );
@@ -361,170 +361,9 @@ class _ClassesState extends State<Classes> {
               ),
             ),
           ),
-
-          //SubmissionPage(Reports).
-          // Stack(
-          //   clipBehavior: Clip.none,
-          //   children: [
-          //     Padding(
-          //       padding:
-          //           const EdgeInsets.only(top: 10, bottom: 30),
-          //       child: GestureDetector(
-          //         onTap: () {
-          //           Navigator.push(
-          //             context,
-          //             MaterialPageRoute(
-          //               builder: (context) =>
-          //                   SubmissionStudent(),
-          //             ),
-          //           );
-          //         },
-          //         child: Container(
-          //           width: 340,
-          //           decoration: BoxDecoration(
-          //             color: Color.fromRGBO(246, 246, 246, 1),
-          //             borderRadius: BorderRadius.circular(7),
-          //             border: Border.all(
-          //                 color:
-          //                     Color.fromRGBO(217, 217, 217, 1),
-          //                 width: 1),
-          //           ),
-          //           child: Padding(
-          //             padding: const EdgeInsets.all(8.0),
-          //             child: Column(
-          //               crossAxisAlignment:
-          //                   CrossAxisAlignment.start,
-          //               mainAxisSize: MainAxisSize.min,
-          //               children: [
-          //                 Row(
-          //                   children: [
-          //                     Container(
-          //                       width: 45,
-          //                       height: 45,
-          //                       decoration: BoxDecoration(
-          //                         shape: BoxShape.circle,
-          //                       ),
-          //                       child: ClipOval(
-          //                         child: Image.asset(
-          //                           "assets/login/profile.jpeg",
-          //                           fit: BoxFit.cover,
-          //                         ),
-          //                       ),
-          //                     ),
-          //                     const SizedBox(
-          //                       width: 10,
-          //                     ),
-          //                     Column(
-          //                       crossAxisAlignment:
-          //                           CrossAxisAlignment.start,
-          //                       children: [
-          //                         Text(
-          //                           "Name",
-          //                           style: GoogleFonts.urbanist(
-          //                             fontSize: 14,
-          //                             fontWeight:
-          //                                 FontWeight.w500,
-          //                             color:
-          //                                 const Color.fromRGBO(
-          //                                     0, 0, 0, 1),
-          //                           ),
-          //                         ),
-          //                         Text(
-          //                           "Date",
-          //                           style: GoogleFonts.urbanist(
-          //                             fontSize: 10,
-          //                             fontWeight:
-          //                                 FontWeight.w500,
-          //                             color:
-          //                                 const Color.fromRGBO(
-          //                                     96, 95, 95, 1),
-          //                           ),
-          //                         ),
-          //                       ],
-          //                     ),
-          //                     const Spacer(),
-          //                     Icon(Icons.more_vert)
-          //                   ],
-          //                 ),
-          //                 const SizedBox(
-          //                   height: 10,
-          //                 ),
-          //                 //if attachements,files,comments,questions
-          //                 Text(
-          //                   "New Assignment: Submit your report here ",
-          //                   style: GoogleFonts.urbanist(
-          //                     fontSize: 14,
-          //                     fontWeight: FontWeight.w400,
-          //                     color: const Color.fromRGBO(
-          //                         0, 0, 0, 1),
-          //                   ),
-          //                 ),
-          //                 const SizedBox(
-          //                   height: 10,
-          //                 ),
-
-          //                 Container(
-          //                   height: 1,
-          //                   color: Color.fromRGBO(
-          //                       213, 213, 213, 1),
-          //                 ),
-          //                 const SizedBox(
-          //                   height: 8,
-          //                 ),
-          //                 Text(
-          //                   "Add Comment",
-          //                   style: GoogleFonts.urbanist(
-          //                     fontSize: 14,
-          //                     fontWeight: FontWeight.w500,
-          //                     color: const Color.fromRGBO(
-          //                         142, 140, 140, 1),
-          //                   ),
-          //                 ),
-          //                 const SizedBox(
-          //                   height: 8,
-          //                 ),
-          //               ],
-          //             ),
-          //           ),
-          //         ),
-          //       ),
-          //     ),
-          //     Positioned(
-          //       left: 20,
-          //       bottom: 20,
-          //       child: Container(
-          //         width: 35,
-          //         height: 22,
-          //         decoration: BoxDecoration(
-          //           color: Color.fromRGBO(246, 246, 246, 1),
-          //           borderRadius: BorderRadius.circular(9),
-          //           border: Border.all(
-          //               color: Color.fromRGBO(217, 217, 217, 1),
-          //               width: 1),
-          //         ),
-          //         child: Row(
-          //           mainAxisAlignment:
-          //               MainAxisAlignment.spaceEvenly,
-          //           children: [
-          //             Image.asset(
-          //                 "assets/instructor/emoticon-happy-outline.png"),
-          //             Icon(
-          //               Icons.add,
-          //               size: 10,
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //     ),
-          //   ],
-          // ),
         ],
       ),
     );
-    //       ),
-    //     ],
-    //   ),
-    // );
   }
 }
 
