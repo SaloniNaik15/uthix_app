@@ -136,7 +136,6 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
               _buildProfileField(Icons.school, "Banaras Hindu University"),
 
               const SizedBox(height: 30),
-
               // Buttons
               Row(
                 children: [
@@ -159,27 +158,6 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
                 ],
               ),
               const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {},
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.black),
-                        padding: EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      child: Text(
-                        "Add Account",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: "Urbanist",
-                            fontSize: 16),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
             ],
           ),
         ),

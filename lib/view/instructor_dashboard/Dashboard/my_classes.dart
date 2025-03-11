@@ -14,7 +14,7 @@ class _MyClassesState extends State<MyClasses> {
   final TextEditingController _emailController = TextEditingController();
   final Dio _dio = Dio();
   final String apiUrl = "https://admin.uthix.com/api/manage-classes";
-  final String token = "129|R7THr97G2ycwBYljdixjLa6EIUNMYZZ4tzAuU5Esbe4f2409";
+  final String token = "112|OZqf3MUzqsvrPd0XkqX7tT9YM0mCwlf0E6Az5Nykfb3c42fd";
   List<dynamic> classes = [];
 
   @override
@@ -271,272 +271,280 @@ class _MyClassesState extends State<MyClasses> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Container(
-            height: 90,
-            width: double.infinity,
-            color: Color.fromRGBO(43, 92, 116, 1),
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Row(
-                children: [
-                  Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
-                          offset: const Offset(0, 4),
-                          blurRadius: 8,
-                        ),
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
-                          offset: const Offset(0, 0),
-                          blurRadius: 4,
-                        ),
-                      ],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(120),
+        child: Container(
+          height: 130,
+          width: double.infinity,
+          color: Color.fromRGBO(43, 92, 116, 1),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 30, left: 10, right: 10),
+            child: Row(
+              children: [
+                Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        offset: const Offset(0, 4),
+                        blurRadius: 8,
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        offset: const Offset(0, 0),
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, size: 25),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                     ),
-                    child: Center(
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_back, size: 25),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                  ),
+                ),
+                const SizedBox(width: 15),
+                Text(
+                  "My Classes",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                Spacer(),
+                Container(
+                  width: 45,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(3.0),
+                    child: ClipOval(
+                      child: Image.asset(
+                        "assets/login/profile.jpeg",
+                        fit: BoxFit.cover,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 15),
-                  Text(
-                    "My Classes",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const Spacer(),
-                  Container(
-                    width: 45,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: ClipOval(
-                        child: Image.asset(
-                          "assets/login/profile.jpeg",
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: classes.length,
-              itemBuilder: (context, index) {
-                final classItem = classes[index];
-                return Padding(
-                  padding:
-                      const EdgeInsets.only(left: 40, right: 40, bottom: 40),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => InstructorClass(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: 340,
-                      height: 152,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Color.fromRGBO(217, 217, 217, 1),
-                        ),
-                        color: Color.fromRGBO(246, 246, 246, 1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                    classItem['classroom']['class_name'] ??
-                                        "Unknown Class",
-                                    style: GoogleFonts.urbanist(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w600)),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                    classItem['classroom']['section'] ??
-                                        "No section ",
-                                    style: GoogleFonts.urbanist(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w600)),
-                                const Spacer(),
-                                Icon(Icons.more_vert),
-                              ],
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                                classItem['classroom']['subject']['name'] ??
-                                    "No subject found ",
-                                style: GoogleFonts.urbanist(
-                                    fontSize: 14, fontWeight: FontWeight.w500)),
-                            const SizedBox(height: 5),
-                            Text(classItem['title'] ?? "No title",
-                                style: GoogleFonts.urbanist(fontSize: 14)),
-                            const SizedBox(height: 5),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 80,
-                                  height: 23,
-                                  child: Stack(
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      Positioned(
-                                        left: 0,
-                                        child: Container(
-                                          width: 23,
-                                          height: 23,
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.black),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(1.0),
-                                            child: ClipOval(
-                                              child: Image.asset(
-                                                  "assets/login/profile.jpeg",
-                                                  fit: BoxFit.cover),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        left: 15,
-                                        child: Container(
-                                          width: 23,
-                                          height: 23,
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.black),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(1.0),
-                                            child: ClipOval(
-                                              child: Image.asset(
-                                                  "assets/login/profile.jpeg",
-                                                  fit: BoxFit.cover),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        left: 30,
-                                        child: Container(
-                                          width: 23,
-                                          height: 23,
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.black),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(1.0),
-                                            child: ClipOval(
-                                              child: Image.asset(
-                                                "assets/login/profile.jpeg",
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        left: 45,
-                                        child: Container(
-                                          width: 23,
-                                          height: 23,
-                                          decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.black),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(1.0),
-                                            child: ClipOval(
-                                              child: Image.asset(
-                                                  "assets/login/profile.jpeg",
-                                                  fit: BoxFit.cover),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Spacer(),
-                                GestureDetector(
-                                  onTap: () {
-                                    showCenteredModal();
-                                  },
-                                  child: Container(
-                                    height: 39,
-                                    width: 126,
-                                    decoration: BoxDecoration(
-                                      color: Color.fromRGBO(255, 255, 255, 1),
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                          color: Color.fromRGBO(43, 92, 116, 1),
-                                          width: 1),
-                                    ),
-                                    child: Center(
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            Icons.add,
-                                            color:
-                                                Color.fromRGBO(43, 92, 116, 1),
-                                            //size: 5,
-                                          ),
-                                          Text(
-                                            "Add Participant",
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color.fromRGBO(
-                                                  43, 92, 116, 1),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+        ),
+      ),
+      body: ListView.builder(
+        itemCount: classes.length,
+        itemBuilder: (context, index) {
+          final classItem = classes[index];
+          return Padding(
+            padding:
+                const EdgeInsets.only(top: 15, left: 20, right: 20, bottom: 15),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => InstructorClass(),
                   ),
                 );
               },
+              child: Container(
+                width: 290,
+                height: 152,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Color.fromRGBO(217, 217, 217, 1),
+                  ),
+                  color: Color.fromRGBO(246, 246, 246, 1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            classItem['classroom']['class_name'] ??
+                                "Unknown Class",
+                            style: GoogleFonts.urbanist(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            classItem['classroom']['section'] ?? "No section",
+                            style: GoogleFonts.urbanist(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const Spacer(),
+                          Icon(Icons.more_vert),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        classItem['classroom']['subject']['name'] ??
+                            "No subject found",
+                        style: GoogleFonts.urbanist(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        classItem['title'] ?? "No title",
+                        style: GoogleFonts.urbanist(fontSize: 14),
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 80,
+                            height: 23,
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Positioned(
+                                  left: 0,
+                                  child: Container(
+                                    width: 23,
+                                    height: 23,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.black,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(1.0),
+                                      child: ClipOval(
+                                        child: Image.asset(
+                                          "assets/login/profile.jpeg",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 15,
+                                  child: Container(
+                                    width: 23,
+                                    height: 23,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.black,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(1.0),
+                                      child: ClipOval(
+                                        child: Image.asset(
+                                          "assets/login/profile.jpeg",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 30,
+                                  child: Container(
+                                    width: 23,
+                                    height: 23,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.black,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(1.0),
+                                      child: ClipOval(
+                                        child: Image.asset(
+                                          "assets/login/profile.jpeg",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 45,
+                                  child: Container(
+                                    width: 23,
+                                    height: 23,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.black,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(1.0),
+                                      child: ClipOval(
+                                        child: Image.asset(
+                                          "assets/login/profile.jpeg",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: () {
+                              showCenteredModal();
+                            },
+                            child: Container(
+                              height: 39,
+                              width: 126,
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(255, 255, 255, 1),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Color.fromRGBO(43, 92, 116, 1),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Center(
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.add,
+                                      color: Color.fromRGBO(43, 92, 116, 1),
+                                    ),
+                                    Text(
+                                      "Add Participant",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color.fromRGBO(43, 92, 116, 1),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

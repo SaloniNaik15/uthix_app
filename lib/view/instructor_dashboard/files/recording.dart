@@ -15,6 +15,7 @@ class _RecordingState extends State<Recording> {
     String selectedClass = 'Choose Class';
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           Container(

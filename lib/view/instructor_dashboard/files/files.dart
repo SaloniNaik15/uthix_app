@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uthix_app/modal/navbarWidgetInstructor.dart';
 import 'package:uthix_app/view/instructor_dashboard/Chat/chat.dart';
-import 'package:uthix_app/view/instructor_dashboard/Chat/new_chat.dart';
-import 'package:uthix_app/view/instructor_dashboard/Chat/personal_chat.dart';
-import 'package:uthix_app/view/instructor_dashboard/files/recording.dart';
-import 'package:uthix_app/view/instructor_dashboard/files/upload.dart';
 import 'package:uthix_app/view/instructor_dashboard/Dashboard/instructor_dashboard.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/profile_account.dart';
+import 'package:uthix_app/view/instructor_dashboard/files/recording.dart';
+import 'package:uthix_app/view/instructor_dashboard/files/upload.dart';
 
 class Files extends StatefulWidget {
   const Files({super.key});
@@ -89,6 +87,7 @@ class _FilesState extends State<Files> {
     String selectedClass = 'Choose Class';
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         clipBehavior: Clip.none,
         children: [

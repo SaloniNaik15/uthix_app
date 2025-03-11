@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/modal/navbarWidgetStudent.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
 import 'package:uthix_app/view/Student_Pages/Files/files.dart';
@@ -6,6 +7,7 @@ import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
 import 'package:uthix_app/view/Student_Pages/Student_Chat/stud_chat.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../homeRegistration/registration.dart';
 import '../Buy_Books/Coupons.dart';
 import '../Buy_Books/Wishlist.dart';
 import 'Order_Tracking.dart';
@@ -42,6 +44,17 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
         });
       });
     }
+  }
+
+  Future<void> logoutUser(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
+    await prefs.remove('user_role');
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Registration()),
+    );
   }
 
   final List<Map<String, dynamic>> navItems = [
@@ -252,7 +265,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                           ),
                         ),
                         onPressed: () {
-                          print("Outlined Button Pressed!");
+                          logoutUser(context);
                         },
                         child: const Text(
                           "Log out",

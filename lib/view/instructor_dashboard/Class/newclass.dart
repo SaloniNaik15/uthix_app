@@ -16,7 +16,7 @@ class _NewclassState extends State<Newclass> {
   TimeOfDay? _selectTime;
   final Dio _dio = Dio();
   final String apiUrl = "https://admin.uthix.com/api/class-chapter";
-  final String token = "129|R7THr97G2ycwBYljdixjLa6EIUNMYZZ4tzAuU5Esbe4f2409";
+  final String token = "112|OZqf3MUzqsvrPd0XkqX7tT9YM0mCwlf0E6Az5Nykfb3c42fd";
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   bool sendReminder = false;
@@ -32,11 +32,14 @@ class _NewclassState extends State<Newclass> {
     }
 
     final Map<String, dynamic> requestData = {
-      "classroom_id": 2,
       "title": titleController.text.trim(),
       "date": DateFormat('yyyy-MM-dd').format(_selectdate!),
       "time": "${_selectTime!.hour.toString().padLeft(2, '0')}:${_selectTime!.minute.toString().padLeft(2, '0')}:00",
       "timezone": "IST",
+
+      "repeat_days": null,
+
+      "reminder_time": sendReminder ? 1 : 0,
       "description": descriptionController.text.trim(),
     };
 
@@ -58,17 +61,13 @@ class _NewclassState extends State<Newclass> {
       print("Response Data: ${response.data}");
 
       if (response.statusCode == 201 && response.data["status"]) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Classroom created successfully!")),
-          );
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Class created successfully!")),
+        );
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Failed: ${response.data['message']}")),
-          );
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed")),
+        );
       }
     } catch (e) {
       if (e is DioException) {
@@ -84,6 +83,7 @@ class _NewclassState extends State<Newclass> {
       }
     }
   }
+
 
 
   Future<void> _pickDatefunc() async {

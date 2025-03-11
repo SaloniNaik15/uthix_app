@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/modal/navbarWidgetInstructor.dart';
 import 'package:uthix_app/view/instructor_dashboard/Chat/chat.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/detail_profile.dart';
@@ -11,6 +12,8 @@ import 'package:uthix_app/view/instructor_dashboard/Profile/instructor_manage.da
 import 'package:uthix_app/view/instructor_dashboard/Profile/instructor_settings.dart';
 import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
 import 'package:uthix_app/view/instructor_dashboard/Dashboard/instructor_dashboard.dart';
+
+import '../../login/start_login.dart';
 
 class ProfileAccount extends StatefulWidget {
   const ProfileAccount({super.key});
@@ -37,6 +40,18 @@ class _ProfileAccountState extends State<ProfileAccount> {
         });
       });
     }
+  }
+
+  Future<void> logoutUser(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
+    await prefs.remove('user_role');
+
+    // Navigate to Login Screen after logout
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => StartLogin()),
+    );
   }
 
   final List<Map<String, dynamic>> navItems = [
@@ -81,6 +96,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -280,28 +296,32 @@ class _ProfileAccountState extends State<ProfileAccount> {
             height: 70,
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 30, right: 30),
-            child: Container(
+            padding: const EdgeInsets.only(left: 35, right: 35),
+            child: SizedBox(
               height: 50,
-              width: 363,
-              decoration: BoxDecoration(
-                  border: Border.all(
-                      color: Color.fromRGBO(249, 56, 56, 1), width: 1),
-                  borderRadius: BorderRadius.circular(4)),
-              child: Center(
-                child: Text(
-                  "Log out",
-                  style: GoogleFonts.urbanist(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color.fromRGBO(249, 56, 56, 1)),
-                ),
-              ),
+              width: MediaQuery.sizeOf(context).width,
+              child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(
+                        color: Colors.red,
+                        width: 1), // Border color & thickness
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5), // Rounded corners
+                    ),
+                  ),
+                  onPressed: () {
+                    logoutUser(context);
+                  },
+                  child: const Text(
+                    "Log out",
+                    style: TextStyle(
+                        color: Colors.red,
+                        fontFamily: "Urbanist",
+                        fontWeight: FontWeight.bold),
+                  )),
             ),
           ),
-          const SizedBox(
-            height: 30,
-          ),
+          const SizedBox(height: 20),
           Center(
             child: Navbar(
                 onItemTapped: onItemTapped, selectedIndex: selectedIndex),

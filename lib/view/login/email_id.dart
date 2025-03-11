@@ -7,6 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/login/main_combine.dart';
 import 'package:uthix_app/view/login/reset_password.dart';
 
+// Role-based navigation
+import '../Ecommerce/e_commerce.dart'; // Student Screen
+import '../Seller_dashboard/dashboard.dart'; // Seller Screen
+import '../instructor_dashboard/Dashboard/instructor_dashboard.dart'; // Instructor Screen
+
 class EmailId extends StatefulWidget {
   const EmailId({super.key});
 
@@ -17,11 +22,17 @@ class EmailId extends StatefulWidget {
 class _EmailIdState extends State<EmailId> {
   final TextEditingController _emailIdController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool ispassword = true; // Toggle password visibility
 
-  bool ispassword = true;
+  Future<void> saveUserSession(String token, String role) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', token);
+    await prefs.setString('user_role', role);
+  }
 
   void _login() async {
-    String email = _emailIdController.text.trim();
+    String email =
+        _emailIdController.text.trim().toLowerCase(); // Convert to lowercase
     String password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
@@ -39,30 +50,46 @@ class _EmailIdState extends State<EmailId> {
       );
 
       final data = jsonDecode(response.body);
-      log("API Response: $data"); // Log the full response
+      log("API Response: $data");
 
       if (response.statusCode == 200 && data.containsKey('access_token')) {
-        // Store access token in SharedPreferences
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('access_token', data['access_token']);
+        // Extract values
+        String token = data['access_token'];
+        String role =
+            data['role'] ?? 'student'; // Default to student if missing
 
-        // Retrieve & log the stored token to verify
-        String? storedToken = prefs.getString('access_token');
-        log("Stored Token in SharedPreferences: $storedToken");
+        // Store in SharedPreferences
+        await saveUserSession(token, role);
+
+        // Log stored values
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        log("Stored Token: ${prefs.getString('auth_token')}, Role: ${prefs.getString('user_role')}");
+
+        // Navigate based on role
+        Widget nextScreen;
+        if (role == 'seller') {
+          nextScreen = SellerDashboard();
+        } else if (role == 'student') {
+          nextScreen = ECommerce();
+        } else if (role == 'instructor') {
+          nextScreen = InstructorDashboard();
+        } else {
+          nextScreen = MainCombine(); // Default screen
+        }
 
         Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => MainCombine()),
-        );
+            context, MaterialPageRoute(builder: (context) => nextScreen));
       } else {
+        // Show error message from API
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data['message'] ?? "Login failed")),
+          SnackBar(
+              content: Text(data['message'] ?? "Invalid email or password")),
         );
       }
     } catch (e) {
       log("Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("An error occurred. Try again.")),
+        SnackBar(content: Text("An error occurred. Please try again.")),
       );
     }
   }
@@ -193,19 +220,13 @@ class _EmailIdState extends State<EmailId> {
         child: TextField(
           controller: controller,
           keyboardType: TextInputType.emailAddress,
-          style: GoogleFonts.urbanist(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: Color.fromRGBO(96, 95, 95, 1),
-          ),
+          style:
+              GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: hint,
-            hintStyle: GoogleFonts.urbanist(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Color.fromRGBO(96, 95, 95, 1),
-            ),
+            hintStyle:
+                GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
           ),
         ),
       ),
@@ -226,30 +247,18 @@ class _EmailIdState extends State<EmailId> {
         child: TextField(
           controller: _passwordController,
           obscureText: ispassword,
-          style: GoogleFonts.urbanist(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: Color.fromRGBO(96, 95, 95, 1),
-          ),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: "Enter your Password",
-            hintStyle: GoogleFonts.urbanist(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Color.fromRGBO(96, 95, 95, 1),
-            ),
-            suffixIcon: GestureDetector(
-              onTap: () {
+            suffixIcon: IconButton(
+              icon: Icon(ispassword
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined),
+              onPressed: () {
                 setState(() {
                   ispassword = !ispassword;
                 });
               },
-              child: Icon(
-                ispassword
-                    ? Icons.visibility_off_outlined
-                    : Icons.visibility_outlined,
-              ),
             ),
           ),
         ),

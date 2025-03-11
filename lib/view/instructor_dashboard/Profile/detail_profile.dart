@@ -173,7 +173,8 @@ class ProfileField extends StatefulWidget {
   final String label;
   final String hint;
 
-  ProfileField({required this.icon, required this.label, required this.hint});
+  const ProfileField(
+      {super.key, required this.icon, required this.label, required this.hint});
 
   @override
   _ProfileFieldState createState() => _ProfileFieldState();
