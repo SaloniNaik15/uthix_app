@@ -178,7 +178,7 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
           Padding(
             padding: const EdgeInsets.only(left: 30, right: 30, top: 50),
             child: SizedBox(
-              height: 80,
+              height: 85,
               child: Column(
                 children: [
                   Row(
@@ -245,7 +245,7 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
             ),
           ),
           const Divider(
-            thickness: 3,
+            thickness: 2,
             color: Color.fromRGBO(200, 209, 215, 1),
           ),
           // Chat Message List

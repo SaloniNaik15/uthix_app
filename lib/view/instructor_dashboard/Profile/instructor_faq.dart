@@ -9,7 +9,7 @@ class InstructorFaq extends StatefulWidget {
 
 class _InstructorFaqState extends State<InstructorFaq> {
   // List to store the expanded state for each list item
-  List<bool> _expandedStates = List.filled(8, false);
+  final List<bool> _expandedStates = List.filled(8, false);
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uthix_app/view/instructor_dashboard/submission/view_assignmnets.dart';
@@ -17,6 +15,7 @@ class _SubmissionState extends State<Submission> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -210,9 +209,9 @@ class _SubmissionState extends State<Submission> {
             height: 10,
           ),
           Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30),
-              child: SizedBox(
-                height: 500,
+              padding: const EdgeInsets.only(left: 20, right: 20),
+              child: Container(
+                height: 600,
                 child: ListView.builder(
                   shrinkWrap: true,
                   itemCount: 13,

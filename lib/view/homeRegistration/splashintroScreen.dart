@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/homeRegistration/registration.dart';
+import '../Seller_dashboard/dashboard.dart';
+import '../instructor_dashboard/Dashboard/instructor_dashboard.dart';
+import '../login/main_combine.dart'; // Instructor Dashboard
 
 class Introscreen extends StatefulWidget {
   const Introscreen({super.key});
@@ -10,22 +14,51 @@ class Introscreen extends StatefulWidget {
 }
 
 class _IntroscreenState extends State<Introscreen> {
-  //Delayed for 3 sec.
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(seconds: 3), () {
+    _checkLoginState();
+  }
+
+  Future<void> _checkLoginState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    String? role = prefs.getString('user_role'); // Retrieve user role
+
+    // Simulate splash screen delay
+    await Future.delayed(Duration(seconds: 3));
+
+    if (token != null && role != null) {
+      if (role == "seller") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SellerDashboard()),
+        );
+      } else if (role == "instructor") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => InstructorDashboard()),
+        );
+      } else {
+        // Default: Navigate to Student Home
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainCombine()),
+        );
+      }
+    } else {
+      // If no token, go to registration/login screen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Registration()),
       );
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //SplashScreen
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           Positioned.fill(

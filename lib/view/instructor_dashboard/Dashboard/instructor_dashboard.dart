@@ -1,13 +1,14 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uthix_app/modal/navbarWidgetInstructor.dart';
 import 'package:uthix_app/view/instructor_dashboard/Chat/chat.dart';
-import 'package:uthix_app/view/instructor_dashboard/Class/newclass.dart';
-import 'package:uthix_app/view/instructor_dashboard/Dashboard/my_classes.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/profile_account.dart';
 import 'package:uthix_app/view/instructor_dashboard/calender/calender.dart';
 import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
+
+import 'ClassData.dart';
 
 class InstructorDashboard extends StatefulWidget {
   const InstructorDashboard({super.key});
@@ -57,6 +58,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     }
   }
 
+  // Controllers for text input
   final TextEditingController _classnameController = TextEditingController();
   final TextEditingController _sectionController = TextEditingController();
   final TextEditingController _subjectController = TextEditingController();
@@ -64,7 +66,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
 
   final Dio _dio = Dio();
   final String apiUrl = "https://admin.uthix.com/api/classroom";
-  final String token = "129|R7THr97G2ycwBYljdixjLa6EIUNMYZZ4tzAuU5Esbe4f2409";
+  final String token = "112|OZqf3MUzqsvrPd0XkqX7tT9YM0mCwlf0E6Az5Nykfb3c42fd";
 
   List<Map<String, dynamic>> subjects = [];
   int? selectedSubjectId;
@@ -75,56 +77,92 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     _fetchSubjects();
   }
 
+  // Function to create class by posting user-entered data.
+  // Note: The payload does not include a "classroom_id" so that the backend generates it automatically.
   Future<void> _createClass() async {
     if (selectedSubjectId == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Please select a subject!")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select a subject!")));
+      return;
     }
+
+    // Prepare the request payload using the current controller values.
+    final requestData = {
+      "instructor_id": 1, // Use integer or string as expected by your API
+      "class_name": _classnameController.text.trim(),
+      "section": _sectionController.text.trim(),
+      "subject_id": selectedSubjectId,
+      "link": _classlinkController.text.trim(),
+    };
+
+    // Debug print to verify request payload
+    print("Request Data: ${jsonEncode(requestData)}");
+
     try {
       Response response = await _dio.post(
         apiUrl,
         options: Options(
           headers: {
             "Authorization": "Bearer $token",
+            "Accept": "application/json",
             "Content-Type": "application/json",
           },
         ),
-        data: {
-          "instructor_id": 1,
-          "class_name": _classnameController.text.trim(),
-          "section": _sectionController.text.trim(),
-          "subject_id": selectedSubjectId,
-          "link": _classlinkController.text.trim(),
-        },
+        data: requestData,
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      final responseData = response.data;
+      // Check that the API returns a 201 status code and a true status in the response body.
+      if (response.statusCode == 201 && responseData["status"] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Class created successfully!")),
+          SnackBar(content: Text(responseData["message"])),
         );
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => Newclass()));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed: ${response.data}")),
+          context,
+          MaterialPageRoute(builder: (context) => ClassData()),
         );
+      } else {
+        // Print errors to console for debugging
+        print("Failed: ${responseData["errors"]}");
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Failed")));
       }
     } catch (e) {
       if (e is DioException) {
         print("Dio Error Code: ${e.response?.statusCode}");
         print("Error Data: ${e.response?.data}");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${e.response?.data}")),
-        );
+            SnackBar(content: Text("Error: ${e.response?.data}")));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Unexpected Error: ${e.toString()}")),
-        );
+            SnackBar(content: Text("Unexpected Error: ${e.toString()}")));
       }
     }
   }
 
+  // Function to fetch subjects for the dropdown.
+  Future<void> _fetchSubjects() async {
+    try {
+      Response response = await _dio.get(
+        "https://admin.uthix.com/api/subject",
+        options: Options(headers: {
+          "Authorization":
+              "Bearer 111|mKDQUpVlndNCwxgRQ8DuI6EjKmF6o09WMh46tcWGf7321fea"
+        }),
+      );
+      if (response.statusCode == 200) {
+        setState(() {
+          subjects = List<Map<String, dynamic>>.from(response.data["subjects"]);
+        });
+      }
+    } catch (e) {
+      print("Error fetching subjects: $e");
+    }
+  }
+
+  // Modal dialog that uses the same controllers so that user-entered data is retained.
   void showCenteredModal() {
+    // Optionally refresh the subjects list before showing the modal.
     _fetchSubjects();
 
     showGeneralDialog(
@@ -180,7 +218,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                             height: 37,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(4),
-                              color: Color.fromRGBO(43, 92, 116, 1),
+                              color: const Color.fromRGBO(43, 92, 116, 1),
                             ),
                             child: Center(
                               child: Text(
@@ -207,23 +245,6 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     );
   }
 
-  Future<void> _fetchSubjects() async {
-    try {
-      Response response = await _dio.get("https://admin.uthix.com/api/subject",
-          options: Options(headers: {
-            "Authorization":
-                "Bearer 27|aUCqamch2YylbeJhdTWp7UWsWORc2DcBonSoscPw79712c20"
-          }));
-      if (response.statusCode == 200) {
-        setState(() {
-          subjects = List<Map<String, dynamic>>.from(response.data["subjects"]);
-        });
-      }
-    } catch (e) {
-      print("Error fetching subjects: $e");
-    }
-  }
-
   Widget _buildDropdownField(
       String label, List<Map<String, dynamic>> items, int? selectedValue) {
     return Column(
@@ -238,9 +259,9 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: Color.fromRGBO(246, 246, 246, 1),
+            color: const Color.fromRGBO(246, 246, 246, 1),
             borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: Color.fromRGBO(210, 210, 210, 1)),
+            border: Border.all(color: const Color.fromRGBO(210, 210, 210, 1)),
           ),
           child: DropdownButton<int>(
             value: selectedValue,
@@ -286,27 +307,25 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
           height: 45,
           width: 341,
           decoration: BoxDecoration(
-            color: Color.fromRGBO(246, 246, 246, 1),
+            color: const Color.fromRGBO(246, 246, 246, 1),
             borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: Color.fromRGBO(210, 210, 210, 1)),
+            border: Border.all(color: const Color.fromRGBO(210, 210, 210, 1)),
           ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: controller,
               style: GoogleFonts.urbanist(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: Colors.black87,
-              ),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black87),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: hint,
                 hintStyle: GoogleFonts.urbanist(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.black45,
-                ),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.black45),
               ),
             ),
           ),
@@ -322,6 +341,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
+          // Header section
           Column(
             children: [
               Padding(
@@ -419,6 +439,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
               const SizedBox(height: 30),
             ],
           ),
+          // Background image positioned below header
           Positioned.fill(
             top: 200,
             child: Image.asset(
@@ -426,6 +447,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
               fit: BoxFit.cover,
             ),
           ),
+          // Dashboard grid
           Positioned.fill(
             top: 250,
             child: Align(
@@ -450,7 +472,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => MyClasses()),
+                                builder: (context) => ClassData()),
                           );
                         }
                         if (dashBoard[index]["title"] == "Calender") {
@@ -480,10 +502,9 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                             Text(
                               dashBoard[index]["title"]!,
                               style: GoogleFonts.urbanist(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: const Color.fromRGBO(96, 95, 95, 1),
-                              ),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color.fromRGBO(96, 95, 95, 1)),
                             ),
                           ],
                         ),
@@ -494,13 +515,15 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
               ),
             ),
           ),
+          // Bottom navigation bar
           Positioned(
             bottom: 20,
             left: 0,
             right: 0,
             child: Center(
-                child: Navbar(
-                    onItemTapped: onItemTapped, selectedIndex: selectedIndex)),
+              child: Navbar(
+                  onItemTapped: onItemTapped, selectedIndex: selectedIndex),
+            ),
           ),
         ],
       ),

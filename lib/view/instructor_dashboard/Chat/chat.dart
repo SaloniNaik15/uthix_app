@@ -138,7 +138,7 @@ class _ChatState extends State<Chat> {
               ),
               const SizedBox(height: 10),
               SizedBox(
-                height: 580,
+                height: 700,
                 child: ListView.builder(
                   itemCount: 10,
                   itemBuilder: (context, index) {
@@ -281,7 +281,7 @@ class _ChatState extends State<Chat> {
             ),
           ),
           Positioned(
-            bottom: 100,
+            bottom: 150,
             right: 30,
             child: GestureDetector(
               onTap: () {

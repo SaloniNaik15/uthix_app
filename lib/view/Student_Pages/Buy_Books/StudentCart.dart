@@ -19,12 +19,11 @@ class _StudentcartState extends State<Studentcart> {
   double shippingCost = 40;
   double discount = 0;
   // Default values if no address saved.
-  String selectedAddress = "Home";
+  String selectedAddress = "hhome";
   int selectedAddressId = 0;
 
   final Dio dio = Dio();
-  final String token =
-      "9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64";
+  final String token = "9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64";
 
   @override
   void initState() {
@@ -77,7 +76,7 @@ class _StudentcartState extends State<Studentcart> {
   double get totalAmount {
     double total = cartItems.fold(0.0, (sum, item) {
       double price = ((item['product']['price'] ??
-          item['product']['discount_price']) as num)
+              item['product']['discount_price']) as num)
           .toDouble();
       int quantity = item['quantity'];
       return sum + (quantity * price);
@@ -91,7 +90,7 @@ class _StudentcartState extends State<Studentcart> {
     if (cartItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("⚠️ Cart is empty. Please add items to proceed.")),
+            content: Text("⚠ Cart is empty. Please add items to proceed.")),
       );
       return;
     }
@@ -99,14 +98,15 @@ class _StudentcartState extends State<Studentcart> {
     if (selectedAddressId == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("⚠️ Please select a valid delivery address.")),
+            content: Text("⚠ Please select a valid delivery address.")),
       );
       return;
     }
 
     List<Map<String, dynamic>> orderItems = cartItems.map((item) {
-      double price = (item['product']['discount_price'] ??
-          item['product']['price']).toDouble();
+      double price =
+          (item['product']['discount_price'] ?? item['product']['price'])
+              .toDouble();
       int quantity = item['quantity'];
       return {
         "product_id": item['product']['id'],
@@ -117,8 +117,9 @@ class _StudentcartState extends State<Studentcart> {
     }).toList();
 
     double subtotal = cartItems.fold(0.0, (sum, item) {
-      double price = (item['product']['discount_price'] ??
-          item['product']['price']).toDouble();
+      double price =
+          (item['product']['discount_price'] ?? item['product']['price'])
+              .toDouble();
       return sum + (item['quantity'] * price);
     });
 
@@ -179,7 +180,8 @@ class _StudentcartState extends State<Studentcart> {
   }
 
   void removeFromCart(int cartId) async {
-    final String apiUrl = "https://admin.uthix.com/api/remove-from-cart/$cartId";
+    final String apiUrl =
+        "https://admin.uthix.com/api/remove-from-cart/$cartId";
 
     try {
       final response = await dio.delete(
@@ -198,7 +200,7 @@ class _StudentcartState extends State<Studentcart> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content:
-              Text("Failed to remove item: ${response.data['message']}")),
+                  Text("Failed to remove item: ${response.data['message']}")),
         );
       }
     } catch (e) {
@@ -227,34 +229,22 @@ class _StudentcartState extends State<Studentcart> {
             );
           },
           onChangeAddress: (address) {
-            // Optional callback if needed.
+            // Store only the address_type
+            String displayAddress = address['address_type'] ?? "Home";
+
+            setState(() {
+              selectedAddress = displayAddress;
+              selectedAddressId = address["id"];
+            });
+
+            // Save selected address type persistently
+            saveSelectedAddress(displayAddress, address["id"]);
+
+            print("✅ Address Selected: $selectedAddress");
           },
         );
       },
     );
-
-    if (result != null && result is Map<String, dynamic>) {
-      // Extract only the address type to display.
-      String displayAddress = result['address_type'] ?? "Home";
-
-      setState(() {
-        selectedAddress = displayAddress;
-        selectedAddressId = result["id"];
-      });
-      // Save the latest state persistently.
-      await saveSelectedAddress(displayAddress, result["id"]);
-      print("✅ Address Selected: $selectedAddress");
-      print("✅ Address ID Updated: $selectedAddressId");
-      // Navigate to the next page with the address.
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => StudentAddress(address: result),
-        ),
-      );
-    } else {
-      print("⚠️ Address selection canceled or returned null.");
-    }
   }
 
   @override
@@ -284,160 +274,179 @@ class _StudentcartState extends State<Studentcart> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : cartItems.isEmpty
-          ? const Center(
-        child: Text(
-          "Cart is Empty",
-          style: TextStyle(fontSize: 18, fontFamily: "Urbanist"),
-        ),
-      )
-          : Container(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: <Widget>[
-              // Address Section
-              Container(
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFD9D9D9)),
-                    color: const Color(0xFFF6F6F6)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Deliver to this address: $selectedAddress",
-                      style: const TextStyle(
-                          fontSize: 14, fontFamily: "Urbanist"),
-                    ),
-                    TextButton(
-                      onPressed: showAddressBottomSheet,
-                      child: const Text(
-                        "Change",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontFamily: "Urbanist",
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2B5C74),
+              ? const Center(
+                  child: Text(
+                    "Cart is Empty",
+                    style: TextStyle(fontSize: 18, fontFamily: "Urbanist"),
+                  ),
+                )
+              : Container(
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: <Widget>[
+                        // Address Section
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: const Color(0xFFD9D9D9)),
+                              color: const Color(0xFFF6F6F6)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Deliver to this address:",
+                                      style: const TextStyle(
+                                          fontSize: 14, fontFamily: "Urbanist"),
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                      selectedAddress, // Display address type
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontFamily: "Urbanist",
+                                          fontWeight: FontWeight.normal),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: showAddressBottomSheet,
+                                child: const Text(
+                                  "Change",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: "Urbanist",
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF2B5C74),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Cart Items List
-              Expanded(
-                child: ListView.builder(
-                  itemCount: cartItems.length,
-                  itemBuilder: (context, index) {
-                    final item = cartItems[index];
-                    final product = item['product'];
-                    final int cartId = item['id'];
-                    int quantity = (item['quantity'] != null)
-                        ? (item['quantity'] as num).toInt()
-                        : 1;
-                    final String title = product['title'];
-                    final double price =
-                    (product['price']).toDouble();
-                    final String imageUrl =
-                    (product['first_image'] != null &&
-                        product['first_image']['image_path'] !=
-                            null)
-                        ? 'https://admin.uthix.com/storage/image/products/${product['first_image']['image_path']}'
-                        : "https://via.placeholder.com/150";
+                        const SizedBox(height: 10),
+                        // Cart Items List
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: cartItems.length,
+                            itemBuilder: (context, index) {
+                              final item = cartItems[index];
+                              final product = item['product'];
+                              final int cartId = item['id'];
+                              int quantity = (item['quantity'] != null)
+                                  ? (item['quantity'] as num).toInt()
+                                  : 1;
+                              final String title = product['title'];
+                              final double price =
+                                  (product['price']).toDouble();
+                              final String imageUrl = (product['first_image'] !=
+                                          null &&
+                                      product['first_image']['image_path'] !=
+                                          null)
+                                  ? 'https://admin.uthix.com/storage/image/products/${product['first_image']['image_path']}'
+                                  : "https://via.placeholder.com/150";
 
-                    return buildCartItem(
-                        cartId,
-                        title,
-                        product['description'] ??
-                            "No description available",
-                        imageUrl,
-                        price,
-                        quantity,
-                        index);
-                  },
-                ),
-              ),
-              // Discount Code Section
-              Row(
-                children: [
-                  const Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: "Discount Code or Gift Card",
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 10),
-                      ),
+                              return buildCartItem(
+                                  cartId,
+                                  title,
+                                  product['description'] ??
+                                      "No description available",
+                                  imageUrl,
+                                  price,
+                                  quantity,
+                                  index);
+                            },
+                          ),
+                        ),
+                        // Discount Code Section
+                        Row(
+                          children: [
+                            const Expanded(
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  hintText: "Discount Code or Gift Card",
+                                  border: OutlineInputBorder(),
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 12, horizontal: 10),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 15),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(
+                                    () => discount = 100); // Example discount
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 30, vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5)),
+                                  backgroundColor: const Color(0xFFD9D9D9)),
+                              child: const Text(
+                                "Apply",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: "Urbanist",
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        // Price Details
+                        const Divider(),
+                        buildPriceRow("Subtotal",
+                            "₹${(totalAmount - shippingCost + discount).toStringAsFixed(2)}"),
+                        buildPriceRow(
+                            "Shipping", "₹${shippingCost.toStringAsFixed(2)}"),
+                        buildPriceRow(
+                            "Discount", "- ₹${discount.toStringAsFixed(2)}"),
+                        const Divider(),
+                        buildPriceRow(
+                            "Total", "₹${totalAmount.toStringAsFixed(2)}",
+                            isBold: true),
+                        const Divider(),
+                        const SizedBox(height: 10),
+                        // Proceed to Payment Button
+                        ElevatedButton(
+                          onPressed: () => placeOrder(),
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(double.infinity, 50),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5)),
+                            backgroundColor: const Color(0xFF2B5C74),
+                            elevation: 5,
+                            shadowColor: Colors.black54,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.payment, color: Colors.white),
+                              SizedBox(width: 10),
+                              Text("Proceed to Payment",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Urbanist",
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  )),
+                            ],
+                          ),
+                        )
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 15),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() => discount = 100); // Example discount
-                    },
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 14),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5)),
-                        backgroundColor: const Color(0xFFD9D9D9)),
-                    child: const Text(
-                      "Apply",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontFamily: "Urbanist",
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              // Price Details
-              const Divider(),
-              buildPriceRow("Subtotal",
-                  "₹${(totalAmount - shippingCost + discount).toStringAsFixed(2)}"),
-              buildPriceRow("Shipping",
-                  "₹${shippingCost.toStringAsFixed(2)}"),
-              buildPriceRow("Discount",
-                  "- ₹${discount.toStringAsFixed(2)}"),
-              const Divider(),
-              buildPriceRow("Total",
-                  "₹${totalAmount.toStringAsFixed(2)}",
-                  isBold: true),
-              const Divider(),
-              const SizedBox(height: 10),
-              // Proceed to Payment Button
-              ElevatedButton(
-                onPressed: () => placeOrder(),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5)),
-                  backgroundColor: const Color(0xFF2B5C74),
-                  elevation: 5,
-                  shadowColor: Colors.black54,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.payment, color: Colors.white),
-                    SizedBox(width: 10),
-                    Text("Proceed to Payment",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: "Urbanist",
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        )),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -570,14 +579,12 @@ class _StudentcartState extends State<Studentcart> {
           Text(title,
               style: TextStyle(
                   fontSize: isBold ? 16 : 14,
-                  fontWeight:
-                  isBold ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
                   fontFamily: "Urbanist")),
           Text(value,
               style: TextStyle(
                   fontSize: isBold ? 16 : 14,
-                  fontWeight:
-                  isBold ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
                   fontFamily: "Urbanist")),
         ],
       ),

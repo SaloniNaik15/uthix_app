@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../homeRegistration/registration.dart';
 import 'FrequentlyAskedQuestions.dart';
 import 'HelpDesk.dart';
 import 'ManageAccounts.dart';
@@ -12,6 +14,17 @@ class YourAccount extends StatefulWidget {
 
   @override
   State<YourAccount> createState() => _ManageYourAccountState();
+}
+
+Future<void> logoutUser(BuildContext context) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.remove('auth_token');
+  await prefs.remove('user_role');
+
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => Registration()),
+  );
 }
 
 class _ManageYourAccountState extends State<YourAccount> {
@@ -54,12 +67,11 @@ class _ManageYourAccountState extends State<YourAccount> {
               child: Column(
                 children: [
                   _buildListTile(
-                    icon: Icons.person_outline,
-                    title: "Profile",
-                    subtitle: "",
-                    navigateTo: Profile(),
-                    context: context
-                  ),
+                      icon: Icons.person_outline,
+                      title: "Profile",
+                      subtitle: "",
+                      navigateTo: Profile(),
+                      context: context),
                   const Divider(
                     height: 1,
                   ),
@@ -98,7 +110,7 @@ class _ManageYourAccountState extends State<YourAccount> {
                     title: "FAQs",
                     subtitle: "Frequently Asked Questions",
                     navigateTo: Frequentlyaskedquestions(),
-                      context: context,
+                    context: context,
                   ),
                   const Divider(
                     height: 1,
@@ -126,11 +138,11 @@ class _ManageYourAccountState extends State<YourAccount> {
                           width: 1), // Border color & thickness
                       shape: RoundedRectangleBorder(
                         borderRadius:
-                        BorderRadius.circular(5), // Rounded corners
+                            BorderRadius.circular(5), // Rounded corners
                       ),
                     ),
                     onPressed: () {
-                      print("Outlined Button Pressed!");
+                      logoutUser(context);
                     },
                     child: const Text(
                       "Log out",
@@ -167,13 +179,14 @@ class _ManageYourAccountState extends State<YourAccount> {
       ),
       subtitle: subtitle.isNotEmpty
           ? Text(subtitle,
-          style: const TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w500,
-            fontFamily: "Urbanist",
-          ))
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+                fontFamily: "Urbanist",
+              ))
           : null,
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
+      trailing:
+          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
       onTap: () {
         Navigator.push(
           context,
@@ -182,5 +195,4 @@ class _ManageYourAccountState extends State<YourAccount> {
       },
     );
   }
-
 }
