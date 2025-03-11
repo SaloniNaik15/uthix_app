@@ -1,8 +1,11 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:path/path.dart' as path;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -37,16 +40,37 @@ class _CreateStoreState extends State<CreateStore> {
         await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
+      File imageFile = File(pickedFile.path);
+      File? compressedImage = await _compressImage(imageFile);
 
-      // Save the image path in SharedPreferences
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("logo", pickedFile.path);
+      if (compressedImage != null) {
+        setState(() {
+          _selectedImage = compressedImage;
+        });
 
-      log("Saved Image Path: ${pickedFile.path}");
+        // Save the image path in SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString("logo", compressedImage.path);
+
+        log("Saved Image Path: ${compressedImage.path}");
+      }
     }
+  }
+
+  Future<File?> _compressImage(File file) async {
+    final dir = await getTemporaryDirectory();
+    final targetPath =
+        path.join(dir.path, 'compressed_${path.basename(file.path)}');
+
+    var result = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      targetPath,
+      quality: 85, // Adjust quality (0-100)
+      minWidth: 800, // Resize width (optional)
+      minHeight: 800, // Resize height (optional)
+    );
+
+    return result != null ? File(result.path) : null;
   }
 
   Future<void> _saveStoreData() async {

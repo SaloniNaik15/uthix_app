@@ -41,15 +41,6 @@ class _MailidpageState extends State<Mailidpage> {
     });
   }
 
-  Future<void> _saveUserCredentials(
-      String email, String password, String accessToken) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString("email", email);
-    await prefs.setString("password", password);
-    await prefs.setString("userToken", accessToken);
-    print("Email & Password Saved: $email, $password,$accessToken");
-  }
-
   Future<void> _registerUser() async {
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -64,7 +55,7 @@ class _MailidpageState extends State<Mailidpage> {
       "name": _userNameController.text,
       "email": _emailIdController.text,
       "password": _passwordController.text,
-      "role": _selectedRole,
+      "role": _selectedRole ?? "",
     });
 
     try {
@@ -74,16 +65,15 @@ class _MailidpageState extends State<Mailidpage> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
-
         SharedPreferences prefs = await SharedPreferences.getInstance();
+
         await prefs.setString("userToken", data["access_token"]);
         await prefs.setString("userName", data["user"]["name"]);
         await prefs.setString("userRole", data["user"]["role"]);
         await prefs.setString("userEmail", data["user"]["email"]);
 
-        // Save email and password
-        await _saveUserCredentials(_emailIdController.text,
-            _passwordController.text, data["access_token"]);
+        // ✅ Manually store the password
+        await prefs.setString("password", _passwordController.text);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Registration Successful!")),
@@ -94,13 +84,11 @@ class _MailidpageState extends State<Mailidpage> {
           MaterialPageRoute(builder: (context) => Successpage()),
         );
       } else {
-        log("Error: ${response.body}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Registration Failed: ${response.body}")),
         );
       }
     } catch (e) {
-      debugPrint("Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: $e")),
       );
@@ -148,7 +136,6 @@ class _MailidpageState extends State<Mailidpage> {
                   _buildTextField(
                     controller: _userNameController,
                     hintText: "Please Enter Your Name",
-                    keyboardType: TextInputType.text,
                   ),
                   const SizedBox(height: 20),
                   _buildTextField(
@@ -229,11 +216,6 @@ class _MailidpageState extends State<Mailidpage> {
           controller: controller,
           obscureText: isObscure,
           keyboardType: keyboardType,
-          style: GoogleFonts.urbanist(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            color: const Color.fromRGBO(96, 95, 95, 1),
-          ),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: hintText,
@@ -272,7 +254,7 @@ class _MailidpageState extends State<Mailidpage> {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _selectedRole,
-          hint: const Text("Please Select Your Role"),
+          hint: Text("SelectRole"),
           isExpanded: true,
           items: roles.map((String role) {
             return DropdownMenuItem<String>(

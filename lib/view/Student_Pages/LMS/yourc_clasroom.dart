@@ -22,6 +22,7 @@ class _YourClasroomState extends State<YourClasroom> {
   int selectedIndex = 0;
 
   String? email;
+  int classroomId = 0;
   String? password;
   String? accessLoginToken;
   int? studentId;
@@ -122,7 +123,7 @@ class _YourClasroomState extends State<YourClasroom> {
             final classroom = student["classroom"] ?? {};
             final instructor = classroom["instructor"]?["user"] ?? {};
 
-            int? classroomId = classroom["id"]; // Store classroom_id
+            classroomId = student["classroom_id"]; // Store classroom_id
             String className = classroom["class_name"] ?? "Default Class";
             String section = classroom["section"] ?? "Default Section";
             String instructorName = instructor["name"] ?? "Unknown Instructor";
@@ -454,16 +455,14 @@ class _YourClasroomState extends State<YourClasroom> {
                                         left: 20, right: 20, bottom: 20),
                                     child: GestureDetector(
                                       onTap: () {
-                                        int classroomId =
-                                            classData["classroomId"];
-
-                                        log("SALONI:$classroomId");
+                                        int classid = classroomId;
+                                        log("SALONI:$classid");
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) => Classes(
                                                 classroomId:
-                                                    classroomId), // Replace with your screen
+                                                    classid), // Replace with your screen
                                           ),
                                         );
                                       },

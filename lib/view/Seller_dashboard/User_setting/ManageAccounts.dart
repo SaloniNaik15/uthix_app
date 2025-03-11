@@ -1,6 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer';
+import 'package:http/http.dart' as http;
+import 'package:uthix_app/view/homeRegistration/registration.dart';
 
-class ManageAccountScreen extends StatelessWidget {
+class ManageAccountScreen extends StatefulWidget {
+  @override
+  _ManageAccountScreenState createState() => _ManageAccountScreenState();
+}
+
+class _ManageAccountScreenState extends State<ManageAccountScreen> {
+  String? accessToken;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    await _loadUserCredentials();
+  }
+
+  Future<void> _loadUserCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    // ✅ Password now saved
+    String? savedaccessToken = prefs.getString("userToken");
+
+    log("Retrieved acesstoken: $savedaccessToken");
+
+    setState(() {
+      accessToken = savedaccessToken ?? "No accesstoken";
+    });
+  }
+
+  Future<void> logoutUser() async {
+    final url = Uri.parse("https://admin.uthix.com/api/logout");
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+
+      final response = await http.post(
+        url,
+        headers: {
+          "Authorization": "Bearer $accessToken",
+          "Content-Type": "application/json",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        log("Logout successful");
+
+        // Clear shared preferences
+        await prefs.remove("userToken");
+        await prefs.remove("userEmail");
+        await prefs.remove("password");
+        await prefs.remove("userRole");
+        await prefs.remove("userName");
+        log("SharedPreferences cleared successfully");
+
+        // Navigate to RegistrationPage
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Registration()),
+          );
+        }
+      } else {
+        log("Logout failed: ${response.body}");
+      }
+    } catch (e) {
+      log("Error logging out: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,19 +136,20 @@ class ManageAccountScreen extends StatelessWidget {
               _buildProfileField(Icons.school, "Banaras Hindu University"),
 
               const SizedBox(height: 30),
+              // Buttons
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () {},
+                      onPressed: logoutUser,
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.black),
+                        side: BorderSide(color: Colors.red),
                         padding: EdgeInsets.symmetric(vertical: 14),
                       ),
                       child: Text(
-                        "Add Account",
+                        "Log out",
                         style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.red,
                             fontFamily: "Urbanist",
                             fontSize: 16),
                       ),
@@ -83,7 +157,7 @@ class ManageAccountScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
             ],
           ),
         ),
