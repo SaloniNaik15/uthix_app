@@ -46,7 +46,7 @@ class _InventoryDataState extends State<InventoryData> {
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String? savedaccessToken = prefs.getString("userToken");
+    String? savedaccessToken = prefs.getString("auth_token");
 
     log("Retrieved acesstoken: $savedaccessToken");
 

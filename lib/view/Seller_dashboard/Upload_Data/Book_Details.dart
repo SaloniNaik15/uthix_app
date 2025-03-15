@@ -94,7 +94,7 @@ class _PersonalDetailsState extends State<BookDetails> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? selectedCategoryIdStr = prefs.getString("selectedCategoryId");
-    String? savedAccessToken = prefs.getString("userToken");
+    String? savedAccessToken = prefs.getString("auth_token");
 
     if (selectedCategoryIdStr == null || selectedCategoryIdStr.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../UpcomingPage.dart';
 import 'Create_Store_Data/CreateStore.dart';
 import 'Inventory_data/Inventory.dart';
 import 'Manage_store_Data/ManageStores.dart';
 import 'Orders_Data/Oders.dart';
 import 'Upload_Data/Upload.dart';
-import 'User_setting/Profile.dart';
 import 'User_setting/YourAccount.dart';
 
 class SellerDashboard extends StatefulWidget {
@@ -62,8 +62,8 @@ class _SellerDashboardState extends State<SellerDashboard> {
 
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? savedEmail = prefs.getString("userEmail"); // ✅ Correct key
-    String? savedPassword = prefs.getString("password"); // ✅ Password now saved
+    String? savedEmail = prefs.getString("email");
+    String? savedPassword = prefs.getString("password");
     String? savedaccessToken = prefs.getString("userToken");
 
     log("Retrieved Email: $savedEmail");
@@ -226,7 +226,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                       context,
                       'Create Store',
                       'assets/Seller_dashboard_images/create_store.png',
-                      CreateStore()),
+                      UnderConstructionScreen()),
                   buildGridItem(
                       context,
                       'Manage Stores',
@@ -236,7 +236,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                       context,
                       'My Profile',
                       'assets/Seller_dashboard_images/my_profile.png',
-                      Profile()),
+                      YourAccount()),
                 ],
               ),
             ),
@@ -294,7 +294,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const ManageOrders()));
+                          builder: (context) => UnderConstructionScreen()));
                 },
                 child: Image.asset('assets/icons/orderIcon.png', height: 35),
               ),
@@ -425,14 +425,16 @@ class _SellerDashboardState extends State<SellerDashboard> {
     }
 
     // Delay the dialog to be shown after the current frame is completed
+    // Delay the dialog to be shown after the current frame is completed
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+      if (!context.mounted)
+        return; // Ensure the widget is still part of the tree
 
       showDialog(
         context: context,
-        builder: (BuildContext context) {
+        builder: (BuildContext dialogContext) {
           return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setDialogState) {
+            builder: (BuildContext dialogContext, StateSetter setDialogState) {
               return AlertDialog(
                 title: Text("Select a Subcategory for $parentName"),
                 content: Column(
@@ -454,17 +456,22 @@ class _SellerDashboardState extends State<SellerDashboard> {
                           });
 
                           // After selection, navigate to UploadData screen
-                          Navigator.pop(context); // Close the dialog
+                          if (dialogContext.mounted) {
+                            Navigator.pop(dialogContext); // Close the dialog
+                          }
+
                           _saveSelectedSubcategory(
                               subcategoryId, subcategoryName);
 
-                          // Navigate to UploadData screen with the selected subcategory ID and name
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => UploadData(),
-                            ),
-                          );
+                          // Ensure the page is still mounted before navigation
+                          if (context.mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UploadData(),
+                              ),
+                            );
+                          }
                         },
                         activeColor: const Color.fromRGBO(43, 96, 116, 1),
                       ),
