@@ -39,7 +39,7 @@ class _UploadDataState extends State<UploadData> {
           prefs.getString("selectedCategoryName") ?? "Uncategorized";
       selectedSubcategory = prefs.getString("selectedSubcategoryName");
 
-      email = prefs.getString("userEmail") ?? "No Email Found";
+      email = prefs.getString("email") ?? "No Email Found";
       password = prefs.getString("password") ?? "No Password Found";
       accessToken = prefs.getString("userToken") ?? "No accessToken";
     });

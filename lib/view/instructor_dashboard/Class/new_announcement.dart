@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewAnnouncement extends StatefulWidget {
   const NewAnnouncement({Key? key}) : super(key: key);
@@ -16,16 +17,33 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
   final TextEditingController _announceController = TextEditingController();
 
   // Ensure the endpoint URL matches your backend. Check for typos if needed.
-  final String apiUrl = "https://admin.uthix.com/api/annocment";
-  final String token = "112|OZqf3MUzqsvrPd0XkqX7tT9YM0mCwlf0E6Az5Nykfb3c42fd";
+  final String apiUrl = "https://admin.uthix.com/api/announcement";
+  String? token; // Token will be loaded from SharedPreferences
 
   File? _selectedFile;
 
-  final String instructorId = "1";
-  final String classroomId = "3";
+  final String instructorId = "2";
+  final String classroomId = "1";
   DateTime? _dueDate;
 
   final Dio _dio = Dio();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadToken();
+  }
+
+  /// Loads the access token from SharedPreferences using the key "auth_token".
+  Future<void> _loadToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      token = prefs.getString('auth_token');
+    });
+    if (token == null) {
+      debugPrint("No token found. User may not be logged in.");
+    }
+  }
 
   /// Picks a single file from the device.
   Future<void> _pickAttachment() async {
@@ -49,6 +67,13 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
     if (announcementText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Announcement text cannot be empty.")),
+      );
+      return;
+    }
+
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Access token not found.")),
       );
       return;
     }

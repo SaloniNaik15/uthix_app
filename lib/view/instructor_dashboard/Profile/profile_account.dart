@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/modal/navbarWidgetInstructor.dart';
 import 'package:uthix_app/view/instructor_dashboard/Chat/chat.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/detail_profile.dart';
@@ -61,7 +62,11 @@ class _ProfileAccountState extends State<ProfileAccount> {
       "page": InstructorDashboard()
     },
     {"icon": Icons.folder_open_outlined, "title": "Files", "page": Files()},
-    {"icon": Icons.chat_outlined, "title": "Chat", "page": const Chat()},
+    {
+      "icon": Icons.chat_outlined,
+      "title": "Chat",
+      "page": UnderConstructionScreen()
+    },
     {
       "icon": Icons.person_outline,
       "title": "Profile",

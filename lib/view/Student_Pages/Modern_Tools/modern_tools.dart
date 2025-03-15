@@ -39,6 +39,7 @@ class _ModernToolsState extends State<ModernTools> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           Positioned.fill(

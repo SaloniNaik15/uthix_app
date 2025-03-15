@@ -53,6 +53,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -171,7 +172,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                           Text(
                             "Last Grade",
                             style: GoogleFonts.urbanist(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: const Color.fromRGBO(96, 95, 95, 1),
                             ),
@@ -201,9 +202,9 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Text(
-                            "Assignments",
+                            "Assignment",
                             style: GoogleFonts.urbanist(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: const Color.fromRGBO(96, 95, 95, 1),
                             ),
@@ -235,7 +236,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                           Text(
                             "Attendance",
                             style: GoogleFonts.urbanist(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: const Color.fromRGBO(96, 95, 95, 1),
                             ),

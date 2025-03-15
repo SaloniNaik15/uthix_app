@@ -1,14 +1,12 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'package:path/path.dart' as path;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
+import 'package:path/path.dart' as p;
 import 'package:uthix_app/view/Seller_dashboard/Create_Store_Data/Personal_details.dart';
 
 class CreateStore extends StatefulWidget {
@@ -37,92 +35,98 @@ class _CreateStoreState extends State<CreateStore> {
 
   Future<void> _pickImage() async {
     final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      File imageFile = File(pickedFile.path);
-      File? compressedImage = await _compressImage(imageFile);
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
 
-      if (compressedImage != null) {
-        setState(() {
-          _selectedImage = compressedImage;
-        });
+      // Save the image path in SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("logo", pickedFile.path);
 
-        // Save the image path in SharedPreferences
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString("logo", compressedImage.path);
-
-        log("Saved Image Path: ${compressedImage.path}");
-      }
+      log("Saved Image Path: ${pickedFile.path}");
     }
   }
 
-  Future<File?> _compressImage(File file) async {
-    final dir = await getTemporaryDirectory();
-    final targetPath =
-        path.join(dir.path, 'compressed_${path.basename(file.path)}');
-
-    var result = await FlutterImageCompress.compressAndGetFile(
-      file.absolute.path,
-      targetPath,
-      quality: 85, // Adjust quality (0-100)
-      minWidth: 800, // Resize width (optional)
-      minHeight: 800, // Resize height (optional)
-    );
-
-    return result != null ? File(result.path) : null;
-  }
-
-  Future<void> _saveStoreData() async {
+  /// Saves the store data locally AND calls the API to create the store.
+  /// This API call uses Dio with a dynamic authentication token.
+  Future<void> _createStore() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    // Build store data from text fields
     Map<String, dynamic> storeData = {
       "store_name": _storeNameController.text,
       "store_address": _addressController.text,
       "counter": _counterController.text,
       "school": _schoolController.text,
-      "logo": _selectedImage?.path ?? "", // Store image path
     };
 
+    // Create a FormData object. If a logo is selected, attach it.
+    FormData formData = FormData.fromMap(storeData);
+    if (_selectedImage != null && await _selectedImage!.exists()) {
+      formData.files.add(MapEntry(
+        "logo",
+        await MultipartFile.fromFile(
+          _selectedImage!.path,
+          filename: p.basename(_selectedImage!.path),
+        ),
+      ));
+      // Also add the image path to the store data if needed locally.
+      storeData["logo"] = _selectedImage!.path;
+    } else {
+      formData.fields.add(MapEntry("logo", ""));
+    }
+
+    // Save store data locally for later use if needed.
     String jsonData = json.encode(storeData);
     await prefs.setString("storeData", jsonData);
-
     log("Stored Data: $jsonData");
-  }
 
-  Widget _buildTextField(
-      String label, String hint, TextEditingController controller) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontFamily: 'Urbanist',
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF605F5F),
-          ),
+    // Retrieve dynamic authentication token
+    String? token = prefs.getString("auth_token");
+    if (token == null || token.isEmpty) {
+      log("⚠️ Authentication token is missing.");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Authentication failed. Please log in again.")),
+      );
+      return;
+    }
+
+    try {
+      // Create Dio instance and call the API. Adjust the endpoint as needed.
+      Dio dio = Dio();
+      Response response = await dio.post(
+        "https://admin.uthix.com/api/vendor-store",
+        data: formData,
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token", // Dynamic token
+            "Content-Type": "multipart/form-data",
+          },
         ),
-        const SizedBox(height: 5),
-        TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderSide: const BorderSide(color: Color(0xFFD2D2D2)),
-            ),
-            filled: true,
-            fillColor: const Color(0xFFF6F6F6),
-            hintText: hint,
-            hintStyle: const TextStyle(
-              fontFamily: 'Urbanist',
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-      ],
-    );
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        log("Store created successfully: ${response.data}");
+        // Navigate to Personal Details screen upon successful creation.
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PersonalDetails()),
+        );
+      } else {
+        log("Store creation failed: ${response.statusCode}, ${response.data}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to create store: ${response.data}")),
+        );
+      }
+    } catch (e) {
+      log("Error creating store: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Network error. Please try again. Error: $e")),
+      );
+    }
   }
 
   @override
@@ -189,15 +193,10 @@ class _CreateStoreState extends State<CreateStore> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 10),
-                    _buildTextField(
-                        "Store Name", "e.g., Class A", _storeNameController),
-                    _buildTextField(
-                        "Address", "e.g., Class B", _addressController),
-                    _buildTextField(
-                        "School/University", "e.g., BHU", _schoolController),
-                    _buildTextField(
-                        "Counter No.", "e.g., 0010", _counterController),
-
+                    _buildTextField("Store Name", "e.g., Class A", _storeNameController),
+                    _buildTextField("Address", "e.g., Class B", _addressController),
+                    _buildTextField("School/University", "e.g., BHU", _schoolController),
+                    _buildTextField("Counter No.", "e.g., 0010", _counterController),
                     const SizedBox(height: 10),
                     // Image Picker for Logo
                     GestureDetector(
@@ -206,42 +205,34 @@ class _CreateStoreState extends State<CreateStore> {
                         width: double.infinity,
                         height: 50,
                         decoration: BoxDecoration(
-                          color: Color(0xFFFCFCFC),
+                          color: const Color(0xFFFCFCFC),
                           borderRadius: BorderRadius.circular(40),
-                          border: Border.all(color: Color(0xFFD2D2D2)),
+                          border: Border.all(color: const Color(0xFFD2D2D2)),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.image, color: Colors.grey),
-                            SizedBox(width: 8),
+                            const Icon(Icons.image, color: Colors.grey),
+                            const SizedBox(width: 8),
                             Text(
                               _selectedImage == null
                                   ? "Upload Store Logo"
                                   : "Logo Selected",
-                              style: TextStyle(color: Colors.black),
+                              style: const TextStyle(color: Colors.black),
                             ),
                           ],
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {
-                        await _saveStoreData();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PersonalDetails()),
-                        );
+                        await _createStore();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2B5C74),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 60, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       child: const Text(
                         "Create",
@@ -255,6 +246,40 @@ class _CreateStoreState extends State<CreateStore> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField(String label, String hint, TextEditingController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontFamily: 'Urbanist',
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF605F5F),
+          ),
+        ),
+        const SizedBox(height: 5),
+        TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderSide: const BorderSide(color: Color(0xFFD2D2D2)),
+            ),
+            filled: true,
+            fillColor: const Color(0xFFF6F6F6),
+            hintText: hint,
+            hintStyle: const TextStyle(
+              fontFamily: 'Urbanist',
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+      ],
     );
   }
 }

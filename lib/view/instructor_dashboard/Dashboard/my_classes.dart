@@ -1,10 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:uthix_app/view/instructor_dashboard/Class/class.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uthix_app/view/instructor_dashboard/Class/class.dart'; // Ensure this import points to your InstructorClass widget
 
 class MyClasses extends StatefulWidget {
-  const MyClasses({super.key});
+  final String classroomId; // Add the classroomId parameter
+
+  const MyClasses({super.key, required this.classroomId});
 
   @override
   State<MyClasses> createState() => _MyClassesState();
@@ -13,18 +16,34 @@ class MyClasses extends StatefulWidget {
 class _MyClassesState extends State<MyClasses> {
   final TextEditingController _emailController = TextEditingController();
   final Dio _dio = Dio();
+  // You might want to update this URL to include widget.classroomId if your API supports filtering.
   final String apiUrl = "https://admin.uthix.com/api/manage-classes";
-  final String token = "112|OZqf3MUzqsvrPd0XkqX7tT9YM0mCwlf0E6Az5Nykfb3c42fd";
+  String? token;
   List<dynamic> classes = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchClassroom();
+    _loadToken();
+  }
+
+  // Load token from SharedPreferences using the key "auth_token"
+  Future<void> _loadToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      token = prefs.getString('auth_token');
+    });
+    debugPrint("Token loaded: $token");
+    if (token != null) {
+      _fetchClassroom();
+    } else {
+      debugPrint("Access token not found. User may not be logged in.");
+    }
   }
 
   Future<void> _fetchClassroom() async {
     try {
+      // Optionally, modify the API URL here to fetch only data for widget.classroomId
       final response = await _dio.get(
         apiUrl,
         options: Options(
@@ -35,19 +54,22 @@ class _MyClassesState extends State<MyClasses> {
         ),
       );
 
-      print("Response Code: ${response.statusCode}");
-      print("Response Data: ${response.data}");
+      debugPrint("Response Code: ${response.statusCode}");
+      debugPrint("Response Data: ${response.data}");
 
       if (response.statusCode == 200 && response.data["status"] == true) {
         setState(() {
           classes = response.data['data'];
         });
+      } else {
+        debugPrint("Error: ${response.data["message"]}");
       }
     } catch (e) {
-      print("Error fetching classes: $e");
+      debugPrint("Error fetching classes: $e");
     }
   }
 
+  // Modal to invite a participant (can be reused as needed)
   void showCenteredModal() {
     showGeneralDialog(
       context: context,
@@ -87,9 +109,7 @@ class _MyClassesState extends State<MyClasses> {
                             color: Color.fromRGBO(43, 92, 116, 1),
                           ),
                         ),
-                        const SizedBox(
-                          height: 2,
-                        ),
+                        const SizedBox(height: 2),
                         Row(
                           children: [
                             Container(
@@ -105,7 +125,7 @@ class _MyClassesState extends State<MyClasses> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: TextField(
                                   controller: _emailController,
-                                  keyboardType: TextInputType.phone,
+                                  keyboardType: TextInputType.emailAddress,
                                   style: GoogleFonts.urbanist(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w400,
@@ -123,7 +143,7 @@ class _MyClassesState extends State<MyClasses> {
                                 ),
                               ),
                             ),
-                            Spacer(),
+                            const Spacer(),
                             Container(
                               height: 45,
                               width: 62,
@@ -131,7 +151,7 @@ class _MyClassesState extends State<MyClasses> {
                                 color: Color.fromRGBO(43, 92, 116, 1),
                                 borderRadius: BorderRadius.circular(13),
                               ),
-                              child: Center(
+                              child: const Center(
                                 child: Text(
                                   "Invite",
                                   style: TextStyle(
@@ -144,11 +164,9 @@ class _MyClassesState extends State<MyClasses> {
                             )
                           ],
                         ),
-                        const SizedBox(
-                          height: 45,
-                        ),
+                        const SizedBox(height: 45),
                         Container(
-                          height: 176,
+                          height: 186,
                           width: 341,
                           decoration: BoxDecoration(
                             border: Border.all(
@@ -170,13 +188,12 @@ class _MyClassesState extends State<MyClasses> {
                                         color: Color.fromRGBO(43, 92, 116, 1),
                                       ),
                                       child: Center(
-                                          child: Image.asset(
-                                              "assets/instructor/link.png")),
+                                        child: Image.asset(
+                                            "assets/instructor/link.png"),
+                                      ),
                                     ),
-                                    const SizedBox(
-                                      width: 20,
-                                    ),
-                                    Text(
+                                    const SizedBox(width: 20),
+                                    const Text(
                                       "Class invitation Link",
                                       style: TextStyle(
                                         fontSize: 20,
@@ -186,9 +203,7 @@ class _MyClassesState extends State<MyClasses> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(
-                                  height: 30,
-                                ),
+                                const SizedBox(height: 30),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -202,15 +217,11 @@ class _MyClassesState extends State<MyClasses> {
                                       ),
                                       child: Row(
                                         children: [
-                                          const SizedBox(
-                                            width: 30,
-                                          ),
+                                          const SizedBox(width: 30),
                                           Image.asset(
                                               "assets/instructor/share-outline.png"),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text(
+                                          const SizedBox(width: 5),
+                                          const Text(
                                             "Share",
                                             style: TextStyle(
                                               fontSize: 16,
@@ -230,15 +241,11 @@ class _MyClassesState extends State<MyClasses> {
                                       ),
                                       child: Row(
                                         children: [
-                                          const SizedBox(
-                                            width: 30,
-                                          ),
+                                          const SizedBox(width: 30),
                                           Image.asset(
                                               "assets/instructor/content-copy.png"),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text(
+                                          const SizedBox(width: 5),
+                                          const Text(
                                             "Copy",
                                             style: TextStyle(
                                               fontSize: 16,
@@ -272,11 +279,11 @@ class _MyClassesState extends State<MyClasses> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(120),
+        preferredSize: const Size.fromHeight(120),
         child: Container(
           height: 130,
           width: double.infinity,
-          color: Color.fromRGBO(43, 92, 116, 1),
+          color: const Color.fromRGBO(43, 92, 116, 1),
           child: Padding(
             padding: const EdgeInsets.only(top: 30, left: 10, right: 10),
             child: Row(
@@ -310,7 +317,7 @@ class _MyClassesState extends State<MyClasses> {
                   ),
                 ),
                 const SizedBox(width: 15),
-                Text(
+                const Text(
                   "My Classes",
                   style: TextStyle(
                     fontSize: 20,
@@ -318,11 +325,11 @@ class _MyClassesState extends State<MyClasses> {
                     color: Colors.white,
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 Container(
                   width: 45,
                   height: 45,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.white,
                   ),
@@ -345,26 +352,29 @@ class _MyClassesState extends State<MyClasses> {
         itemCount: classes.length,
         itemBuilder: (context, index) {
           final classItem = classes[index];
+          // Extract the class's unique ID (assuming it's in classItem['id'])
+          final classId = classItem['id'].toString();
           return Padding(
             padding:
                 const EdgeInsets.only(top: 15, left: 20, right: 20, bottom: 15),
             child: GestureDetector(
               onTap: () {
+                // Navigate to the InstructorClass page, passing the classId so that only chapters for this classroom are shown.
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => InstructorClass(),
+                    builder: (context) => InstructorClass(classId: classId),
                   ),
                 );
               },
               child: Container(
-                width: 290,
-                height: 152,
+                width: MediaQuery.of(context).size.width,
+                height: 160,
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Color.fromRGBO(217, 217, 217, 1),
+                    color: const Color.fromRGBO(217, 217, 217, 1),
                   ),
-                  color: Color.fromRGBO(246, 246, 246, 1),
+                  color: const Color.fromRGBO(246, 246, 246, 1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Padding(
@@ -391,7 +401,7 @@ class _MyClassesState extends State<MyClasses> {
                             ),
                           ),
                           const Spacer(),
-                          Icon(Icons.more_vert),
+                          const Icon(Icons.more_vert),
                         ],
                       ),
                       const SizedBox(height: 5),
@@ -506,33 +516,33 @@ class _MyClassesState extends State<MyClasses> {
                               showCenteredModal();
                             },
                             child: Container(
-                              height: 39,
-                              width: 126,
+                              height: 40,
+                              width: 130,
                               decoration: BoxDecoration(
-                                color: Color.fromRGBO(255, 255, 255, 1),
+                                color: const Color.fromRGBO(255, 255, 255, 1),
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: Color.fromRGBO(43, 92, 116, 1),
+                                  color: const Color.fromRGBO(43, 92, 116, 1),
                                   width: 1,
                                 ),
                               ),
-                              child: Center(
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.add,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Icon(
+                                    Icons.add,
+                                    color: Color.fromRGBO(43, 92, 116, 1),
+                                  ),
+                                  SizedBox(width: 2),
+                                  Text(
+                                    "Add Participant",
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
                                       color: Color.fromRGBO(43, 92, 116, 1),
                                     ),
-                                    Text(
-                                      "Add Participant",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color.fromRGBO(43, 92, 116, 1),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),

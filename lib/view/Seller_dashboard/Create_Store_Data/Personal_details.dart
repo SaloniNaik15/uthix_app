@@ -23,7 +23,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   bool isSubmitting = false;
   String? email;
   String? password;
-  String? accessToken;
+  String? accessToken; // ✅ Store Dynamic Token
 
   @override
   void initState() {
@@ -31,34 +31,20 @@ class _PersonalDetailsState extends State<PersonalDetails> {
     _loadUserCredentials();
   }
 
+  // ✅ Fetch Auth Token & User Details
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? savedEmail = prefs.getString("userEmail"); // ✅ Correct key
-    String? savedPassword = prefs.getString("password"); // ✅ Password now saved
-    String? savedaccessToken = prefs.getString("userToken");
-
-    log("Retrieved Email: $savedEmail");
-    log("Retrieved Password: $savedPassword");
-    log("Retrieved acesstoken: $savedaccessToken");
-
     setState(() {
-      email = savedEmail ?? "No Email Found";
-      password = savedPassword ?? "No Password Found";
-      accessToken = savedaccessToken ?? "No accesstoken";
+      email = prefs.getString("email") ?? "No Email Found";
+      password = prefs.getString("password") ?? "No Password Found";
+      accessToken = prefs.getString("auth_token"); // ✅ Get auth_token
     });
   }
 
-  Future<void> _savePersonalDetails() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString("userName", _nameController.text);
-    await prefs.setString("userMobile", _phoneController.text);
-    log("Personal details saved: Name - ${_nameController.text}, Mobile - ${_phoneController.text}");
-  }
-
+  // ✅ Submit Data with Dynamic Token
   Future<void> _submitData() async {
     if (!mounted) return;
     setState(() => isSubmitting = true);
-    await _savePersonalDetails();
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? storeDataJson = prefs.getString("storeData");
@@ -99,13 +85,21 @@ class _PersonalDetailsState extends State<PersonalDetails> {
     log(jsonEncode(personalData));
 
     try {
+      if (accessToken == null || accessToken!.isEmpty) {
+        log("⚠️ No access token available. Cannot send request.");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("⚠️ Authentication failed. Please log in again.")),
+        );
+        return;
+      }
+
       var request = http.MultipartRequest(
         "POST",
         Uri.parse("https://admin.uthix.com/api/vendor-store"),
       );
 
       request.headers.addAll({
-        "Authorization": "Bearer $accessToken",
+        "Authorization": "Bearer $accessToken", // ✅ Dynamic Token
         "Accept": "application/json",
       });
 
@@ -128,12 +122,12 @@ class _PersonalDetailsState extends State<PersonalDetails> {
       var responseData = await response.stream.bytesToString();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        log("Data Submitted Successfully: $responseData");
+        log("✅ Data Submitted Successfully: $responseData");
       } else {
-        log("Submission Failed: ${response.statusCode}, $responseData");
+        log("❌ Submission Failed: ${response.statusCode}, $responseData");
       }
     } catch (e) {
-      log("Error submitting data: $e");
+      log("❌ Error submitting data: $e");
     }
     setState(() => isSubmitting = false);
   }
@@ -190,7 +184,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2B5C74),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 80, vertical: 10),
+                  const EdgeInsets.symmetric(horizontal: 80, vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(40),
                   ),
@@ -198,7 +192,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                 child: isSubmitting
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text("Submit",
-                        style: TextStyle(fontSize: 15, color: Colors.white)),
+                    style: TextStyle(fontSize: 15, color: Colors.white)),
               ),
               const SizedBox(height: 20),
             ],
@@ -222,18 +216,6 @@ class _PersonalDetailsState extends State<PersonalDetails> {
           fillColor: Colors.white,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(
-                color: Color.fromRGBO(210, 210, 210, 1), width: 1),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(
-                color: Color.fromRGBO(210, 210, 210, 1), width: 1),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(
-                color: Color.fromRGBO(210, 210, 210, 1), width: 1),
           ),
         ),
       ),
@@ -249,25 +231,8 @@ class _PersonalDetailsState extends State<PersonalDetails> {
         readOnly: true,
         decoration: InputDecoration(
           hintText: label,
-          hintStyle: TextStyle(color: Colors.grey),
           prefixIcon: Icon(icon, color: Colors.grey),
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(
-                color: Color.fromRGBO(210, 210, 210, 1), width: 1),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(
-                color: Color.fromRGBO(210, 210, 210, 1), width: 1),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(
-                color: Color.fromRGBO(210, 210, 210, 1), width: 1),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
         ),
         onTap: () async {
           DateTime? pickedDate = await showDatePicker(

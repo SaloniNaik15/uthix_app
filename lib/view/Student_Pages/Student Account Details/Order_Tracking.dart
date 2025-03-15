@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uthix_app/UpcomingPage.dart';
 import 'Order_Processing.dart'; // Your order processing screen
 
 class OrdersTrackingPage extends StatefulWidget {
@@ -17,9 +19,6 @@ class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
 
   final Dio _dio = Dio(BaseOptions(
     baseUrl: 'https://admin.uthix.com/api/orders',
-    headers: {
-      'Authorization': 'Bearer 9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64'
-    },
   ));
 
   @override
@@ -29,11 +28,40 @@ class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
   }
 
   Future<void> fetchOrders() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token =
+        prefs.getString('auth_token'); // ✅ Retrieve token dynamically
+
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Authentication failed. Please log in again.")),
+      );
+      return;
+    }
+
     try {
-      final response = await _dio.get('');
+      final response = await _dio.get(
+        '',
+        options: Options(headers: {
+          'Authorization': 'Bearer $token', // ✅ Dynamic Token
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        }),
+      );
+
       if (response.statusCode == 200) {
+        List fetchedOrders = response.data['orders'] ?? [];
+
+        // ✅ Sort orders by latest first (Descending order based on created_at)
+        fetchedOrders.sort((a, b) {
+          DateTime dateA = DateTime.parse(a['created_at']);
+          DateTime dateB = DateTime.parse(b['created_at']);
+          return dateB.compareTo(dateA);
+        });
+
         setState(() {
-          orders = response.data['orders'] ?? [];
+          orders = fetchedOrders;
           isLoading = false;
         });
       } else {
@@ -69,122 +97,125 @@ class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : orders.isEmpty
-          ? const Center(child: Text("No orders found."))
-          : SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Search bar (optional)
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: const TextField(
-                        decoration: InputDecoration(
-                          hintText: "Search in orders",
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: Color(0xFF605F5F),
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 14),
+              ? const Center(child: Text("No orders found."))
+              : SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Search bar (optional)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: const TextField(
+                                  decoration: InputDecoration(
+                                    hintText: "Search in orders",
+                                    prefixIcon: Icon(
+                                      Icons.search,
+                                      color: Color(0xFF605F5F),
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding:
+                                        EdgeInsets.symmetric(vertical: 14),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.tune,
+                                    color: Color(0xFF605F5F)),
+                                onPressed: () {
+                                  // Handle filter button tap if needed.
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
+                        const SizedBox(height: 15),
+                        const Divider(color: Color(0xFF605F5F), thickness: 2),
+                        const SizedBox(height: 20),
+                        // List of orders.
+                        ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: orders.length,
+                          itemBuilder: (context, index) {
+                            final order = orders[index];
+
+                            // Extract order status and date.
+                            final orderStatus = order['status'] ?? 'In Process';
+                            final orderDate = order['created_at'] != null
+                                ? order['created_at'].substring(0, 10)
+                                : "N/A";
+
+                            // Extract details of the first order item.
+                            final items = order['order_items'] ?? [];
+                            final firstItem =
+                                items.isNotEmpty ? items[0] : null;
+                            final bookName = firstItem != null &&
+                                    firstItem['product'] != null
+                                ? firstItem['product']['title'] ?? 'Book Name'
+                                : 'Book Name';
+                            final description = firstItem != null &&
+                                    firstItem['product'] != null
+                                ? firstItem['product']['description'] ??
+                                    'Description'
+                                : 'Description';
+                            final price = "₹${order['total_amount'] ?? '0'}";
+
+                            return OrderCard(
+                              orderStatus: orderStatus,
+                              orderDate: orderDate,
+                              bookName: bookName,
+                              description: description,
+                              price: price,
+                              imagePath:
+                                  'assets/Seller_dashboard_images/book.jpg',
+                              onUpdateStatus: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        UnderConstructionScreen(),
+                                    // OrderProcessing(
+                                    //   orderId: order['id'],
+                                    // ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
                         ),
                       ],
                     ),
-                    child: IconButton(
-                      icon: const Icon(Icons.tune,
-                          color: Color(0xFF605F5F)),
-                      onPressed: () {
-                        // Handle filter button tap if needed.
-                      },
-                    ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              const Divider(color: Color(0xFF605F5F), thickness: 2),
-              const SizedBox(height: 20),
-              // List of orders.
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: orders.length,
-                itemBuilder: (context, index) {
-                  final order = orders[index];
-
-                  // Extract order status and date.
-                  final orderStatus = order['status'] ?? 'In Process';
-                  final orderDate = order['created_at'] != null
-                      ? order['created_at'].substring(0, 10)
-                      : "N/A";
-
-                  // Extract details of the first order item.
-                  final items = order['order_items'] ?? [];
-                  final firstItem = items.isNotEmpty ? items[0] : null;
-                  final bookName = firstItem != null &&
-                      firstItem['product'] != null
-                      ? firstItem['product']['title'] ?? 'Book Name'
-                      : 'Book Name';
-                  final description = firstItem != null &&
-                      firstItem['product'] != null
-                      ? firstItem['product']['description'] ??
-                      'Description'
-                      : 'Description';
-                  final price = "₹${order['total_amount'] ?? '0'}";
-
-                  return OrderCard(
-                    orderStatus: orderStatus,
-                    orderDate: orderDate,
-                    bookName: bookName,
-                    description: description,
-                    price: price,
-                    imagePath:
-                    'assets/Seller_dashboard_images/book.jpg',
-                    onUpdateStatus: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OrderProcessing(
-                            orderId: order['id'],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
+                ),
     );
   }
 }
@@ -388,7 +419,8 @@ class OrderCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: List.generate(
                           5,
-                              (index) => const Icon(Icons.star_border_outlined, size: 28),
+                          (index) =>
+                              const Icon(Icons.star_border_outlined, size: 28),
                         ),
                       ),
                       Row(

@@ -5,7 +5,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/modal/navbarWidgetStudent.dart';
+import 'package:uthix_app/view/Ecommerce/e_commerce.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
 import 'package:uthix_app/view/Student_Pages/Files/files.dart';
 import 'package:uthix_app/view/Student_Pages/HomePages/drawer_classroom.dart';
@@ -29,8 +31,12 @@ class _HomePagesState extends State<HomePages> {
   final List<Map<String, dynamic>> navItems = [
     {"icon": Icons.home_outlined, "title": "Home", "page": HomePages()},
     {"icon": Icons.folder_open_outlined, "title": "Files", "page": StudFiles()},
-    {"icon": Icons.find_in_page, "title": "Find", "page": BuyTextBooks()},
-    {"icon": Icons.chat_outlined, "title": "Chat", "page": StudChat()},
+    {"icon": Icons.find_in_page, "title": "Find", "page": ECommerce()},
+    {
+      "icon": Icons.chat_outlined,
+      "title": "Chat",
+      "page": UnderConstructionScreen()
+    },
     {
       "icon": Icons.person_outline,
       "title": "Profile",
@@ -105,6 +111,7 @@ class _HomePagesState extends State<HomePages> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       drawer: MyDrawer(
         onItemSelected: onDrawerItemSelected,
         selectedIndex: drawerindex,
@@ -263,7 +270,17 @@ class _HomePagesState extends State<HomePages> {
                         } else if (dashBoard[index]["title"] == "COMMUNITY") {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => StudChat()),
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    UnderConstructionScreen()),
+                          );
+                        }
+                        else if (dashBoard[index]["title"] == "DEMO CLASSES") {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    UnderConstructionScreen()),
                           );
                         }
                       },

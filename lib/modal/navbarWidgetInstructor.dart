@@ -26,7 +26,13 @@ class Navbar extends StatefulWidget {
 
 class _NavbarState extends State<Navbar> {
   final List<Map<String, dynamic>> navItems = [
-    {"icon": Icons.home_outlined, "title": "Home", "page": InstructorClass()},
+    {
+      "icon": Icons.home_outlined,
+      "title": "Home",
+      "page": InstructorClass(
+        classId: '',
+      )
+    },
     {"icon": Icons.folder_open_outlined, "title": "Files", "page": Files()},
     {"icon": Icons.chat_outlined, "title": "Chat", "page": Chat()},
     {"icon": Icons.person_outline, "title": "Profile", "page": Profile()},

@@ -23,7 +23,7 @@ class _ManageOrdersState extends State<ManageOrders> {
 
   Future<void> fetchOrders() async {
     const String apiUrl = "https://admin.uthix.com/api/vendor/all-orders";
-    const String token = "19|oPune0eP5bVOdqzBDTUww0Gc8Mc0KzoEZbKaZ5ondf6a7ca9";
+    const String token = "154|puvWRhP4wDQToAwdo8MLAtih4yrsFkqX81OVIjnS78678cbd";
 
     try {
       final response = await http.get(
@@ -42,10 +42,15 @@ class _ManageOrdersState extends State<ManageOrders> {
         final data = json.decode(response.body);
         print("Parsed Data: $data"); // Logs parsed JSON data
 
-        if (data['status']) {
+        if (data['status'] && data['orders'] != null && data['orders'].isNotEmpty) {
           setState(() {
             orders = data['orders'];
           });
+        } else {
+          setState(() {
+            orders = []; // Set orders to empty if no orders are found
+          });
+          log("No orders found."); // Log message for debugging
         }
       } else {
         throw Exception("Failed to load orders: ${response.body}");

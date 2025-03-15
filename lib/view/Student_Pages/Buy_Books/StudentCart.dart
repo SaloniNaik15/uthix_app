@@ -19,19 +19,36 @@ class _StudentcartState extends State<Studentcart> {
   double shippingCost = 40;
   double discount = 0;
   // Default values if no address saved.
-  String selectedAddress = "hhome";
+  String selectedAddress = "home";
   int selectedAddressId = 0;
+  String? authToken; // Store token
 
   final Dio dio = Dio();
-  final String token = "9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64";
 
   @override
   void initState() {
     super.initState();
+    loadAuthToken();
     loadSelectedAddress();
     fetchCartItems();
   }
+  Future<void> loadAuthToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
 
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Authentication failed. Please login again.")),
+      );
+      return;
+    }
+
+    setState(() {
+      authToken = token;
+    });
+    loadSelectedAddress();
+    fetchCartItems();
+  }
   // Load saved address data from persistent storage.
   Future<void> loadSelectedAddress() async {
     final prefs = await SharedPreferences.getInstance();
@@ -51,16 +68,17 @@ class _StudentcartState extends State<Studentcart> {
   Future<void> fetchCartItems() async {
     const String apiUrl = "https://admin.uthix.com/api/view-cart";
 
+    if (authToken == null) return;
+
     try {
       final response = await dio.get(
         apiUrl,
-        options: Options(headers: {"Authorization": "Bearer $token"}),
+        options: Options(headers: {"Authorization": "Bearer $authToken"}), // ✅ Dynamic Token
       );
-      print("Cart API Response: ${response.data}");
+
       if (response.statusCode == 200 && response.data["status"] == true) {
         setState(() {
-          cartItems = List<Map<String, dynamic>>.from(
-              response.data['cart']['items'] ?? []);
+          cartItems = List<Map<String, dynamic>>.from(response.data['cart']['items'] ?? []);
           isLoading = false;
         });
       } else {
@@ -75,38 +93,34 @@ class _StudentcartState extends State<Studentcart> {
 
   double get totalAmount {
     double total = cartItems.fold(0.0, (sum, item) {
-      double price = ((item['product']['price'] ??
-              item['product']['discount_price']) as num)
-          .toDouble();
+      double price = ((item['product']['price'] ?? item['product']['discount_price']) as num).toDouble();
       int quantity = item['quantity'];
       return sum + (quantity * price);
     });
     return total + shippingCost - discount;
   }
 
+
+  // 🔹 Place Order API Call
   Future<void> placeOrder() async {
     const String orderApiUrl = "https://admin.uthix.com/api/orders";
 
     if (cartItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("⚠ Cart is empty. Please add items to proceed.")),
+        const SnackBar(content: Text("⚠️ Cart is empty. Please add items to proceed.")),
       );
       return;
     }
 
     if (selectedAddressId == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("⚠ Please select a valid delivery address.")),
+        const SnackBar(content: Text("⚠️ Please select a valid delivery address.")),
       );
       return;
     }
 
     List<Map<String, dynamic>> orderItems = cartItems.map((item) {
-      double price =
-          (item['product']['discount_price'] ?? item['product']['price'])
-              .toDouble();
+      double price = (item['product']['discount_price'] ?? item['product']['price']).toDouble();
       int quantity = item['quantity'];
       return {
         "product_id": item['product']['id'],
@@ -117,9 +131,7 @@ class _StudentcartState extends State<Studentcart> {
     }).toList();
 
     double subtotal = cartItems.fold(0.0, (sum, item) {
-      double price =
-          (item['product']['discount_price'] ?? item['product']['price'])
-              .toDouble();
+      double price = (item['product']['discount_price'] ?? item['product']['price']).toDouble();
       return sum + (item['quantity'] * price);
     });
 
@@ -133,24 +145,14 @@ class _StudentcartState extends State<Studentcart> {
       "payment_method": "cod"
     };
 
-    print("📡 Sending Order Data: $orderData");
-
     try {
       final response = await dio.post(
         orderApiUrl,
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Content-Type": "application/json"
-          },
-        ),
+        options: Options(headers: {"Authorization": "Bearer $authToken", "Content-Type": "application/json"}), // ✅ Dynamic Token
         data: orderData,
       );
 
-      print("✅ API Response: ${response.data}");
-
-      if (response.statusCode == 201 &&
-          response.data['message'] == "Order placed successfully") {
+      if (response.statusCode == 201 && response.data['message'] == "Order placed successfully") {
         if (context.mounted) {
           Navigator.pushReplacement(
             context,
@@ -166,29 +168,26 @@ class _StudentcartState extends State<Studentcart> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  "❌ Failed to place order: ${response.data['message'] ?? 'Unknown error'}")),
+          SnackBar(content: Text("❌ Failed to place order: ${response.data['message'] ?? 'Unknown error'}")),
         );
       }
     } catch (e) {
-      print("❌ Exception: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("❌ Error placing order: ${e.toString()}")),
       );
     }
   }
 
+  // ✅ Remove Item from Cart API Call
   void removeFromCart(int cartId) async {
-    final String apiUrl =
-        "https://admin.uthix.com/api/remove-from-cart/$cartId";
+    final String apiUrl = "https://admin.uthix.com/api/remove-from-cart/$cartId";
 
     try {
       final response = await dio.delete(
         apiUrl,
-        options: Options(headers: {"Authorization": "Bearer $token"}),
+        options: Options(headers: {"Authorization": "Bearer $authToken"}), // ✅ Dynamic Token
       );
-      print("Remove API Response: ${response.data}");
+
       if (response.statusCode == 200 && response.data["status"] == true) {
         setState(() {
           cartItems.removeWhere((item) => item["id"] == cartId);
@@ -198,9 +197,7 @@ class _StudentcartState extends State<Studentcart> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  Text("Failed to remove item: ${response.data['message']}")),
+          SnackBar(content: Text("Failed to remove item: ${response.data['message']}")),
         );
       }
     } catch (e) {
@@ -210,9 +207,18 @@ class _StudentcartState extends State<Studentcart> {
     }
   }
 
+
   // Opens the bottom sheet and waits for the user to select an address.
   Future<void> showAddressBottomSheet() async {
-    final result = await showModalBottomSheet(
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Authentication failed. Please login again.")),
+      );
+      return;
+    }
+     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -305,9 +311,7 @@ class _StudentcartState extends State<Studentcart> {
                                       style: const TextStyle(
                                           fontSize: 14, fontFamily: "Urbanist"),
                                     ),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
+                                    SizedBox(width: 5,),
                                     Text(
                                       selectedAddress, // Display address type
                                       style: const TextStyle(

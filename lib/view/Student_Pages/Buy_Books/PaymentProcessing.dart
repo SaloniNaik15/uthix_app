@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'OrderConfirmed.dart';
 import 'CardDetails.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -86,12 +87,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   Future<void> _updatePaymentStatus(String status, String transactionId) async {
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('auth_token'); // ✅ Retrieve token dynamically
+
+      if (token == null || token.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Authentication failed. Please log in again.")),
+        );
+        return;
+      }
+
       print("Updating payment status: status=$status, transactionId=$transactionId, orderId=${widget.orderId}");
+
       final response = await http.post(
         Uri.parse('https://admin.uthix.com/api/update-payment-status'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': '9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64',
+          'Authorization': 'Bearer $token', // ✅ Dynamic Token
         },
         body: jsonEncode({
           'order_id': widget.orderId,
@@ -124,13 +136,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
     });
 
     try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('auth_token'); // ✅ Retrieve token dynamically
+
+      if (token == null || token.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Authentication failed. Please log in again.")),
+        );
+        return;
+      }
+
       print("Starting payment request for order ID: ${widget.orderId}, amount: ${(widget.totalPrice + 40) * 100}");
 
       final response = await http.post(
         Uri.parse('https://admin.uthix.com/api/create-payment'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': '9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64'
+          'Authorization': 'Bearer $token', // ✅ Dynamic Token
         },
         body: jsonEncode({
           'order_id': widget.orderId,

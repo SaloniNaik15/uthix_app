@@ -18,8 +18,6 @@ class _ManageProfileState extends State<Profile> {
   String? email;
   String? password;
   String? accessToken;
-  String? mobileno;
-  String? name;
 
   @override
   void initState() {
@@ -39,24 +37,18 @@ class _ManageProfileState extends State<Profile> {
 
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? savedEmail = prefs.getString("userEmail"); // ✅ Correct key
-    String? savedPassword = prefs.getString("password"); // ✅ Password now saved
-    String? savedaccessToken = prefs.getString("userToken");
-    String? savedName = prefs.getString("userName");
-    String? savedMobile = prefs.getString("userMobile");
-    log("Retrieved Email: $savedEmail");
-    log("Retrieved Password: $savedPassword");
-    log("Retrieved acesstoken: $savedaccessToken");
-    log("Retrieved acesstoken: $savedName");
-    log("Retrieved acesstoken: $savedMobile");
+
+    if (!mounted) return;
 
     setState(() {
-      email = savedEmail ?? "No Email Found";
-      password = savedPassword ?? "No Password Found";
-      accessToken = savedaccessToken ?? "No accesstoken";
-      name = savedName ?? "no";
-      mobileno = savedMobile ?? "no";
+      email = prefs.getString("email") ?? "No Email Found";
+      password = prefs.getString("password") ?? "No Password Found";
+      accessToken = prefs.getString("userToken") ?? "";
     });
+
+    log("Retrieved Email: $email");
+    log("Retrieved Password: $password");
+    log("Retrieved Access Token: $accessToken");
   }
 
   Future<void> fetchProfileData() async {
@@ -283,14 +275,14 @@ class _ManageProfileState extends State<Profile> {
                             icon: Icons.person,
                             label: "Name",
                             hint: "Enter your name",
-                            initialValue: name ?? "",
+                            initialValue: profileData["name"] ?? "",
                             onSave: (value) => updateProfile("name", value),
                           ),
                           ProfileField(
                             icon: Icons.phone,
                             label: "Phone",
                             hint: "Enter your phone number",
-                            initialValue: mobileno ?? "no",
+                            initialValue: profileData["mobile"] ?? "",
                             onSave: (value) => updateProfile("mobile", value),
                           ),
                           ProfileField(

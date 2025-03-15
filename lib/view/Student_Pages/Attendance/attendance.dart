@@ -17,6 +17,7 @@ class _AttendanceState extends State<Attendance> {
         percentage / 100; // Convert percentage to progress value (0 to 1)
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         clipBehavior: Clip.none,
         children: [

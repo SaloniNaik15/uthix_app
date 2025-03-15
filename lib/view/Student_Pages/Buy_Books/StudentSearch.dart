@@ -64,8 +64,7 @@ class _StudentSearchState extends State<StudentSearch> {
             searchResults = products.where((product) {
               final title = product['title']?.toString().toLowerCase() ?? '';
               final author = product['author']?.toString().toLowerCase() ?? '';
-              final language =
-                  product['language']?.toString().toLowerCase() ?? '';
+              final language = product['language']?.toString().toLowerCase() ?? '';
 
               return title.contains(queryLower) ||
                   author.contains(queryLower) ||
@@ -98,8 +97,7 @@ class _StudentSearchState extends State<StudentSearch> {
                 });
               },
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                 margin: const EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
@@ -109,7 +107,7 @@ class _StudentSearchState extends State<StudentSearch> {
                 child: Text(
                   filters[index],
                   style: TextStyle(
-                    color: Colors.grey,
+                    color:  Colors.grey,
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -130,7 +128,8 @@ class _StudentSearchState extends State<StudentSearch> {
 
           return GestureDetector(
             onTap: () {
-              setState(() {});
+              setState(() {
+              });
             },
             child: Card(
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -147,16 +146,15 @@ class _StudentSearchState extends State<StudentSearch> {
                 contentPadding: const EdgeInsets.all(16),
                 leading: product['thumbnail_img'] != null
                     ? ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          'https://admin.uthix.com/storage/image/products/${product['first_image']['image_path']}',
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : const Icon(Icons.image_not_supported,
-                        size: 50, color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    'https://admin.uthix.com/storage/image/products/${product['first_image']['image_path']}',
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  ),
+                )
+                    : const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
                 title: Text(
                   product['title'] ?? 'No Title',
                   style: TextStyle(
@@ -165,6 +163,7 @@ class _StudentSearchState extends State<StudentSearch> {
                     color: Colors.black, // Change text color
                   ),
                 ),
+
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -187,7 +186,7 @@ class _StudentSearchState extends State<StudentSearch> {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
-                        color: Colors.green,
+                        color:Colors.green,
                       ),
                     ),
                   ],
@@ -221,57 +220,48 @@ class _StudentSearchState extends State<StudentSearch> {
         ),
       ),
       body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: searchController,
-                focusNode: _focusNode, // Attach focus node
-                onChanged: (value) => searchCategories(value),
-                decoration: InputDecoration(
-                  hintText: 'Search by title, author, or language',
-                  prefixIcon:
-                      const Icon(Icons.search, color: Color(0xFFAFAFAF)),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                    borderSide: BorderSide(
-                      color: isFocused
-                          ? Color(0xFFAFAFAF)
-                          : const Color(
-                              0xFFD9D9D9), // Change border color on focus
-                    ),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: searchController,
+              focusNode: _focusNode, // Attach focus node
+              onChanged: (value) => searchCategories(value),
+              decoration: InputDecoration(
+                hintText: 'Search by title, author, or language',
+                prefixIcon: const Icon(Icons.search, color: Color(0xFFAFAFAF)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide(
+                    color: isFocused ? Color(0xFFAFAFAF) : const Color(0xFFD9D9D9), // Change border color on focus
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                    borderSide: BorderSide(
-                      color: isFocused
-                          ? Color(0xFFAFAFAF)
-                          : const Color(0xFFD9D9D9), // Default border color
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                    borderSide: const BorderSide(
-                        color: Color(0xFFAFAFAF),
-                        width: 2.0), // Red border when focused
-                  ),
-                  filled: true,
-                  fillColor: const Color(0xFFF6F6F6),
                 ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: BorderSide(
+                    color: isFocused ? Color(0xFFAFAFAF) : const Color(0xFFD9D9D9), // Default border color
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30.0),
+                  borderSide: const BorderSide(color: Color(0xFFAFAFAF), width: 2.0), // Red border when focused
+                ),
+                filled: true,
+                fillColor: const Color(0xFFF6F6F6),
               ),
-              const SizedBox(height: 16.0),
-              buildFilterTabs(),
-              const SizedBox(height: 16.0),
-              isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : searchResults.isEmpty
-                      ? const Center(
-                          child: Text("No results found",
-                              style: TextStyle(color: Colors.grey)))
-                      : buildSearchResults(),
-            ],
-          )),
+            ),
+            const SizedBox(height: 16.0),
+            buildFilterTabs(),
+            const SizedBox(height: 16.0),
+            isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : searchResults.isEmpty
+                ? const Center(child: Text("No results found", style: TextStyle(color: Colors.grey)))
+                : buildSearchResults(),
+          ],
+        )
+      ),
     );
   }
 }
