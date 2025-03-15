@@ -74,6 +74,7 @@ class _GradeStudentState extends State<GradeStudent> {
     TextEditingController feedbackController = TextEditingController();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.only(left: 10, right: 10, top: 40),
         child: Column(

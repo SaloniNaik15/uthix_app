@@ -1,22 +1,41 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:uthix_app/view/Seller_dashboard/Inventory_data/ViewDetails.dart';
 
 import 'CustomerPhotosPage.dart';
 import 'CustomerReviewPage.dart';
 
 class Bookdetails extends StatefulWidget {
-  const Bookdetails({super.key, required product});
+  final int productId;
+  const Bookdetails({super.key, required this.productId});
 
   @override
   State<Bookdetails> createState() => _BookdetailsState();
 }
 
 class _BookdetailsState extends State<Bookdetails> {
-  List<String> images = [
-    'assets/Seller_dashboard_images/book.jpg',
-    'assets/Seller_dashboard_images/book.jpg',
-    'assets/Seller_dashboard_images/book.jpg',
-    'assets/Seller_dashboard_images/book.jpg',
-  ];
+  late Future<Map<String, dynamic>> productFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    productFuture = fetchProduct();
+  }
+
+  // Use the passed productId to build the API URL dynamically.
+  Future<Map<String, dynamic>> fetchProduct() async {
+    final response = await http.get(
+      Uri.parse(
+          "https://admin.uthix.com/api/products/view/${widget.productId}"),
+    );
+    if (response.statusCode == 200) {
+      // Decode the response and extract the product object
+      return json.decode(response.body)["product"];
+    } else {
+      throw Exception("Failed to load product");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,288 +44,274 @@ class _BookdetailsState extends State<Bookdetails> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Color.fromARGB(255, 119, 78, 78),
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
       ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Image carousel or grid view
-                  SizedBox(
-                    height: 200,
-                    child: GridView.builder(
-                      scrollDirection: Axis.horizontal,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 1,
-                        crossAxisSpacing: 20,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 0.55, // Adjust space between images
-                      ),
-                      itemCount: images.length,
-                      itemBuilder: (context, index) {
-                        return Stack(
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: productFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          } else if (snapshot.hasData) {
+            var product = snapshot.data!;
+            // Extract dynamic list of images from the API data
+            List<dynamic> imagesData = product["images"] ?? [];
+            // Update the mapping to the correct base URL:
+            List<String> images = imagesData.map((img) {
+              return "https://admin.uthix.com/storage/image/products/${img["image_path"]}";
+            }).toList();
+
+            return Stack(
+              children: [
+                SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Image carousel populated from API images
+                        SizedBox(
+                          height: 200,
+                          child: GridView.builder(
+                            scrollDirection: Axis.horizontal,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 1,
+                              crossAxisSpacing: 20,
+                              mainAxisSpacing: 10,
+                              childAspectRatio: 0.55,
+                            ),
+                            itemCount: images.length,
+                            itemBuilder: (context, index) {
+                              return Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Center(
+                                      child: Image.network(
+                                        images[index],
+                                        fit: BoxFit.cover,
+                                        alignment: Alignment.center,
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                2,
+                                        height: 200,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return const Icon(Icons.broken_image);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+                        // Book title and details from API
+                        Text(
+                          product["title"] ?? "No title",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'Urbanist',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          product["isbn"] ?? "",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'Urbanist',
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
                           children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.asset(
-                                images[index], // Display each image
-                                fit: BoxFit.cover,
-                                width: 100,
-                                height: 100,
+                            const Text(
+                              "5",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.w400,
                               ),
                             ),
-                            Positioned(
-                              top: 5,
-                              right: 5,
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    images.removeAt(
-                                        index); // Remove image on cross click
-                                  });
-                                },
-                                child: const CircleAvatar(
-                                  radius: 12,
-                                  backgroundColor: Colors.white,
-                                  child: Icon(
-                                    Icons.close,
-                                    size: 14,
-                                    color: Colors.black,
+                            const SizedBox(width: 5),
+                            Icon(Icons.star, color: Colors.amber, size: 14),
+                            Icon(Icons.star, color: Colors.amber, size: 14),
+                            Icon(Icons.star, color: Colors.amber, size: 14),
+                            Icon(Icons.star, color: Colors.amber, size: 14),
+                            Icon(Icons.star, color: Colors.amber, size: 14),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  product["price"].toString(),
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.blue,
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  // Text description for the item
-                  const Text(
-                    "Relativity: The Special and the General Theory",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Urbanist',
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Text(
-                    "Hard Cover",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Urbanist',
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "5",
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontFamily: 'Urbanist',
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Icon(Icons.star, color: Colors.amber, size: 14),
-                      Icon(Icons.star, color: Colors.amber, size: 14),
-                      Icon(Icons.star, color: Colors.amber, size: 14),
-                      Icon(Icons.star, color: Colors.amber, size: 14),
-                      Icon(Icons.star, color: Colors.amber, size: 14),
-                    ],
-                  ),
-                  SizedBox(height: 5),
-                  Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment
-                                .start, // Align text to the start
-                            children: [
-                              Text(
-                                "2,000",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.blue,
-                                  fontFamily: 'Urbanist',
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8), // Spacing between elements
-                      Container(
-                        width: double.infinity, // Full width
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8), // Padding for spacing
-                        child: Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween, // Center content
-                          children: [
-                            Text(
-                              "by Albert",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
-                                fontFamily: 'Urbanist',
-                              ),
-                            ),
-                            const SizedBox(
-                                width: 4), // Space between text and divider
-                            Text(
-                              "|",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              "January",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
-                                fontFamily: 'Urbanist',
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              "|",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              "14th edition",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
-                                fontFamily: 'Urbanist',
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        "New Simplified Physics Book by albert Einstein is a popular book for students studying physics, particulary in indian education SYstem",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontFamily: 'Urbanist',
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      SizedBox(
-                        height: 20,
-                      ),
-
-                      //Delivery Instruction
-                      deliveryInstructions(),
-
-                      //Delivery date data
-                      DeliveryDateWidget(),
-
-                      SizedBox(
-                        height: 20,
-                      ),
-                      //For Review and Rating
-                      reviewAndRating(),
-                      SizedBox(
-                        height: 20,
-                      ),
-
-                      //Customer Review pages
-                      CustomerReview(),
-                      SizedBox(height: 10),
-
-                      Positioned(
-                        bottom: 16,
-                        left: 16,
-                        right: 16,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            OutlinedButton.icon(
-                              onPressed: () {},
-                              icon: Icon(Icons.favorite_border,
-                                  size: 18, color: Color(0xFF305C78)),
-                              label: Text('Wishlist',
-                                  style: TextStyle(
-                                      color: Colors.black,
+                            const SizedBox(height: 8),
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "by ${product["author"] ?? ""}",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
                                       fontFamily: 'Urbanist',
-                                      fontWeight: FontWeight.bold)),
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: Colors.grey),
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 40, vertical: 15),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  const Text(
+                                    "|",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    product["language"] ?? "",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                      fontFamily: 'Urbanist',
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  const Text(
+                                    "|",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    "${product["pages"]} pages",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                      fontFamily: 'Urbanist',
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            SizedBox(width: 20),
-                            ElevatedButton.icon(
-                              onPressed: () {},
-                              icon: Icon(Icons.shopping_bag_outlined,
-                                  size: 18, color: Colors.white),
-                              label: Text(
-                                'Add to Bag',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Urbanist',
-                                    fontWeight: FontWeight.bold),
+                            const SizedBox(height: 10),
+                            Text(
+                              product["description"] ?? "",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.bold,
                               ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color(0xFF305C78), // Dark blue shade
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 40, vertical: 15),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
+                            ),
+                            const SizedBox(height: 20),
+                            // Delivery Instructions
+                            deliveryInstructions(),
+                            const DeliveryDateWidget(),
+                            const SizedBox(height: 20),
+                            reviewAndRating(),
+                            const SizedBox(height: 20),
+                            CustomerReview(),
+                            const SizedBox(height: 10),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  OutlinedButton.icon(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.favorite_border,
+                                      size: 18,
+                                      color: Color(0xFF305C78),
+                                    ),
+                                    label: const Text(
+                                      'Wishlist',
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontFamily: 'Urbanist',
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    style: OutlinedButton.styleFrom(
+                                      side:
+                                          const BorderSide(color: Colors.grey),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 40, vertical: 15),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  ElevatedButton.icon(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.shopping_bag_outlined,
+                                      size: 18,
+                                      color: Colors.white,
+                                    ),
+                                    label: const Text(
+                                      'Add to Bag',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Urbanist',
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF305C78),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 40, vertical: 15),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
-          ),
-        ],
+                ),
+              ],
+            );
+          } else {
+            return const Center(child: Text("No data available"));
+          }
+        },
       ),
     );
   }
@@ -392,13 +397,12 @@ Widget reviewAndRating() {
       Row(
         children: [
           Container(
-            padding: EdgeInsets.all(5),
+            padding: const EdgeInsets.all(5),
             width: 70,
             height: 35,
             decoration: BoxDecoration(
-              shape: BoxShape.rectangle,
               borderRadius: BorderRadius.circular(10),
-              color: Color(0xFF2B5C74),
+              color: const Color(0xFF2B5C74),
             ),
             child: Center(
               child: Row(
@@ -440,28 +444,25 @@ Widget CustomerReview() {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Builder(
-        builder: (BuildContext context) {
-          return TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => StudentCustomerPhotos()),
-              );
-            },
-            child: Text(
-              "Customer Photos",
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Urbanist',
-              ),
+      Builder(builder: (BuildContext context) {
+        return TextButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => StudentCustomerPhotos()),
+            );
+          },
+          child: const Text(
+            "Customer Photos",
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Urbanist',
             ),
-          );
-        },
-      ),
+          ),
+        );
+      }),
       const SizedBox(height: 10),
       SizedBox(
         height: 80,
@@ -495,7 +496,7 @@ Widget CustomerReview() {
           },
         ),
       ),
-      SizedBox(height: 20),
+      const SizedBox(height: 20),
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -511,13 +512,12 @@ Widget CustomerReview() {
           Row(
             children: [
               Container(
-                padding: EdgeInsets.all(5),
+                padding: const EdgeInsets.all(5),
                 width: 70,
                 height: 35,
                 decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(10),
-                  color: Color(0xFF2B5C74),
+                  color: const Color(0xFF2B5C74),
                 ),
                 child: Center(
                   child: Row(
@@ -551,8 +551,8 @@ Widget CustomerReview() {
               ),
             ],
           ),
-          SizedBox(height: 10),
-          Text(
+          const SizedBox(height: 10),
+          const Text(
             'Books are in good condition and got them on time, happy with the packaging',
             style: TextStyle(
               fontSize: 14,
@@ -560,32 +560,30 @@ Widget CustomerReview() {
               fontWeight: FontWeight.w500,
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             children: [
-              Builder(
-                builder: (BuildContext context) {
-                  return TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => StudentPageCustomerReview()),
-                      );
-                    },
-                    child: Text(
-                      'View all 12 reviews',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontFamily: 'Urbanist',
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400,
-                      ),
+              Builder(builder: (BuildContext context) {
+                return TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => StudentPageCustomerReview()),
+                    );
+                  },
+                  child: const Text(
+                    'View all 12 reviews',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontFamily: 'Urbanist',
+                      color: Colors.black,
+                      fontWeight: FontWeight.w400,
                     ),
-                  );
-                },
-              ),
-              Icon(
+                  ),
+                );
+              }),
+              const Icon(
                 Icons.arrow_forward_ios,
                 size: 10,
               ),
@@ -595,102 +593,4 @@ Widget CustomerReview() {
       ),
     ],
   );
-}
-
-Widget deliveryInstructions() {
-  return Container(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildDeliveryRow(
-          imagePath: "assets/Seller_dashboard_images/order_outline.png",
-          text: "Get it till Friday, 17th January",
-        ),
-        const SizedBox(height: 15),
-        _buildDeliveryRow(
-          imagePath: "assets/Seller_dashboard_images/COD_icon.png",
-          text: "COD is not available",
-        ),
-        const SizedBox(height: 15),
-        _buildDeliveryRow(
-          imagePath: "assets/Seller_dashboard_images/return_icon.png",
-          text: "Problem free 7 days return and exchange",
-        ),
-      ],
-    ),
-  );
-}
-
-Widget _buildDeliveryRow({required String imagePath, required String text}) {
-  return Row(
-    children: [
-      Image.asset(imagePath, height: 30),
-      const SizedBox(width: 10),
-      Text(
-        text,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          fontFamily: 'Urbanist',
-        ),
-      ),
-    ],
-  );
-}
-
-class StatItem extends StatelessWidget {
-  final String title;
-  final String value;
-  final IconData? icon;
-  final Color? backgroundColor;
-
-  const StatItem({
-    super.key,
-    required this.title,
-    required this.value,
-    this.icon,
-    this.backgroundColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-      decoration: BoxDecoration(
-        color: backgroundColor ?? Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 14,
-              fontFamily: 'Urbanist',
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
-            ),
-          ),
-          // const SizedBox(height: 5),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 15,
-              fontFamily: 'Urbanist',
-              fontWeight: FontWeight.w700,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 5),
-          if (icon != null)
-            Icon(
-              icon,
-              size: 15,
-              color: Colors.black87,
-            ),
-        ],
-      ),
-    );
-  }
 }

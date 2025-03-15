@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
- import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'BookDetails.dart';
 import 'StudentCart.dart';
 import 'StudentSearch.dart';
@@ -20,22 +20,44 @@ class _BuybookspagesState extends State<Buybookspages> {
   List<Map<String, dynamic>> products = [];
   bool isLoading = true;
   final Dio dio = Dio();
+  String? authToken; // Store token
 
   @override
   void initState() {
     super.initState();
+    loadAuthToken(); // Load token before fetching products
     fetchProducts(widget.categoryId);
   }
 
+// ✅ Fetch token from SharedPreferences
+  Future<void> loadAuthToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      authToken = prefs.getString('auth_token'); // Retrieve token
+    });
+
+    if (authToken != null) {
+      fetchProducts(widget.categoryId);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("User not authenticated. Please login.")),
+      );
+    }
+  }
+
   // 🔹 Fetch Products API Call
+// 🔹 Fetch Products API Call
   Future<void> fetchProducts(int categoryId) async {
+    if (authToken == null) return;
+
     try {
       final response = await dio.get(
         'https://admin.uthix.com/api/products',
         queryParameters: {"category_id": categoryId},
+        options: Options(
+          headers: {"Authorization": "Bearer $authToken"}, // Use dynamic token
+        ),
       );
-
-      print("Products Response: ${response.data}");
 
       if (response.statusCode == 200) {
         setState(() {
@@ -59,62 +81,48 @@ class _BuybookspagesState extends State<Buybookspages> {
   //  Add to Cart API Call
   Future<void> addToCart(
       BuildContext context, Map<String, dynamic> product, int quantity) async {
-    const String token = "9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64";
+    if (authToken == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Authentication failed. Please login again.")),
+      );
+      return;
+    }
+
     const String apiUrl = "https://admin.uthix.com/api/add-to-cart";
 
     try {
-      if (product["id"] == null || product["price"] == null) {
-        print("Error: Missing required fields");
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Error: Missing product details!")),
-        );
-        return;
-      }
-
       final requestData = {
         "product_id": product["id"],
         "quantity": quantity,
         "price": product["price"],
       };
 
-      print("Sending Request Data: $requestData");
-
-      // 🔹 Send API request
-      final response = await Dio().post(
+      final response = await dio.post(
         apiUrl,
         options: Options(
           headers: {
-            "Authorization": "Bearer $token",
+            "Authorization": "Bearer $authToken", // Use dynamic token
             "Content-Type": "application/json",
           },
         ),
         data: requestData,
       );
 
-      print("API Response: ${response.data}");
-
       if (response.statusCode == 201 && response.data["status"] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Product added to cart!")),
         );
-
-        // Navigate to StudentCart Page
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => Studentcart(cartItems: response.data["cart_items"] ?? []),
-        //   ),
-        // );
       } else {
-        print("API Error: ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(
-                  "Failed to add to cart: ${response.data['message'] ?? 'Unknown error'}")),
+            content: Text(
+                "Failed to add to cart: ${response.data['message'] ?? 'Unknown error'}"),
+          ),
         );
       }
     } catch (e) {
-      print(" API Exception: $e");
+      print("API Exception: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Something went wrong: ${e.toString()}")),
       );
@@ -147,9 +155,7 @@ class _BuybookspagesState extends State<Buybookspages> {
               () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => Studentcart(
-                            cartItems: [],
-                          )))),
+                      builder: (context) => Studentcart(cartItems: [])))),
         ],
         elevation: 0,
       ),
@@ -302,9 +308,20 @@ class _BookItemsListState extends State<BookItemsList> {
     await prefs.setStringList("wishlist", wishlistStrings);
   }
 
-  // API call to add/remove item from wishlist.
-  Future<void> addToWishlist(BuildContext context, Map<String, dynamic> book) async {
-    final String token = "9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64";
+  Future<void> addToWishlist(
+      BuildContext context, Map<String, dynamic> book) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token =
+        prefs.getString('auth_token'); // Retrieve the token dynamically
+
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Authentication failed. Please login again.")),
+      );
+      return;
+    }
+
     try {
       bool isInWishlist = wishlist.contains(book['id']);
       final String imageUrl = book['first_image'] != null
@@ -323,7 +340,7 @@ class _BookItemsListState extends State<BookItemsList> {
         },
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token',
+            'Authorization': 'Bearer $token', // ✅ Dynamic Token
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           },
@@ -332,27 +349,39 @@ class _BookItemsListState extends State<BookItemsList> {
 
       if (response.statusCode == 200) {
         setState(() {
-          // Toggle the wishlist state.
           if (isInWishlist) {
             wishlist.remove(book['id']);
           } else {
             wishlist.add(book['id']);
           }
         });
-        // Save the updated wishlist.
         await updateWishlist();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isInWishlist ? "Book removed from wishlist!" : "Book added to wishlist!"),
-            backgroundColor: isInWishlist ? const Color(0xFF2B5C74) : const Color(0xFF2B5C50),
+            content: Text(isInWishlist
+                ? "Book removed from wishlist!"
+                : "Book added to wishlist!"),
+            backgroundColor: isInWishlist
+                ? const Color(0xFF2B5C74)
+                : const Color(0xFF2B5C50),
           ),
         );
+      } else if (response.statusCode == 401) {
+        print("⛔ Unauthorized: Token is invalid or expired.");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text("Session expired. Please log in again.")),
+        );
+        // handle401Error(); // Logout user if token is invalid
       } else {
-        throw Exception("Failed to update wishlist. Response: ${response.data}");
+        throw Exception(
+            "Failed to update wishlist. Response: ${response.data}");
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}"), backgroundColor: Colors.red),
+        SnackBar(
+            content: Text("Error: ${e.toString()}"),
+            backgroundColor: Colors.red),
       );
     }
   }
@@ -392,7 +421,10 @@ class _BookItemsListState extends State<BookItemsList> {
                       // Navigate to the Bookdetails page.
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Bookdetails(product: book)),
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              Bookdetails(productId: book['id']),
+                        ),
                       );
                     },
                     child: Column(
@@ -402,7 +434,8 @@ class _BookItemsListState extends State<BookItemsList> {
                         Container(
                           padding: const EdgeInsets.all(10.0),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.withOpacity(0.5), width: 2),
+                            border: Border.all(
+                                color: Colors.grey.withOpacity(0.5), width: 2),
                             borderRadius: BorderRadius.circular(10),
                             color: Colors.white,
                             boxShadow: [
@@ -422,7 +455,8 @@ class _BookItemsListState extends State<BookItemsList> {
                                   height: 150,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => const Icon(
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Icon(
                                     Icons.image_not_supported,
                                     size: 100,
                                     color: Colors.grey,
@@ -433,7 +467,8 @@ class _BookItemsListState extends State<BookItemsList> {
                                 bottom: 5,
                                 left: 5,
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 5, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: Colors.white.withOpacity(0.8),
                                     borderRadius: BorderRadius.circular(5),
@@ -450,7 +485,8 @@ class _BookItemsListState extends State<BookItemsList> {
                                         ),
                                       ),
                                       const SizedBox(width: 2),
-                                      const Icon(Icons.star, color: Colors.amber, size: 14),
+                                      const Icon(Icons.star,
+                                          color: Colors.amber, size: 14),
                                     ],
                                   ),
                                 ),
@@ -504,8 +540,12 @@ class _BookItemsListState extends State<BookItemsList> {
                           children: [
                             IconButton(
                               icon: Icon(
-                                isInWishlist ? Icons.favorite : Icons.favorite_border,
-                                color: isInWishlist ? const Color(0xFF2B5C74) : const Color(0xFF2B5C74),
+                                isInWishlist
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: isInWishlist
+                                    ? const Color(0xFF2B5C74)
+                                    : const Color(0xFF2B5C74),
                               ),
                               onPressed: () => addToWishlist(context, book),
                             ),
@@ -513,22 +553,27 @@ class _BookItemsListState extends State<BookItemsList> {
                               onPressed: () async {
                                 int quantity = 1;
                                 if (book.isNotEmpty) {
-                                  await widget.addToCart(context, book, quantity);
+                                  await widget.addToCart(
+                                      context, book, quantity);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Book data is missing!")),
+                                    const SnackBar(
+                                        content: Text("Book data is missing!")),
                                   );
                                 }
                               },
-                              label: const Text('Add to Bag', style: TextStyle(color: Colors.white)),
+                              label: const Text('Add to Bag',
+                                  style: TextStyle(color: Colors.white)),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF2B5C74),
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              icon: const Icon(Icons.shopping_bag_outlined, size: 16, color: Colors.white),
+                              icon: const Icon(Icons.shopping_bag_outlined,
+                                  size: 16, color: Colors.white),
                             ),
                           ],
                         ),

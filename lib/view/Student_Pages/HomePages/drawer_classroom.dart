@@ -3,9 +3,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:uthix_app/view/Student_Pages/Attendance/attendance.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
 import 'package:uthix_app/view/Student_Pages/Calendar/calendar.dart';
+import 'package:uthix_app/view/Student_Pages/Files/files.dart';
+import 'package:uthix_app/view/Student_Pages/Files/recording.dart';
 import 'package:uthix_app/view/Student_Pages/Grade/grade.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/yourc_clasroom.dart';
 import 'package:uthix_app/view/Student_Pages/Progress/progress_tracking.dart';
+import 'package:uthix_app/view/Student_Pages/Student%20Account%20Details/Order_Tracking.dart';
+import 'package:uthix_app/view/Student_Pages/Student%20Account%20Details/Student_HelpDesk.dart';
+import 'package:uthix_app/view/Student_Pages/Student%20Account%20Details/Student_ManageAccount.dart';
 
 // Import all the pages
 
@@ -153,13 +158,13 @@ class _MyDrawerState extends State<MyDrawer> {
         page = ProgressTracking();
         break;
       case 3:
-        page = null;
+        page = OrdersTrackingPage();
         break;
       case 4:
-        page = null;
+        page = StudFiles();
         break;
       case 5:
-        page = null;
+        page = StudRecording();
         break;
       case 6:
         page = BuyTextBooks();
@@ -171,10 +176,10 @@ class _MyDrawerState extends State<MyDrawer> {
         page = GradeStudent();
         break;
       case 9:
-        page = null;
+        page = StudentManageAccount();
         break;
       case 10:
-        page = null;
+        page = StudentHelpdesk();
         break;
       default:
         return;

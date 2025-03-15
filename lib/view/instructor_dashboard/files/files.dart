@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/modal/navbarWidgetInstructor.dart';
 import 'package:uthix_app/view/instructor_dashboard/Chat/chat.dart';
 import 'package:uthix_app/view/instructor_dashboard/Dashboard/instructor_dashboard.dart';
@@ -43,7 +44,11 @@ class _FilesState extends State<Files> {
       "page": InstructorDashboard()
     },
     {"icon": Icons.folder_open_outlined, "title": "Files", "page": Files()},
-    {"icon": Icons.chat_outlined, "title": "Chat", "page": const Chat()},
+    {
+      "icon": Icons.chat_outlined,
+      "title": "Chat",
+      "page": UnderConstructionScreen()
+    },
     {
       "icon": Icons.person_outline,
       "title": "Profile",

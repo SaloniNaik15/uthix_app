@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddAddressScreen extends StatefulWidget {
   @override
@@ -21,9 +22,20 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   final TextEditingController _stateController = TextEditingController();
   final TextEditingController _streetController = TextEditingController();
 
-
   Future<void> _saveAddress() async {
     if (!_formKey.currentState!.validate()) return;
+
+    // ✅ Fetch token dynamically from SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+
+    if (token == null || token.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Authentication failed. Please log in again.")),
+      );
+      return;
+    }
 
     final Map<String, dynamic> addressData = {
       "user_id": 1,
@@ -40,13 +52,9 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       "country": "India"
     };
 
-
-
-    String token = "9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64";
-
     BaseOptions options = BaseOptions(
       headers: {
-        "Authorization": "Bearer $token",
+        "Authorization": "Bearer $token", // ✅ Dynamic Token
         "Content-Type": "application/json",
         "Accept": "application/json",
       },
@@ -65,28 +73,31 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       if (response.statusCode == 201) {
         if (response.data["status"] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Address saved successfully")),
+            const SnackBar(content: Text("Address saved successfully")),
           );
           Navigator.pop(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Failed to save address: ${response.data["message"]}")),
+            SnackBar(
+                content: Text(
+                    "Failed to save address: ${response.data["message"]}")),
           );
         }
-      }
-
-      else if (response.statusCode == 401) {
+      } else if (response.statusCode == 401) {
         print("Unauthorized: Invalid Token");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Session expired. Please log in again.")),
+          const SnackBar(
+              content: Text("Session expired. Please log in again.")),
         );
       } else if (response.statusCode == 302) {
         print("Redirection detected to: ${response.headers['location']}");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Unexpected redirection. Try again later.")),
+          const SnackBar(
+              content: Text("Unexpected redirection. Try again later.")),
         );
       } else {
-        print("Unexpected error: ${response.statusCode}, Response: ${response.data}");
+        print(
+            "Unexpected error: ${response.statusCode}, Response: ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error: ${response.data.toString()}")),
         );
@@ -94,11 +105,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     } catch (e) {
       print("Dio error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Network error. Please try again.")),
+        const SnackBar(content: Text("Network error. Please try again.")),
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -124,38 +134,48 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             children: [
               _buildTextField("Name*", controller: _nameController),
               SizedBox(height: 10),
-              _buildTextField("Mobile Number*", keyboardType: TextInputType.phone, controller: _phoneController),
+              _buildTextField("Mobile Number*",
+                  keyboardType: TextInputType.phone,
+                  controller: _phoneController),
               SizedBox(height: 10),
-              _buildTextField("Alternate Phone", keyboardType: TextInputType.phone, controller: _altPhoneController),
+              _buildTextField("Alternate Phone",
+                  keyboardType: TextInputType.phone,
+                  controller: _altPhoneController),
               SizedBox(height: 10),
               ListTile(
                 leading: Icon(Icons.my_location),
-                title: Text("Use my current Location", style: TextStyle(fontSize: 14)),
+                title: Text("Use my current Location",
+                    style: TextStyle(fontSize: 14)),
                 onTap: () {},
               ),
               SizedBox(height: 10),
-              _buildTextField("Pin Code*", keyboardType: TextInputType.number, controller: _postalCodeController),
+              _buildTextField("Pin Code*",
+                  keyboardType: TextInputType.number,
+                  controller: _postalCodeController),
               SizedBox(height: 10),
               _buildTextField(
                 "Address (House No, Building, Street, Area)*",
                 controller: _areaController,
-                helperText: "Please update flat/house no. and society/apartment details",
+                helperText:
+                    "Please update flat/house no. and society/apartment details",
                 helperStyle: TextStyle(
                   color: Color(0xFFF99608),
                 ),
               ),
               SizedBox(height: 10),
-
               _buildTextField("Street*", controller: _streetController),
               SizedBox(height: 10),
-
               _buildTextField("Landmark*", controller: _landmarkController),
               SizedBox(height: 10),
               Row(
                 children: [
-                  Expanded(child: _buildTextField("City / District*", controller: _cityController)),
+                  Expanded(
+                      child: _buildTextField("City / District*",
+                          controller: _cityController)),
                   SizedBox(width: 10),
-                  Expanded(child: _buildTextField("State*", controller: _stateController)),
+                  Expanded(
+                      child: _buildTextField("State*",
+                          controller: _stateController)),
                 ],
               ),
               SizedBox(height: 10),
@@ -165,7 +185,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   Expanded(
                     child: RadioListTile(
                       title: Text("Home",
-                          style: TextStyle(color: Colors.black, fontFamily: 'Urbanist')),
+                          style: TextStyle(
+                              color: Colors.black, fontFamily: 'Urbanist')),
                       value: "Home",
                       groupValue: _addressType,
                       onChanged: (value) {
@@ -176,7 +197,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   Expanded(
                     child: RadioListTile(
                       title: Text("Office",
-                          style: TextStyle(color: Colors.black, fontFamily: 'Urbanist')),
+                          style: TextStyle(
+                              color: Colors.black, fontFamily: 'Urbanist')),
                       value: "Office",
                       groupValue: _addressType,
                       onChanged: (value) {
@@ -193,7 +215,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                     setState(() => _isDefault = value!);
                   },
                 ),
-                title: Text("Make this my default address", style: TextStyle(fontSize: 12, fontFamily: 'Urbanist')),
+                title: Text("Make this my default address",
+                    style: TextStyle(fontSize: 12, fontFamily: 'Urbanist')),
               ),
               SizedBox(height: 10),
               Row(
@@ -204,15 +227,20 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: Colors.grey),
                       ),
-                      child: Text("Cancel", style: TextStyle(color: Colors.black, fontFamily: 'Urbanist')),
+                      child: Text("Cancel",
+                          style: TextStyle(
+                              color: Colors.black, fontFamily: 'Urbanist')),
                     ),
                   ),
                   SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: _saveAddress,
-                      style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF2B5C74)),
-                      child: Text("Save", style: TextStyle(color: Colors.white, fontFamily: 'Urbanist')),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF2B5C74)),
+                      child: Text("Save",
+                          style: TextStyle(
+                              color: Colors.white, fontFamily: 'Urbanist')),
                     ),
                   ),
                 ],
@@ -224,12 +252,17 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     );
   }
 
-  Widget _buildTextField(String label, {TextInputType keyboardType = TextInputType.text, TextEditingController? controller, String? helperText, TextStyle? helperStyle}) {
+  Widget _buildTextField(String label,
+      {TextInputType keyboardType = TextInputType.text,
+      TextEditingController? controller,
+      String? helperText,
+      TextStyle? helperStyle}) {
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: TextStyle(fontFamily: 'Urbanist', fontWeight: FontWeight.w400),
+        labelStyle:
+            TextStyle(fontFamily: 'Urbanist', fontWeight: FontWeight.w400),
         border: OutlineInputBorder(
           borderSide: BorderSide(color: Color(0xFFD2D2D2)),
         ),

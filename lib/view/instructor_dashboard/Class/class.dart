@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/view/instructor_dashboard/Class/announcement.dart';
 import 'package:uthix_app/view/instructor_dashboard/Class/live_classes.dart';
 import 'package:uthix_app/view/instructor_dashboard/Class/new_announcement.dart';
 import 'package:uthix_app/view/instructor_dashboard/submission/submission.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InstructorClass extends StatefulWidget {
-  const InstructorClass({super.key});
+  const InstructorClass({super.key, required String classId});
 
   @override
   State<InstructorClass> createState() => _InstructorClassState();
@@ -21,20 +23,35 @@ class _InstructorClassState extends State<InstructorClass> {
   bool isLoading = true;
   bool isAnnouncementsLoading = true;
   int currentIndex = 0;
-  final String token = "112|OZqf3MUzqsvrPd0XkqX7tT9YM0mCwlf0E6Az5Nykfb3c42fd";
+  String? token; // Token will be loaded from SharedPreferences
 
   @override
   void initState() {
     super.initState();
-    fetchClassData();
-    fetchAnnouncements();
+    _loadToken();
+  }
+
+  // Load token from SharedPreferences and call the API methods if available.
+  Future<void> _loadToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      // Changed from 'access_token' to 'auth_token'
+      token = prefs.getString('auth_token');
+    });
+    if (token != null) {
+      fetchClassData();
+      fetchAnnouncements();
+    } else {
+      print("No token found. User may not be logged in.");
+    }
   }
 
   Future<void> fetchAnnouncements() async {
+    if (token == null) return;
     try {
       print("Fetching announcements...");
       var response = await Dio().get(
-        'https://admin.uthix.com/api/classroom/3/announcements',
+        'https://admin.uthix.com/api/classroom/1/announcements',
         options: Options(
           headers: {
             "Authorization": "Bearer $token",
@@ -57,7 +74,6 @@ class _InstructorClassState extends State<InstructorClass> {
   }
 
   Future<void> _openAttachment(BuildContext context, String url) async {
-    // Check if the URL can be launched
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -68,9 +84,9 @@ class _InstructorClassState extends State<InstructorClass> {
   }
 
   Future<void> fetchClassData() async {
+    if (token == null) return;
     try {
       print("Fetching class data...");
-
       var response = await Dio().get(
         'https://admin.uthix.com/api/subject-classes/1',
         options: Options(
@@ -80,9 +96,7 @@ class _InstructorClassState extends State<InstructorClass> {
           },
         ),
       );
-
-      print("Response received: ${response.data}"); // Debugging
-
+      print("Response received: ${response.data}");
       if (response.statusCode == 200 && response.data["status"] == true) {
         setState(() {
           classData = response.data["data"];
@@ -119,7 +133,6 @@ class _InstructorClassState extends State<InstructorClass> {
     final announcementProvider = Provider.of<AnnouncementProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
-      // AppBar placed using PreferredSize.
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(100),
         child: Container(
@@ -127,7 +140,6 @@ class _InstructorClassState extends State<InstructorClass> {
           padding: const EdgeInsets.only(left: 10, top: 60, right: 10),
           child: Row(
             children: [
-              // Back icon button.
               Container(
                 height: 40,
                 width: 40,
@@ -157,7 +169,6 @@ class _InstructorClassState extends State<InstructorClass> {
                 ),
               ),
               const Spacer(),
-              // Plus icon.
               Container(
                 width: 40,
                 height: 40,
@@ -184,13 +195,13 @@ class _InstructorClassState extends State<InstructorClass> {
                 ),
               ),
               const SizedBox(width: 15),
-              // "Go Live" button.
               GestureDetector(
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LiveClasses()));
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => UnderConstructionScreen()),
+                  );
                 },
                 child: Container(
                   width: 70,
@@ -227,11 +238,9 @@ class _InstructorClassState extends State<InstructorClass> {
           ),
         ),
       ),
-      // Body content.
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Display ClassCard if available.
             isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : classData.isEmpty
@@ -239,7 +248,6 @@ class _InstructorClassState extends State<InstructorClass> {
                     : Column(
                         children: [
                           const SizedBox(height: 40),
-                          // Assuming ClassCard is a custom widget defined elsewhere.
                           ClassCard(
                             subject: classData[currentIndex]["classroom"]
                                     ?["subject"]?["name"] ??
@@ -247,8 +255,7 @@ class _InstructorClassState extends State<InstructorClass> {
                             mentor: classData[currentIndex]["classroom"]
                                     ?["instructor"]?["name"] ??
                                 "No Mentor",
-                            schedule:
-                                "10:00 AM - 12:30 PM | MON THU FRI", // Hardcoded example.
+                            schedule: "10:00 AM - 12:30 PM | MON THU FRI",
                             coMentors: "N/A",
                             chapter: classData[currentIndex]["title"] ??
                                 "No description",
@@ -259,14 +266,12 @@ class _InstructorClassState extends State<InstructorClass> {
                           ),
                         ],
                       ),
-            // Additional content: Teacher/Participants and Announcement section.
             Padding(
               padding: const EdgeInsets.all(20),
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: Column(
                   children: [
-                    // Teacher and Participants section.
                     Row(
                       children: [
                         Column(
@@ -355,7 +360,6 @@ class _InstructorClassState extends State<InstructorClass> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    // Announcement container.
                     GestureDetector(
                       onTap: () async {
                         final result = await Navigator.push(
@@ -409,7 +413,6 @@ class _InstructorClassState extends State<InstructorClass> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    // Announcements ListView.
                     SizedBox(
                       height: 350,
                       child: isAnnouncementsLoading
@@ -420,11 +423,11 @@ class _InstructorClassState extends State<InstructorClass> {
                                 var announcement = announcementsData[index];
                                 return GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => Submission()),
-                                    );
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //       builder: (context) => Submission()),
+                                    // );
                                   },
                                   child: Container(
                                     width: 400,
@@ -458,9 +461,8 @@ class _InstructorClassState extends State<InstructorClass> {
                                               ),
                                               const SizedBox(width: 10),
                                               Text(
-                                                announcement["classroom"]
-                                                            ["instructor"]
-                                                        ["user"]["name"] ??
+                                                announcement["instructor"]
+                                                        ["name"] ??
                                                     "No Name",
                                                 style: GoogleFonts.urbanist(
                                                   fontSize: 14,
@@ -517,17 +519,22 @@ class _InstructorClassState extends State<InstructorClass> {
                                                                     .grey),
                                                             const SizedBox(
                                                                 width: 5),
-                                                            Text(
-                                                              attachment[
-                                                                  "attachment_file"],
-                                                              style: GoogleFonts
-                                                                  .urbanist(
-                                                                fontSize: 14,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400,
-                                                                color: Colors
-                                                                    .black,
+                                                            Expanded(
+                                                              child: Text(
+                                                                attachment[
+                                                                    "attachment_file"],
+                                                                style: GoogleFonts
+                                                                    .urbanist(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
                                                               ),
                                                             ),
                                                           ],
@@ -656,11 +663,8 @@ class ClassCard extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.arrow_back_ios,
                           size: 10, color: Colors.white),
-                      onPressed: hasPrevious
-                          ? onPrevious
-                          : null, // Disable if no previous class
+                      onPressed: hasPrevious ? onPrevious : null,
                     ),
-                    // const SizedBox(width: 2),
                     _buildTabText("PREVIOUS"),
                     const SizedBox(width: 25),
                     _buildTabText("ONGOING"),
@@ -670,8 +674,7 @@ class ClassCard extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.arrow_forward_ios,
                           size: 10, color: Colors.white),
-                      onPressed:
-                          hasNext ? onNext : null, // Disable if no next class
+                      onPressed: hasNext ? onNext : null,
                     ),
                   ],
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dio/dio.dart';
+import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/modal/navbarWidgetStudent.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/StudentSearch.dart';
@@ -25,8 +26,12 @@ class _ECommerceState extends State<ECommerce> {
   final List<Map<String, dynamic>> navItems = [
     {"icon": Icons.home_outlined, "title": "Home", "page": HomePages()},
     {"icon": Icons.folder_open_outlined, "title": "Files", "page": StudFiles()},
-    {"icon": Icons.find_in_page, "title": "Find", "page": const BuyTextBooks()},
-    {"icon": Icons.chat_outlined, "title": "Chat", "page": StudChat()},
+    {"icon": Icons.find_in_page, "title": "Find", "page": const ECommerce()},
+    {
+      "icon": Icons.chat_outlined,
+      "title": "Chat",
+      "page": UnderConstructionScreen()
+    },
     {
       "icon": Icons.person_outline,
       "title": "Profile",

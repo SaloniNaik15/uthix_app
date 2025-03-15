@@ -40,7 +40,7 @@ class _ClassesState extends State<Classes> {
 
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('access_token'); // Retrieve token
+    String? token = prefs.getString('auth_token'); // Retrieve token
     log("Retrieved Token: $token"); // Log token for verification
 
     setState(() {
@@ -157,6 +157,7 @@ class _ClassesState extends State<Classes> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           Padding(

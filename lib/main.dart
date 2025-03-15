@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/view/Ecommerce/e_commerce.dart';
 import 'package:uthix_app/view/Seller_dashboard/dashboard.dart';
 import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
@@ -31,6 +33,9 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        textTheme: GoogleFonts.urbanistTextTheme(),
+      ),
       //home: StartLogin()
       home: Introscreen(),
       //home: SellerDashboard(),
