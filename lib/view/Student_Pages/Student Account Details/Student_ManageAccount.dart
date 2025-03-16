@@ -1,10 +1,8 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:uthix_app/view/homeRegistration/registration.dart';
+import '../../login/start_login.dart';
 
 class StudentManageAccount extends StatefulWidget {
   const StudentManageAccount({super.key});
@@ -28,7 +26,7 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
 
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('access_token'); // Retrieve token
+    String? token = prefs.getString('auth_token'); // Retrieve token
     log("Retrieved Token: $token"); // Log token for verification
 
     setState(() {
@@ -57,19 +55,59 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
         await prefs.clear();
         log("SharedPreferences cleared successfully");
 
-        // Navigate to RegistrationPage
-        if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => Registration()),
-          );
-        }
+        // Ensure widget is still mounted before navigating
+        if (!context.mounted) return;
+
+        // Navigate to StartLogin screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => StartLogin()),
+        );
       } else {
         log("Logout failed: ${response.body}");
       }
     } catch (e) {
       log("Error logging out: $e");
     }
+  }
+
+  // Logout Confirmation Dialog
+  void showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text("Logout"),
+          content: Text("Are you sure you want to logout?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Close dialog
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(dialogContext).pop(); // Close dialog
+
+                // Clear token and logout
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                await prefs.clear();
+                log("SharedPreferences cleared successfully");
+
+                // Call the logout function to handle API logout
+                logoutUser();
+              },
+              child: Text(
+                "Logout",
+                style: TextStyle(color: Colors.red), // Highlight logout button
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -80,7 +118,7 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF605F5F)),
+          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -135,16 +173,16 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
 
               const SizedBox(height: 30),
 
-              // Buttons
+              // Logout Button with Popup
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        logoutUser();
+                        showLogoutDialog(context); // Show confirmation popup
                       },
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.red),
+                        side: BorderSide(color: Colors.red ,),
                         padding: EdgeInsets.symmetric(vertical: 14),
                       ),
                       child: Text(

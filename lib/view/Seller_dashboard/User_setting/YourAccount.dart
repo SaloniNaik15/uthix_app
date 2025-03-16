@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../homeRegistration/registration.dart';
+import '../../login/start_login.dart';
 import 'FrequentlyAskedQuestions.dart';
 import 'HelpDesk.dart';
 import 'ManageAccounts.dart';
@@ -22,7 +21,7 @@ Future<void> logoutUser(BuildContext context) async {
 
   Navigator.pushReplacement(
     context,
-    MaterialPageRoute(builder: (context) => Registration()),
+    MaterialPageRoute(builder: (context) => StartLogin()),
   );
 }
 class _ManageYourAccountState extends State<YourAccount> {
