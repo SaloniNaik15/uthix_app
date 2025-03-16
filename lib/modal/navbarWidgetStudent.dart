@@ -1,19 +1,9 @@
-// navbar.dart
-
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
-import 'package:uthix_app/view/Student_Pages/Files/files.dart';
-import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
-import 'package:uthix_app/view/Student_Pages/Student%20Account%20Details/Student_AccountPage.dart';
-import 'package:uthix_app/view/Student_Pages/Student_Chat/stud_chat.dart';
-import 'package:uthix_app/view/homeRegistration/profile.dart';
-import 'package:uthix_app/view/instructor_dashboard/Chat/chat.dart';
-import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:uthix_app/modal/nav_itemStudent.dart';
 
-class NavbarStudent extends StatefulWidget {
+class NavbarStudent extends StatelessWidget {
   final Function(int) onItemTapped;
   final int selectedIndex;
 
@@ -24,72 +14,55 @@ class NavbarStudent extends StatefulWidget {
   });
 
   @override
-  // ignore: library_private_types_in_public_api
-  _NavbarStudentState createState() => _NavbarStudentState();
-}
-
-class _NavbarStudentState extends State<NavbarStudent> {
-  final List<Map<String, dynamic>> navItems = [
-    {"icon": Icons.home_outlined, "title": "Home", "page": HomePages()},
-    {"icon": Icons.folder_open_outlined, "title": "Files", "page": StudFiles()},
-    {"icon": Icons.find_in_page, "title": "Find", "page": BuyTextBooks()},
-    {"icon": Icons.chat_outlined, "title": "Chat", "page": StudChat()},
-    {
-      "icon": Icons.person_outline,
-      "title": "Profile",
-      "page": const StudentAccountPages()
-    },
-  ];
-
-  @override
   Widget build(BuildContext context) {
     return Container(
-      width: 350,
-      height: 59,
+      width: MediaQuery.of(context).size.width * 0.9, // 90% of screen width
+
+      height: 59.h, // Responsive height
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
-            offset: const Offset(0, 8),
-            blurRadius: 16,
+            offset: Offset(0, 8.h),
+            blurRadius: 16.r,
           ),
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
-            offset: const Offset(0, 0),
-            blurRadius: 4,
+            offset: Offset(0, 0),
+            blurRadius: 4.r,
           ),
         ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: List.generate(
-          navItems.length,
+          navStudItems.length,
           (index) => GestureDetector(
-            onTap: () => widget.onItemTapped(index),
+            onTap: () => onItemTapped(index),
             child: Container(
-              width: 55,
-              height: 55,
-              decoration: const BoxDecoration(
+              width: 60.w,
+              height: 60.h,
+              decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Color.fromRGBO(255, 255, 255, 1),
+                color: Colors.white,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    navItems[index]["icon"],
-                    size: 20,
-                    color: widget.selectedIndex == index
+                    navStudItems[index]["icon"],
+                    size: 20.sp, // Responsive icon size
+                    color: selectedIndex == index
                         ? Colors.blue
                         : const Color.fromRGBO(96, 95, 95, 1),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2.h),
                   Text(
-                    navItems[index]["title"],
+                    navStudItems[index]["title"],
                     style: GoogleFonts.urbanist(
-                      fontSize: 10,
+                      fontSize: 10.sp, // Responsive font size
                       fontWeight: FontWeight.w400,
-                      color: widget.selectedIndex == index
+                      color: selectedIndex == index
                           ? Colors.blue
                           : const Color.fromRGBO(96, 95, 95, 1),
                     ),

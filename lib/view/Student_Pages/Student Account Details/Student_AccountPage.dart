@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/UpcomingPage.dart';
+import 'package:uthix_app/modal/nav_itemStudent.dart';
 import 'package:uthix_app/modal/navbarWidgetStudent.dart';
 import 'package:uthix_app/view/Ecommerce/e_commerce.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
@@ -39,7 +40,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
     if (index != 4) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => navItems[index]["page"]),
+        MaterialPageRoute(builder: (context) => navStudItems[index]["page"]),
       ).then((_) {
         setState(() {
           selectedIndex = 4;
@@ -58,22 +59,6 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
       MaterialPageRoute(builder: (context) => Registration()),
     );
   }
-
-  final List<Map<String, dynamic>> navItems = [
-    {"icon": Icons.home_outlined, "title": "Home", "page": HomePages()},
-    {"icon": Icons.folder_open_outlined, "title": "Files", "page": StudFiles()},
-    {"icon": Icons.find_in_page, "title": "Find", "page": ECommerce()},
-    {
-      "icon": Icons.chat_outlined,
-      "title": "Chat",
-      "page": UnderConstructionScreen()
-    },
-    {
-      "icon": Icons.person_outline,
-      "title": "Profile",
-      "page": StudentAccountPages()
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {

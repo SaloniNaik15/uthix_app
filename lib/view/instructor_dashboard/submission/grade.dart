@@ -76,132 +76,137 @@ class _GradeState extends State<Grade> {
     TextEditingController feedbackController = TextEditingController();
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10, top: 40),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 40,
-              width: 40,
-              decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 1),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    offset: const Offset(0, 4),
-                    blurRadius: 8,
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 15, right: 15, top: 40),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 40,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(255, 255, 255, 1),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      offset: const Offset(0, 4),
+                      blurRadius: 8,
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      offset: const Offset(0, 0),
+                      blurRadius: 4,
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, size: 25),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                   ),
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    offset: const Offset(0, 0),
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
-              child: Center(
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back, size: 25),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
-            Text(
-              "Grading and Feedback",
-              style: GoogleFonts.urbanist(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: const Color.fromRGBO(96, 95, 95, 1),
+              const SizedBox(height: 30),
+              Text(
+                "Grading and Feedback",
+                style: GoogleFonts.urbanist(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: const Color.fromRGBO(96, 95, 95, 1),
+                ),
               ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              "Please grade the work according to the following criterion",
-              style: GoogleFonts.urbanist(
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: const Color.fromRGBO(96, 95, 95, 1),
+              const SizedBox(height: 5),
+              Text(
+                "Please grade the work according to the following criterion",
+                style: GoogleFonts.urbanist(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w300,
+                  color: const Color.fromRGBO(96, 95, 95, 1),
+                ),
               ),
-            ),
-            const SizedBox(height: 40),
-            gradeRow("Course Engagement", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 18),
-            gradeRow("Class Attendance", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 18),
-            gradeRow("Problem Solving", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 18),
-            gradeRow("Quick Thinking", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 18),
-            gradeRow("Course Knowledge", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 18),
-            gradeRow("Detailed Work", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 18),
-            gradeRow(
-                "Presentation Skills", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 30),
-            const Divider(
-              thickness: 2,
-              color: Color.fromRGBO(217, 217, 217, 1),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Row(
-                children: [
-                  const Icon(Icons.menu, color: Color.fromRGBO(96, 95, 95, 1)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextField(
-                      controller: feedbackController,
-                      keyboardType: TextInputType.text,
-                      style: GoogleFonts.urbanist(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: const Color.fromRGBO(96, 95, 95, 1),
-                      ),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "Feedback Note",
-                        hintStyle: GoogleFonts.urbanist(
+              const SizedBox(height: 40),
+              gradeRow(
+                  "Course Engagement", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 18),
+              gradeRow("Class Attendance", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 18),
+              gradeRow("Problem Solving", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 18),
+              gradeRow("Quick Thinking", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 18),
+              gradeRow("Course Knowledge", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 18),
+              gradeRow("Detailed Work", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 18),
+              gradeRow(
+                  "Presentation Skills", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 30),
+              const Divider(
+                thickness: 2,
+                color: Color.fromRGBO(217, 217, 217, 1),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.menu,
+                        color: Color.fromRGBO(96, 95, 95, 1)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: feedbackController,
+                        keyboardType: TextInputType.text,
+                        style: GoogleFonts.urbanist(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
                           color: const Color.fromRGBO(96, 95, 95, 1),
                         ),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Feedback Note",
+                          hintStyle: GoogleFonts.urbanist(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: const Color.fromRGBO(96, 95, 95, 1),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Divider(
+                thickness: 2,
+                color: Color.fromRGBO(217, 217, 217, 1),
+              ),
+              const SizedBox(height: 30),
+              Center(
+                child: Container(
+                  height: 42,
+                  width: 170,
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(43, 92, 116, 1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "Submit",
+                      style: GoogleFonts.urbanist(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: const Color.fromRGBO(255, 255, 255, 1),
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-            const Divider(
-              thickness: 2,
-              color: Color.fromRGBO(217, 217, 217, 1),
-            ),
-            const SizedBox(height: 90),
-            Center(
-              child: Container(
-                height: 42,
-                width: 170,
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(43, 92, 116, 1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Center(
-                  child: Text(
-                    "Submit",
-                    style: GoogleFonts.urbanist(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: const Color.fromRGBO(255, 255, 255, 1),
-                    ),
-                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

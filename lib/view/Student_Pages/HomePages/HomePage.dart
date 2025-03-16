@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/UpcomingPage.dart';
+import 'package:uthix_app/modal/nav_itemStudent.dart';
 import 'package:uthix_app/modal/navbarWidgetStudent.dart';
 import 'package:uthix_app/view/Ecommerce/e_commerce.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
@@ -27,22 +28,6 @@ class HomePages extends StatefulWidget {
 
 class _HomePagesState extends State<HomePages> {
   int selectedIndex = 0;
-
-  final List<Map<String, dynamic>> navItems = [
-    {"icon": Icons.home_outlined, "title": "Home", "page": HomePages()},
-    {"icon": Icons.folder_open_outlined, "title": "Files", "page": StudFiles()},
-    {"icon": Icons.find_in_page, "title": "Find", "page": ECommerce()},
-    {
-      "icon": Icons.chat_outlined,
-      "title": "Chat",
-      "page": UnderConstructionScreen()
-    },
-    {
-      "icon": Icons.person_outline,
-      "title": "Profile",
-      "page": const StudentAccountPages(),
-    },
-  ];
 
   final List<Map<String, String>> dashBoard = [
     {"image": "assets/Student_Home_icons/Buy_Books.png", "title": "BUY BOOKS"},
@@ -75,7 +60,7 @@ class _HomePagesState extends State<HomePages> {
 
   Future<void> _initializeData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('access_token'); // Retrieve token
+    String? token = prefs.getString('auth_token'); // Retrieve token
     log("Retrieved Token: $token"); // Log token for verification
 
     setState(() {
@@ -91,7 +76,7 @@ class _HomePagesState extends State<HomePages> {
     if (index != 0) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => navItems[index]["page"]),
+        MaterialPageRoute(builder: (context) => navStudItems[index]["page"]),
       ).then((_) {
         setState(() {
           selectedIndex = 0;
@@ -112,6 +97,79 @@ class _HomePagesState extends State<HomePages> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(50),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          titleSpacing: 0, // Ensures elements are properly aligned
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: Icon(Icons.menu, color: Colors.black),
+              onPressed: () =>
+                  Scaffold.of(context).openDrawer(), // Open MyDrawer
+            ),
+          ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Spacer(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Mahima Mandal",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontFamily: "Urbanist",
+                      fontWeight: FontWeight.w500,
+                      color: Color.fromRGBO(96, 95, 95, 1),
+                    ),
+                  ),
+                  Text(
+                    "MAHIMA 007",
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontFamily: "Urbanist",
+                      fontWeight: FontWeight.w500,
+                      color: Color.fromRGBO(96, 95, 95, 1),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 15,
+              ),
+              // Profile Image
+              Container(
+                height: 45,
+                width: 45,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(19),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      offset: const Offset(0, 4),
+                      blurRadius: 8,
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    "assets/login/profile.jpeg",
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 15,
+              ),
+            ],
+          ),
+        ),
+      ),
       drawer: MyDrawer(
         onItemSelected: onDrawerItemSelected,
         selectedIndex: drawerindex,
@@ -119,111 +177,15 @@ class _HomePagesState extends State<HomePages> {
       ),
       body: Stack(
         children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 40, right: 50, top: 50),
-                child: Row(
-                  children: [
-                    Builder(
-                      builder: (context) => GestureDetector(
-                        onTap: () {
-                          Scaffold.of(context).openDrawer();
-                        },
-                        child: Container(
-                          height: 40,
-                          width: 40,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.06),
-                                offset: const Offset(0, 4),
-                                blurRadius: 8,
-                              ),
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.04),
-                                offset: const Offset(0, 0),
-                                blurRadius: 4,
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Icon(
-                              Icons.menu,
-                              size: 25,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Spacer(),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          "Mahima Mandal",
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: "Urbanist",
-                              fontWeight: FontWeight.w500,
-                              color: Color.fromRGBO(96, 95, 95, 1)),
-                        ),
-                        Text(
-                          "MAHIMA 007",
-                          style: TextStyle(
-                              fontSize: 10,
-                              fontFamily: "Urbanist",
-                              fontWeight: FontWeight.w500,
-                              color: Color.fromRGBO(96, 95, 95, 1)),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    Container(
-                      height: 45,
-                      width: 45,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(19),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.06),
-                            offset: const Offset(0, 4),
-                            blurRadius: 8,
-                          ),
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
-                            offset: const Offset(0, 0),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          "assets/login/profile.jpeg",
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
           Positioned.fill(
-            top: 110,
+            top: 10,
             child: Image.asset(
               "assets/instructor/background.png",
               fit: BoxFit.cover,
             ),
           ),
           Positioned.fill(
-            top: 180,
+            top: 100,
             child: Align(
               alignment: Alignment.topCenter,
               child: Padding(
@@ -274,8 +236,8 @@ class _HomePagesState extends State<HomePages> {
                                 builder: (context) =>
                                     UnderConstructionScreen()),
                           );
-                        }
-                        else if (dashBoard[index]["title"] == "DEMO CLASSES") {
+                        } else if (dashBoard[index]["title"] ==
+                            "DEMO CLASSES") {
                           Navigator.push(
                             context,
                             MaterialPageRoute(

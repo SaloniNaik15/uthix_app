@@ -158,64 +158,66 @@ class _ClassesState extends State<Classes> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
-            child: Row(
-              children: [
-                Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        offset: const Offset(0, 4),
-                        blurRadius: 8,
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        offset: const Offset(0, 0),
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: const Icon(Icons.menu, size: 25),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: Container(
+          margin: const EdgeInsets.only(left: 10, top: 10, bottom: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.06),
+                offset: const Offset(0, 4),
+                blurRadius: 8,
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                offset: const Offset(0, 0),
+                blurRadius: 4,
+              ),
+            ],
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.menu, size: 25),
+            onPressed: () {
+              // Add menu functionality here
+            },
+          ),
+        ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
+            height: 42,
+            width: 42,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(19),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  offset: const Offset(0, 4),
+                  blurRadius: 8,
                 ),
-                const Spacer(),
-                Container(
-                  height: 42,
-                  width: 42,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(19),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        offset: const Offset(0, 4),
-                        blurRadius: 8,
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        offset: const Offset(0, 0),
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      "assets/login/profile.jpeg",
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  offset: const Offset(0, 0),
+                  blurRadius: 4,
                 ),
               ],
             ),
+            child: ClipOval(
+              child: Image.asset(
+                "assets/login/profile.jpeg",
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-
+        ],
+      ),
+      body: Column(
+        children: [
           isLoading
               ? const Center(child: CircularProgressIndicator())
               : classData.isEmpty

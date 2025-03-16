@@ -1,16 +1,9 @@
 // navbar.dart
-
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:uthix_app/view/Seller_dashboard/User_setting/Profile.dart';
-import 'package:uthix_app/view/homeRegistration/profile.dart';
-import 'package:uthix_app/view/instructor_dashboard/Chat/chat.dart';
-import 'package:uthix_app/view/instructor_dashboard/Class/class.dart';
-import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
+import 'nav_items.dart'; // Import the global nav items
 
-class Navbar extends StatefulWidget {
+class Navbar extends StatelessWidget {
   final Function(int) onItemTapped;
   final int selectedIndex;
 
@@ -19,24 +12,6 @@ class Navbar extends StatefulWidget {
     required this.selectedIndex,
     super.key,
   });
-
-  @override
-  _NavbarState createState() => _NavbarState();
-}
-
-class _NavbarState extends State<Navbar> {
-  final List<Map<String, dynamic>> navItems = [
-    {
-      "icon": Icons.home_outlined,
-      "title": "Home",
-      "page": InstructorClass(
-        classId: '',
-      )
-    },
-    {"icon": Icons.folder_open_outlined, "title": "Files", "page": Files()},
-    {"icon": Icons.chat_outlined, "title": "Chat", "page": Chat()},
-    {"icon": Icons.person_outline, "title": "Profile", "page": Profile()},
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +37,7 @@ class _NavbarState extends State<Navbar> {
         children: List.generate(
           navItems.length,
           (index) => GestureDetector(
-            onTap: () => widget.onItemTapped(index),
+            onTap: () => onItemTapped(index),
             child: Container(
               width: 60,
               height: 60,
@@ -76,7 +51,7 @@ class _NavbarState extends State<Navbar> {
                   Icon(
                     navItems[index]["icon"],
                     size: 20,
-                    color: widget.selectedIndex == index
+                    color: selectedIndex == index
                         ? Colors.blue
                         : const Color.fromRGBO(96, 95, 95, 1),
                   ),
@@ -86,7 +61,7 @@ class _NavbarState extends State<Navbar> {
                     style: GoogleFonts.urbanist(
                       fontSize: 10,
                       fontWeight: FontWeight.w400,
-                      color: widget.selectedIndex == index
+                      color: selectedIndex == index
                           ? Colors.blue
                           : const Color.fromRGBO(96, 95, 95, 1),
                     ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/UpcomingPage.dart';
+import 'package:uthix_app/modal/nav_items.dart';
 import 'package:uthix_app/modal/navbarWidgetInstructor.dart';
 import 'package:uthix_app/view/instructor_dashboard/Chat/chat.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/profile_account.dart';
@@ -23,20 +24,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   int selectedIndex = 0;
   String? token;
 
-  final List<Map<String, dynamic>> navItems = [
-    {"icon": Icons.home_outlined, "title": "Home", "page": null},
-    {"icon": Icons.folder_open_outlined, "title": "Files", "page": Files()},
-    {
-      "icon": Icons.chat_outlined,
-      "title": "Chat",
-      "page": UnderConstructionScreen()
-    },
-    {
-      "icon": Icons.person_outline,
-      "title": "Profile",
-      "page": const ProfileAccount()
-    },
-  ];
+
 
   // Added the Submission card as an additional entry.
   final List<Map<String, String>> dashBoard = [
@@ -275,48 +263,6 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   Widget _buildHeader() {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 40, right: 50, top: 50),
-          child: Row(
-            children: [
-              Container(
-                height: 40,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
-                      offset: const Offset(0, 4),
-                      blurRadius: 8,
-                    ),
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      offset: const Offset(0, 0),
-                      blurRadius: 4,
-                    ),
-                  ],
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back, size: 25),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ),
-              const SizedBox(width: 30),
-              Text(
-                "Instructor Dashboard",
-                style: GoogleFonts.urbanist(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: const Color.fromRGBO(95, 95, 95, 1),
-                ),
-              ),
-            ],
-          ),
-        ),
         const SizedBox(height: 20),
         Container(
           height: 1,
@@ -371,7 +317,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   // Build the dashboard grid.
   Widget _buildDashboardGrid() {
     return Padding(
-      padding: const EdgeInsets.only(left: 30, right: 30),
+      padding: const EdgeInsets.only(left: 30, right: 30, top: 15),
       child: GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -443,15 +389,10 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
 
   // Build the bottom navigation bar.
   Widget _buildBottomNavigationBar() {
-    return Positioned(
-      bottom: 20,
-      left: 0,
-      right: 0,
-      child: Center(
-        child: Navbar(
-          onItemTapped: onItemTapped,
-          selectedIndex: selectedIndex,
-        ),
+    return Center(
+      child: Navbar(
+        onItemTapped: onItemTapped,
+        selectedIndex: selectedIndex,
       ),
     );
   }
@@ -459,30 +400,82 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          // Header Section
-          _buildHeader(),
-          // Background image below header
-          Positioned.fill(
-            top: 200,
-            child: Image.asset("assets/instructor/background.png",
-                fit: BoxFit.cover),
-          ),
-          // Dashboard grid positioned appropriately
-          Positioned.fill(
-            top: 250,
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: _buildDashboardGrid(),
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 20),
+            child: Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    offset: const Offset(0, 4),
+                    blurRadius: 8,
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    offset: const Offset(0, 0),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, size: 25),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
             ),
           ),
-          // Bottom navigation bar
-          _buildBottomNavigationBar(),
-        ],
-      ),
-    );
+          title: Text(
+            "Instructor Dashboard",
+            style: GoogleFonts.urbanist(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: const Color.fromRGBO(95, 95, 95, 1),
+            ),
+          ),
+          centerTitle: true,
+        ),
+        body: Stack(
+          children: [
+            /// Background Image Covering Full Screen
+            Positioned.fill(
+              top: 100,
+              child: Image.asset(
+                "assets/instructor/background.png",
+                fit: BoxFit.cover,
+              ),
+            ),
+
+            /// Scrollable Dashboard Content
+            Column(
+              children: [
+                _buildHeader(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: BouncingScrollPhysics(),
+                    child: _buildDashboardGrid(),
+                  ),
+                ),
+              ],
+            ),
+
+            /// Fixed Bottom Navigation Bar
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 20, // Adjust spacing as needed
+              child: _buildBottomNavigationBar(),
+            ),
+          ],
+        ));
   }
 
   // Reusable text field builder.

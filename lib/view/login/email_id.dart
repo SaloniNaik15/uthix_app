@@ -36,7 +36,9 @@ class _EmailIdState extends State<EmailId> {
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please enter email and password", style: GoogleFonts.urbanist())),
+        SnackBar(
+            content: Text("Please enter email and password",
+                style: GoogleFonts.urbanist())),
       );
       return;
     }
@@ -64,23 +66,28 @@ class _EmailIdState extends State<EmailId> {
         if (role == 'seller') {
           nextScreen = SellerDashboard();
         } else if (role == 'student') {
-          nextScreen = ECommerce();
+          nextScreen = MainCombine();
         } else if (role == 'instructor') {
           nextScreen = InstructorDashboard();
         } else {
           nextScreen = MainCombine();
         }
 
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => nextScreen));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => nextScreen));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data['message'] ?? "Invalid email or password", style: GoogleFonts.urbanist())),
+          SnackBar(
+              content: Text(data['message'] ?? "Invalid email or password",
+                  style: GoogleFonts.urbanist())),
         );
       }
     } catch (e) {
       log("Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("An error occurred. Please try again.", style: GoogleFonts.urbanist())),
+        SnackBar(
+            content: Text("An error occurred. Please try again.",
+                style: GoogleFonts.urbanist())),
       );
     }
   }
@@ -94,14 +101,16 @@ class _EmailIdState extends State<EmailId> {
             Positioned.fill(
               child: Opacity(
                 opacity: 0.30,
-                child: Image.asset("assets/registration/splash.png", fit: BoxFit.cover),
+                child: Image.asset("assets/registration/splash.png",
+                    fit: BoxFit.cover),
               ),
             ),
             Column(
               children: [
                 Expanded(
                   child: SingleChildScrollView(
-                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: Column(
@@ -127,7 +136,9 @@ class _EmailIdState extends State<EmailId> {
                             ),
                           ),
                           const SizedBox(height: 40),
-                          _buildTextField(controller: _emailIdController, hint: "Please type your Email Id"),
+                          _buildTextField(
+                              controller: _emailIdController,
+                              hint: "Please type your Email Id"),
                           const SizedBox(height: 20),
                           _buildPasswordField(),
                           const SizedBox(height: 20),
@@ -135,7 +146,8 @@ class _EmailIdState extends State<EmailId> {
                             alignment: Alignment.centerRight,
                             child: GestureDetector(
                               onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ResetPassword()));
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => ResetPassword()));
                               },
                               child: Text(
                                 "Forgot password?",
@@ -155,7 +167,8 @@ class _EmailIdState extends State<EmailId> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom > 0 ? 20 : 40,
+                    bottom:
+                        MediaQuery.of(context).viewInsets.bottom > 0 ? 20 : 40,
                   ),
                   child: GestureDetector(
                     onTap: () {
@@ -189,7 +202,8 @@ class _EmailIdState extends State<EmailId> {
     );
   }
 
-  Widget _buildTextField({required TextEditingController controller, required String hint}) {
+  Widget _buildTextField(
+      {required TextEditingController controller, required String hint}) {
     return Container(
       height: 45,
       width: double.infinity,
@@ -203,11 +217,13 @@ class _EmailIdState extends State<EmailId> {
         child: TextField(
           controller: controller,
           keyboardType: TextInputType.emailAddress,
-          style: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+          style:
+              GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: hint,
-            hintStyle: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+            hintStyle:
+                GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
           ),
         ),
       ),
@@ -228,13 +244,17 @@ class _EmailIdState extends State<EmailId> {
         child: TextField(
           controller: _passwordController,
           obscureText: ispassword,
-          style: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+          style:
+              GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: "Enter your Password",
-            hintStyle: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+            hintStyle:
+                GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
             suffixIcon: IconButton(
-              icon: Icon(ispassword ? Icons.visibility_off_outlined : Icons.visibility_outlined),
+              icon: Icon(ispassword
+                  ? Icons.visibility_off_outlined
+                  : Icons.visibility_outlined),
               onPressed: () {
                 setState(() {
                   ispassword = !ispassword;
