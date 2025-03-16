@@ -127,12 +127,12 @@ class _CalenderState extends State<Calender> {
               ),
             ),
           ),
-          const SizedBox(height: 50),
+          const SizedBox(height: 30),
           Padding(
             padding: const EdgeInsets.only(left: 10, right: 10),
             child: Container(
-              height: 450,
-              width: 400,
+              height: 400,
+              //width: 400,
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(
@@ -143,7 +143,7 @@ class _CalenderState extends State<Calender> {
                 children: [
                   // Month Navigation Bar with Selected Date
                   SizedBox(
-                    height: 80,
+                    height: 50,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
