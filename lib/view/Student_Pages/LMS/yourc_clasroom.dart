@@ -10,6 +10,7 @@ import 'package:uthix_app/modal/navbarWidgetStudent.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
 import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/classes.dart';
+import 'package:uthix_app/modal/nav_itemStudent.dart';
 
 import '../../../UpcomingPage.dart';
 import '../Files/files.dart';
@@ -104,7 +105,7 @@ class _YourClasroomState extends State<YourClasroom> {
         },
       );
 
-      print("Response Body:\n${response.body}\n"); // Log full response
+      log("STUDNET-Response Body:\n${response.body}\n"); // Log full response
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
@@ -186,7 +187,7 @@ class _YourClasroomState extends State<YourClasroom> {
       );
 
       print("Response Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}"); // Log API Response
+      log(" ALLCLASROMS-Response Body: ${response.body}"); // Log API Response
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
@@ -255,63 +256,63 @@ class _YourClasroomState extends State<YourClasroom> {
                     Text(
                       "Class Details",
                       style:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10),
                     classrooms.isNotEmpty
                         ? Flexible(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: classrooms.length,
-                        itemBuilder: (context, index) {
-                          final classroom = classrooms[index];
-                          bool isSelected = selectedClassroomId ==
-                              classroom['id'].toString();
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: classrooms.length,
+                              itemBuilder: (context, index) {
+                                final classroom = classrooms[index];
+                                bool isSelected = selectedClassroomId ==
+                                    classroom['id'].toString();
 
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedClassroomId = classroom['id']
-                                    .toString(); // Store selected ID
-                              });
-                              print(
-                                  "Selected Classroom ID: $selectedClassroomId");
-                            },
-                            child: Container(
-                              margin: EdgeInsets.only(bottom: 10),
-                              padding: EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? Colors.blue.shade100
-                                    : Color.fromRGBO(246, 246, 246, 1),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: isSelected
-                                      ? Colors.blue
-                                      : Colors.grey,
-                                  width: isSelected ? 2 : 1,
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                      "Class Name: ${classroom['class_name']}"),
-                                  SizedBox(height: 5),
-                                  Text(
-                                      "Section: ${classroom['section']}"),
-                                ],
-                              ),
+                                return GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectedClassroomId = classroom['id']
+                                          .toString(); // Store selected ID
+                                    });
+                                    print(
+                                        "Selected Classroom ID: $selectedClassroomId");
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(bottom: 10),
+                                    padding: EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? Colors.blue.shade100
+                                          : Color.fromRGBO(246, 246, 246, 1),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? Colors.blue
+                                            : Colors.grey,
+                                        width: isSelected ? 2 : 1,
+                                      ),
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                            "Class Name: ${classroom['class_name']}"),
+                                        SizedBox(height: 5),
+                                        Text(
+                                            "Section: ${classroom['section']}"),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
-                    )
+                          )
                         : Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text("No classrooms available."),
-                    ),
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text("No classrooms available."),
+                          ),
                     SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {
@@ -347,7 +348,7 @@ class _YourClasroomState extends State<YourClasroom> {
     if (index != 0) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => navItems[index]["page"]),
+        MaterialPageRoute(builder: (context) => navStudItems[index]["page"]),
       ).then((_) {
         setState(() {
           selectedIndex = 0;
@@ -356,189 +357,160 @@ class _YourClasroomState extends State<YourClasroom> {
     }
   }
 
-  final List<Map<String, dynamic>> navItems = [
-    {"icon": Icons.home_outlined, "title": "Home", "page": HomePages()},
-    {"icon": Icons.folder_open_outlined, "title": "Files", "page": StudFiles()},
-
-    {"icon": Icons.find_in_page, "title": "Find", "page": BuyTextBooks()},
-    {"icon": Icons.chat_outlined, "title": "Chat", "page": UnderConstructionScreen()},
-    {"icon": Icons.person_outline, "title": "Profile", "page": StudentAccountPages()},
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: Colors.white,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(70), // Adjust height as needed
+        child: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          titleSpacing: 0, // Ensures elements are properly aligned
+          leading: Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: IconButton(
+                  onPressed: Navigator.of(context).pop,
+                  icon: Icon(Icons.arrow_back_ios))),
+          title: Text(
+            "Your Classroom",
+            style: GoogleFonts.urbanist(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: const Color.fromRGBO(96, 95, 95, 1),
+            ),
+          ),
+          centerTitle: true,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 20),
+              child: Container(
+                height: 42,
+                width: 42,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(19),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      offset: const Offset(0, 4),
+                      blurRadius: 8,
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    "assets/Student_Home_icons/stud_logo.png",
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+
       body: Stack(
         clipBehavior: Clip.none,
         children: [
           Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 20, right: 20, top: 28),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
-                              offset: const Offset(0, 4),
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Icon(Icons.arrow_back_ios, size: 25),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 75),
-                    Text(
-                      "Your Clasroom",
-                      style: GoogleFonts.urbanist(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: const Color.fromRGBO(96, 95, 95, 1),
-                      ),
-                    ),
-                    Spacer(),
-                    Container(
-                      height: 42,
-                      width: 42,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(19),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.06),
-                            offset: const Offset(0, 4),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          "assets/Student_Home_icons/stud_logo.png",
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
               Divider(thickness: 1, color: Color.fromRGBO(217, 217, 217, 1)),
               Expanded(
                 child: isLoading
                     ? Center(
-                    child:
-                    CircularProgressIndicator()) // Show loader while fetching
-                    : hasError
-                    ? Center(
-                    child: Text("Failed to load data")) // Error message
+                        child:
+                            CircularProgressIndicator()) // Show loader while fetchin
                     : classList.isEmpty
-                    ? Center(
-                    child: Text(
-                        "No classrooms assigned yet")) // No data
-                    : ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: classList
-                      .length, // Use the actual list length
-                  itemBuilder: (context, index) {
-                    final classData = classList[index];
+                        ? Center(
+                            child:
+                                Text("No classrooms assigned yet")) // No data
+                        : ListView.builder(
+                            padding: EdgeInsets.zero,
+                            itemCount:
+                                classList.length, // Use the actual list length
+                            itemBuilder: (context, index) {
+                              final classData = classList[index];
 
-                    return Padding(
-                      padding: const EdgeInsets.only(
-                          left: 20, right: 20, bottom: 20),
-                      child: GestureDetector(
-                        onTap: () {
-                          int classroomId =
-                          classData["classroomId"];
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 20, right: 20, bottom: 20),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    int classroomId = classData["classroomId"];
 
-                          log("SALONI:$classroomId");
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Classes(
-                                  classroomId:
-                                  classroomId), // Replace with your screen
-                            ),
-                          );
-                        },
-                        child: Container(
-                          height: 121,
-                          width: 339,
-                          decoration: BoxDecoration(
-                            color:
-                            Color.fromRGBO(246, 246, 246, 1),
-                            border: Border.all(
-                              color: Color.fromRGBO(
-                                  217, 217, 217, 1),
-                              width: 1,
-                            ),
-                            borderRadius:
-                            BorderRadius.circular(10),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      classData["className"] ??
-                                          "Unknown Class",
-                                      style: GoogleFonts.urbanist(
-                                        fontSize: 20,
-                                        fontWeight:
-                                        FontWeight.w600,
-                                        color: Color.fromRGBO(
-                                            96, 95, 95, 1),
+                                    log("SALONI:$classroomId");
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Classes(
+                                            classroomId:
+                                                classroomId), // Replace with your screen
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 121,
+                                    width: 339,
+                                    decoration: BoxDecoration(
+                                      color: Color.fromRGBO(246, 246, 246, 1),
+                                      border: Border.all(
+                                        color: Color.fromRGBO(217, 217, 217, 1),
+                                        width: 1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                classData["className"] ??
+                                                    "Unknown Class",
+                                                style: GoogleFonts.urbanist(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Color.fromRGBO(
+                                                      96, 95, 95, 1),
+                                                ),
+                                              ),
+                                              Spacer(),
+                                              Icon(Icons.more_vert,
+                                                  color: Color.fromRGBO(
+                                                      96, 95, 95, 1)),
+                                            ],
+                                          ),
+                                          Text(
+                                            "Section: ${classData["section"] ?? 'N/A'}",
+                                            style: GoogleFonts.urbanist(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color:
+                                                  Color.fromRGBO(96, 95, 95, 1),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 19),
+                                          Text(
+                                            "Instructor: ${classData["instructor"] ?? 'N/A'}",
+                                            style: GoogleFonts.urbanist(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color:
+                                                  Color.fromRGBO(96, 95, 95, 1),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    Spacer(),
-                                    Icon(Icons.more_vert,
-                                        color: Color.fromRGBO(
-                                            96, 95, 95, 1)),
-                                  ],
-                                ),
-                                Text(
-                                  "Section: ${classData["section"] ?? 'N/A'}",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color.fromRGBO(
-                                        96, 95, 95, 1),
                                   ),
                                 ),
-                                const SizedBox(height: 19),
-                                Text(
-                                  "Instructor: ${classData["instructor"] ?? 'N/A'}",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color.fromRGBO(
-                                        96, 95, 95, 1),
-                                  ),
-                                ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
               ),
             ],
           ),
@@ -554,15 +526,15 @@ class _YourClasroomState extends State<YourClasroom> {
             ),
           ),
           Positioned(
-            bottom: 100, // Adjust to position FAB above Navbar
-            right: 20, // Adjust for proper alignment
+            bottom: 120, // Adjust to position FAB above Navbar
+            right: 30, // Adjust for proper alignment
             child: FloatingActionButton(
               onPressed: () async {
                 await fetchClassrooms();
                 showClassDetailsDialog(); // Show dialog after fetching data
               },
               backgroundColor:
-              Color.fromRGBO(43, 92, 116, 1), // Custom FAB color
+                  Color.fromRGBO(43, 92, 116, 1), // Custom FAB color
               shape: CircleBorder(),
               child: Icon(Icons.add, color: Colors.white), // White add icon
             ),

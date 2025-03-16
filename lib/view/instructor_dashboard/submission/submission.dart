@@ -73,47 +73,25 @@ class _SubmissionState extends State<Submission> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          centerTitle: false,
+        ),
+      ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top navigation bar with back button
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(left: 10, top: 20, right: 10),
-                    child: Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.06),
-                            offset: const Offset(0, 4),
-                            blurRadius: 8,
-                          ),
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
-                            offset: const Offset(0, 0),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_back, size: 25),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  // Assignment details container
                   Stack(
                     clipBehavior: Clip.none,
                     children: [

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/UpcomingPage.dart';
+import 'package:uthix_app/modal/nav_items.dart';
 import 'package:uthix_app/modal/navbarWidgetInstructor.dart';
 import 'package:uthix_app/view/instructor_dashboard/Chat/chat.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/detail_profile.dart';
@@ -15,6 +16,11 @@ import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
 import 'package:uthix_app/view/instructor_dashboard/Dashboard/instructor_dashboard.dart';
 
 import '../../login/start_login.dart';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileAccount extends StatefulWidget {
   const ProfileAccount({super.key});
@@ -48,31 +54,12 @@ class _ProfileAccountState extends State<ProfileAccount> {
     await prefs.remove('auth_token');
     await prefs.remove('user_role');
 
-    // Navigate to Login Screen after logout
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => StartLogin()),
     );
   }
 
-  final List<Map<String, dynamic>> navItems = [
-    {
-      "icon": Icons.home_outlined,
-      "title": "Home",
-      "page": InstructorDashboard()
-    },
-    {"icon": Icons.folder_open_outlined, "title": "Files", "page": Files()},
-    {
-      "icon": Icons.chat_outlined,
-      "title": "Chat",
-      "page": UnderConstructionScreen()
-    },
-    {
-      "icon": Icons.person_outline,
-      "title": "Profile",
-      "page": const ProfileAccount()
-    },
-  ];
 
   final List<Map<String, String>> menuItems = [
     {"icon": "assets/account_profile/account-outline.png", "title": "Profile"},
@@ -100,239 +87,191 @@ class _ProfileAccountState extends State<ProfileAccount> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 30, top: 30, bottom: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        offset: const Offset(0, 4),
-                        blurRadius: 8,
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        offset: const Offset(0, 0),
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, size: 25),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                Text(
-                  "Your Profile",
-                  style: GoogleFonts.urbanist(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: const Color.fromRGBO(0, 0, 0, 1),
-                  ),
-                ),
-              ],
+    return ScreenUtilInit(
+      designSize: const Size(400, 780), // Base design size
+      builder: (context, child) {
+        return Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, size: 25.sp),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
           ),
-          Container(
-            height: 130,
-            width: 420,
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(246, 246, 246, 1),
-            ),
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 30),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(
-                        "Mahima",
-                        style: GoogleFonts.urbanist(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                          color: const Color.fromRGBO(0, 0, 0, 1),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 250,
-                        child: Text(
-                          "Congratulations! You are our premium member now",
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: const Color.fromRGBO(0, 0, 0, 1),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  top: 0,
-                  left: 289,
-                  child: Transform.rotate(
-                    angle: -1.12 * (3.14159 / 180),
-                    child: Opacity(
-                      opacity: 1,
-                      child: Image.asset(
-                        'assets/instructor/premium.png',
-                        width: 128,
-                        height: 128,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 50,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Container(
-              height: 370,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: const Color.fromRGBO(252, 252, 252, 1),
-                border:
-                    Border.all(color: const Color.fromRGBO(217, 217, 217, 1)),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: ListView.separated(
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(top: 10),
-                itemCount: menuItems.length,
-                separatorBuilder: (_, __) => const Divider(
-                    thickness: 1, color: Color.fromRGBO(210, 210, 210, 1)),
-                itemBuilder: (context, index) {
-                  final item = menuItems[index];
-                  return GestureDetector(
-                    onTap: () {
-                      if (item["title"] == "Profile") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DetailProfile()),
-                        );
-                      } else if (item["title"] == "Help Desk") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => InstructorHelpdesk()),
-                        );
-                      } else if (item["title"] == "Manage Accounts") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => InstructorManage()),
-                        );
-                      } else if (item["title"] == "FAQs") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => InstructorFaq()),
-                        );
-                      } else if (item["title"] == "Settings") {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => InstructorSettings()),
-                        );
-                      }
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 30, vertical: 10),
-                      child: Row(
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 130.h,
+                width: double.infinity,
+                decoration: BoxDecoration(color: Color(0xFFF6F6F6)),
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 30.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Image.asset(item["icon"]!, width: 24, height: 24),
-                          const SizedBox(width: 15),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item["title"]!,
-                                style: GoogleFonts.urbanist(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black),
+                          Text(
+                            "Mahima",
+                            style: GoogleFonts.urbanist(
+                              fontSize: 24.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 250.w,
+                            child: Text(
+                              "Congratulations! You are our premium member now",
+                              style: GoogleFonts.urbanist(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
                               ),
-                              if (item.containsKey("subtitle"))
-                                Text(
-                                  item["subtitle"]!,
-                                  style: GoogleFonts.urbanist(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black),
-                                ),
-                            ],
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  );
-                },
+                    Positioned(
+                      top: 0,
+                      left: 272.w,
+                      child: Transform.rotate(
+                        angle: -1.12 * (3.14159 / 180),
+                        child: Image.asset(
+                          'assets/instructor/premium.png',
+                          width: 128.w,
+                          height: 128.h,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
-          const SizedBox(
-            height: 70,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 35, right: 35),
-            child: SizedBox(
-              height: 50,
-              width: MediaQuery.sizeOf(context).width,
-              child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(
-                        color: Colors.red,
-                        width: 1), // Border color & thickness
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5), // Rounded corners
+              SizedBox(height: 50.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 30.w),
+                child: Container(
+                  height: 370.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFCFCFC),
+                    border: Border.all(color: Color(0xFFD9D9D9)),
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: ListView.separated(
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.only(top: 10.h),
+                    itemCount: menuItems.length,
+                    separatorBuilder: (_, __) =>
+                        Divider(thickness: 1, color: Color(0xFFD2D2D2)),
+                    itemBuilder: (context, index) {
+                      final item = menuItems[index];
+                      return GestureDetector(
+                        onTap: () {
+                          if (item["title"] == "Profile") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DetailProfile()),
+                            );
+                          } else if (item["title"] == "Help Desk") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => InstructorHelpdesk()),
+                            );
+                          } else if (item["title"] == "Manage Accounts") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => InstructorManage()),
+                            );
+                          } else if (item["title"] == "FAQs") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => InstructorFaq()),
+                            );
+                          } else if (item["title"] == "Settings") {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => InstructorSettings()),
+                            );
+                          }
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 30.w, vertical: 10.h),
+                          child: Row(
+                            children: [
+                              Image.asset(item["icon"]!,
+                                  width: 24.w, height: 24.h),
+                              SizedBox(width: 15.w),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item["title"]!,
+                                    style: GoogleFonts.urbanist(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black),
+                                  ),
+                                  if (item.containsKey("subtitle"))
+                                    Text(
+                                      item["subtitle"]!,
+                                      style: GoogleFonts.urbanist(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              SizedBox(height: 70.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 35.w),
+                child: SizedBox(
+                  height: 50.h,
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.red, width: 1.w),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.r)),
+                    ),
+                    onPressed: () {
+                      logoutUser(context);
+                    },
+                    child: Text(
+                      "Log out",
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontFamily: "Urbanist",
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.sp),
                     ),
                   ),
-                  onPressed: () {
-                    logoutUser(context);
-                  },
-                  child: const Text(
-                    "Log out",
-                    style: TextStyle(
-                        color: Colors.red,
-                        fontFamily: "Urbanist",
-                        fontWeight: FontWeight.bold),
-                  )),
-            ),
+                ),
+              ),
+              SizedBox(height: 20.h),
+            ],
           ),
-          const SizedBox(height: 20),
-          Center(
-            child: Navbar(
-                onItemTapped: onItemTapped, selectedIndex: selectedIndex),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

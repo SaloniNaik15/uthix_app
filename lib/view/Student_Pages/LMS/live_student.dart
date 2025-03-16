@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:uthix_app/view/Student_Pages/LMS/query_provider.dart';
+
 import 'package:uthix_app/view/Student_Pages/LMS/query_student.dart';
 import 'package:uthix_app/view/instructor_dashboard/Class/announcement.dart';
 import 'package:uthix_app/view/instructor_dashboard/submission/submission.dart';
@@ -19,77 +19,71 @@ class _LiveStudentState extends State<LiveStudent> {
   final TextEditingController _queryController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    final announcementProvider = Provider.of<AnnouncementProvider>(context);
-    final queryProvider = Provider.of<QueryProvider>(context);
-
     return Scaffold(
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
-            child: Row(
-              children: [
-                Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        offset: const Offset(0, 4),
-                        blurRadius: 8,
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        offset: const Offset(0, 0),
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, size: 25),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(70),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: Container(
+            margin: const EdgeInsets.only(left: 10, top: 10, bottom: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  offset: const Offset(0, 4),
+                  blurRadius: 8,
                 ),
-                const Spacer(),
-                Container(
-                  height: 42,
-                  width: 42,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(19),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        offset: const Offset(0, 4),
-                        blurRadius: 8,
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        offset: const Offset(0, 0),
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      "assets/login/profile.jpeg",
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  offset: const Offset(0, 0),
+                  blurRadius: 4,
                 ),
               ],
             ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, size: 25, color: Colors.black),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
           ),
-          const SizedBox(
-            height: 40,
-          ),
+          actions: [
+            Container(
+              margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
+              height: 42,
+              width: 42,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(19),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    offset: const Offset(0, 4),
+                    blurRadius: 8,
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    offset: const Offset(0, 0),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: Image.asset(
+                  "assets/login/profile.jpeg",
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: Column(
+        children: [
           Container(
             height: 230,
             width: double.infinity,
@@ -104,7 +98,7 @@ class _LiveStudentState extends State<LiveStudent> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(40),
+            padding: const EdgeInsets.only(left: 20, right: 10, top: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -189,12 +183,7 @@ class _LiveStudentState extends State<LiveStudent> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: GestureDetector(
-                            onTap: () {
-                              if (_queryController.text.trim().isNotEmpty) {
-                                queryProvider.addQuery(_queryController.text);
-                                _queryController.clear();
-                              }
-                            },
+                            onTap: () {},
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 6),
@@ -222,7 +211,7 @@ class _LiveStudentState extends State<LiveStudent> {
                 SizedBox(
                   height: 250,
                   child: ListView.builder(
-                    itemCount: queryProvider.queries.length,
+                    itemCount: 10,
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () {
@@ -273,7 +262,7 @@ class _LiveStudentState extends State<LiveStudent> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  queryProvider.queries[index],
+                                  "Submit",
                                   //using provider text send by query,
                                   style: GoogleFonts.urbanist(
                                     fontSize: 16,
