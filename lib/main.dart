@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:uthix_app/upcoming.dart';
 import 'package:uthix_app/view/Ecommerce/e_commerce.dart';
 import 'package:uthix_app/view/Seller_dashboard/dashboard.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/BookDetails.dart';

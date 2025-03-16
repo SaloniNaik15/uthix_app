@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dio/dio.dart';
 import 'package:uthix_app/UpcomingPage.dart';
@@ -98,130 +99,137 @@ class _ECommerceState extends State<ECommerce> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          // Background image with opacity overlay.
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.30,
-              child: Image.asset("assets/registration/splash.png",
-                  fit: BoxFit.cover),
+    return WillPopScope(
+      onWillPop: () async {
+        SystemNavigator.pop();
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Stack(
+          children: [
+            // Background image with opacity overlay.
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.30,
+                child: Image.asset("assets/registration/splash.png",
+                    fit: BoxFit.cover),
+              ),
             ),
-          ),
-          // Top header with user greeting.
-          Container(
-            height: 100,
-            width: double.infinity,
-            decoration:
-                const BoxDecoration(color: Color.fromRGBO(43, 92, 116, 1)),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 20, top: 30),
-              child: Row(
-                children: [
-                  Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
-                          offset: const Offset(0, 4),
-                          blurRadius: 8,
+            // Top header with user greeting.
+            Container(
+              height: 100,
+              width: double.infinity,
+              decoration:
+                  const BoxDecoration(color: Color.fromRGBO(43, 92, 116, 1)),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20, top: 30),
+                child: Row(
+                  children: [
+                    Container(
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            offset: const Offset(0, 4),
+                            blurRadius: 8,
+                          ),
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            offset: const Offset(0, 0),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.person_2_outlined,
+                          size: 25,
                         ),
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
-                          offset: const Offset(0, 0),
-                          blurRadius: 4,
-                        ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.person_2_outlined,
-                        size: 25,
                       ),
                     ),
+                    const SizedBox(width: 15),
+                    Text(
+                      "Hello User!!",
+                      style: GoogleFonts.urbanist(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Main content area.
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 150),
+                  Center(
+                    child: Image.asset(
+                      "assets/ecommerce/main.png",
+                      width: 340,
+                      height: 256,
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                  const SizedBox(width: 15),
+                  const SizedBox(height: 10),
                   Text(
-                    "Hello User!!",
+                    "Categories",
                     style: GoogleFonts.urbanist(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
+                  const SizedBox(height: 5),
+                  isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : Expanded(
+                          child: SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.4,
+                            child: GridView.builder(
+                              padding: const EdgeInsets.all(10),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 2.0,
+                                mainAxisSpacing: 1.0,
+                                childAspectRatio: 1.35,
+                              ),
+                              itemCount: categories.length,
+                              itemBuilder: (context, index) {
+                                return buildGridItem(
+                                    context, categories[index]);
+                              },
+                            ),
+                          ),
+                        ),
+                  const SizedBox(height: 10),
                 ],
               ),
             ),
-          ),
-          // Main content area.
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 150),
-                Center(
-                  child: Image.asset(
-                    "assets/ecommerce/main.png",
-                    width: 340,
-                    height: 256,
-                    fit: BoxFit.contain,
-                  ),
+            // Bottom navigation bar.
+            Positioned(
+              bottom: 30,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: NavbarStudent(
+                  onItemTapped: onItemTapped,
+                  selectedIndex: selectedIndex,
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  "Categories",
-                  style: GoogleFonts.urbanist(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : Expanded(
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.4,
-                          child: GridView.builder(
-                            padding: const EdgeInsets.all(10),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 2.0,
-                              mainAxisSpacing: 1.0,
-                              childAspectRatio: 1.35,
-                            ),
-                            itemCount: categories.length,
-                            itemBuilder: (context, index) {
-                              return buildGridItem(context, categories[index]);
-                            },
-                          ),
-                        ),
-                      ),
-                const SizedBox(height: 10),
-              ],
-            ),
-          ),
-          // Bottom navigation bar.
-          Positioned(
-            bottom: 30,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: NavbarStudent(
-                onItemTapped: onItemTapped,
-                selectedIndex: selectedIndex,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
