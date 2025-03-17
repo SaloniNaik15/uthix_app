@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../login/start_login.dart';
 import '../Student Account Details/Student_Add_Address.dart';
 
 class AddressSelectionSheet extends StatefulWidget {
@@ -41,7 +44,8 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
       );
       if (response.statusCode == 200) {
         setState(() {
-          addresses = List<Map<String, dynamic>>.from(response.data['address']);
+          addresses =
+          List<Map<String, dynamic>>.from(response.data['address']);
           isLoading = false;
         });
       }
@@ -64,7 +68,7 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
         Container(
           decoration: const BoxDecoration(color: Colors.white),
           child: isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator())
               : Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,39 +76,40 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
               // Drag indicator
               Center(
                 child: Container(
-                  width: 60,
-                  height: 5,
+                  width: 60.w,
+                  height: 5.h,
                   decoration: BoxDecoration(
                     color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(10.r),
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              const Padding(
-                padding: EdgeInsets.all(10.0),
+              SizedBox(height: 10.h),
+              Padding(
+                padding: EdgeInsets.all(10.w),
                 child: Text(
                   "Change Delivery Address",
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
-                    fontFamily: "Urbanist",
+
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10.h),
               Container(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 12, horizontal: 16),
-                decoration: const BoxDecoration(color: Color(0xFFF1F1F1)),
+                padding: EdgeInsets.symmetric(
+                    vertical: 12.h, horizontal: 16.w),
+                decoration:
+                const BoxDecoration(color: Color(0xFFF1F1F1)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       "Saved addresses",
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "Urbanist",
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16.sp,
                       ),
                     ),
                     TextButton(
@@ -117,27 +122,28 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
                           ),
                         );
                       },
-                      child: const Text(
+                      child: Text(
                         "+ Add Address",
                         style: TextStyle(
                           color: Colors.black54,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "Urbanist",
+                          fontWeight: FontWeight.w600,
+
+                          fontSize: 14.sp,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10.h),
               // List of addresses.
               Column(
                 children: addresses.map((address) {
                   return Column(
                     children: [
                       ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                        contentPadding: EdgeInsets.symmetric(
+                            horizontal: 8.w, vertical: 4.h),
                         leading: Radio<Map<String, dynamic>>(
                           value: address,
                           groupValue: selectedAddress,
@@ -151,20 +157,20 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
                         title: Text(
                           "${address['name']} - ${address['address_type']}",
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14.sp,
                             fontWeight: selectedAddress != null &&
                                 selectedAddress!['id'] ==
                                     address['id']
                                 ? FontWeight.bold
                                 : FontWeight.normal,
-                            fontFamily: "Urbanist",
+
                           ),
                         ),
                         subtitle: Text(
                           "${address['street']}, ${address['city']}, ${address['state']} - ${address['postal_code']}",
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.black,
-                            fontFamily: "Urbanist",
+                            fontSize: 14.sp,
                           ),
                         ),
                         trailing: OutlinedButton(
@@ -182,35 +188,36 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
                               selectedAddress = address;
                             });
 
-                            print("✅ Address Selected: $displayAddress");
-                            print("✅ Address ID: ${address['id']}");
+                            print("Address Selected: $displayAddress");
+                            print("Address ID: ${address['id']}");
 
                             Navigator.pop(context, address);
                           },
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Color(0xFF2B5C74)),
+                            side: const BorderSide(
+                                color: Color(0xFF2B5C74)),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
+                                borderRadius: BorderRadius.circular(8.r)),
                           ),
-                          child: const Text(
+                          child: Text(
                             "Change",
                             style: TextStyle(
-                              color: Color(0xFF2B5C74),
-                              fontFamily: "Urbanist",
+                              color: const Color(0xFF2B5C74),
                               fontWeight: FontWeight.bold,
+                              fontSize: 14.sp,
                             ),
                           ),
                         ),
                       ),
                       Divider(
                         color: Colors.grey[300],
-                        thickness: 3,
+                        thickness: 3.h,
                       ),
                     ],
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10.h),
             ],
           ),
         ),

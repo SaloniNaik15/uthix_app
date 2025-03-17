@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/BuyBooksPages.dart';
-
 import 'StudentSearch.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BuyTextBooks extends StatefulWidget {
   // Make categoryId optional.
@@ -26,8 +26,7 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
   Future<void> fetchCategories() async {
     try {
       final dio = Dio();
-      final response =
-          await dio.get('https://admin.uthix.com/api/all-categories');
+      final response = await dio.get('https://admin.uthix.com/api/all-categories');
 
       print(response.data); // Debugging
 
@@ -38,12 +37,12 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
           setState(() {
             categories = (jsonData['categories'] as List)
                 .map((item) => {
-                      'id': item['id'] is int ? item['id'] : 0,
-                      'cat_title': item['cat_title']?.toString() ?? 'No Title',
-                      'cat_image': item['cat_image'] != null
-                          ? 'https://admin.uthix.com/storage/image/category/${item['cat_image']}'
-                          : '',
-                    })
+              'id': item['id'] is int ? item['id'] : 0,
+              'cat_title': item['cat_title']?.toString() ?? 'No Title',
+              'cat_image': item['cat_image'] != null
+                  ? 'https://admin.uthix.com/storage/image/category/${item['cat_image']}'
+                  : '',
+            })
                 .toList();
             isLoading = false;
           });
@@ -66,19 +65,19 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(70),
+        preferredSize: Size.fromHeight(60.h),
         child: AppBar(
           backgroundColor: const Color(0xFF2B5C74),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+            icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 20.sp),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
-          title: const Text(
+          title: Text(
             "Buy Textbooks",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -86,7 +85,7 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
           centerTitle: false,
           actions: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(8.w),
               child: Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
@@ -96,12 +95,13 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
                       color: Colors.grey.withOpacity(0.3),
                       blurRadius: 4,
                       spreadRadius: 2,
-                      offset: const Offset(0, 2),
+                      offset: Offset(0, 2),
                     ),
                   ],
                 ),
+                // Uncomment the IconButton if you want a search button.
                 // child: IconButton(
-                //   icon: const Icon(Icons.search, color: Colors.black),
+                //   icon: Icon(Icons.search, color: Colors.black, size: 20.sp),
                 //   onPressed: () {
                 //     Navigator.push(
                 //       context,
@@ -119,37 +119,37 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
         children: [
           Column(
             children: [
-              const SizedBox(height: 20),
+              //SizedBox(height: 10.h),
               isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? Center(child: CircularProgressIndicator())
                   : categories.isEmpty
-                      ? const Center(
-                          child: Text("No categories available",
-                              style: TextStyle(fontSize: 18)),
-                        )
-                      : Expanded(
-                          child: GridView.builder(
-                            padding: const EdgeInsets.all(10),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 1.0,
-                              mainAxisSpacing: 0.5,
-                              childAspectRatio: 1.3,
-                            ),
-                            itemCount: categories.length,
-                            itemBuilder: (context, index) {
-                              final category = categories[index];
+                  ? Center(
+                child: Text("No categories available.",
+                    style: TextStyle(fontSize: 18.sp)),
+              )
+                  : Expanded(
+                child: GridView.builder(
+                  padding: EdgeInsets.all(10.w),
+                  gridDelegate:
+                  SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 1.0.w,
+                    mainAxisSpacing: 0.5.h,
+                    childAspectRatio: 1.3,
+                  ),
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    final category = categories[index];
 
-                              return buildGridItem(
-                                context,
-                                category['id'] as int,
-                                category['cat_image'] ?? '',
-                                category['cat_title'] ?? 'No Title',
-                              );
-                            },
-                          ),
-                        ),
+                    return buildGridItem(
+                      context,
+                      category['id'] as int,
+                      category['cat_image'] ?? '',
+                      category['cat_title'] ?? 'No Title',
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ],
@@ -171,30 +171,30 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
         );
       },
       child: Container(
-        margin: const EdgeInsets.all(8),
+        margin: EdgeInsets.all(8.w),
         child: Stack(
           children: [
             ClipRRect(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(20.r),
               child: Image.network(
                 image,
-                width: 150,
-                height: 130,
+                width: 150.w,
+                height: 130.h,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => Container(
-                  width: 150,
-                  height: 130,
+                  width: 150.w,
+                  height: 130.h,
                   color: Colors.grey,
-                  child: const Icon(Icons.image_not_supported,
-                      color: Colors.white),
+                  child: Icon(Icons.image_not_supported,
+                      color: Colors.white, size: 100.sp),
                 ),
               ),
             ),
             Container(
-              width: 150,
-              height: 130,
+              width: 150.w,
+              height: 130.h,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20.r),
                 gradient: const LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -207,13 +207,14 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: EdgeInsets.all(10.w),
                   child: Text(
                     name,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w400,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),

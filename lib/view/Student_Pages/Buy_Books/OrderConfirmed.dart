@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../Student Account Details/Order_Tracking.dart';
+
 class OrderConfirmed extends StatefulWidget {
   final int orderId;
   final String orderNumber;
@@ -20,14 +21,13 @@ class _OrderConfirmedState extends State<OrderConfirmed> {
   void initState() {
     super.initState();
     // After 5 seconds, redirect to the OrderTracking page.
-    Timer(const Duration(seconds: 5), () {
+    Timer(Duration(seconds: 5), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => OrdersTrackingPage(orderId: widget.orderId),
         ),
       );
-
     });
   }
 
@@ -48,15 +48,14 @@ class _OrderConfirmedState extends State<OrderConfirmed> {
             mainAxisSize: MainAxisSize.min, // Centers content vertically
             crossAxisAlignment: CrossAxisAlignment.center, // Centers text horizontally
             children: [
-              const Text(
+              Text(
                 "Payment Successful",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  fontFamily: "Urbanist",
+                  fontSize: 14.sp,
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -64,35 +63,37 @@ class _OrderConfirmedState extends State<OrderConfirmed> {
                     "Order Confirmed",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 24,
+                      fontSize: 24.sp,
                       color: const Color(0xFF2B5C74),
-                      fontFamily: "Urbanist",
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6.w),
                   Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: EdgeInsets.all(6.w),
                     decoration: const BoxDecoration(
                       color: Colors.blueAccent,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.check,
                       color: Colors.white,
-                      size: 18,
+                      size: 18.sp,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Text(
                 "Order Number: ${widget.orderNumber}",
-                style: const TextStyle(fontSize: 16, fontFamily: "Urbanist"),
+                style: TextStyle(fontSize: 16.sp),
               ),
-              const SizedBox(height: 10),
-              const Text(
+              SizedBox(height: 10.h),
+              Text(
                 "Redirecting to order tracking...",
-                style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             ],
           ),

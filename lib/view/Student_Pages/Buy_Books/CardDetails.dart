@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'OrderConfirmed.dart';
 
 class CardPaymentScreen extends StatefulWidget {
-  const CardPaymentScreen({super.key, required int orderId, required String orderNumber, required int totalPrice});
+  final int orderId;
+  final String orderNumber;
+  final int totalPrice;
+
+  const CardPaymentScreen({
+    super.key,
+    required this.orderId,
+    required this.orderNumber,
+    required this.totalPrice,
+  });
 
   @override
   _CardPaymentScreenState createState() => _CardPaymentScreenState();
@@ -24,7 +33,12 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
       });
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => OrderConfirmed(orderId: 1, orderNumber: '',)),
+        MaterialPageRoute(
+          builder: (context) => OrderConfirmed(
+            orderId: widget.orderId,
+            orderNumber: widget.orderNumber,
+          ),
+        ),
       );
     });
   }
@@ -35,7 +49,8 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
+          icon: Icon(Icons.arrow_back_ios,
+              color: const Color(0xFF605F5F), size: 20.sp),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -43,8 +58,8 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
         title: Text(
           "Give your Card Details",
           style: TextStyle(
-              fontFamily: 'Urbanist',
-              fontSize: 18,
+
+              fontSize: 18.sp,
               fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
@@ -53,56 +68,59 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
       body: Stack(
         children: [
           Padding(
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.all(20.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("Credit Card / Debit Card",
                     style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'Urbanist',
+                        fontSize: 16.sp,
+
                         fontWeight: FontWeight.bold)),
-                SizedBox(height: 10),
+                SizedBox(height: 10.h),
                 Row(
                   children: [
-                    Text("2 Items"),
-                    SizedBox(width: 16),
+                    Text("2 Items", style: TextStyle(fontSize: 14.sp)),
+                    SizedBox(width: 16.w),
                     Text("Total ₹3040",
                         style: TextStyle(
-                            fontFamily: 'Urbanist',
-                            fontWeight: FontWeight.bold)),
+
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14.sp)),
                   ],
                 ),
-                SizedBox(height: 40),
+                SizedBox(height: 40.h),
                 TextField(
                   decoration: InputDecoration(
                     labelText: "Card Number",
                     labelStyle: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'Urbanist',
+                        fontSize: 16.sp,
+
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF605F5F)),
-                    border: OutlineInputBorder(),
+                        color: const Color(0xFF605F5F)),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.r)),
                   ),
                   keyboardType: TextInputType.number,
                   style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                       color: Colors.black),
                 ),
-                SizedBox(height: 30),
+                SizedBox(height: 30.h),
                 TextField(
                   decoration: InputDecoration(
                     labelText: "Card Holder Name",
                     labelStyle: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'Urbanist',
+                        fontSize: 16.sp,
+
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF605F5F)),
-                    border: OutlineInputBorder(),
+                        color: const Color(0xFF605F5F)),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.r)),
                   ),
                 ),
-                SizedBox(height: 30),
+                SizedBox(height: 30.h),
                 Row(
                   children: [
                     Expanded(
@@ -110,26 +128,28 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
                         decoration: InputDecoration(
                           labelText: "Expiry Date (MM/YY)",
                           labelStyle: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Urbanist',
+                              fontSize: 16.sp,
+
                               fontWeight: FontWeight.w500,
-                              color: Color(0xFF605F5F)),
-                          border: OutlineInputBorder(),
+                              color: const Color(0xFF605F5F)),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.r)),
                         ),
                         keyboardType: TextInputType.datetime,
                       ),
                     ),
-                    SizedBox(width: 16),
+                    SizedBox(width: 16.w),
                     Expanded(
                       child: TextField(
                         decoration: InputDecoration(
                           labelText: "CVV",
                           labelStyle: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Urbanist',
+                              fontSize: 16.sp,
+
                               fontWeight: FontWeight.w500,
-                              color: Color(0xFF605F5F)),
-                          border: OutlineInputBorder(),
+                              color: const Color(0xFF605F5F)),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.r)),
                         ),
                         obscureText: true,
                         keyboardType: TextInputType.number,
@@ -141,16 +161,16 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
                 ElevatedButton(
                   onPressed: _processPayment,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF2B5C74),
-                    minimumSize: Size(double.infinity, 50),
+                    backgroundColor: const Color(0xFF2B5C74),
+                    minimumSize: Size(double.infinity, 50.h),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(25.r),
                     ),
                   ),
                   child: Text("Pay",
                       style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'Urbanist',
+                          fontSize: 16.sp,
+
                           color: Colors.white)),
                 ),
               ],
@@ -165,14 +185,14 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
                   children: [
                     SpinKitFadingCircle(
                       color: Colors.blueAccent,
-                      size: 100.0,
+                      size: 100.sp,
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     Text(
                       "Please wait until your payment is received",
                       style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'Urbanist',
+                          fontSize: 16.sp,
+
                           fontWeight: FontWeight.bold),
                     ),
                   ],
