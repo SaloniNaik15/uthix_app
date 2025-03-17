@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:uthix_app/view/Ecommerce/e_commerce.dart';
 
 import 'package:uthix_app/view/homeRegistration/splashintroScreen.dart';
 
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // Import ScreenUti
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +19,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(400, 780), // Adjust based on your design
+      designSize: const Size(375, 812),
       minTextAdapt: true,
       builder: (context, child) {
         return MaterialApp(
