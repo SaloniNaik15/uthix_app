@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'BookDetails.dart';
 import 'StudentCart.dart';
 import 'StudentSearch.dart';
@@ -25,11 +27,11 @@ class _BuybookspagesState extends State<Buybookspages> {
   @override
   void initState() {
     super.initState();
-    loadAuthToken(); // Load token before fetching products
+    loadAuthToken();
     fetchProducts(widget.categoryId);
   }
 
-// ✅ Fetch token from SharedPreferences
+  // ✅ Fetch token from SharedPreferences
   Future<void> loadAuthToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -46,7 +48,6 @@ class _BuybookspagesState extends State<Buybookspages> {
   }
 
   // 🔹 Fetch Products API Call
-// 🔹 Fetch Products API Call
   Future<void> fetchProducts(int categoryId) async {
     if (authToken == null) return;
 
@@ -62,7 +63,7 @@ class _BuybookspagesState extends State<Buybookspages> {
       if (response.statusCode == 200) {
         setState(() {
           products =
-              List<Map<String, dynamic>>.from(response.data['products'] ?? []);
+          List<Map<String, dynamic>>.from(response.data['products'] ?? []);
           isLoading = false;
         });
       } else {
@@ -129,30 +130,42 @@ class _BuybookspagesState extends State<Buybookspages> {
     }
   }
 
+  Widget _iconButton(IconData icon, VoidCallback onTap) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 10.h),
+      child: CircleAvatar(
+        backgroundColor: Colors.white,
+        child: IconButton(
+            icon: Icon(icon, color: Colors.black, size: 20.sp),
+            onPressed: onTap),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Ensure that ScreenUtil is initialized in main.dart
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
+          icon: Icon(Icons.arrow_back_ios,
+              color: const Color(0xFF605F5F), size: 20.sp),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           _iconButton(
               Icons.search,
-              () => Navigator.push(
+                  () => Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => StudentSearch(categoryId: null)))),
-          _iconButton(
-              Icons.favorite_border,
-              () => Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Wishlist()))),
+          _iconButton(Icons.favorite_border,
+                  () => Navigator.push(context, MaterialPageRoute(builder: (context) => Wishlist()))),
           _iconButton(
               Icons.shopping_bag_outlined,
-              () => Navigator.push(
+                  () => Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => Studentcart(cartItems: [])))),
@@ -160,43 +173,34 @@ class _BuybookspagesState extends State<Buybookspages> {
         elevation: 0,
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : products.isEmpty
-              ? const Center(child: Text("No products available."))
-              : Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("Products",
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 5),
-                      Text("${products.length} Items",
-                          style: const TextStyle(
-                              fontSize: 14, color: Colors.black87)),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child: BookItemsList(
-                          books: products,
-                          addToCart: addToCart,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-      bottomNavigationBar: const SortByButton(),
-    );
-  }
-
-  Widget _iconButton(IconData icon, VoidCallback onTap) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-      child: CircleAvatar(
-        backgroundColor: Colors.white,
-        child: IconButton(
-            icon: Icon(icon, color: Colors.black, size: 20), onPressed: onTap),
+          ? Center(
+          child: Text("No products available.",
+              style: TextStyle(fontSize: 14.sp)))
+          : Padding(
+        padding: EdgeInsets.all(8.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Products",
+                style: TextStyle(
+                    fontSize: 18.sp, fontWeight: FontWeight.bold)),
+            SizedBox(height: 5.h),
+            Text("${products.length} Items",
+                style: TextStyle(
+                    fontSize: 14.sp, color: Colors.black87)),
+            SizedBox(height: 10.h),
+            Expanded(
+              child: BookItemsList(
+                books: products,
+                addToCart: addToCart,
+              ),
+            ),
+          ],
+        ),
       ),
+      bottomNavigationBar: const SortByButton(),
     );
   }
 }
@@ -207,20 +211,20 @@ class SortByButton extends StatelessWidget {
   void _showSortOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(15))),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(15.r))),
       builder: (context) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 15),
-            child: const Text("Sort by",
+            padding: EdgeInsets.only(top: 20.h),
+            child: Text("Sort by",
                 style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 18.sp,
                     fontFamily: 'Urbanist',
                     fontWeight: FontWeight.w500)),
           ),
-          const Divider(),
+          Divider(),
           _sortOption(context, "Relevance"),
           _sortOption(context, "Discount"),
           _sortOption(context, "Price: High to Low"),
@@ -235,8 +239,8 @@ class SortByButton extends StatelessWidget {
   Widget _sortOption(BuildContext context, String title) {
     return ListTile(
       title: Text(title,
-          style: const TextStyle(
-            fontSize: 16,
+          style: TextStyle(
+            fontSize: 16.sp,
             fontFamily: 'Urbanist',
           )),
       onTap: () => Navigator.pop(context),
@@ -248,17 +252,17 @@ class SortByButton extends StatelessWidget {
     return GestureDetector(
       onTap: () => _showSortOptions(context),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 15),
+        padding: EdgeInsets.symmetric(vertical: 15.h),
         decoration: const BoxDecoration(color: Colors.white, boxShadow: [
           BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 2),
         ]),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.swap_vert, size: 18, color: Colors.black54),
-            SizedBox(width: 8),
+            Icon(Icons.swap_vert, size: 18.sp, color: Colors.black54),
+            SizedBox(width: 8.w),
             Text("Sort by",
-                style: TextStyle(fontSize: 16, color: Colors.black)),
+                style: TextStyle(fontSize: 16.sp, color: Colors.black)),
           ],
         ),
       ),
@@ -268,8 +272,7 @@ class SortByButton extends StatelessWidget {
 
 class BookItemsList extends StatefulWidget {
   final List<Map<String, dynamic>> books;
-  final Future<void> Function(BuildContext, Map<String, dynamic>, int)
-      addToCart;
+  final Future<void> Function(BuildContext, Map<String, dynamic>, int) addToCart;
 
   const BookItemsList({
     Key? key,
@@ -311,8 +314,7 @@ class _BookItemsListState extends State<BookItemsList> {
   Future<void> addToWishlist(
       BuildContext context, Map<String, dynamic> book) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token =
-        prefs.getString('auth_token'); // Retrieve the token dynamically
+    String? token = prefs.getString('auth_token');
 
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -372,7 +374,6 @@ class _BookItemsListState extends State<BookItemsList> {
           const SnackBar(
               content: Text("Session expired. Please log in again.")),
         );
-        // handle401Error(); // Logout user if token is invalid
       } else {
         throw Exception(
             "Failed to update wishlist. Response: ${response.data}");
@@ -388,204 +389,207 @@ class _BookItemsListState extends State<BookItemsList> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate dynamic aspect ratio for grid items.
+    final double horizontalPadding = 40.w;
+    final double itemWidth =
+        (MediaQuery.of(context).size.width - horizontalPadding) / 2;
+    // Adjust the multiplier as needed (1.7 in this case)
+    final double itemHeight = itemWidth * 1.8;
+    final double aspectRatio = itemWidth / itemHeight;
+
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 0.55,
-                ),
-                itemCount: widget.books.length,
-                itemBuilder: (context, index) {
-                  final book = widget.books[index];
-                  // Check if book is in wishlist.
-                  final bool isInWishlist = wishlist.contains(book['id']);
-                  final String title = book['title'] ?? "No Title";
-                  final String author = book['author'] ?? "Unknown Author";
-                  final String price = book['price']?.toString() ?? "0";
-                  final String rating = book['rating']?.toString() ?? "N/A";
-                  final String imageUrl = book['first_image'] != null
-                      ? 'https://admin.uthix.com/storage/image/products/${book['first_image']['image_path']}'
-                      : "https://via.placeholder.com/150";
+        padding: EdgeInsets.all(8.w),
+        child: GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10.w,
+            mainAxisSpacing: 12.h,
+            childAspectRatio: aspectRatio,
+          ),
+          itemCount: widget.books.length,
+          itemBuilder: (context, index) {
+            final book = widget.books[index];
+            final bool isInWishlist = wishlist.contains(book['id']);
+            final String title = book['title'] ?? "No Title";
+            final String author = book['author'] ?? "Unknown Author";
+            final String price = book['price']?.toString() ?? "0";
+            final String rating = book['rating']?.toString() ?? "N/A";
+            final String imageUrl = book['first_image'] != null
+                ? 'https://admin.uthix.com/storage/image/products/${book['first_image']['image_path']}'
+                : "https://via.placeholder.com/150";
 
-                  return GestureDetector(
-                    onTap: () {
-                      // Navigate to the Bookdetails page.
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              Bookdetails(productId: book['id']),
-                        ),
-                      );
-                    },
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Book image with rating overlay.
-                        Container(
-                          padding: const EdgeInsets.all(10.0),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Colors.grey.withOpacity(0.5), width: 2),
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 4,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          child: Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  imageUrl,
-                                  height: 150,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      const Icon(
-                                    Icons.image_not_supported,
-                                    size: 100,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 5,
-                                left: 5,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 5, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.8),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        rating,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 2),
-                                      const Icon(Icons.star,
-                                          color: Colors.amber, size: 14),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        // Book Title.
-                        Text(
-                          title,
-                          textAlign: TextAlign.left,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontFamily: 'Urbanist',
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        // Author Name.
-                        Text(
-                          "Author: $author",
-                          textAlign: TextAlign.left,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontFamily: 'Urbanist',
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black87,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 8),
-                        // Book Price.
-                        Text(
-                          "₹$price",
-                          textAlign: TextAlign.left,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'Urbanist',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        // Wishlist and Add to Cart buttons.
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                isInWishlist
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                                color: isInWishlist
-                                    ? const Color(0xFF2B5C74)
-                                    : const Color(0xFF2B5C74),
-                              ),
-                              onPressed: () => addToWishlist(context, book),
-                            ),
-                            ElevatedButton.icon(
-                              onPressed: () async {
-                                int quantity = 1;
-                                if (book.isNotEmpty) {
-                                  await widget.addToCart(
-                                      context, book, quantity);
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text("Book data is missing!")),
-                                  );
-                                }
-                              },
-                              label: const Text('Add to Bag',
-                                  style: TextStyle(color: Colors.white)),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF2B5C74),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 6),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              icon: const Icon(Icons.shopping_bag_outlined,
-                                  size: 16, color: Colors.white),
-                            ),
-                          ],
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Bookdetails(productId: book['id']),
+                  ),
+                );
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Product image with rating overlay.
+                  Container(
+                    padding: EdgeInsets.all(5.w),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          color: Colors.grey.withOpacity(0.5), width: 2.w),
+                      borderRadius: BorderRadius.circular(10.r),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          spreadRadius: 2,
                         ),
                       ],
                     ),
-                  );
-                },
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8.r),
+                          child: CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            height: 150.h,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              height: 150.h,
+                              width: double.infinity,
+                              color: Colors.grey[200],
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              height: 150.h,
+                              width: double.infinity,
+                              color: Colors.grey[200],
+                              child: Icon(
+                                Icons.image_not_supported,
+                                size: 100.sp,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 5.h,
+                          left: 5.w,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(5.r),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  rating,
+                                  style: TextStyle(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(width: 2.w),
+                                Icon(Icons.star, color: Colors.amber, size: 14.sp),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 4.h),
+                  // Product Title.
+                  Text(
+                    title,
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontFamily: 'Urbanist',
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4.h),
+                  // Author.
+                  Text(
+                    "Author: $author",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontFamily: 'Urbanist',
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black87,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4.h),
+                  // Price.
+                  Text(
+                    "₹$price",
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontFamily: 'Urbanist',
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  //SizedBox(height: 4.h),
+                  // Wishlist and Add to Bag buttons.
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(
+                          isInWishlist ? Icons.favorite : Icons.favorite_border,
+                          color: const Color(0xFF2B5C74),
+                          size: 25.sp,
+                        ),
+                        onPressed: () => addToWishlist(context, book),
+                      ),
+                      //SizedBox(width: 2.w),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            int quantity = 1;
+                            if (book.isNotEmpty) {
+                              await widget.addToCart(context, book, quantity);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Book data is missing!")),
+                              );
+                            }
+                          },
+                          icon: Icon(Icons.shopping_bag_outlined, size: 16.sp, color: Colors.white),
+                          label: Text('Add to Bag',
+                              style: TextStyle(color: Colors.white, fontSize: 12.sp)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF2B5C74),
+                            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
   }
 }
+
+
