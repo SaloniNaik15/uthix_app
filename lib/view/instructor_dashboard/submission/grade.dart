@@ -76,6 +76,18 @@ class _GradeState extends State<Grade> {
     TextEditingController feedbackController = TextEditingController();
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_outlined,
+            size: 25,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Padding(
@@ -83,35 +95,7 @@ class _GradeState extends State<Grade> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                height: 40,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(255, 255, 255, 1),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
-                      offset: const Offset(0, 4),
-                      blurRadius: 8,
-                    ),
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      offset: const Offset(0, 0),
-                      blurRadius: 4,
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back, size: 25),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
               Text(
                 "Grading and Feedback",
                 style: GoogleFonts.urbanist(

@@ -51,7 +51,7 @@ class _ModernToolsState extends State<ModernTools> {
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                shape: BoxShape.circle, // Ensures a perfect circle
+                shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.06),
@@ -67,7 +67,7 @@ class _ModernToolsState extends State<ModernTools> {
               ),
               child: Center(
                 child: IconButton(
-                  icon: const Icon(Icons.arrow_back,
+                  icon: const Icon(Icons.arrow_back_ios_outlined,
                       size: 25, color: Colors.black),
                   onPressed: () {
                     Navigator.pop(context);

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/UpcomingPage.dart';
@@ -24,8 +25,6 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   int selectedIndex = 0;
   String? token;
 
-
-
   // Added the Submission card as an additional entry.
   final List<Map<String, String>> dashBoard = [
     {"image": "assets/instructor/create_class.png", "title": "Create Class"},
@@ -41,7 +40,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   // Controllers for class creation fields
   final TextEditingController _classnameController = TextEditingController();
   final TextEditingController _sectionController = TextEditingController();
-  final TextEditingController _subjectController = TextEditingController();
+
   final TextEditingController _classlinkController = TextEditingController();
 
   final Dio _dio = Dio();
@@ -301,7 +300,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
               Text(
                 "Hii Surnamika",
                 style: GoogleFonts.urbanist(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w500,
                   color: const Color.fromRGBO(96, 95, 95, 1),
                 ),
@@ -388,14 +387,6 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   }
 
   // Build the bottom navigation bar.
-  Widget _buildBottomNavigationBar() {
-    return Center(
-      child: Navbar(
-        onItemTapped: onItemTapped,
-        selectedIndex: selectedIndex,
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -406,31 +397,11 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
           elevation: 0,
           leading: Padding(
             padding: const EdgeInsets.only(left: 20),
-            child: Container(
-              height: 40,
-              width: 40,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    offset: const Offset(0, 4),
-                    blurRadius: 8,
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    offset: const Offset(0, 0),
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, size: 25),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_outlined, size: 25),
+              onPressed: () {
+                Navigator.pop(context);
+              },
             ),
           ),
           title: Text(
@@ -469,10 +440,13 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
 
             /// Fixed Bottom Navigation Bar
             Positioned(
+              bottom: 15.h,
               left: 0,
               right: 0,
-              bottom: 20, // Adjust spacing as needed
-              child: _buildBottomNavigationBar(),
+              child: Center(
+                child: Navbar(
+                    onItemTapped: onItemTapped, selectedIndex: selectedIndex),
+              ),
             ),
           ],
         ));

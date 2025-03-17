@@ -62,38 +62,23 @@ class _ProgressTrackingState extends State<ProgressTracking> {
             child: AppBar(
               backgroundColor: const Color.fromRGBO(43, 92, 116, 1),
               elevation: 0, // Removes shadow
+
               automaticallyImplyLeading: false, // Removes default back arrow
               flexibleSpace: Padding(
                 padding: const EdgeInsets.only(
-                    top: 40, left: 30, right: 30), // Adjust for top alignment
+                    top: 10, left: 20, right: 30), // Adjust for top alignment
                 child: Row(
                   children: [
-                    Container(
-                      height: 40,
-                      width: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.06),
-                            offset: const Offset(0, 4),
-                            blurRadius: 8,
-                          ),
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
-                            offset: const Offset(0, 0),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_back, size: 25),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
+                    Center(
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back_ios_outlined,
+                          size: 25,
+                          color: Colors.white,
                         ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                       ),
                     ),
                     const SizedBox(width: 75),

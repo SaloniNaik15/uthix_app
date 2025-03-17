@@ -16,7 +16,8 @@ class _CustomerPhotosState extends State<CustomerPhotos> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
+          icon: const Icon(Icons.arrow_back_ios_outlined,
+              color: Color(0xFF605F5F)),
           onPressed: () {
             Navigator.pop(context);
           },

@@ -306,22 +306,17 @@ class _StudFilesState extends State<StudFiles> {
           ),
           // Fixed Bottom Navigation Bar inside Stack
           Positioned(
+            bottom: 15,
             left: 0,
             right: 0,
-            bottom: 15.h,
-            child: _buildBottomNavigationBar(),
+            child: Center(
+              child: NavbarStudent(
+                onItemTapped: onItemTapped,
+                selectedIndex: selectedIndex,
+              ),
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-// Navbar widget function
-  Widget _buildBottomNavigationBar() {
-    return Center(
-      child: NavbarStudent(
-        onItemTapped: onItemTapped,
-        selectedIndex: selectedIndex,
       ),
     );
   }

@@ -35,7 +35,7 @@ class _QueryHistoryState extends State<QueryHistory> {
           elevation: 0,
           leading: IconButton(
             onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.arrow_back_ios),
+            icon: const Icon(Icons.arrow_back_ios_outlined),
           ),
           actions: [
             Padding(
@@ -92,7 +92,8 @@ class _QueryHistoryState extends State<QueryHistory> {
               ),
             ),
             const SizedBox(height: 10),
-            Expanded( // This prevents RenderFlex overflow
+            Expanded(
+              // This prevents RenderFlex overflow
               child: ListView.builder(
                 itemCount: 10,
                 padding: const EdgeInsets.only(top: 10),
@@ -101,7 +102,8 @@ class _QueryHistoryState extends State<QueryHistory> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const DetailQuery()),
+                        MaterialPageRoute(
+                            builder: (context) => const DetailQuery()),
                       );
                     },
                     child: Container(

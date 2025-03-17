@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -77,34 +78,36 @@ class _SellerDashboardState extends State<SellerDashboard> {
     });
   }
 
+  final Dio dio = Dio();
+
   /// Fetch Parent Categories (Where `parent_category_id` is null)
   Future<void> fetchParentCategories() async {
     try {
-      final response = await http.get(
-        Uri.parse('https://admin.uthix.com/api/all-categories'),
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": "Bearer $accessToken"
-        },
+      final response = await dio.get(
+        'https://admin.uthix.com/api/all-categories',
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "Bearer $accessToken"
+          },
+        ),
       );
 
-      log("API Response: ${response.body}");
+      log("API Response: ${response.data}");
 
       if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
+        final jsonData = response.data;
         if (jsonData.containsKey('categories') &&
             jsonData['categories'] is List) {
           setState(() {
             categories = List<Map<String, String>>.from(
               jsonData['categories']
-                  .where((item) =>
-                      item['parent_category_id'] == null) // Fetch only parents
+                  .where((item) => item['parent_category_id'] == null)
                   .map((item) => {
                         "id": item['id'].toString(),
                         "cat_title": item['cat_title'].toString(),
-                        "parent_category_id":
-                            "", // Parent categories have no parent
+                        "parent_category_id": "",
                       }),
             );
             isLoading = false;
@@ -127,25 +130,25 @@ class _SellerDashboardState extends State<SellerDashboard> {
 
   Future<void> fetchSubcategories(int parentId) async {
     try {
-      final response = await http.get(
-        Uri.parse('https://admin.uthix.com/api/all-categories'),
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": "Bearer $accessToken"
-        },
+      final response = await dio.get(
+        'https://admin.uthix.com/api/all-categories',
+        options: Options(
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "Bearer $accessToken"
+          },
+        ),
       );
 
       if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
+        final jsonData = response.data;
         if (jsonData.containsKey('categories') &&
             jsonData['categories'] is List) {
           setState(() {
             subcategories = List<Map<String, String>>.from(
               jsonData['categories']
-                  .where((item) =>
-                      item['parent_category_id'] ==
-                      parentId) // Fetch subcategories
+                  .where((item) => item['parent_category_id'] == parentId)
                   .map((item) => {
                         "id": item['id'].toString(),
                         "cat_title": item['cat_title'].toString(),
@@ -157,7 +160,6 @@ class _SellerDashboardState extends State<SellerDashboard> {
 
           log("Fetched Subcategories for Parent ID $parentId: $subcategories");
 
-          // Ensure widget is still mounted before calling the dialog
           if (mounted) {
             showSubcategoryMenu(
                 context, parentId.toString(), 'Parent Category Name');
@@ -323,23 +325,20 @@ class _SellerDashboardState extends State<SellerDashboard> {
           borderRadius: BorderRadius.circular(10),
           side: const BorderSide(color: Color(0xFFD2D2D2), width: 2),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: Column(
-            children: [
-              Image.asset(imagePath, height: 135, fit: BoxFit.cover),
-              const SizedBox(height: 2),
-              Text(
-                title,
-                style: const TextStyle(
-                  fontFamily: 'Urbanist',
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF605F5F),
-                ),
-                textAlign: TextAlign.center,
+        child: Column(
+          children: [
+            Image.asset(imagePath, height: 135, fit: BoxFit.cover),
+            const SizedBox(height: 2),
+            Text(
+              title,
+              style: const TextStyle(
+                fontFamily: 'Urbanist',
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF605F5F),
               ),
-            ],
-          ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );

@@ -60,46 +60,30 @@ class _LiveClassesState extends State<LiveClasses> {
     final announcementProvider = Provider.of<AnnouncementProvider>(context);
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        toolbarHeight: 50,
+        elevation: 2,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 10, top: 5),
+          child: CircleAvatar(
+            backgroundColor: Colors.white,
+            radius: 20,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_outlined,
+                  size: 25, color: Colors.black),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             // Header with back button.
-            Padding(
-              padding: const EdgeInsets.only(left: 10, top: 20, right: 10),
-              child: Row(
-                children: [
-                  Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
-                          offset: const Offset(0, 4),
-                          blurRadius: 8,
-                        ),
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
-                          offset: const Offset(0, 0),
-                          blurRadius: 4,
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_back, size: 25),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ),
-                  ),
-                  const Spacer(),
-                ],
-              ),
-            ),
+
             const SizedBox(height: 40),
             // Container to show the Zoom meeting using a WebViewWidget.
             Container(

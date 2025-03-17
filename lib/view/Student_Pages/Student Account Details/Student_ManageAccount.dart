@@ -118,7 +118,8 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
+          icon: const Icon(Icons.arrow_back_ios_outlined,
+              color: Color(0xFF605F5F)),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -182,7 +183,9 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
                         showLogoutDialog(context); // Show confirmation popup
                       },
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.red ,),
+                        side: BorderSide(
+                          color: Colors.red,
+                        ),
                         padding: EdgeInsets.symmetric(vertical: 14),
                       ),
                       child: Text(

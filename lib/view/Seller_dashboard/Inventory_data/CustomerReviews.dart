@@ -15,7 +15,8 @@ class _CustomerreviewsState extends State<Customerreviews> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
+          icon: const Icon(Icons.arrow_back_ios_outlined,
+              color: Color(0xFF605F5F)),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -30,13 +31,18 @@ class _CustomerreviewsState extends State<Customerreviews> {
           ),
         ),
       ),
-      body: SingleChildScrollView( // Keep the SingleChildScrollView for scrollability if needed
-        child: Padding( // Add some padding for better visual appearance
+      body: SingleChildScrollView(
+        // Keep the SingleChildScrollView for scrollability if needed
+        child: Padding(
+          // Add some padding for better visual appearance
           padding: const EdgeInsets.all(16.0),
-          child: Column( // Main layout is a Column
-            crossAxisAlignment: CrossAxisAlignment.start, // Align to the start (left)
+          child: Column(
+            // Main layout is a Column
+            crossAxisAlignment:
+                CrossAxisAlignment.start, // Align to the start (left)
             children: [
-              Row( // Row for rating and stars
+              Row(
+                // Row for rating and stars
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
@@ -49,7 +55,8 @@ class _CustomerreviewsState extends State<Customerreviews> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(width: 8), // Add some space between number and stars
+                  const SizedBox(
+                      width: 8), // Add some space between number and stars
 
                   Icon(Icons.star, color: Colors.amber, size: 12),
                   Icon(Icons.star, color: Colors.amber, size: 12),
@@ -58,7 +65,8 @@ class _CustomerreviewsState extends State<Customerreviews> {
                   Icon(Icons.star, color: Colors.amber, size: 12),
                 ],
               ),
-              const SizedBox(height: 30), // Space between rating and "Customer Photos"
+              const SizedBox(
+                  height: 30), // Space between rating and "Customer Photos"
 
               Text(
                 "Photos",
@@ -71,7 +79,8 @@ class _CustomerreviewsState extends State<Customerreviews> {
               ),
               const SizedBox(height: 10),
 
-              SizedBox( // ListView
+              SizedBox(
+                // ListView
                 height: 70,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
@@ -95,16 +104,18 @@ class _CustomerreviewsState extends State<Customerreviews> {
                 ),
               ),
               SizedBox(height: 20),
-             Divider(),
-              SizedBox(height: 20,),
+              Divider(),
+              SizedBox(
+                height: 20,
+              ),
 
               ReviewCard(
                 name: "User Name",
                 timeAgo: "2 months ago",
-                reviewText: "Book are in good condition and got them on time,happen  with the packaging",
+                reviewText:
+                    "Book are in good condition and got them on time,happen  with the packaging",
                 rating: 3,
               ),
-
             ],
           ),
         ),

@@ -28,7 +28,7 @@ class _StudRecordingState extends State<StudRecording> {
           ),
         ),
         centerTitle: false,
-        leading: _iconButton(Icons.arrow_back, () {
+        leading: _iconButton(Icons.arrow_back_ios_outlined, () {
           Navigator.pop(context);
         }),
       ),

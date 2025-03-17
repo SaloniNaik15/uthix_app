@@ -5,22 +5,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/modal/nav_items.dart';
-import 'package:uthix_app/modal/navbarWidgetInstructor.dart';
-import 'package:uthix_app/view/instructor_dashboard/Chat/chat.dart';
+
 import 'package:uthix_app/view/instructor_dashboard/Profile/detail_profile.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/instructor_faq.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/instructor_helpdesk.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/instructor_manage.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/instructor_settings.dart';
-import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
-import 'package:uthix_app/view/instructor_dashboard/Dashboard/instructor_dashboard.dart';
 
 import '../../login/start_login.dart';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileAccount extends StatefulWidget {
   const ProfileAccount({super.key});
@@ -60,7 +54,6 @@ class _ProfileAccountState extends State<ProfileAccount> {
     );
   }
 
-
   final List<Map<String, String>> menuItems = [
     {"icon": "assets/account_profile/account-outline.png", "title": "Profile"},
     {
@@ -94,7 +87,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
           backgroundColor: Colors.white,
           appBar: AppBar(
             leading: IconButton(
-              icon: Icon(Icons.arrow_back, size: 25.sp),
+              icon: Icon(Icons.arrow_back_ios_outlined, size: 25.sp),
               onPressed: () {
                 Navigator.pop(context);
               },

@@ -17,22 +17,7 @@ class NavbarStudent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.9, // 90% of screen width
-
       height: 59.h, // Responsive height
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            offset: Offset(0, 8.h),
-            blurRadius: 16.r,
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            offset: Offset(0, 0),
-            blurRadius: 4.r,
-          ),
-        ],
-      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: List.generate(
@@ -45,6 +30,18 @@ class NavbarStudent extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    offset: Offset(0, 8.h),
+                    blurRadius: 16.r,
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    offset: Offset(0, 0),
+                    blurRadius: 4.r,
+                  ),
+                ],
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

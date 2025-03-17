@@ -39,7 +39,6 @@ class _FilesState extends State<Files> {
     }
   }
 
-
   //Now list of maps used.
   final List<Map<String, String>> files = [
     {
@@ -320,22 +319,15 @@ class _FilesState extends State<Files> {
           ),
           // Fixed Bottom Navigation Bar inside Stack
           Positioned(
+            bottom: 15.h,
             left: 0,
             right: 0,
-            bottom: 15.h,
-            child: _buildBottomNavigationBar(),
+            child: Center(
+              child: Navbar(
+                  onItemTapped: onItemTapped, selectedIndex: selectedIndex),
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-// Navbar widget function
-  Widget _buildBottomNavigationBar() {
-    return Center(
-      child: Navbar(
-        onItemTapped: onItemTapped,
-        selectedIndex: selectedIndex,
       ),
     );
   }

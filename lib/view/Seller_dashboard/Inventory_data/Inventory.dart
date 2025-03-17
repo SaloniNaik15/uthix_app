@@ -223,7 +223,8 @@ class _InventoryDataState extends State<InventoryData> {
         leading: Padding(
           padding: const EdgeInsets.only(left: 10.0),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
+            icon: const Icon(Icons.arrow_back_ios_outlined,
+                color: Color(0xFF605F5F)),
             onPressed: () {
               Navigator.pop(context);
             },

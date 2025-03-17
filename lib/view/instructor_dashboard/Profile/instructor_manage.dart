@@ -16,7 +16,8 @@ class _InstructorManageState extends State<InstructorManage> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF605F5F)),
+          icon: const Icon(Icons.arrow_back_ios_outlined,
+              color: Color(0xFF605F5F)),
           onPressed: () {
             Navigator.pop(context);
           },

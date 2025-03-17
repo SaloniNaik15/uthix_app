@@ -263,7 +263,7 @@ class _NewclassState extends State<Newclass> {
             children: [
               const SizedBox(height: 10),
               IconButton(
-                icon: const Icon(Icons.arrow_back, size: 24),
+                icon: const Icon(Icons.arrow_back_ios_outlined, size: 24),
                 onPressed: () => Navigator.pop(context),
               ),
               const SizedBox(height: 16),

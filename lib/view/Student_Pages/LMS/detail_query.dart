@@ -18,7 +18,7 @@ class _DetailQueryState extends State<DetailQuery> {
         elevation: 0,
         leading: IconButton(
             onPressed: Navigator.of(context).pop,
-            icon: Icon(Icons.arrow_back_ios)),
+            icon: Icon(Icons.arrow_back_ios_outlined)),
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
