@@ -402,6 +402,31 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
               onPressed: () {
                 Navigator.pop(context);
               },
+            child: Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    offset: const Offset(0, 4),
+                    blurRadius: 8,
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    offset: const Offset(0, 0),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_rounded, size: 25),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
             ),
           ),
           title: Text(

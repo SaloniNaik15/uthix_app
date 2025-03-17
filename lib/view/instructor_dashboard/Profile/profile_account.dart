@@ -86,8 +86,9 @@ class _ProfileAccountState extends State<ProfileAccount> {
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
+            backgroundColor: Colors.white,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios_outlined, size: 25.sp),
+              icon: Icon(Icons.arrow_back_ios, size: 25.sp),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -147,7 +148,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
               ),
               SizedBox(height: 50.h),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.w),
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
                 child: Container(
                   height: 370.h,
                   width: double.infinity,

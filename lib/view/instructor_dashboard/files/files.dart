@@ -62,63 +62,8 @@ class _FilesState extends State<Files> {
       "description": "15 GB, Modified by Admin on 10/02/2025",
     },
     {
-      "assetPath": "assets/files_icons/document_pdf.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
       "assetPath": "assets/files_icons/image.png",
-      "title": "Images",
-      "description": "8 GB, Modified by User on 05/01/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/video.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/document_pdf.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/document_pdf.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/image.png",
-      "title": "Images",
-      "description": "8 GB, Modified by User on 05/01/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/video.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/document_pdf.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/document_pdf.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/image.png",
-      "title": "Images",
-      "description": "8 GB, Modified by User on 05/01/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/video.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/document_pdf.png",
-      "title": "Documents",
+      "title": "Screenshot",
       "description": "15 GB, Modified by Admin on 10/02/2025",
     },
   ];
