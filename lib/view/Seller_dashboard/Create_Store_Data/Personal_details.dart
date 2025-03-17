@@ -88,7 +88,8 @@ class _PersonalDetailsState extends State<PersonalDetails> {
       if (accessToken == null || accessToken!.isEmpty) {
         log("⚠️ No access token available. Cannot send request.");
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("⚠️ Authentication failed. Please log in again.")),
+          const SnackBar(
+              content: Text("⚠️ Authentication failed. Please log in again.")),
         );
         return;
       }
@@ -139,7 +140,8 @@ class _PersonalDetailsState extends State<PersonalDetails> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
+          icon: const Icon(Icons.arrow_back_ios_outlined,
+              color: Color(0xFF605F5F)),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -184,7 +186,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2B5C74),
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 80, vertical: 10),
+                      const EdgeInsets.symmetric(horizontal: 80, vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(40),
                   ),
@@ -192,7 +194,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                 child: isSubmitting
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text("Submit",
-                    style: TextStyle(fontSize: 15, color: Colors.white)),
+                        style: TextStyle(fontSize: 15, color: Colors.white)),
               ),
               const SizedBox(height: 20),
             ],

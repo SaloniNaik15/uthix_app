@@ -24,7 +24,7 @@ class _StudentSettingsState extends State<StudentSettings> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(
-            Icons.arrow_back_ios_outlined,
+            Icons.arrow_back_ios,
             color: Color(0xFF605F5F),
           ),
           onPressed: () {

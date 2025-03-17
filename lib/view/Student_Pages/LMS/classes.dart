@@ -3,14 +3,11 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uthix_app/view/Student_Pages/LMS/live_student.dart';
-import 'package:uthix_app/view/Student_Pages/LMS/submission_student.dart';
-import 'package:uthix_app/view/instructor_dashboard/Class/new_announcement.dart';
-import 'package:uthix_app/view/instructor_dashboard/submission/submission.dart';
 
 class Classes extends StatefulWidget {
   final int classroomId;
@@ -48,60 +45,66 @@ class _ClassesState extends State<Classes> {
     });
   }
 
+  final Dio dio = Dio(); // Initialize Dio instance
+
   Future<void> fetchData() async {
     const String url = 'https://admin.uthix.com/api/subject-classes/1';
     String? token = accessLoginToken;
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
+      final response = await dio.get(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
       );
 
       print('Response Code: ${response.statusCode}');
-      log('Response Body: ${response.body}');
+      log('Response Body: ${response.data}');
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final Map<String, dynamic> responseData = response.data;
         setState(() {
           classData = responseData["data"];
-          isLoading = false; // Ensure loading stops
+          isLoading = false;
         });
       } else {
         print("Error: Invalid response structure");
         setState(() {
-          isLoading = false; // Ensure loading stops even on failure
+          isLoading = false;
         });
       }
     } catch (e) {
       print("Error fetching class data: $e");
       setState(() {
-        isLoading = false; // Ensure loading stops even on exception
+        isLoading = false;
       });
     }
   }
 
   Future<void> fetchAnnouncements() async {
     const String url = 'https://admin.uthix.com/api/classroom/1/announcements';
-    String? token = accessLoginToken; // Ensure you have the token
+    String? token = accessLoginToken;
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Add token if required
-        },
+      final response = await dio.get(
+        url,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+        ),
       );
 
       print('Response Code: ${response.statusCode}');
-      log('Response Body: ${response.body}');
+      log('Response Body: ${response.data}');
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final Map<String, dynamic> responseData = response.data;
         if (responseData["status"] == true) {
           List<dynamic> announcements = responseData["data"];
 
@@ -161,30 +164,11 @@ class _ClassesState extends State<Classes> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: Container(
-          margin: const EdgeInsets.only(left: 10, top: 10, bottom: 10),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.06),
-                offset: const Offset(0, 4),
-                blurRadius: 8,
-              ),
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                offset: const Offset(0, 0),
-                blurRadius: 4,
-              ),
-            ],
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.menu, size: 25),
-            onPressed: () {
-              // Add menu functionality here
-            },
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.menu, size: 25),
+          onPressed: () {
+            // Add menu functionality here
+          },
         ),
         actions: [
           Container(

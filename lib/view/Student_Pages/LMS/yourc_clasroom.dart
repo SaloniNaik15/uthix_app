@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -57,77 +58,80 @@ class _YourClasroomState extends State<YourClasroom> {
     await createStudent();
   }
 
-  // ✅ Fetch student_id using the token
+  final Dio dio = Dio();
+
   Future<int?> createStudent() async {
     if (accessLoginToken == null || accessLoginToken!.isEmpty) {
       log("Error: Token is missing, skipping student creation.");
       return null;
     }
 
-    final response = await http.post(
-      Uri.parse("https://admin.uthix.com/api/student"),
-      headers: {
-        'Authorization': 'Bearer $accessLoginToken',
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    );
+    try {
+      final response = await dio.post(
+        "https://admin.uthix.com/api/student",
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessLoginToken',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+      );
 
-    log("Create Student API Response: ${response.body}");
+      log("Create Student API Response: ${response.data}");
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      var data = jsonDecode(response.body);
-
-      if (data["data"] != null && data["data"]["user_id"] != null) {
-        int newStudentId = data["data"]["user_id"];
-        log("✅ New student created with user_id: $newStudentId");
-        return newStudentId; // Return the user_id
-      } else {
-        log("❌ Error: user_id is missing in response.");
-        return null;
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        var data = response.data;
+        if (data["data"] != null && data["data"]["user_id"] != null) {
+          int newStudentId = data["data"]["user_id"];
+          log("✅ New student created with user_id: $newStudentId");
+          return newStudentId;
+        } else {
+          log("❌ Error: user_id is missing in response.");
+        }
       }
-    } else {
-      log("❌ Failed to create student: ${response.statusCode}");
-      return null;
+    } catch (e) {
+      log("❌ Failed to create student: $e");
     }
+    return null;
   }
 
   Future<void> fetchAndLogClassroomData() async {
     const url = 'https://admin.uthix.com/api/student-classroom';
-
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $accessLoginToken',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+      final response = await dio.get(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessLoginToken',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
       );
 
-      log("STUDNET-Response Body:\n${response.body}\n"); // Log full response
+      log("STUDNET-Response Body:\n${response.data}\n");
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonData = json.decode(response.body);
+        final Map<String, dynamic> jsonData = response.data;
 
         if (jsonData["status"] == true && jsonData["students"] != null) {
           List<dynamic> students = jsonData["students"];
 
           if (students.isEmpty) {
             setState(() {
-              classList = []; // No students found
+              classList = [];
               isLoading = false;
             });
             return;
           }
 
           List<Map<String, dynamic>> classrooms = [];
-
           for (var student in students) {
             final classroom = student["classroom"] ?? {};
             final instructor = classroom["instructor"]?["user"] ?? {};
 
-            int? classroomId = classroom["id"]; // Store classroom_id
+            int? classroomId = classroom["id"];
             String className = classroom["class_name"] ?? "Default Class";
             String section = classroom["section"] ?? "Default Section";
             String instructorName = instructor["name"] ?? "Unknown Instructor";
@@ -140,7 +144,7 @@ class _YourClasroomState extends State<YourClasroom> {
 
             if (classroom.isNotEmpty && classroomId != null) {
               classrooms.add({
-                "classroomId": classroomId, // Store classroom_id
+                "classroomId": classroomId,
                 "className": className,
                 "section": section,
                 "instructor": instructorName,
@@ -158,12 +162,6 @@ class _YourClasroomState extends State<YourClasroom> {
             isLoading = false;
           });
         }
-      } else {
-        print("Error: ${response.statusCode} - ${response.body}");
-        setState(() {
-          hasError = true;
-          isLoading = false;
-        });
       }
     } catch (e) {
       print("Error: $e");
@@ -177,20 +175,22 @@ class _YourClasroomState extends State<YourClasroom> {
   List<dynamic> classrooms = [];
   Future<void> fetchClassrooms() async {
     try {
-      final response = await http.get(
-        Uri.parse('https://admin.uthix.com/api/all-classroom'),
-        headers: {
-          'Authorization': 'Bearer $accessLoginToken',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+      final response = await dio.get(
+        'https://admin.uthix.com/api/all-classroom',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessLoginToken',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
       );
 
       print("Response Status Code: ${response.statusCode}");
-      log(" ALLCLASROMS-Response Body: ${response.body}"); // Log API Response
+      log("ALLCLASROMS-Response Body: ${response.data}");
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
+        final Map<String, dynamic> data = response.data;
         setState(() {
           classrooms = data['classrooms'];
         });
@@ -204,26 +204,25 @@ class _YourClasroomState extends State<YourClasroom> {
     }
   }
 
-  String? selectedClassroomId; // Stores the selected classroom ID
-
+  String? selectedClassroomId;
   Future<void> postSelectedClassroom(String classroomId) async {
-// Replace with your actual token
-
     try {
-      final response = await http.post(
-        Uri.parse('https://admin.uthix.com/api/student-classroom'),
-        headers: {
-          'Authorization': 'Bearer $accessLoginToken',
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: jsonEncode({
+      final response = await dio.post(
+        'https://admin.uthix.com/api/student-classroom',
+        data: jsonEncode({
           "classroom_id": classroomId,
         }),
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessLoginToken',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
       );
 
       print("POST Status Code: ${response.statusCode}");
-      print("POST Response Body: ${response.body}");
+      print("POST Response Body: ${response.data}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Classroom selected successfully!");
@@ -371,7 +370,7 @@ class _YourClasroomState extends State<YourClasroom> {
               padding: const EdgeInsets.only(left: 20),
               child: IconButton(
                   onPressed: Navigator.of(context).pop,
-                  icon: Icon(Icons.arrow_back_ios))),
+                  icon: Icon(Icons.arrow_back_ios_outlined))),
           title: Text(
             "Your Classroom",
             style: GoogleFonts.urbanist(

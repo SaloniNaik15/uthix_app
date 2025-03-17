@@ -45,7 +45,8 @@ class _LiveStudentState extends State<LiveStudent> {
               ],
             ),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back, size: 25, color: Colors.black),
+              icon: const Icon(Icons.arrow_back_ios_outlined,
+                  size: 25, color: Colors.black),
               onPressed: () {
                 Navigator.pop(context);
               },

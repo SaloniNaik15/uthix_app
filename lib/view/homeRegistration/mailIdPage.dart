@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:uthix_app/view/homeRegistration/successPage.dart';
 
 class Mailidpage extends StatefulWidget {
@@ -29,16 +29,7 @@ class _MailidpageState extends State<Mailidpage> {
   @override
   void initState() {
     super.initState();
-    _loadSavedData();
-  }
-
-  Future<void> _loadSavedData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _userNameController.text = prefs.getString("userName") ?? "";
-      _emailIdController.text = prefs.getString("userEmail") ?? "";
-      _selectedRole = prefs.getString("userRole");
-    });
+    // _loadSavedData();
   }
 
   Future<void> _registerUser() async {
@@ -66,11 +57,11 @@ class _MailidpageState extends State<Mailidpage> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
 
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString("userToken", data["access_token"]);
-        await prefs.setString("userName", data["user"]["name"]);
-        await prefs.setString("userRole", data["user"]["role"]);
-        await prefs.setString("userEmail", data["user"]["email"]);
+        // SharedPreferences prefs = await SharedPreferences.getInstance();
+        // await prefs.setString("userToken", data["access_token"]);
+        // await prefs.setString("userName", data["user"]["name"]);
+        // await prefs.setString("userRole", data["user"]["role"]);
+        // await prefs.setString("userEmail", data["user"]["email"]);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Registration Successful!")),

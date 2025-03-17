@@ -273,13 +273,14 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
             ),
           ),
           // Custom Bottom Navigation Bar (Always Above Background)
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 20),
+          Positioned(
+            bottom: 15,
+            left: 0,
+            right: 0,
+            child: Center(
               child: NavbarStudent(
-                selectedIndex: selectedIndex,
                 onItemTapped: onItemTapped,
+                selectedIndex: selectedIndex,
               ),
             ),
           ),

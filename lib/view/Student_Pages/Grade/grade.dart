@@ -75,144 +75,135 @@ class _GradeStudentState extends State<GradeStudent> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_outlined,
+            size: 25,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10, top: 40),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 40,
-              width: 40,
-              decoration: BoxDecoration(
-                color: const Color.fromRGBO(255, 255, 255, 1),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    offset: const Offset(0, 4),
-                    blurRadius: 8,
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    offset: const Offset(0, 0),
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
-              child: Center(
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back, size: 25),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+        padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Grading and Feedback",
+                style: GoogleFonts.urbanist(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: const Color.fromRGBO(96, 95, 95, 1),
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
-            Text(
-              "Grading and Feedback",
-              style: GoogleFonts.urbanist(
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
-                color: const Color.fromRGBO(96, 95, 95, 1),
+              const SizedBox(height: 5),
+              Text(
+                "Please grade the work according to the following criterion",
+                style: GoogleFonts.urbanist(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w300,
+                  color: const Color.fromRGBO(96, 95, 95, 1),
+                ),
               ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              "Please grade the work according to the following criterion",
-              style: GoogleFonts.urbanist(
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: const Color.fromRGBO(96, 95, 95, 1),
+              const SizedBox(height: 40),
+              gradeRow(
+                  "Course Engagement", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 18),
+              gradeRow("Class Attendance", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 18),
+              gradeRow("Problem Solving", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 18),
+              gradeRow("Quick Thinking", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 18),
+              gradeRow("Course Knowledge", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 18),
+              gradeRow("Detailed Work", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 18),
+              gradeRow(
+                  "Presentation Skills", ["Excellent", "Well Done", "Basic"]),
+              const SizedBox(height: 30),
+              const Divider(
+                thickness: 2,
+                color: Color.fromRGBO(217, 217, 217, 1),
               ),
-            ),
-            const SizedBox(height: 40),
-            gradeRow("Course Engagement", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 18),
-            gradeRow("Class Attendance", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 18),
-            gradeRow("Problem Solving", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 18),
-            gradeRow("Quick Thinking", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 18),
-            gradeRow("Course Knowledge", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 18),
-            gradeRow("Detailed Work", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 18),
-            gradeRow(
-                "Presentation Skills", ["Excellent", "Well Done", "Basic"]),
-            const SizedBox(height: 30),
-            const Divider(
-              thickness: 2,
-              color: Color.fromRGBO(217, 217, 217, 1),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Row(
-                children: [
-                  const Icon(Icons.menu, color: Color.fromRGBO(96, 95, 95, 1)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextField(
-                      controller: feedbackController,
-                      keyboardType: TextInputType.text,
-                      style: GoogleFonts.urbanist(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: const Color.fromRGBO(96, 95, 95, 1),
-                      ),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "Feedback Note",
-                        hintStyle: GoogleFonts.urbanist(
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.menu,
+                        color: Color.fromRGBO(96, 95, 95, 1)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: feedbackController,
+                        keyboardType: TextInputType.text,
+                        style: GoogleFonts.urbanist(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
                           color: const Color.fromRGBO(96, 95, 95, 1),
                         ),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Feedback Note",
+                          hintStyle: GoogleFonts.urbanist(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: const Color.fromRGBO(96, 95, 95, 1),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Text(
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in .",
-              style: GoogleFonts.urbanist(
-                fontSize: 14,
-                fontWeight: FontWeight.w300,
-                color: const Color.fromRGBO(96, 95, 95, 1),
-              ),
-            ),
-            const SizedBox(height: 30),
-            Center(
-              child: Container(
-                height: 42,
-                width: 170,
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(255, 255, 255, 1),
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color.fromRGBO(0, 0, 0, 0.15), // rgba(0,0,0,0.15)
-                      blurRadius: 5, // Equivalent to 5px
-                      spreadRadius: 0, // Equivalent to 0px
-                      offset: Offset(0, 0), // Equivalent to 0px 0px
                     ),
                   ],
                 ),
-                child: Center(
-                  child: Text(
-                    "Leave a Comment",
-                    style: GoogleFonts.urbanist(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: const Color.fromRGBO(96, 95, 95, 1),
+              ),
+              Text(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in .",
+                style: GoogleFonts.urbanist(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w300,
+                  color: const Color.fromRGBO(96, 95, 95, 1),
+                ),
+              ),
+              const SizedBox(height: 30),
+              Center(
+                child: Container(
+                  height: 42,
+                  width: 170,
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(255, 255, 255, 1),
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color:
+                            Color.fromRGBO(0, 0, 0, 0.15), // rgba(0,0,0,0.15)
+                        blurRadius: 5, // Equivalent to 5px
+                        spreadRadius: 0, // Equivalent to 0px
+                        offset: Offset(0, 0), // Equivalent to 0px 0px
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      "Leave a Comment",
+                      style: GoogleFonts.urbanist(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: const Color.fromRGBO(96, 95, 95, 1),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(
+                height: 20,
+              )
+            ],
+          ),
         ),
       ),
     );

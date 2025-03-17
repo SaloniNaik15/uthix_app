@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/detail_query.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/query_history.dart';
 
-
 class QueryStudent extends StatefulWidget {
   const QueryStudent({super.key});
 
@@ -25,7 +24,8 @@ class _QueryStudentState extends State<QueryStudent> {
           elevation: 0,
           toolbarHeight: 40,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, size: 25, color: Colors.black),
+            icon: const Icon(Icons.arrow_back_ios_outlined,
+                size: 25, color: Colors.black),
             onPressed: () => Navigator.pop(context),
           ),
           actions: [
@@ -96,7 +96,6 @@ class _QueryStudentState extends State<QueryStudent> {
                     color: Color.fromRGBO(132, 132, 132, 1),
                   ),
                 ),
-                
               ],
             ),
             SizedBox(height: 10.h),

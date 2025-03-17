@@ -77,7 +77,8 @@ class _NewChatState extends State<StudNewchart> {
       padding: const EdgeInsets.only(left: 30, right: 30, top: 25),
       child: Row(
         children: [
-          _buildIcon(Icons.arrow_back, () => Navigator.pop(context)),
+          _buildIcon(
+              Icons.arrow_back_ios_outlined, () => Navigator.pop(context)),
           const SizedBox(width: 15),
           Text(
             "New Chat",

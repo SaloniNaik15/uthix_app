@@ -15,9 +15,6 @@ import 'package:uthix_app/view/Student_Pages/HomePages/drawer_classroom.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/yourc_clasroom.dart';
 import 'package:uthix_app/view/Student_Pages/Modern_Tools/modern_tools.dart';
 import 'package:uthix_app/view/Student_Pages/Progress/progress_tracking.dart';
-import 'package:uthix_app/view/Student_Pages/Student%20Account%20Details/Student_AccountPage.dart';
-import 'package:uthix_app/view/Student_Pages/Student_Chat/stud_chat.dart';
-import 'package:uthix_app/view/instructor_dashboard/Profile/profile_account.dart';
 
 class HomePages extends StatefulWidget {
   const HomePages({super.key});
@@ -288,12 +285,15 @@ class _HomePagesState extends State<HomePages> {
             ),
           ),
           Positioned(
-            bottom: 30,
+            bottom: 15,
             left: 0,
             right: 0,
             child: Center(
-                child: NavbarStudent(
-                    onItemTapped: onItemTapped, selectedIndex: selectedIndex)),
+              child: NavbarStudent(
+                onItemTapped: onItemTapped,
+                selectedIndex: selectedIndex,
+              ),
+            ),
           ),
         ],
       ),

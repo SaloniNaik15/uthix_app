@@ -78,7 +78,8 @@ class _SubmissionState extends State<Submission> {
         child: AppBar(
           backgroundColor: Colors.white,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+            icon:
+                const Icon(Icons.arrow_back_ios_outlined, color: Colors.black),
             onPressed: () {
               Navigator.pop(context);
             },

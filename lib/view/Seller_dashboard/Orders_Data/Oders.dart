@@ -42,7 +42,9 @@ class _ManageOrdersState extends State<ManageOrders> {
         final data = json.decode(response.body);
         print("Parsed Data: $data"); // Logs parsed JSON data
 
-        if (data['status'] && data['orders'] != null && data['orders'].isNotEmpty) {
+        if (data['status'] &&
+            data['orders'] != null &&
+            data['orders'].isNotEmpty) {
           setState(() {
             orders = data['orders'];
           });
@@ -91,7 +93,8 @@ class _ManageOrdersState extends State<ManageOrders> {
     return AppBar(
       backgroundColor: Colors.white,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
+        icon:
+            const Icon(Icons.arrow_back_ios_outlined, color: Color(0xFF605F5F)),
         onPressed: () => Navigator.pop(context),
       ),
       title: const Text(

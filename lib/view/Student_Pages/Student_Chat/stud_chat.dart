@@ -9,14 +9,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/modal/nav_itemStudent.dart';
 import 'package:uthix_app/modal/navbarWidgetStudent.dart';
-import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
-import 'package:uthix_app/view/Student_Pages/Files/files.dart';
-import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
-import 'package:uthix_app/view/Student_Pages/Student%20Account%20Details/Student_AccountPage.dart';
+
 import 'package:uthix_app/view/Student_Pages/Student_Chat/stud_newChart.dart';
 import 'package:uthix_app/view/Student_Pages/Student_Chat/stud_personalChat.dart';
-import 'package:uthix_app/view/instructor_dashboard/Chat/new_chat.dart';
-import 'package:uthix_app/view/instructor_dashboard/Chat/personal_chat.dart';
 
 class StudChat extends StatefulWidget {
   const StudChat({super.key});
@@ -261,7 +256,7 @@ class _StudChatState extends State<StudChat> {
                 ],
               ),
               Positioned(
-                bottom: 15, // <-- Set bottom to 0 to remove white space
+                bottom: 15,
                 left: 0,
                 right: 0,
                 child: Center(

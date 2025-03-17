@@ -23,7 +23,7 @@ class _SubmissionStudentState extends State<SubmissionStudent> {
         child: AppBar(
           leading: IconButton(
               onPressed: Navigator.of(context).pop,
-              icon: Icon(Icons.arrow_back_ios)),
+              icon: Icon(Icons.arrow_back_ios_outlined)),
         ),
       ),
       body: SingleChildScrollView(

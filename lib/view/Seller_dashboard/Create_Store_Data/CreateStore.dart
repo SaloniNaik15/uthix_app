@@ -35,7 +35,7 @@ class _CreateStoreState extends State<CreateStore> {
 
   Future<void> _pickImage() async {
     final pickedFile =
-    await ImagePicker().pickImage(source: ImageSource.gallery);
+        await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
@@ -89,7 +89,8 @@ class _CreateStoreState extends State<CreateStore> {
     if (token == null || token.isEmpty) {
       log("⚠️ Authentication token is missing.");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Authentication failed. Please log in again.")),
+        const SnackBar(
+            content: Text("Authentication failed. Please log in again.")),
       );
       return;
     }
@@ -136,7 +137,8 @@ class _CreateStoreState extends State<CreateStore> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
+          icon: const Icon(Icons.arrow_back_ios_outlined,
+              color: Color(0xFF605F5F)),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -193,10 +195,14 @@ class _CreateStoreState extends State<CreateStore> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 10),
-                    _buildTextField("Store Name", "e.g., Class A", _storeNameController),
-                    _buildTextField("Address", "e.g., Class B", _addressController),
-                    _buildTextField("School/University", "e.g., BHU", _schoolController),
-                    _buildTextField("Counter No.", "e.g., 0010", _counterController),
+                    _buildTextField(
+                        "Store Name", "e.g., Class A", _storeNameController),
+                    _buildTextField(
+                        "Address", "e.g., Class B", _addressController),
+                    _buildTextField(
+                        "School/University", "e.g., BHU", _schoolController),
+                    _buildTextField(
+                        "Counter No.", "e.g., 0010", _counterController),
                     const SizedBox(height: 10),
                     // Image Picker for Logo
                     GestureDetector(
@@ -231,8 +237,10 @@ class _CreateStoreState extends State<CreateStore> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2B5C74),
-                        padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 60, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
                       ),
                       child: const Text(
                         "Create",
@@ -249,7 +257,8 @@ class _CreateStoreState extends State<CreateStore> {
     );
   }
 
-  Widget _buildTextField(String label, String hint, TextEditingController controller) {
+  Widget _buildTextField(
+      String label, String hint, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

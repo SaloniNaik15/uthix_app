@@ -25,7 +25,6 @@ class _ECommerceState extends State<ECommerce> {
   List<Map<String, dynamic>> categories = [];
   bool isLoading = true;
 
-
   @override
   void initState() {
     super.initState();
@@ -204,7 +203,7 @@ class _ECommerceState extends State<ECommerce> {
             ),
             // Bottom navigation bar.
             Positioned(
-              bottom: 30,
+              bottom: 15,
               left: 0,
               right: 0,
               child: Center(
