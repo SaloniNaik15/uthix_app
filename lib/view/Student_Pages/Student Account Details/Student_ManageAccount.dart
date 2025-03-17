@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../../login/start_login.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class StudentManageAccount extends StatefulWidget {
   const StudentManageAccount({super.key});
@@ -26,8 +27,8 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
 
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token'); // Retrieve token
-    log("Retrieved Token: $token"); // Log token for verification
+    String? token = prefs.getString('auth_token');
+    log("Retrieved Token: $token");
 
     setState(() {
       accessLoginToken = token;
@@ -78,14 +79,23 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           backgroundColor: Colors.white,
-          title: Text("Logout"),
-          content: Text("Are you sure you want to logout?"),
+          title: Text(
+            "Logout",
+            style: TextStyle(fontSize: 18.sp),
+          ),
+          content: Text(
+            "Are you sure you want to logout?",
+            style: TextStyle(fontSize: 16.sp),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(dialogContext).pop(); // Close dialog
               },
-              child: Text("Cancel"),
+              child: Text(
+                "Cancel",
+                style: TextStyle(fontSize: 16.sp),
+              ),
             ),
             TextButton(
               onPressed: () async {
@@ -101,7 +111,7 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
               },
               child: Text(
                 "Logout",
-                style: TextStyle(color: Colors.red), // Highlight logout button
+                style: TextStyle(fontSize: 16.sp, color: Colors.red),
               ),
             ),
           ],
@@ -118,8 +128,11 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_outlined,
-              color: Color(0xFF605F5F)),
+          icon: Icon(
+            Icons.arrow_back_ios_outlined,
+            color: const Color(0xFF605F5F),
+            size: 20.sp,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -127,52 +140,51 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Column(
             children: [
-              const SizedBox(height: 10),
-              const Text(
+              SizedBox(height: 10.h),
+              Text(
                 "Manage your Account",
                 style: TextStyle(
-                  fontSize: 20,
-                  fontFamily: "Urbanist",
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 10.h),
               // Profile Image
               CircleAvatar(
-                radius: 50,
+                radius: 50.r,
                 backgroundImage: AssetImage(
-                    "assets/Seller_dashboard_images/ManageStoreBackground.png"), // Replace with network image if needed
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                "Mahima Mandal",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: "Urbanist",
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2B5C74),
+                  "assets/Seller_dashboard_images/ManageStoreBackground.png",
                 ),
               ),
-              const Text(
+              SizedBox(height: 10.h),
+              Text(
+                "Mahima Mandal",
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF2B5C74),
+                ),
+              ),
+              Text(
                 "Class X B\nDelhi Public School, New Delhi\n+91 XXXXXX XXXXX",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontSize: 14,
-                    fontFamily: "Urbanist",
-                    fontWeight: FontWeight.w400),
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
 
-              // Text Fields
+              // Profile fields
               _buildProfileField(Icons.person, "Mahima"),
               _buildProfileField(Icons.phone, "+91 XXXXXX XXXXX"),
               _buildProfileField(Icons.location_on, "IP Extension, New Delhi"),
               _buildProfileField(Icons.school, "Banaras Hindu University"),
 
-              const SizedBox(height: 30),
+              SizedBox(height: 30.h),
 
               // Logout Button with Popup
               Row(
@@ -185,42 +197,44 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
                           color: Colors.red,
+                          width: 1.w,
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 14),
+                        padding: EdgeInsets.symmetric(vertical: 14.h),
                       ),
                       child: Text(
                         "Log out",
                         style: TextStyle(
-                            color: Colors.red,
-                            fontFamily: "Urbanist",
-                            fontSize: 16),
+                          color: Colors.red,
+                          fontSize: 14.sp,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10.h),
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {},
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.black),
-                        padding: EdgeInsets.symmetric(vertical: 14),
+                        side: BorderSide(
+                          color: Colors.black, width: 1.w,),
+                        padding: EdgeInsets.symmetric(vertical: 14.h),
                       ),
                       child: Text(
                         "Add Account",
                         style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: "Urbanist",
-                            fontSize: 16),
+                          color: Colors.black,
+                          fontSize: 14.sp,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+
             ],
           ),
         ),
@@ -230,33 +244,35 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
 
   Widget _buildProfileField(IconData icon, String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: 12.h),
       child: TextField(
         decoration: InputDecoration(
           filled: true,
-          fillColor: Color(0xFFFCFCFC),
+          fillColor: const Color(0xFFFCFCFC),
           prefixIcon: Icon(
             icon,
             color: Colors.grey,
+            size: 20.sp,
           ),
           hintText: text,
           hintStyle: TextStyle(
-            color: Color(0xFF605F5F),
+            color: const Color(0xFF605F5F),
             fontWeight: FontWeight.w500,
+            fontSize: 14.sp,
           ),
           enabled: false,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(30.r),
             borderSide: BorderSide(
-              color: Color(0xFFD2D2D2),
-              width: 2,
+              color: const Color(0xFFD2D2D2),
+              width: 2.w,
             ),
           ),
           disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(30.r),
             borderSide: BorderSide(
-              color: Color(0xFFD2D2D2),
-              width: 1,
+              color: const Color(0xFFD2D2D2),
+              width: 1.w,
             ),
           ),
         ),

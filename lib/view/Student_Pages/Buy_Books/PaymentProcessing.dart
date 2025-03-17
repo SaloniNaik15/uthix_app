@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'OrderConfirmed.dart';
 import 'CardDetails.dart';
@@ -71,7 +72,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) async {
-    print("Payment failed with code: ${response.code}, message: ${response.message}");
+    print(
+        "Payment failed with code: ${response.code}, message: ${response.message}");
     await _updatePaymentStatus("failed", response.code.toString());
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Payment failed: ${response.message}")),
@@ -85,25 +87,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  Future<void> _updatePaymentStatus(String status, String transactionId) async {
+  Future<void> _updatePaymentStatus(
+      String status, String transactionId) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('auth_token'); // ✅ Retrieve token dynamically
+      String? token = prefs.getString('auth_token'); // Retrieve token dynamically
 
       if (token == null || token.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Authentication failed. Please log in again.")),
+          const SnackBar(
+              content: Text(
+                  "Authentication failed. Please log in again.")),
         );
         return;
       }
 
-      print("Updating payment status: status=$status, transactionId=$transactionId, orderId=${widget.orderId}");
+      print(
+          "Updating payment status: status=$status, transactionId=$transactionId, orderId=${widget.orderId}");
 
       final response = await http.post(
         Uri.parse('https://admin.uthix.com/api/update-payment-status'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // ✅ Dynamic Token
+          'Authorization': 'Bearer $token', // Dynamic Token
         },
         body: jsonEncode({
           'order_id': widget.orderId,
@@ -113,14 +119,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ).timeout(
         const Duration(seconds: 15),
         onTimeout: () {
-          throw Exception("Connection timed out while updating payment status.");
+          throw Exception(
+              "Connection timed out while updating payment status.");
         },
       );
 
       print("Update Payment Status Response: ${response.body}");
 
       if (response.statusCode != 200) {
-        print("Error updating payment status. Status code: ${response.statusCode}");
+        print(
+            "Error updating payment status. Status code: ${response.statusCode}");
       }
     } catch (e) {
       print("Error updating payment status: $e");
@@ -137,22 +145,25 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('auth_token'); // ✅ Retrieve token dynamically
+      String? token = prefs.getString('auth_token'); // Retrieve token dynamically
 
       if (token == null || token.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Authentication failed. Please log in again.")),
+          const SnackBar(
+              content: Text(
+                  "Authentication failed. Please log in again.")),
         );
         return;
       }
 
-      print("Starting payment request for order ID: ${widget.orderId}, amount: ${(widget.totalPrice + 40) * 100}");
+      print(
+          "Starting payment request for order ID: ${widget.orderId}, amount: ${(widget.totalPrice + 40) * 100}");
 
       final response = await http.post(
         Uri.parse('https://admin.uthix.com/api/create-payment'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // ✅ Dynamic Token
+          'Authorization': 'Bearer $token', // Dynamic Token
         },
         body: jsonEncode({
           'order_id': widget.orderId,
@@ -163,7 +174,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ).timeout(
         const Duration(seconds: 15),
         onTimeout: () {
-          throw Exception("Connection timed out. Please check your internet connection and try again.");
+          throw Exception(
+              "Connection timed out. Please check your internet connection and try again.");
         },
       );
 
@@ -192,16 +204,20 @@ class _PaymentScreenState extends State<PaymentScreen> {
             );
           }
         } else {
-          print("Failed to create Razorpay order: ${responseData['message']}");
+          print(
+              "Failed to create Razorpay order: ${responseData['message']}");
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Failed to create Razorpay order: ${responseData['message']}")),
+            SnackBar(
+                content: Text(
+                    "Failed to create Razorpay order: ${responseData['message']}")),
           );
         }
       } else if (response.statusCode == 401) {
         throw Exception("Authentication failed. Please check your API key.");
       } else if (response.statusCode == 400) {
         final errorData = jsonDecode(response.body);
-        throw Exception("Invalid request: ${errorData['message'] ?? 'Unknown error'}");
+        throw Exception(
+            "Invalid request: ${errorData['message'] ?? 'Unknown error'}");
       } else {
         throw Exception("Server returned status code: ${response.statusCode}");
       }
@@ -247,7 +263,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-
   @override
   void dispose() {
     _razorpay.clear();
@@ -256,47 +271,44 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Responsive UI using ScreenUtil and no custom font family in TextStyles
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
+          icon: Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F), size: 20.sp),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           "Payment",
           style: TextStyle(
-            fontSize: 20,
-            fontFamily: 'Urbanist',
+            fontSize: 18.sp,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
         ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               "Choose your Payment Gateway",
               style: TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Urbanist',
-                  fontWeight: FontWeight.bold),
+                  fontSize: 16.sp, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 10.h),
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              gridDelegate:
-              const SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 30,
+                crossAxisSpacing: 16.w,
+                mainAxisSpacing: 30.h,
                 childAspectRatio: 1,
               ),
               itemCount: paymentMethods.length,
@@ -309,28 +321,28 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   },
                   child: Material(
                     elevation: 5,
-                    color: const Color(0xFFFCFCFC),
-                    borderRadius: BorderRadius.circular(15),
+                    color: Color(0xFFFCFCFC),
+                    borderRadius: BorderRadius.circular(15.r),
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: selectedPaymentIndex == index
                               ? Colors.blue
-                              : const Color(0xFFFCFCFC),
+                              : Color(0xFFFCFCFC),
                           width: 2,
                         ),
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(15.r),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset(paymentImages[index], height: 50),
-                          const SizedBox(height: 8),
-                          Text(paymentMethods[index],
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontFamily: 'Urbanist',
-                              )),
+                          Image.asset(paymentImages[index],
+                              height: 50.h),
+                          SizedBox(height: 8.h),
+                          Text(
+                            paymentMethods[index],
+                            style: TextStyle(fontSize: 14.sp),
+                          ),
                         ],
                       ),
                     ),
@@ -338,52 +350,51 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 );
               },
             ),
-            const SizedBox(height: 40),
-            const Text(
+            SizedBox(height: 40.h),
+            Text(
               "Your Bill Amount",
-              style:
-              TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 16.sp, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
+            Divider(),
+            SizedBox(height: 8.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("Item price"),
+                Text("Item price",
+                    style: TextStyle(
+                        fontSize: 16.sp, fontWeight: FontWeight.w500)),
                 Text("₹${widget.totalPrice}")
               ],
             ),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: const [Text("Shipping"), Text("₹40")],
-            // ),
-            const SizedBox(height: 20),
-            const Divider(),
-            const SizedBox(height: 20),
+            SizedBox(height: 10.h),
+            Divider(),
+            SizedBox(height: 20.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("Total",
+                Text("Total",
                     style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
-                Text("₹${widget.totalPrice }",
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
+                        fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                Text("₹${widget.totalPrice}",
+                    style: TextStyle(
+                        fontSize: 16.sp, fontWeight: FontWeight.bold)),
               ],
             ),
-            const Spacer(),
+            Spacer(),
             ElevatedButton(
               onPressed: isLoading ? null : _handlePayment,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2B5C74),
-                minimumSize: const Size(double.infinity, 50),
+                backgroundColor: Color(0xFF2B5C74),
+                minimumSize: Size(double.infinity, 50.h),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50)),
+                    borderRadius: BorderRadius.circular(50.r)),
               ),
-              child: const Text("Check Out",
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Urbanist',
-                      color: Colors.white)),
+              child: Text(
+                "Check Out",
+                style: TextStyle(fontSize: 16.sp, color: Colors.white),
+              ),
             ),
           ],
         ),

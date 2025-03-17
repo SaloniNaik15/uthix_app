@@ -2,12 +2,10 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:uthix_app/view/Seller_dashboard/Inventory_data/ViewDetails.dart';
+
 import 'CustomerPhotosPage.dart';
 import 'CustomerReviewPage.dart';
-import 'BookDetails.dart';
-import 'StudentCart.dart';
-import 'StudentSearch.dart';
-import 'Wishlist.dart';
 
 class Bookdetails extends StatefulWidget {
   final int productId;
@@ -19,6 +17,7 @@ class Bookdetails extends StatefulWidget {
 
 class _BookdetailsState extends State<Bookdetails> {
   late Future<Map<String, dynamic>> productFuture;
+  final Dio _dio = Dio();
 
   @override
   void initState() {
@@ -26,11 +25,10 @@ class _BookdetailsState extends State<Bookdetails> {
     productFuture = fetchProduct();
   }
 
-  // Fetch product details using Dio.
+  // Use Dio to build the API URL dynamically and fetch the product data.
   Future<Map<String, dynamic>> fetchProduct() async {
     try {
-      final dio = Dio();
-      final response = await dio.get(
+      final response = await _dio.get(
           "https://admin.uthix.com/api/products/view/${widget.productId}");
       if (response.statusCode == 200) {
         return response.data["product"];
@@ -44,266 +42,286 @@ class _BookdetailsState extends State<Bookdetails> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return SafeArea(
+      child: Scaffold(
         backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios,
-              color: const Color.fromARGB(255, 119, 78, 78), size: 20.sp),
-          onPressed: () => Navigator.pop(context),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios,
+              color: const Color.fromARGB(255, 119, 78, 78),
+              size: 20.sp,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
         ),
-      ),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: productFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-                child: Text("Error: ${snapshot.error}",
-                    style: TextStyle(fontSize: 14.sp)));
-          } else if (snapshot.hasData) {
-            var product = snapshot.data!;
-            // Extract images from API data and map to full URL.
-            List<dynamic> imagesData = product["images"] ?? [];
-            List<String> images = imagesData.map((img) {
-              return "https://admin.uthix.com/storage/image/products/${img["image_path"]}";
-            }).toList();
+        body: SafeArea(
+          child: FutureBuilder<Map<String, dynamic>>(
+            future: productFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text(
+                    "Error: ${snapshot.error}",
+                    style: TextStyle(fontSize: 14.sp,),
+                  ),
+                );
+              } else if (snapshot.hasData) {
+                var product = snapshot.data!;
+                // Extract dynamic list of images from the API data.
+                List<dynamic> imagesData = product["images"] ?? [];
+                List<String> images = imagesData.map((img) {
+                  return "https://admin.uthix.com/storage/image/products/${img["image_path"]}";
+                }).toList();
 
-            return SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Horizontal list of product images.
-                    SizedBox(
-                      height: 200.h,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: images.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin: EdgeInsets.only(right: 20.w),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10.r),
-                              child: Image.network(
-                                images[index],
-                                fit: BoxFit.cover,
-                                width: MediaQuery.of(context).size.width / 2,
-                                height: 200.h,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Icon(Icons.broken_image, size: 40.sp),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 10.h),
-                    // Book title and ISBN.
-                    Text(
-                      product["title"] ?? "No title",
-                      style: TextStyle(
-                          fontSize: 16.sp,
-                          fontFamily: 'Urbanist',
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 5.h),
-                    Text(
-                      product["isbn"] ?? "",
-                      style: TextStyle(
-                          fontSize: 14.sp,
-                          fontFamily: 'Urbanist',
-                          fontWeight: FontWeight.w400),
-                    ),
-                    SizedBox(height: 10.h),
-                    // Ratings Row.
-                    Row(
-                      children: [
-                        Text(
-                          "5", // Replace with dynamic rating if available.
-                          style: TextStyle(
-                              fontSize: 12.sp,
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.w400),
-                        ),
-                        SizedBox(width: 5.w),
-                        ...List.generate(
-                            5,
-                                (index) => Icon(Icons.star,
-                                color: Colors.amber, size: 14.sp)),
-                      ],
-                    ),
-                    SizedBox(height: 5.h),
-                    // Price and additional details.
-                    Column(
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.all(10.w),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Image carousel populated from API images.
+                        SizedBox(
+                          height: 200.h,
+                          child: GridView.builder(
+                            scrollDirection: Axis.horizontal,
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 1,
+                              crossAxisSpacing: 20.w,
+                              mainAxisSpacing: 10.h,
+                              childAspectRatio: 0.55,
+                            ),
+                            itemCount: images.length,
+                            itemBuilder: (context, index) {
+                              return Stack(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10.r),
+                                    child: Center(
+                                      child: Image.network(
+                                        images[index],
+                                        fit: BoxFit.cover,
+                                        alignment: Alignment.center,
+                                        width: 0.5.sw,
+                                        height: 200.h,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Icon(Icons.broken_image, size: 50.sp);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 15.h),
+                        // Book title and details.
                         Text(
-                          product["price"].toString(),
+                          product["title"] ?? "No title",
                           style: TextStyle(
-                              fontSize: 16.sp,
-                              color: Colors.blue,
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.bold),
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          product["isbn"] ?? "",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                         SizedBox(height: 8.h),
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.symmetric(vertical: 8.h),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "by ${product["author"] ?? ""}",
-                                style: TextStyle(
-                                    fontSize: 14.sp,
-                                    color: Colors.grey,
-                                    fontFamily: 'Urbanist'),
+                        Row(
+                          children: [
+                            Text(
+                              "5",
+                              style: TextStyle(
+                                fontSize: 12.sp,
+
+                                fontWeight: FontWeight.bold,
                               ),
-                              SizedBox(width: 4.w),
-                              Text(
-                                "|",
-                                style: TextStyle(
-                                    fontSize: 16.sp,
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(width: 10.w),
-                              Text(
-                                product["language"] ?? "",
-                                style: TextStyle(
-                                    fontSize: 14.sp,
-                                    color: Colors.grey,
-                                    fontFamily: 'Urbanist'),
-                              ),
-                              SizedBox(width: 4.w),
-                              Text(
-                                "|",
-                                style: TextStyle(
-                                    fontSize: 16.sp,
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(width: 10.w),
-                              Text(
-                                "${product["pages"]} pages",
-                                style: TextStyle(
-                                    fontSize: 14.sp,
-                                    color: Colors.grey,
-                                    fontFamily: 'Urbanist'),
-                              ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(width: 5.w),
+                            Icon(Icons.star, color: Colors.amber, size: 14.sp),
+                            Icon(Icons.star, color: Colors.amber, size: 14.sp),
+                            Icon(Icons.star, color: Colors.amber, size: 14.sp),
+                            Icon(Icons.star, color: Colors.amber, size: 14.sp),
+                            Icon(Icons.star, color: Colors.amber, size: 14.sp),
+                          ],
                         ),
-                        SizedBox(height: 10.h),
-                        Text(
-                          product["description"] ?? "",
-                          style: TextStyle(
-                              fontSize: 14.sp,
-                              fontFamily: 'Urbanist',
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 20.h),
-                        // Delivery Instructions.
-                        deliveryInstructions(),
-                        SizedBox(height: 20.h),
-                        const DeliveryDateWidget(),
-                        SizedBox(height: 20.h),
-                        reviewAndRating(),
-                        SizedBox(height: 20.h),
-                        CustomerReview(),
-                        SizedBox(height: 10.h),
-                        // Action Buttons: Wishlist & Add to Bag (each occupies half width).
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.favorite_border,
-                                      size: 18.sp,
-                                      color: const Color(0xFF305C78)),
-                                  label: Text(
-                                    'Wishlist',
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14.sp),
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(color: Colors.grey),
-                                    padding: EdgeInsets.symmetric(vertical: 15.h),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.r),
-                                    ),
+                        SizedBox(height: 5.h),
+                        Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  product["price"].toString(),
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ),
-                              SizedBox(width: 10.w),
-                              Expanded(
-                                child: ElevatedButton.icon(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.shopping_bag_outlined,
-                                      size: 18.sp, color: Colors.white),
-                                  label: Text(
-                                    'Add to Bag',
+                              ],
+                            ),
+                            SizedBox(height: 5.h),
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.symmetric(vertical: 8.h),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "by ${product["author"] ?? ""}",
                                     style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: Color(0xFF605F5F),
+
+                                    ),
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    "|",
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      color: Color(0xFF605F5F),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  Text(
+                                    product["language"] ?? "",
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: Color(0xFF605F5F),
+
+                                    ),
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    "|",
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      color: Color(0xFF605F5F),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  Text(
+                                    "${product["pages"]} pages",
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
+                                      color: Color(0xFF605F5F),
+
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 5.h),
+                            Text(
+                              product["description"] ?? "",
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            SizedBox(height: 10.h),
+                            // Delivery Instructions and Date widget.
+                            deliveryInstructions(),
+                            const DeliveryDateWidget(),
+                            SizedBox(height: 10.h),
+                            reviewAndRating(),
+                            SizedBox(height: 10.h),
+                            CustomerReview(),
+                            SizedBox(height: 10.h),
+                            // Bottom buttons: Each button takes half the phone screen width.
+                            SafeArea(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton.icon(
+                                      onPressed: () {},
+                                      icon: Icon(
+                                        Icons.favorite_border,
+                                        size: 18.sp,
+                                        color: const Color(0xFF305C78),
+                                      ),
+                                      label: Text(
+                                        'Wishlist',
+                                        style: TextStyle(
+                                          color: Colors.black,
+
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14.sp,
+                                        ),
+                                      ),
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(color: Colors.grey),
+                                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {},
+                                      icon: Icon(
+                                        Icons.shopping_bag_outlined,
+                                        size: 18.sp,
                                         color: Colors.white,
-                                        fontFamily: 'Urbanist',
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14.sp),
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF305C78),
-                                    padding: EdgeInsets.symmetric(vertical: 15.h),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.r),
+                                      ),
+                                      label: Text(
+                                        'Add to Bag',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14.sp,
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFF305C78),
+                                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
+                            )
+
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          } else {
-            return Center(
-                child: Text("No data available",
-                    style: TextStyle(fontSize: 14.sp)));
-          }
-        },
+                  ),
+                );
+              } else {
+                return Center(
+                  child: Text(
+                    "No data available",
+                    style: TextStyle(fontSize: 14.sp,),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
       ),
     );
   }
-}
-
-Widget deliveryInstructions() {
-  return Padding(
-    padding: EdgeInsets.symmetric(horizontal: 16.w),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("Delivery Instructions",
-            style: TextStyle(
-                fontSize: 18.sp,
-                fontFamily: 'Urbanist',
-                fontWeight: FontWeight.bold)),
-        SizedBox(height: 10.h),
-        Text("Please note: We provide free delivery to your registered address.",
-            style: TextStyle(fontSize: 14.sp, fontFamily: 'Urbanist')),
-      ],
-    ),
-  );
 }
 
 class DeliveryDateWidget extends StatelessWidget {
@@ -311,72 +329,84 @@ class DeliveryDateWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("Delivery Date",
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.all(16.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Delivery Date",
               style: TextStyle(
-                  fontSize: 18.sp,
-                  fontFamily: 'Urbanist',
-                  fontWeight: FontWeight.bold)),
-          SizedBox(height: 10.h),
-          Text("Pin Code",
-              style: TextStyle(fontSize: 16.sp, fontFamily: 'Urbanist')),
-          SizedBox(height: 5.h),
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("110092",
-                      style: TextStyle(
-                          fontSize: 16.sp,
-                          fontFamily: 'Urbanist',
-                          fontWeight: FontWeight.w500)),
-                  GestureDetector(
-                    onTap: () {
-                      // Functionality to change pin code goes here.
-                    },
-                    child: Text("Change",
-                        style: TextStyle(
-                            fontSize: 16.sp,
-                            fontFamily: 'Urbanist',
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold)),
-                  ),
-                ],
+                fontSize: 16.sp,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-        ],
+            SizedBox(height: 5.h),
+            Text(
+              "Pin Code",
+              style: TextStyle(fontSize: 14.sp,),
+            ),
+            SizedBox(height: 5.h),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "110092",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        // Add functionality to change pin code
+                      },
+                      child: Text(
+                        "Change",
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 Widget reviewAndRating() {
-  return Padding(
-    padding: EdgeInsets.symmetric(horizontal: 16.w),
+  return SafeArea(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Reviews & Ratings',
-            style: TextStyle(
-                fontSize: 16.sp,
-                fontFamily: 'Urbanist',
-                fontWeight: FontWeight.bold)),
-        SizedBox(height: 8.h),
+        Text(
+          'Reviews & Ratings',
+          style: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 5.h),
         Row(
           children: [
             Container(
-              padding: EdgeInsets.all(5.w),
+              //padding: EdgeInsets.all(2.w),
               width: 70.w,
               height: 35.h,
               decoration: BoxDecoration(
@@ -389,21 +419,26 @@ Widget reviewAndRating() {
                   children: [
                     Icon(Icons.star, color: Colors.white, size: 16.sp),
                     SizedBox(width: 4.w),
-                    Text('4.2',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14.sp)),
+                    Text(
+                      '4.2',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-            SizedBox(width: 16.w),
-            Text('49 Ratings & 12 reviews',
-                style: TextStyle(
-                    fontSize: 14.sp,
-                    fontFamily: 'Urbanist',
-                    fontWeight: FontWeight.w500)),
+            SizedBox(width: 12.w),
+            Text(
+              '49 Ratings & 12 reviews',
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
       ],
@@ -412,28 +447,32 @@ Widget reviewAndRating() {
 }
 
 Widget CustomerReview() {
-  return Padding(
-    padding: EdgeInsets.symmetric(horizontal: 16.w),
+  return SafeArea(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Builder(builder: (BuildContext context) {
-          return TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => StudentCustomerPhotos()),
-              );
-            },
-            child: Text("Customer Photos",
+        Builder(
+          builder: (BuildContext context) {
+            return TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => StudentCustomerPhotos()),
+                );
+              },
+              child: Text(
+                "Customer Photos",
                 style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Urbanist')),
-          );
-        }),
-        SizedBox(height: 10.h),
+                  fontSize: 14.sp,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+
+                ),
+              ),
+            );
+          },
+        ),
+        SizedBox(height: 8.h),
         SizedBox(
           height: 80.h,
           child: ListView.builder(
@@ -455,8 +494,10 @@ Widget CustomerReview() {
                     borderRadius: BorderRadius.circular(15.r),
                   ),
                   child: Center(
-                    child: Text('Item $index',
-                        style: TextStyle(fontSize: 12.sp)),
+                    child: Text(
+                      'Item $index',
+                      style: TextStyle(fontSize: 12.sp),
+                    ),
                   ),
                 ),
               );
@@ -467,16 +508,19 @@ Widget CustomerReview() {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Customer Reviews',
-                style: TextStyle(
-                    fontSize: 14.sp,
-                    fontFamily: 'Urbanist',
-                    fontWeight: FontWeight.bold)),
-            SizedBox(height: 10.h),
+            Text(
+              'Customer Reviews ',
+              style: TextStyle(
+                fontSize: 14.sp,
+
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 8.h),
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(5.w),
+                  //padding: EdgeInsets.all(5.w),
                   width: 70.w,
                   height: 35.h,
                   decoration: BoxDecoration(
@@ -489,52 +533,62 @@ Widget CustomerReview() {
                       children: [
                         Icon(Icons.star, color: Colors.white, size: 16.sp),
                         SizedBox(width: 4.w),
-                        Text('3',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14.sp)),
+                        Text(
+                          '3',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14.sp,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(width: 16.w),
-                Text('2 months ago',
-                    style: TextStyle(
-                        fontSize: 14.sp,
-                        fontFamily: 'Urbanist',
-                        fontWeight: FontWeight.w500)),
+                SizedBox(width: 12.w),
+                Text(
+                  '2 months ago',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
-            SizedBox(height: 10.h),
+            SizedBox(height: 8.h),
             Text(
               'Books are in good condition and got them on time, happy with the packaging',
               style: TextStyle(
-                  fontSize: 14.sp,
-                  fontFamily: 'Urbanist',
-                  fontWeight: FontWeight.w500),
+                fontSize: 14.sp,
+
+                fontWeight: FontWeight.w500,
+              ),
             ),
             SizedBox(height: 10.h),
             Row(
               children: [
-                Builder(builder: (BuildContext context) {
-                  return TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => StudentPageCustomerReview()),
-                      );
-                    },
-                    child: Text(
-                      'View all 12 reviews',
-                      style: TextStyle(
+                Builder(
+                  builder: (BuildContext context) {
+                    return TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => StudentPageCustomerReview()),
+                        );
+                      },
+                      child: Text(
+                        'View all 12 reviews',
+                        style: TextStyle(
                           fontSize: 14.sp,
-                          fontFamily: 'Urbanist',
+
                           color: Colors.black,
-                          fontWeight: FontWeight.w400),
-                    ),
-                  );
-                }),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    );
+                  },
+                ),
                 Icon(Icons.arrow_forward_ios, size: 10.sp),
               ],
             ),
@@ -545,3 +599,18 @@ Widget CustomerReview() {
   );
 }
 
+Widget deliveryInstructions() {
+  return SafeArea(
+    child: Padding(
+      padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
+      child: Text(
+        "Delivery Instructions: Please ensure someone is available to receive the package.",
+        style: TextStyle(
+          fontSize: 14.sp,
+
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ),
+  );
+}

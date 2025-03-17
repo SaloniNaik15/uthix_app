@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class StudentSearch extends StatefulWidget {
   final int? categoryId;
@@ -21,6 +22,7 @@ class _StudentSearchState extends State<StudentSearch> {
     'Stationary',
     'Lab Equipments',
   ];
+  int selectedFilterIndex = 0;
   final FocusNode _focusNode = FocusNode();
   bool isFocused = false;
 
@@ -58,14 +60,15 @@ class _StudentSearchState extends State<StudentSearch> {
         final jsonData = response.data;
         if (jsonData.containsKey('products') && jsonData['products'] is List) {
           final List products = jsonData['products'];
-
           final queryLower = query.toLowerCase();
           setState(() {
             searchResults = products.where((product) {
-              final title = product['title']?.toString().toLowerCase() ?? '';
-              final author = product['author']?.toString().toLowerCase() ?? '';
-              final language = product['language']?.toString().toLowerCase() ?? '';
-
+              final title =
+                  product['title']?.toString().toLowerCase() ?? '';
+              final author =
+                  product['author']?.toString().toLowerCase() ?? '';
+              final language =
+                  product['language']?.toString().toLowerCase() ?? '';
               return title.contains(queryLower) ||
                   author.contains(queryLower) ||
                   language.contains(queryLower);
@@ -84,7 +87,7 @@ class _StudentSearchState extends State<StudentSearch> {
 
   Widget buildFilterTabs() {
     return SizedBox(
-      height: 40,
+      height: 40.h,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
@@ -92,23 +95,29 @@ class _StudentSearchState extends State<StudentSearch> {
             return GestureDetector(
               onTap: () {
                 setState(() {
+                  selectedFilterIndex = index;
                   searchController.text = filters[index];
                   searchCategories(filters[index]);
                 });
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                margin: const EdgeInsets.only(right: 8),
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
+                margin: EdgeInsets.only(right: 8.w),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(20.r),
                   border: Border.all(color: Colors.grey, width: 1),
-                  color: Colors.transparent,
+                  color: selectedFilterIndex == index
+                      ? Color(0xFF2B5C74)
+                      : Colors.transparent,
                 ),
                 child: Text(
                   filters[index],
                   style: TextStyle(
-                    color:  Colors.grey,
+                    color: selectedFilterIndex == index
+                        ? Colors.white
+                        : Colors.grey,
                     fontWeight: FontWeight.w400,
+                    fontSize: 14.sp,
                   ),
                 ),
               ),
@@ -125,68 +134,68 @@ class _StudentSearchState extends State<StudentSearch> {
         itemCount: searchResults.length,
         itemBuilder: (context, index) {
           final product = searchResults[index];
-
           return GestureDetector(
             onTap: () {
               setState(() {
+                // Optionally, add navigation or other logic here
               });
             },
             child: Card(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
+                borderRadius: BorderRadius.circular(15.r),
                 side: BorderSide(
-                  color: Color(0xFFF6F6F6), // Change border color on selection
+                  color: const Color(0xFFF6F6F6),
                   width: 2,
                 ),
               ),
               elevation: 5,
-              color: Colors.white, // Change background color
+              color: Colors.white,
               child: ListTile(
-                contentPadding: const EdgeInsets.all(16),
+                contentPadding: EdgeInsets.all(10.w),
                 leading: product['thumbnail_img'] != null
                     ? ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(8.r),
                   child: Image.network(
                     'https://admin.uthix.com/storage/image/products/${product['first_image']['image_path']}',
-                    width: 80,
-                    height: 80,
+                    width: 80.w,
+                    height: 80.h,
                     fit: BoxFit.cover,
                   ),
                 )
-                    : const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+                    : Icon(Icons.image_not_supported,
+                    size: 50.sp, color: Colors.grey),
                 title: Text(
                   product['title'] ?? 'No Title',
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.black, // Change text color
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16.sp,
+                    color: Colors.black,
                   ),
                 ),
-
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "Author: ${product['author'] ?? 'Unknown'}",
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         color: Colors.black54,
                       ),
                     ),
                     Text(
                       "Language: ${product['language'] ?? 'Not specified'}",
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         color: Colors.black54,
                       ),
                     ),
                     Text(
                       "Price: ₹${product['price'] ?? 'N/A'}",
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w600,
-                        color:Colors.green,
+                        color: Colors.black,
                       ),
                     ),
                   ],
@@ -207,60 +216,68 @@ class _StudentSearchState extends State<StudentSearch> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
+          icon:
+          Icon(Icons.arrow_back_ios, color: const Color(0xFF605F5F), size: 20.sp),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          "Search Books",
+        title: Text(
+          "Recent Searches",
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 18.sp,
             fontWeight: FontWeight.normal,
             color: Colors.black,
           ),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: searchController,
-              focusNode: _focusNode, // Attach focus node
+              focusNode: _focusNode,
               onChanged: (value) => searchCategories(value),
               decoration: InputDecoration(
                 hintText: 'Search by title, author, or language',
-                prefixIcon: const Icon(Icons.search, color: Color(0xFFAFAFAF)),
+                prefixIcon:
+                Icon(Icons.search, color: const Color(0xFFAFAFAF), size: 20.sp),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+                  borderRadius: BorderRadius.circular(30.r),
                   borderSide: BorderSide(
-                    color: isFocused ? Color(0xFFAFAFAF) : const Color(0xFFD9D9D9), // Change border color on focus
+                    color: isFocused
+                        ? const Color(0xFFAFAFAF)
+                        : const Color(0xFFD9D9D9),
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.0),
+                  borderRadius: BorderRadius.circular(30.r),
                   borderSide: BorderSide(
-                    color: isFocused ? Color(0xFFAFAFAF) : const Color(0xFFD9D9D9), // Default border color
+                    color: isFocused
+                        ? const Color(0xFFAFAFAF)
+                        : const Color(0xFFD9D9D9),
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30.0),
-                  borderSide: const BorderSide(color: Color(0xFFAFAFAF), width: 2.0), // Red border when focused
+                  borderRadius: BorderRadius.circular(30.r),
+                  borderSide: const BorderSide(color: Color(0xFFAFAFAF), width: 2.0),
                 ),
                 filled: true,
                 fillColor: const Color(0xFFF6F6F6),
               ),
             ),
-            const SizedBox(height: 16.0),
+            SizedBox(height: 16.h),
             buildFilterTabs(),
-            const SizedBox(height: 16.0),
+            SizedBox(height: 16.h),
             isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator())
                 : searchResults.isEmpty
-                ? const Center(child: Text("No results found", style: TextStyle(color: Colors.grey)))
+                ? Center(
+                child: Text("No results found",
+                    style: TextStyle(color: Colors.grey, fontSize: 14.sp)))
                 : buildSearchResults(),
           ],
-        )
+        ),
       ),
     );
   }

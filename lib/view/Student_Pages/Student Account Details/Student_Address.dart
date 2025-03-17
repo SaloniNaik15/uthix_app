@@ -1,5 +1,7 @@
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../login/start_login.dart';
 import 'Student_Add_Address.dart';
@@ -15,24 +17,31 @@ class _StudentAddressState extends State<StudentAddress> {
   int? selectedAddressIndex;
   List<Map<String, dynamic>> addresses = [];
   final Dio _dio = Dio();
+  String? _authToken;
 
   @override
   void initState() {
     super.initState();
+    _loadUserCredentials();
     _fetchAddresses();
   }
 
-  Future<void> _fetchAddresses() async {
+  Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token =
-        prefs.getString('auth_token'); // ✅ Retrieve token dynamically
+    String? token = prefs.getString('auth_token'); // Retrieve token
+    log("Retrieved Token: $token"); // Log token for verification
 
-    if (token == null || token.isEmpty) {
+    setState(() {
+      _authToken = token;
+    });
+  }
+
+  Future<void> _fetchAddresses() async {
+    if (_authToken == null || _authToken!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("Authentication failed. Please log in again.")),
+        const SnackBar(content: Text("Authentication failed. Please log in again.")),
       );
-      handle401Error(); // ✅ Redirect to login if token is missing
+      handle401Error();
       return;
     }
 
@@ -41,7 +50,7 @@ class _StudentAddressState extends State<StudentAddress> {
         "https://admin.uthix.com/api/address",
         options: Options(
           headers: {
-            "Authorization": "Bearer $token", // ✅ Dynamic Token
+            "Authorization": "Bearer $_authToken", // Dynamic Token
             "Content-Type": "application/json",
             "Accept": "application/json",
           },
@@ -53,38 +62,33 @@ class _StudentAddressState extends State<StudentAddress> {
           addresses = List<Map<String, dynamic>>.from(response.data["address"]);
         });
       } else if (response.statusCode == 401) {
-        print("⛔ Unauthorized: Token is invalid or expired.");
+        log("⛔ Unauthorized: Token is invalid or expired.");
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text("Session expired. Please log in again.")),
+          const SnackBar(content: Text("Session expired. Please log in again.")),
         );
-        handle401Error(); // ✅ Log out if token is expired
+        handle401Error();
       } else {
-        print("⛔ Failed to fetch addresses: ${response.data}");
+        log("⛔ Failed to fetch addresses: ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  "❌ Error fetching addresses: ${response.data.toString()}")),
+          SnackBar(content: Text("❌ Error fetching addresses: ${response.data.toString()}")),
         );
       }
     } catch (e) {
-      print("⛔ Error fetching addresses: $e");
+      log("⛔ Error fetching addresses: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("❌ Network error. Please try again.")),
       );
     }
   }
 
-// ✅ Handle 401 Unauthorized Error (Token Expired)
   Future<void> handle401Error() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_token'); // Clear expired token
+    await prefs.remove('auth_token');
     await prefs.remove('user_role');
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-          builder: (context) => StartLogin()), // Redirect to login
+      MaterialPageRoute(builder: (context) => StartLogin()),
     );
   }
 
@@ -96,8 +100,11 @@ class _StudentAddressState extends State<StudentAddress> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_outlined,
-              color: Color(0xFF605F5F)),
+          icon: Icon(
+            Icons.arrow_back_ios_outlined,
+            color: const Color(0xFF605F5F),
+            size: 20.sp,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -107,16 +114,15 @@ class _StudentAddressState extends State<StudentAddress> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.w),
             child: Text(
               "My Addresses",
               style: TextStyle(
-                  fontSize: 22,
-                  fontFamily: "Urbanist",
-                  fontWeight: FontWeight.bold),
+                fontSize: 22.sp,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-
           // "Add New Address" button
           GestureDetector(
             onTap: () async {
@@ -128,166 +134,124 @@ class _StudentAddressState extends State<StudentAddress> {
             },
             child: Container(
               width: double.infinity,
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.w),
               color: Colors.grey[200],
               child: Text(
                 "+Add New Address",
                 style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: "Urbanist",
-                  color: Color(0xFF2B5C74),
+                  fontSize: 16.sp,
+                  color: const Color(0xFF2B5C74),
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
           ),
-
           Expanded(
             child: addresses.isEmpty
                 ? Center(child: CircularProgressIndicator())
                 : ListView.builder(
-                    itemCount: addresses.length,
-                    itemBuilder: (context, index) {
-                      final address = addresses[index];
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (index == 0 ||
-                              addresses[index - 1]["address_type"] !=
-                                  address["address_type"])
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Text(
-                                address["address_type"] ?? "Other Addresses",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: "Urbanist",
-                                    fontWeight: FontWeight.bold),
+              itemCount: addresses.length,
+              itemBuilder: (context, index) {
+                final address = addresses[index];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (index == 0 ||
+                        addresses[index - 1]["address_type"] != address["address_type"])
+                      Padding(
+                        padding: EdgeInsets.all(16.w),
+                        child: Text(
+                          address["address_type"] ?? "Other Addresses",
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    // Address Card
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedAddressIndex = index;
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.all(16.w),
+                        decoration: BoxDecoration(
+                          color: selectedAddressIndex == index
+                              ? Colors.white
+                              : const Color(0xFFF6F6F6),
+                          border: Border.all(
+                            color: Colors.grey.shade300,
+                            width: 1.w,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              address["name"] ?? "N/A",
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-
-                          // Address Card
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedAddressIndex = index;
-                              });
-                            },
-                            child: Container(
-                              width: double.infinity,
-                              padding: EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: selectedAddressIndex == index
-                                    ? Colors.white
-                                    : Color(0xFFF6F6F6),
-                                border: Border.all(color: Colors.grey.shade300),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    address["name"] ?? "N/A",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(address["area"] ?? "N/A"),
-                                  Text(address["street"] ?? ""),
-                                  Text(address["city"] ?? ""),
-                                  Text(address["postal_code"] ?? ""),
-                                  Text(
-                                      "Mobile Number: ${address["phone"] ?? "N/A"}"),
-                                ],
-                              ),
+                            SizedBox(height: 4.h),
+                            Text(address["area"] ?? "N/A"),
+                            Text(address["street"] ?? ""),
+                            Text(address["city"] ?? ""),
+                            Text(address["postal_code"] ?? ""),
+                            Text("Mobile Number: ${address["phone"] ?? "N/A"}"),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Edit Button (Visible only if selected)
+                    if (selectedAddressIndex == index)
+                      Container(
+                        padding: EdgeInsets.all(8.w),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border(
+                            top: BorderSide(
+                              color: Colors.grey.shade300,
+                              width: 1.w,
                             ),
                           ),
-
-                          // Edit & Remove Buttons (Visible only if selected)
-                          if (selectedAddressIndex == index)
-                            Container(
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border(
-                                  top: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                // Handle Edit Address
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.grey, width: 1.w),
+                                padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 10.h),
+                              ),
+                              child: Text(
+                                "Edit",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14.sp,
                                 ),
                               ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      // Handle Edit Address
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white,
-                                      side: BorderSide(color: Colors.grey),
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 40),
-                                    ),
-                                    child: Text("Edit",
-                                        style: TextStyle(color: Colors.black)),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      await _deleteAddress(address["id"]);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.white,
-                                      side: BorderSide(color: Colors.grey),
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 40),
-                                    ),
-                                    child: Text("Remove",
-                                        style: TextStyle(
-                                            fontFamily: "Urbanist",
-                                            color: Colors.black)),
-                                  ),
-                                ],
-                              ),
                             ),
-
-                          SizedBox(height: 16), // Spacing
-                        ],
-                      );
-                    },
-                  ),
+                            // "Remove" button has been removed as requested.
+                          ],
+                        ),
+                      ),
+                    SizedBox(height: 16.h),
+                  ],
+                );
+              },
+            ),
           ),
         ],
       ),
     );
-  }
-
-  Future<void> _deleteAddress(int addressId) async {
-    String token = "31|q953ermY3FDJcidtQjCGfAstlUb8x4izaA0BMjMz53a72876";
-
-    try {
-      final response = await _dio.delete(
-        "https://admin.uthix.com/api/address/$addressId",
-        options: Options(headers: {
-          "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Address deleted successfully")),
-        );
-        _fetchAddresses(); // Refresh the list
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to delete address")),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
-      );
-    }
   }
 }

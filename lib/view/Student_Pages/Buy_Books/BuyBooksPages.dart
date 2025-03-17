@@ -399,7 +399,7 @@ class _BookItemsListState extends State<BookItemsList> {
 
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.all(8.w),
+        padding: EdgeInsets.all(10.w),
         child: GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

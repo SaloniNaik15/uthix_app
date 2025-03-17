@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CouponsScreen extends StatefulWidget {
   const CouponsScreen({super.key});
@@ -13,22 +15,33 @@ class _CouponsScreenState extends State<CouponsScreen> {
   int selectedTab = 0;
   List<String> tabs = ["Trending", "Discount", "Expiring"];
   List<dynamic> coupons = [];
+  String? _authToken;
 
   @override
   void initState() {
     super.initState();
-    fetchCoupons();
+    loadAuthToken().then((_) => fetchCoupons());
+  }
+
+  Future<void> loadAuthToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    setState(() {
+      _authToken = token;
+    });
   }
 
   Future<void> fetchCoupons() async {
     const String apiUrl = "https://admin.uthix.com/api/manage-coupon";
-    const String token = "9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64"; // Your API token
-
+    if (_authToken == null || _authToken!.isEmpty) {
+      print("Auth token is missing");
+      return;
+    }
     try {
       final response = await Dio().get(
         apiUrl,
         options: Options(
-          headers: {"Authorization": "Bearer $token"}, // Include Token
+          headers: {"Authorization": "Bearer $_authToken"},
         ),
       );
 
@@ -46,60 +59,62 @@ class _CouponsScreenState extends State<CouponsScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(100.0),
-          child: Stack(
-            children: [
-              AppBar(
-                backgroundColor: Colors.white,
-                elevation: 0,
-                leading: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back_ios_outlined,
-                    color: Colors.black,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100.h),
+        child: Stack(
+          children: [
+            AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_outlined,
+                  color: Colors.black,
+                  size: 20.sp,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+            Positioned(
+              top: 100.h,
+              left: 20.w,
+              child: Text(
+                "Coupons",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18.sp,
                 ),
               ),
-              const Positioned(
-                  top: 100,
-                  left: 20,
-                  child: Text(
-                    "Coupons",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      fontFamily: 'Urbanist',
-                    ),
-                  )),
-              Positioned(
-                top: 40,
-                right: -10,
-                child: Image.asset(
-                  'assets/Student_Home_icons/student_cupon.png',
-                  width: 80,
-                  height: 80,
-                ),
+            ),
+            Positioned(
+              top: 40.h,
+              right: -10.w,
+              child: Image.asset(
+                'assets/Student_Home_icons/student_cupon.png',
+                width: 90.w,
+                height: 90.h,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        body: Container(
-          padding: const EdgeInsets.only(top: 2),
-          color: const Color(0xFFEFEFEF),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                height: 60,
+      ),
+      body: Container(
+        padding: EdgeInsets.only(top: 2.h),
+        color: const Color(0xFFEFEFEF),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                height: 60.h,
                 color: Colors.white,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -110,28 +125,29 @@ class _CouponsScreenState extends State<CouponsScreen> {
                           selectedTab = index;
                         });
                       },
-                      child: SingleChildScrollView(
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 5),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            border: Border.all(
-                                color: selectedTab == index
-                                    ? const Color(0xFF2B5C74)
-                                    : Colors.grey),
-                            borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 5.w),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 30.w, vertical: 8.h),
+                        decoration: BoxDecoration(
+                          color: selectedTab == index
+                              ? const Color(0xFF2B5C74)
+                              : Colors.transparent,
+                          border: Border.all(
+                            color: selectedTab == index
+                                ? const Color(0xFF2B5C74)
+                                : Colors.grey,
                           ),
-                          child: Text(
-                            tabs[index],
-                            style: TextStyle(
-                              color: selectedTab == index
-                                  ? const Color(0xFF2B5C74)
-                                  : Colors.grey,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Urbanist',
-                            ),
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        child: Text(
+                          tabs[index],
+                          style: TextStyle(
+                            color: selectedTab == index
+                                ? Colors.white
+                                : Colors.grey,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14.sp,
                           ),
                         ),
                       ),
@@ -139,18 +155,20 @@ class _CouponsScreenState extends State<CouponsScreen> {
                   }),
                 ),
               ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: coupons.length,
-                  itemBuilder: (context, index) {
-                    return CouponCard(coupon: coupons[index]);
-                  },
-                ),
+            ),
+            SizedBox(height: 10.h),
+            Expanded(
+              child: ListView.builder(
+                itemCount: coupons.length,
+                itemBuilder: (context, index) {
+                  return CouponCard(coupon: coupons[index]);
+                },
               ),
-            ],
-          ),
-        ));
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -163,10 +181,10 @@ class CouponCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Colors.white,
-      margin: const EdgeInsets.all(10),
+      margin: EdgeInsets.all(8.w),
       elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.all(15.0),
+        padding: EdgeInsets.all(15.w),
         child: IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,71 +192,69 @@ class CouponCard extends StatelessWidget {
               ClipRRect(
                 child: Image.asset(
                   "assets/Student_Home_icons/couponBook.png",
-                  width: 100,
-                  height: 120,
+                  width: 100.w,
+                  height: 120.h,
                   fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(width: 20),
+              SizedBox(width: 20.w),
               const DottedDividerWithIcon(
-                  height: double.infinity, color: Colors.grey),
-              const SizedBox(width: 20),
+                height: 90, // default value, will be scaled inside widget if needed
+                color: Colors.grey,
+              ),
+              SizedBox(width: 20.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "${coupon["discount_value"]}% off ",
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: TextStyle(
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Urbanist',
                       ),
                     ),
-                    const SizedBox(height: 5),
+                    SizedBox(height: 5.h),
                     Row(
                       children: [
                         Text(
                           "Code: ${coupon["code"]} ",
-                          style: const TextStyle(
-                            fontSize: 14,
+                          style: TextStyle(
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'Urbanist',
                           ),
                         ),
                         IconButton(
                           onPressed: () {},
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.copy,
                             color: Colors.grey,
-                            size: 20,
+                            size: 20.sp,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 5),
+                    SizedBox(height: 5.h),
                     Text(
                       "Expiry: ${coupon["expiration_date"]}",
-                      style: const TextStyle(
-                        fontSize: 14,
+                      style: TextStyle(
+                        fontSize: 14.sp,
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Urbanist',
                       ),
                     ),
-                    const SizedBox(height: 5),
+                    SizedBox(height: 5.h),
                     TextButton(
                       onPressed: () {},
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
-                        minimumSize: const Size(0, 30),
+                        minimumSize: Size(0, 30.h),
                       ),
-                      child: const Text(
+                      child: Text(
                         "View Products",
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           color: Colors.grey,
-                          fontFamily: 'Urbanist',
                         ),
                       ),
                     ),
@@ -272,17 +288,17 @@ class DottedDividerWithIcon extends StatelessWidget {
       children: [
         for (int i = 0; i < 8; i++)
           Container(
-            width: 2,
-            height: 5,
-            margin: const EdgeInsets.symmetric(vertical: 2),
+            width: 2.w,
+            height: 5.h,
+            margin: EdgeInsets.symmetric(vertical: 2.h),
             color: color,
           ),
-        Icon(icon, color: color, size: 20),
+        Icon(icon, color: color, size: 20.sp),
         for (int i = 0; i < 8; i++)
           Container(
-            width: 2,
-            height: 5,
-            margin: const EdgeInsets.symmetric(vertical: 2),
+            width: 2.w,
+            height: 5.h,
+            margin: EdgeInsets.symmetric(vertical: 2.h),
             color: color,
           ),
       ],
