@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_string_interpolations, deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -31,6 +32,7 @@ class _StudCalenderState extends State<StudCalender> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(70),
         child: AppBar(
@@ -39,7 +41,7 @@ class _StudCalenderState extends State<StudCalender> {
           title: Text(
             "Calendar",
             style: GoogleFonts.urbanist(
-              fontSize: 20,
+              fontSize: 20.sp,
               fontWeight: FontWeight.w600,
               color: Colors.white,
             ),
@@ -48,8 +50,8 @@ class _StudCalenderState extends State<StudCalender> {
           leading: Padding(
             padding: const EdgeInsets.only(left: 20),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_outlined,
-                  size: 25, color: Colors.white),
+              icon:  Icon(Icons.arrow_back_ios_outlined,
+                  size: 25.sp, color: Colors.white),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -60,7 +62,7 @@ class _StudCalenderState extends State<StudCalender> {
               padding: const EdgeInsets.only(right: 20),
               child: CircleAvatar(
                 backgroundColor: Colors.white,
-                radius: 22.5,
+                radius: 22.5.r,
                 child: ClipOval(
                   child: Image.asset(
                     "assets/login/profile.jpeg",
@@ -77,8 +79,8 @@ class _StudCalenderState extends State<StudCalender> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(
-            height: 25,
+           SizedBox(
+            height: 15.h,
           ),
           Padding(
             padding: const EdgeInsets.only(left: 15),
@@ -91,52 +93,54 @@ class _StudCalenderState extends State<StudCalender> {
               ),
             ),
           ),
-          const SizedBox(height: 50),
-          Padding(
-            padding: const EdgeInsets.only(left: 10, right: 10),
-            child: Container(
-              height: 450,
-              width: 400,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(
-                    color: const Color.fromRGBO(232, 232, 232, 1), width: 1),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: Column(
-                children: [
-                  // Month Navigation Bar with Selected Date
-                  SizedBox(
-                    height: 80,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_left),
-                          onPressed: () => _changeMonth(-1),
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              DateFormat('MMMM yyyy ,d').format(_focusedDay),
-                              style: GoogleFonts.urbanist(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
+           SizedBox(height: 20.h),
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: Container(
+                height: 450,
+                width: 400,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                      color: const Color.fromRGBO(232, 232, 232, 1), width: 1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Column(
+                  children: [
+                    // Month Navigation Bar with Selected Date
+                    SizedBox(
+                      height: 80,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.arrow_left),
+                            onPressed: () => _changeMonth(-1),
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                DateFormat('MMMM yyyy ,d').format(_focusedDay),
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.arrow_right),
-                          onPressed: () => _changeMonth(1),
-                        ),
-                      ],
+                            ],
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.arrow_right),
+                            onPressed: () => _changeMonth(1),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Expanded(child: _buildTable()),
-                ],
+                    Expanded(child: _buildTable()),
+                  ],
+                ),
               ),
             ),
           ),
@@ -162,7 +166,7 @@ class _StudCalenderState extends State<StudCalender> {
       TableRow(
         children: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
             .map((day) => Container(
-                  height: 50,
+                  height: 50.h,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: Colors.white,

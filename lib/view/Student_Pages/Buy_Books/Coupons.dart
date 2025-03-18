@@ -126,7 +126,7 @@ class _CouponsScreenState extends State<CouponsScreen> {
                         });
                       },
                       child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 5.w),
+                        margin: EdgeInsets.symmetric(horizontal: 5),
                         padding: EdgeInsets.symmetric(
                             horizontal: 30.w, vertical: 8.h),
                         decoration: BoxDecoration(
