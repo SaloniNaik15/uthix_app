@@ -1,0 +1,2 @@
+/Users/deepak/Desktop/project/uthix_app/android/app/.cxx/Debug/5h724g3s/x86/CMakeFiles/edit_cache.dir
+/Users/deepak/Desktop/project/uthix_app/android/app/.cxx/Debug/5h724g3s/x86/CMakeFiles/rebuild_cache.dir

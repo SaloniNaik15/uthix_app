@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Attendance extends StatefulWidget {
@@ -20,12 +21,12 @@ class _AttendanceState extends State<Attendance> {
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(43, 92, 116, 1),
         elevation: 0,
-        toolbarHeight: 90, // Sets the height of the AppBar
+        toolbarHeight: 90.h, // Sets the height of the AppBar
         leading: Padding(
           padding: const EdgeInsets.only(left: 20),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_outlined,
-                size: 25, color: Colors.white),
+            icon:  Icon(Icons.arrow_back_ios_outlined,
+                size: 25.sp, color: Colors.white),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -37,7 +38,7 @@ class _AttendanceState extends State<Attendance> {
             Text(
               "My Attendance",
               style: GoogleFonts.urbanist(
-                fontSize: 20,
+                fontSize: 20.sp,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
@@ -45,7 +46,7 @@ class _AttendanceState extends State<Attendance> {
             Text(
               "Total 9 classes attended out of 12",
               style: GoogleFonts.urbanist(
-                fontSize: 14,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
                 color: Colors.white,
               ),
@@ -58,11 +59,11 @@ class _AttendanceState extends State<Attendance> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 50),
+             SizedBox(height: 50.h),
             Text(
               "Mahima Mandal",
               style: GoogleFonts.urbanist(
-                fontSize: 16,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.w600,
                 color: const Color.fromRGBO(43, 92, 116, 1),
               ),
@@ -70,7 +71,7 @@ class _AttendanceState extends State<Attendance> {
             Text(
               "Class X B",
               style: GoogleFonts.urbanist(
-                fontSize: 16,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
                 color: const Color.fromRGBO(96, 95, 95, 1),
               ),
@@ -78,7 +79,7 @@ class _AttendanceState extends State<Attendance> {
             Text(
               "Delhi Public School, New Delhi",
               style: GoogleFonts.urbanist(
-                fontSize: 16,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
                 color: const Color.fromRGBO(96, 95, 95, 1),
               ),
@@ -86,12 +87,12 @@ class _AttendanceState extends State<Attendance> {
             Text(
               "+91 XXXXX XXXXX",
               style: GoogleFonts.urbanist(
-                fontSize: 16,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
                 color: const Color.fromRGBO(96, 95, 95, 1),
               ),
             ),
-            const SizedBox(height: 60),
+             SizedBox(height: 50.h),
             Center(
               child: Stack(
                 alignment: Alignment.center,
@@ -101,7 +102,7 @@ class _AttendanceState extends State<Attendance> {
                     height: 203,
                     child: CircularProgressIndicator(
                       value: 1,
-                      strokeWidth: 10,
+                      strokeWidth: 10.w,
                       valueColor: AlwaysStoppedAnimation<Color>(
                         const Color.fromARGB(255, 237, 235, 235),
                       ),
@@ -113,7 +114,7 @@ class _AttendanceState extends State<Attendance> {
                     height: 160,
                     child: CircularProgressIndicator(
                       value: progressValue,
-                      strokeWidth: 7,
+                      strokeWidth: 7.w,
                       backgroundColor: Colors.transparent,
                       valueColor: const AlwaysStoppedAnimation<Color>(
                         Color.fromRGBO(43, 92, 116, 1),
@@ -124,7 +125,7 @@ class _AttendanceState extends State<Attendance> {
                   Text(
                     "$percentage%",
                     style: GoogleFonts.urbanist(
-                      fontSize: 32,
+                      fontSize: 32.sp,
                       fontWeight: FontWeight.w600,
                       color: Color.fromRGBO(96, 95, 95, 1),
                     ),
@@ -132,18 +133,18 @@ class _AttendanceState extends State<Attendance> {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 30,
+             SizedBox(
+              height: 25.h,
             ),
             Text(
               "Need $percentage% to pass",
               style: GoogleFonts.urbanist(
-                fontSize: 14,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
                 color: Color.fromRGBO(0, 0, 0, 1),
               ),
             ),
-            const SizedBox(height: 90),
+             SizedBox(height: 90.h),
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 20),
               child: Row(
@@ -155,8 +156,8 @@ class _AttendanceState extends State<Attendance> {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 30,
+             SizedBox(
+              height: 30.h,
             )
           ],
         ),
@@ -167,8 +168,8 @@ class _AttendanceState extends State<Attendance> {
   // Helper widget for info cards
   Widget buildInfoCard(String title, String value) {
     return Container(
-      height: 102,
-      width: 102,
+      height: 102.h,
+      width: 102.w,
       decoration: BoxDecoration(
         color: const Color.fromRGBO(246, 246, 246, 1),
         border: Border.all(color: const Color.fromRGBO(217, 217, 217, 1)),
@@ -180,7 +181,7 @@ class _AttendanceState extends State<Attendance> {
           Text(
             title,
             style: GoogleFonts.urbanist(
-              fontSize: 16,
+              fontSize: 14.sp,
               fontWeight: FontWeight.w600,
               color: const Color.fromRGBO(96, 95, 95, 1),
             ),
@@ -188,7 +189,7 @@ class _AttendanceState extends State<Attendance> {
           Text(
             value,
             style: GoogleFonts.urbanist(
-              fontSize: 16,
+              fontSize: 14.sp,
               fontWeight: FontWeight.w600,
               color: const Color.fromRGBO(96, 95, 95, 1),
             ),

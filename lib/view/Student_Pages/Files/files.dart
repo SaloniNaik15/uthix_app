@@ -144,8 +144,11 @@ class _StudFilesState extends State<StudFiles> {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.menu, color: Colors.white, size: 25),
-          onPressed: () {},
+          icon: Icon(Icons.arrow_back_ios_outlined,
+              color: Colors.white, size: 20.sp),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
       body: Stack(
@@ -153,7 +156,7 @@ class _StudFilesState extends State<StudFiles> {
           Column(
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.w),
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -168,8 +171,8 @@ class _StudFilesState extends State<StudFiles> {
                     ),
                     SizedBox(height: 20.h),
                     Container(
-                      height: 37.h,
-                      width: 167.w,
+                      height: 40.h,
+                      width: 150.w,
                       decoration: BoxDecoration(
                         color: Color.fromRGBO(246, 246, 246, 1),
                         borderRadius: BorderRadius.circular(10.r),
@@ -178,13 +181,13 @@ class _StudFilesState extends State<StudFiles> {
                             width: 1.w),
                       ),
                       child: Padding(
-                        padding: EdgeInsets.all(8.w),
+                        padding: EdgeInsets.all(5.w),
                         child: Row(
                           children: [
                             Text(
                               "Selected Class",
                               style: GoogleFonts.urbanist(
-                                fontSize: 14.sp,
+                                fontSize: 12.sp,
                                 fontWeight: FontWeight.w600,
                                 color: const Color.fromRGBO(96, 95, 95, 1),
                               ),
@@ -198,35 +201,40 @@ class _StudFilesState extends State<StudFiles> {
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: List.generate(
                           sortOptions.length,
-                          (index) => GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedIndex = index;
-                              });
-                            },
-                            child: Container(
-                              height: 47.h,
-                              width: 110.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(38.r),
-                                color: selectedIndex == index
-                                    ? Color.fromRGBO(43, 92, 116, 1)
-                                    : Colors.transparent,
-                                border:
-                                    Border.all(color: Colors.grey, width: 2.w),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  sortOptions[index],
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w700,
-                                    color: selectedIndex == index
-                                        ? Colors.white
-                                        : Colors.grey,
+                          (index) => Padding(
+                            padding: EdgeInsets.only(
+                                right:
+                                    index < sortOptions.length - 1 ? 10.w : 0),
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedIndex = index;
+                                });
+                              },
+                              child: Container(
+                                height: 45.h,
+                                width: 100.w,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(38.r),
+                                  color: selectedIndex == index
+                                      ? Color.fromRGBO(43, 92, 116, 1)
+                                      : Colors.transparent,
+                                  border: Border.all(
+                                      color: Colors.grey, width: 2.w),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    sortOptions[index],
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: selectedIndex == index
+                                          ? Colors.white
+                                          : Colors.grey,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -234,7 +242,7 @@ class _StudFilesState extends State<StudFiles> {
                           ),
                         ),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -244,7 +252,7 @@ class _StudFilesState extends State<StudFiles> {
                   padding: EdgeInsets.only(
                       bottom: 70.h), // Prevents overlap with navbar
                   child: ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 30.w),
+                    padding: EdgeInsets.symmetric(horizontal: 10.w),
                     itemCount: files.length,
                     itemBuilder: (context, index) {
                       final file = files[index];

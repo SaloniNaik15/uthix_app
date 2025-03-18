@@ -88,6 +88,7 @@ class _MailidpageState extends State<Mailidpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
