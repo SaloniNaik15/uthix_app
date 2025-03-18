@@ -69,7 +69,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         options: Options(
           headers: {
             "Authorization":
-                "Bearer 15|px3G0ncBD1lRY4ZkPQSA96JqtQBdgSmmDlOReFFf183ba939"
+            "Bearer 15|px3G0ncBD1lRY4ZkPQSA96JqtQBdgSmmDlOReFFf183ba939"
           },
         ),
       );
@@ -364,10 +364,10 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                   // For the "Submission" card, set a fixed image height.
                   item["title"] == "Submission"
                       ? Image.asset(
-                          item["image"]!,
-                          height: 100,
-                          fit: BoxFit.contain,
-                        )
+                    item["image"]!,
+                    height: 100,
+                    fit: BoxFit.contain,
+                  )
                       : Image.asset(item["image"]!),
                   Text(
                     item["title"]!,
@@ -402,31 +402,6 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
               onPressed: () {
                 Navigator.pop(context);
               },
-            child: Container(
-              height: 40,
-              width: 40,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    offset: const Offset(0, 4),
-                    blurRadius: 8,
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    offset: const Offset(0, 0),
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_rounded, size: 25),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
             ),
           ),
           title: Text(
@@ -545,7 +520,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             isExpanded: true,
             hint: Text("Select Subject",
                 style:
-                    GoogleFonts.urbanist(fontSize: 14, color: Colors.black45)),
+                GoogleFonts.urbanist(fontSize: 14, color: Colors.black45)),
             items: items.map((subject) {
               return DropdownMenuItem<int>(
                 value: subject["id"],
