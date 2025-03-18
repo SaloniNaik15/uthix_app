@@ -41,12 +41,12 @@ class _ManageStoreDataState extends State<ManageStoreData> {
         ),
       ),
       body: SingleChildScrollView(
-
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/Seller_dashboard_images/ManageStoreBackground.png'),
+              image: AssetImage(
+                  'assets/Seller_dashboard_images/ManageStoreBackground.png'),
               fit: BoxFit.cover,
             ),
           ),
@@ -57,13 +57,17 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("My Stores", style: TextStyle(fontSize: 20, fontFamily: 'Urbanist')),
+                    const Text("My Stores",
+                        style: TextStyle(fontSize: 20, fontFamily: 'Urbanist')),
                     GestureDetector(
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const ManageOrders()), // Replace OrderPage with your actual page
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                const ManageOrders()), // Replace OrderPage with your actual page
                       ),
-                      child: Image.asset("assets/icons/orderIcon.png", height: 35),
+                      child:
+                          Image.asset("assets/icons/orderIcon.png", height: 35),
                     ),
                   ],
                 ),
@@ -93,7 +97,7 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                   children: [
                     const Text(
                       "Analytics",
-                      style: TextStyle(fontSize: 20,fontFamily: 'Urbanist'),
+                      style: TextStyle(fontSize: 20, fontFamily: 'Urbanist'),
                     ),
                     SizedBox(
                       width: 150,
@@ -141,12 +145,14 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                         child: const Center(
                           child: Column(
                             mainAxisSize:
-                            MainAxisSize.min, // Keeps content centered
+                                MainAxisSize.min, // Keeps content centered
                             children: [
                               Text(
                                 "Net Profit",
                                 style: TextStyle(
-                                    fontSize: 14, fontFamily: 'Urbanist',fontWeight: FontWeight.bold),
+                                    fontSize: 14,
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 5),
                               Row(
@@ -161,7 +167,9 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                                   Text(
                                     "60,000", // Example count (replace with dynamic value)
                                     style: TextStyle(
-                                        fontSize: 16,fontFamily: 'Urbanist', color: Colors.grey),
+                                        fontSize: 16,
+                                        fontFamily: 'Urbanist',
+                                        color: Colors.grey),
                                   ),
                                 ],
                               ),
@@ -185,19 +193,22 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                         child: const Center(
                           child: Column(
                             mainAxisSize:
-                            MainAxisSize.min, // Keeps content centered
+                                MainAxisSize.min, // Keeps content centered
                             children: [
                               Text(
                                 "Total Products",
                                 style: TextStyle(
                                     fontFamily: 'Urbanist',
-                                    fontSize: 14, fontWeight: FontWeight.bold),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 5), // Spacing between texts
                               Text(
                                 "200", // Example count (replace with dynamic value)
-                                style:
-                                TextStyle(fontSize: 16,fontFamily: 'Urbanist', color: Colors.grey),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'Urbanist',
+                                    color: Colors.grey),
                               ),
                             ],
                           ),
@@ -219,18 +230,22 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                         child: const Center(
                           child: Column(
                             mainAxisSize:
-                            MainAxisSize.min, // Keeps content centered
+                                MainAxisSize.min, // Keeps content centered
                             children: [
                               Text(
                                 "Visitors",
                                 style: TextStyle(
-                                    fontSize: 14,fontFamily: 'Urbanist', fontWeight: FontWeight.bold),
+                                    fontSize: 14,
+                                    fontFamily: 'Urbanist',
+                                    fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 5), // Spacing between texts
                               Text(
                                 "3.1k", // Example count (replace with dynamic value)
-                                style:
-                                TextStyle(fontSize: 16,fontFamily: 'Urbanist', color: Colors.grey),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'Urbanist',
+                                    color: Colors.grey),
                               ),
                             ],
                           ),
@@ -260,7 +275,9 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10,),
+                const SizedBox(
+                  height: 10,
+                ),
                 SizedBox(
                   height: 50,
                   width: 400,
@@ -278,27 +295,33 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                           horizontal: 15), // Adds padding inside the Card
                       child: Row(
                         mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween, // Spaces elements
+                            MainAxisAlignment.spaceBetween, // Spaces elements
                         children: [
                           // Start Text
                           Text(
                             "Quantity in Stock",
                             style: TextStyle(
-                                fontSize: 16, fontFamily: 'Urbanist',fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.bold),
                           ),
 
                           // End Texts
                           Text(
                             "181",
                             style: TextStyle(
-                                fontSize: 16, fontFamily: 'Urbanist',fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 10,),
+                const SizedBox(
+                  height: 10,
+                ),
                 SizedBox(
                   height: 50,
                   width: 400,
@@ -316,27 +339,33 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                           horizontal: 15), // Adds padding inside the Card
                       child: Row(
                         mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween, // Spaces elements
+                            MainAxisAlignment.spaceBetween, // Spaces elements
                         children: [
                           // Start Text
                           Text(
                             "Low Stock Items",
                             style: TextStyle(
-                                fontSize: 16, fontFamily: 'Urbanist',fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.bold),
                           ),
 
                           // End Texts
                           Text(
                             "20",
                             style: TextStyle(
-                                fontSize: 16,fontFamily: 'Urbanist', fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 10,),
+                const SizedBox(
+                  height: 10,
+                ),
                 SizedBox(
                   height: 50,
                   width: 400,
@@ -354,13 +383,15 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                           horizontal: 15), // Adds padding inside the Card
                       child: Row(
                         mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween, // Spaces elements
+                            MainAxisAlignment.spaceBetween, // Spaces elements
                         children: [
                           // Start Text
                           Text(
                             "Profit Margins",
                             style: TextStyle(
-                                fontSize: 16, fontFamily: 'Urbanist',fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.bold),
                           ),
 
                           // End Texts
@@ -388,7 +419,9 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10,),
+                const SizedBox(
+                  height: 10,
+                ),
                 SizedBox(
                   height: 50,
                   width: 400,
@@ -406,20 +439,24 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                           horizontal: 15), // Adds padding inside the Card
                       child: Row(
                         mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween, // Spaces elements
+                            MainAxisAlignment.spaceBetween, // Spaces elements
                         children: [
                           // Start Text
                           Text(
                             "Best Selling Items",
                             style: TextStyle(
-                                fontSize: 16, fontFamily: 'Urbanist',fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.bold),
                           ),
 
                           // End Texts
                           Text(
                             "50",
                             style: TextStyle(
-                                fontSize: 16,fontFamily: 'Urbanist', fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontFamily: 'Urbanist',
+                                fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -479,16 +516,14 @@ class MonthDropdownWidget extends StatelessWidget {
 
 Widget _buildStoreItem(String name, String description, String school) {
   return Card(
-      color: Color(0xFFE9EDF1),
+    color: Color(0xFFE9EDF1),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(10),
       side: const BorderSide(
         color: Color(0xFFD2D2D2),
         width: 1,
       ),
-
     ),
-
     child: Stack(
       children: [
         Padding(
