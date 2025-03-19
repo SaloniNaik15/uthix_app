@@ -70,7 +70,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         options: Options(
           headers: {
             "Authorization":
-            "Bearer 15|px3G0ncBD1lRY4ZkPQSA96JqtQBdgSmmDlOReFFf183ba939"
+                "Bearer 15|px3G0ncBD1lRY4ZkPQSA96JqtQBdgSmmDlOReFFf183ba939"
           },
         ),
       );
@@ -365,10 +365,10 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                   // For the "Submission" card, set a fixed image height.
                   item["title"] == "Submission"
                       ? Image.asset(
-                    item["image"]!,
-                    height: 100,
-                    fit: BoxFit.contain,
-                  )
+                          item["image"]!,
+                          height: 100,
+                          fit: BoxFit.contain,
+                        )
                       : Image.asset(item["image"]!),
                   Text(
                     item["title"]!,
@@ -521,7 +521,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             isExpanded: true,
             hint: Text("Select Subject",
                 style:
-                GoogleFonts.urbanist(fontSize: 14, color: Colors.black45)),
+                    GoogleFonts.urbanist(fontSize: 14, color: Colors.black45)),
             items: items.map((subject) {
               return DropdownMenuItem<int>(
                 value: subject["id"],
