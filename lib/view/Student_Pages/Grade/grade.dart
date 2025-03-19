@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:dio/dio.dart';
+import 'dart:developer';
 
 class GradeStudent extends StatefulWidget {
   const GradeStudent({super.key});
@@ -11,7 +13,45 @@ class GradeStudent extends StatefulWidget {
 }
 
 class _GradeStudentState extends State<GradeStudent> {
-  final Map<String, String> selectedGrades = {};
+  final Dio dio = Dio();
+  final Map<String, String> selectedGrades = {}; // Store selected grades
+  TextEditingController feedbackController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchGradeData();
+  }
+
+  Future<void> fetchGradeData() async {
+    try {
+      dio.options.headers = {
+        'Authorization':
+            'Bearer 191|bRbcNCjEmuOvrRN6tyyErtclry4DGis4x37UydmB95b746a0', // Replace with actual token
+        'Accept': 'application/json',
+      };
+
+      Response response = await dio.get('https://admin.uthix.com/api/grade/10');
+
+      log("API Response: ${response.data}"); // Log the response
+
+      if (response.statusCode == 200 && response.data["status"] == true) {
+        var gradeData = response.data["grade"];
+
+        setState(() {
+          feedbackController.text = gradeData["feedback_note"] ?? "";
+
+          for (var detail in gradeData["grade_details"]) {
+            selectedGrades[detail["criterion"]] = detail["grade"];
+          }
+        });
+      } else {
+        log("Failed to fetch grades");
+      }
+    } catch (e) {
+      log("Error fetching data: $e");
+    }
+  }
 
   Widget gradeRow(String criteria, List<String> ratings) {
     return Row(
@@ -19,14 +59,14 @@ class _GradeStudentState extends State<GradeStudent> {
       children: [
         Container(
           height: 39,
-          width: 86,
+          width: 100,
           alignment: Alignment.centerLeft,
           child: Text(
             criteria,
             style: GoogleFonts.urbanist(
               fontSize: 14,
               fontWeight: FontWeight.w400,
-              color: const Color.fromRGBO(0, 0, 0, 1),
+              color: Colors.black,
             ),
           ),
         ),
@@ -34,24 +74,19 @@ class _GradeStudentState extends State<GradeStudent> {
           GestureDetector(
             onTap: () {
               setState(() {
-                if (selectedGrades[criteria] == rating) {
-                  selectedGrades.remove(criteria);
-                } else {
-                  selectedGrades[criteria] = rating;
-                }
+                selectedGrades[criteria] = rating;
               });
             },
             child: Container(
               height: 34,
-              width: 87,
+              width: 90,
               decoration: BoxDecoration(
                 color: selectedGrades[criteria] == rating
-                    ? const Color.fromRGBO(43, 92, 116, 1)
-                    : const Color.fromRGBO(246, 246, 246, 1),
+                    ? Color.fromRGBO(
+                        43, 92, 116, 1) // Selected grade highlighted in green
+                    : Colors.grey[200], // Unselected in light grey
                 borderRadius: BorderRadius.circular(4),
-                border: Border.all(
-                  color: const Color.fromRGBO(175, 175, 175, 1),
-                ),
+                border: Border.all(color: Colors.grey),
               ),
               child: Center(
                 child: Text(
@@ -59,7 +94,7 @@ class _GradeStudentState extends State<GradeStudent> {
                   style: GoogleFonts.urbanist(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: const Color.fromRGBO(0, 0, 0, 1),
+                    color: Colors.black,
                   ),
                 ),
               ),
@@ -71,24 +106,17 @@ class _GradeStudentState extends State<GradeStudent> {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController feedbackController = TextEditingController();
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_outlined,
-            size: 25,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          icon: const Icon(Icons.arrow_back_ios_outlined, size: 25),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
+        padding: const EdgeInsets.all(10.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,19 +124,17 @@ class _GradeStudentState extends State<GradeStudent> {
               Text(
                 "Grading and Feedback",
                 style: GoogleFonts.urbanist(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: const Color.fromRGBO(96, 95, 95, 1),
-                ),
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black),
               ),
               const SizedBox(height: 5),
               Text(
                 "Please grade the work according to the following criterion",
                 style: GoogleFonts.urbanist(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w300,
-                  color: const Color.fromRGBO(96, 95, 95, 1),
-                ),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                    color: Colors.black54),
               ),
               const SizedBox(height: 40),
               gradeRow(
@@ -127,46 +153,32 @@ class _GradeStudentState extends State<GradeStudent> {
               gradeRow(
                   "Presentation Skills", ["Excellent", "Well Done", "Basic"]),
               const SizedBox(height: 30),
-              const Divider(
-                thickness: 2,
-                color: Color.fromRGBO(217, 217, 217, 1),
-              ),
+              const Divider(thickness: 2, color: Colors.grey),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: Row(
                   children: [
-                    const Icon(Icons.menu,
-                        color: Color.fromRGBO(96, 95, 95, 1)),
+                    const Icon(Icons.menu, color: Colors.black54),
                     const SizedBox(width: 8),
                     Expanded(
                       child: TextField(
                         controller: feedbackController,
                         keyboardType: TextInputType.text,
                         style: GoogleFonts.urbanist(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: const Color.fromRGBO(96, 95, 95, 1),
-                        ),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black),
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Feedback Note",
                           hintStyle: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: const Color.fromRGBO(96, 95, 95, 1),
-                          ),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black54),
                         ),
                       ),
                     ),
                   ],
-                ),
-              ),
-              Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in .",
-                style: GoogleFonts.urbanist(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w300,
-                  color: const Color.fromRGBO(96, 95, 95, 1),
                 ),
               ),
               const SizedBox(height: 30),
@@ -175,33 +187,28 @@ class _GradeStudentState extends State<GradeStudent> {
                   height: 42,
                   width: 170,
                   decoration: BoxDecoration(
-                    color: const Color.fromRGBO(255, 255, 255, 1),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
-                        color:
-                            Color.fromRGBO(0, 0, 0, 0.15), // rgba(0,0,0,0.15)
-                        blurRadius: 5, // Equivalent to 5px
-                        spreadRadius: 0, // Equivalent to 0px
-                        offset: Offset(0, 0), // Equivalent to 0px 0px
-                      ),
+                          color: Colors.black26,
+                          blurRadius: 5,
+                          spreadRadius: 0,
+                          offset: Offset(0, 0)),
                     ],
                   ),
                   child: Center(
                     child: Text(
                       "Leave a Comment",
                       style: GoogleFonts.urbanist(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: const Color.fromRGBO(96, 95, 95, 1),
-                      ),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              )
+              const SizedBox(height: 20),
             ],
           ),
         ),
