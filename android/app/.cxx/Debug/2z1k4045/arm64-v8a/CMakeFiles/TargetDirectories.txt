@@ -1,0 +1,2 @@
+S:/TrapigoInternship/trapigointernship/uthix_app/android/app/.cxx/Debug/2z1k4045/arm64-v8a/CMakeFiles/edit_cache.dir
+S:/TrapigoInternship/trapigointernship/uthix_app/android/app/.cxx/Debug/2z1k4045/arm64-v8a/CMakeFiles/rebuild_cache.dir
