@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uthix_app/view/homeRegistration/RoleSelection.dart';
 import 'package:uthix_app/view/login/main_combine.dart';
 import 'package:uthix_app/view/login/reset_password.dart';
 
@@ -137,7 +138,7 @@ class _EmailIdState extends State<EmailId> {
                             icon: const Icon(Icons.arrow_back_ios, size: 20),
                             onPressed: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => Registration()));
+                                  builder: (context) => Roleselection()));
                             },
                           ),
                           const SizedBox(height: 50),

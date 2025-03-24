@@ -7,7 +7,8 @@ import 'package:http/http.dart' as http;
 import 'package:uthix_app/view/homeRegistration/successPage.dart';
 
 class Mailidpage extends StatefulWidget {
-  const Mailidpage({super.key});
+  final String role;
+  const Mailidpage({super.key, required this.role});
 
   @override
   State<Mailidpage> createState() => _MailidpageState();
@@ -23,13 +24,10 @@ class _MailidpageState extends State<Mailidpage> {
   String? _selectedRole;
   bool ispassword = true;
   bool isconfirm = true;
-
-  final List<String> roles = ["seller", "instructor", "student"];
-
   @override
   void initState() {
     super.initState();
-    // _loadSavedData();
+    _selectedRole = widget.role;
   }
 
   Future<void> _registerUser() async {
@@ -57,11 +55,7 @@ class _MailidpageState extends State<Mailidpage> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
 
-        // SharedPreferences prefs = await SharedPreferences.getInstance();
-        // await prefs.setString("userToken", data["access_token"]);
-        // await prefs.setString("userName", data["user"]["name"]);
-        // await prefs.setString("userRole", data["user"]["role"]);
-        // await prefs.setString("userEmail", data["user"]["email"]);
+
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Registration Successful!")),
@@ -155,7 +149,7 @@ class _MailidpageState extends State<Mailidpage> {
                               setState(() => isconfirm = !isconfirm),
                         ),
                         const SizedBox(height: 20),
-                        _buildRoleDropdown(),
+                        _buildReadOnlyField(label: "Selected Role", value: _selectedRole ?? ""),
                       ],
                     ),
                   ),
@@ -231,34 +225,25 @@ class _MailidpageState extends State<Mailidpage> {
       ),
     );
   }
-
-  Widget _buildRoleDropdown() {
-    return DropdownButtonFormField<String>(
-      value: _selectedRole,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: const Color(0xFFF9F9F9), // Background color
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(50),
-          borderSide: const BorderSide(
-              color: Color(0xFFD9D9D9)), // Default border color
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(50),
-          borderSide: const BorderSide(
-              color: Color(0xFFD9D9D9), width: 1), // Normal border color
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(50),
-          borderSide: const BorderSide(
-              color: Color(0xFFD2D2D2), width: 2), // Border color when selected
+  Widget _buildReadOnlyField({required String label, required String value}) {
+    return Container(
+      height: 50,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(246, 246, 246, 1),
+        borderRadius: BorderRadius.circular(50),
+        border: Border.all(color: const Color.fromRGBO(210, 210, 210, 1)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      alignment: Alignment.centerLeft,
+      child: Text(
+        value,
+        style: GoogleFonts.urbanist(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Colors.black87,
         ),
       ),
-      hint: const Text("Select Your Role"),
-      items: roles
-          .map((role) => DropdownMenuItem(value: role, child: Text(role)))
-          .toList(),
-      onChanged: (newValue) => setState(() => _selectedRole = newValue),
     );
   }
 }

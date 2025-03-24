@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:uthix_app/view/homeRegistration/RoleSelection.dart';
 import 'package:uthix_app/view/homeRegistration/mailIdPage.dart';
 import 'package:uthix_app/view/login/start_login.dart';
 
 class Registration extends StatefulWidget {
-  const Registration({super.key});
+  const Registration({super.key,});
 
   @override
   State<Registration> createState() => _RegistrationState();
@@ -86,7 +87,7 @@ class _RegistrationState extends State<Registration> {
                             onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => Mailidpage(),
+                                builder: (context) => Roleselection(),
                               ),
                             ),
                             iconPath: "assets/registration/gmail.png",
