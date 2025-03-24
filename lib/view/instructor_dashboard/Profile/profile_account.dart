@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/modal/nav_items.dart';
 
@@ -12,6 +12,7 @@ import 'package:uthix_app/view/instructor_dashboard/Profile/instructor_helpdesk.
 import 'package:uthix_app/view/instructor_dashboard/Profile/instructor_manage.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/instructor_settings.dart';
 
+import '../../../Logout.dart';
 import '../../login/start_login.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -41,17 +42,6 @@ class _ProfileAccountState extends State<ProfileAccount> {
         });
       });
     }
-  }
-
-  Future<void> logoutUser(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_token');
-    await prefs.remove('user_role');
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => StartLogin()),
-    );
   }
 
   final List<Map<String, String>> menuItems = [
@@ -146,12 +136,12 @@ class _ProfileAccountState extends State<ProfileAccount> {
                   ],
                 ),
               ),
-              SizedBox(height: 50.h),
+              SizedBox(height: 40.h),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                padding: EdgeInsets.symmetric(horizontal: 10.w),
                 child: Container(
                   height: 370.h,
-                  width: double.infinity,
+                  width: MediaQuery.sizeOf(context).width,
                   decoration: BoxDecoration(
                     color: Color(0xFFFCFCFC),
                     border: Border.all(color: Color(0xFFD9D9D9)),
@@ -235,33 +225,32 @@ class _ProfileAccountState extends State<ProfileAccount> {
                   ),
                 ),
               ),
-              SizedBox(height: 70.h),
+              SizedBox(height: 30.h),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 35.w),
+                padding: const EdgeInsets.all(10),
                 child: SizedBox(
                   height: 50.h,
-                  width: double.infinity,
+                  width: MediaQuery.sizeOf(context).width,
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.red, width: 1.w),
+                      side: const BorderSide(color: Colors.red, width: 1),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5.r)),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
                     ),
                     onPressed: () {
                       logoutUser(context);
                     },
-                    child: Text(
+                    child: const Text(
                       "Log out",
                       style: TextStyle(
                           color: Colors.red,
                           fontFamily: "Urbanist",
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16.sp),
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 20.h),
             ],
           ),
         );
