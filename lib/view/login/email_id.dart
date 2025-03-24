@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +11,7 @@ import 'package:uthix_app/view/login/reset_password.dart';
 // Role-based navigation
 import '../Ecommerce/e_commerce.dart'; // Student Screen
 import '../Seller_dashboard/dashboard.dart'; // Seller Screen
+import '../homeRegistration/registration.dart';
 import '../instructor_dashboard/Dashboard/instructor_dashboard.dart'; // Instructor Screen
 
 class EmailId extends StatefulWidget {
@@ -37,21 +39,27 @@ class _EmailIdState extends State<EmailId> {
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("Please enter email and password",
-                style: GoogleFonts.urbanist())),
+          content: Text(
+            "Please enter email and password",
+            style: GoogleFonts.urbanist(),
+          ),
+        ),
       );
       return;
     }
 
     try {
-      final response = await http.post(
-        Uri.parse('https://admin.uthix.com/api/login'),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "password": password}),
+      final Dio dio = Dio();
+
+      final response = await dio.post(
+        'https://admin.uthix.com/api/login',
+        options: Options(headers: {"Content-Type": "application/json"}),
+        data: {"email": email, "password": password},
       );
 
-      final data = jsonDecode(response.body);
-      log("API Response: $data");
+      log("API Response: ${response.data}");
+
+      final data = response.data;
 
       if (response.statusCode == 200 && data.containsKey('access_token')) {
         String token = data['access_token'];
@@ -74,24 +82,31 @@ class _EmailIdState extends State<EmailId> {
         }
 
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => nextScreen));
+          context,
+          MaterialPageRoute(builder: (context) => nextScreen),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(data['message'] ?? "Invalid email or password",
-                  style: GoogleFonts.urbanist())),
+            content: Text(
+              data['message'] ?? "Invalid email or password",
+              style: GoogleFonts.urbanist(),
+            ),
+          ),
         );
       }
     } catch (e) {
       log("Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("An error occurred. Please try again.",
-                style: GoogleFonts.urbanist())),
+          content: Text(
+            "An error occurred. Please try again.",
+            style: GoogleFonts.urbanist(),
+          ),
+        ),
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,7 +136,8 @@ class _EmailIdState extends State<EmailId> {
                           IconButton(
                             icon: const Icon(Icons.arrow_back_ios, size: 20),
                             onPressed: () {
-                              Navigator.pop(context);
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => Registration()));
                             },
                           ),
                           const SizedBox(height: 50),

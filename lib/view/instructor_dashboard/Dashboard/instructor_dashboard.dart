@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -269,12 +270,12 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         ),
         const SizedBox(height: 20),
         Padding(
-          padding: const EdgeInsets.only(left: 40),
+          padding: const EdgeInsets.only(left: 35),
           child: Row(
             children: [
               Container(
-                height: 45,
-                width: 45,
+                height: 40,
+                width: 40,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(19),
@@ -296,7 +297,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                       fit: BoxFit.cover),
                 ),
               ),
-              const SizedBox(width: 20),
+               SizedBox(width: 20.w),
               Text(
                 "Hii Surnamika",
                 style: GoogleFonts.urbanist(
@@ -308,7 +309,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             ],
           ),
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 20),
       ],
     );
   }
@@ -390,66 +391,66 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
+    return WillPopScope(
+      onWillPop: () async {
+        SystemNavigator.pop();
+        return false;
+      },
+      child: Scaffold(
           backgroundColor: Colors.white,
-          elevation: 0,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 20),
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_outlined, size: 25),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-          title: Text(
-            "Instructor Dashboard",
-            style: GoogleFonts.urbanist(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: const Color.fromRGBO(95, 95, 95, 1),
-            ),
-          ),
-          centerTitle: true,
-        ),
-        body: Stack(
-          children: [
-            /// Background Image Covering Full Screen
-            Positioned.fill(
-              top: 100,
-              child: Image.asset(
-                "assets/instructor/background.png",
-                fit: BoxFit.cover,
+          appBar: AppBar(
+            toolbarHeight: 30.h,
+            backgroundColor: Colors.white,
+
+            title: Text(
+              "Instructor Dashboard",
+              style: GoogleFonts.urbanist(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w600,
+                color: const Color.fromRGBO(95, 95, 95, 1),
               ),
             ),
-
-            /// Scrollable Dashboard Content
-            Column(
-              children: [
-                _buildHeader(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    physics: BouncingScrollPhysics(),
-                    child: _buildDashboardGrid(),
-                  ),
+            centerTitle: true,
+            automaticallyImplyLeading: false, // ✅ Removes back arrow
+            elevation: 0,
+          ),
+          body: Stack(
+            children: [
+              /// Background Image Covering Full Screen
+              Positioned.fill(
+                top: 100,
+                child: Image.asset(
+                  "assets/instructor/background.png",
+                  fit: BoxFit.cover,
                 ),
-              ],
-            ),
-
-            /// Fixed Bottom Navigation Bar
-            Positioned(
-              bottom: 15.h,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Navbar(
-                    onItemTapped: onItemTapped, selectedIndex: selectedIndex),
               ),
-            ),
-          ],
-        ));
+      
+              /// Scrollable Dashboard Content
+              Column(
+                children: [
+                  _buildHeader(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: BouncingScrollPhysics(),
+                      child: _buildDashboardGrid(),
+                    ),
+                  ),
+                ],
+              ),
+      
+              /// Fixed Bottom Navigation Bar
+              Positioned(
+                bottom: 15.h,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Navbar(
+                      onItemTapped: onItemTapped, selectedIndex: selectedIndex),
+                ),
+              ),
+            ],
+          )),
+    );
   }
 
   // Reusable text field builder.
@@ -461,7 +462,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         Text(
           label,
           style: GoogleFonts.inter(
-              fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black54),
+              fontSize: 16.sp, fontWeight: FontWeight.w400, color: Colors.black54),
         ),
         const SizedBox(height: 5),
         Container(
