@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
 import 'package:uthix_app/view/homeRegistration/otpPage.dart';
 import 'package:uthix_app/view/login/main_combine.dart';
 
@@ -262,7 +261,8 @@ class _PhoneOtpState extends State<PhoneOtp> {
                     child: GestureDetector(
                       onTap: () {
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => HomePages()),
+                          MaterialPageRoute(
+                              builder: (context) => const MainCombine()),
                         );
                       },
                       child: Container(
