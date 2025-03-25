@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
+import '../../../Logout.dart';
 import '../../login/start_login.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -34,92 +34,6 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
       accessLoginToken = token;
     });
   }
-
-  Future<void> logoutUser() async {
-    final url = Uri.parse("https://admin.uthix.com/api/logout");
-
-    try {
-      final prefs = await SharedPreferences.getInstance();
-
-      final response = await http.post(
-        url,
-        headers: {
-          "Authorization": "Bearer $accessLoginToken",
-          "Content-Type": "application/json",
-        },
-      );
-
-      if (response.statusCode == 200) {
-        log("Logout successful");
-
-        // Clear shared preferences
-        await prefs.clear();
-        log("SharedPreferences cleared successfully");
-
-        // Ensure widget is still mounted before navigating
-        if (!context.mounted) return;
-
-        // Navigate to StartLogin screen
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => StartLogin()),
-        );
-      } else {
-        log("Logout failed: ${response.body}");
-      }
-    } catch (e) {
-      log("Error logging out: $e");
-    }
-  }
-
-  // Logout Confirmation Dialog
-  void showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          title: Text(
-            "Logout",
-            style: TextStyle(fontSize: 18.sp),
-          ),
-          content: Text(
-            "Are you sure you want to logout?",
-            style: TextStyle(fontSize: 16.sp),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop(); // Close dialog
-              },
-              child: Text(
-                "Cancel",
-                style: TextStyle(fontSize: 16.sp),
-              ),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(dialogContext).pop(); // Close dialog
-
-                // Clear token and logout
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                await prefs.clear();
-                log("SharedPreferences cleared successfully");
-
-                // Call the logout function to handle API logout
-                logoutUser();
-              },
-              child: Text(
-                "Logout",
-                style: TextStyle(fontSize: 16.sp, color: Colors.red),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -187,54 +101,31 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
               SizedBox(height: 30.h),
 
               // Logout Button with Popup
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        showLogoutDialog(context); // Show confirmation popup
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                          color: Colors.red,
-                          width: 1.w,
-                        ),
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
-                      ),
-                      child: Text(
-                        "Log out",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 14.sp,
-                        ),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: SizedBox(
+                  height: 50,
+                  width: MediaQuery.sizeOf(context).width,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.red, width: 1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {},
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(
-                          color: Colors.black, width: 1.w,),
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
-                      ),
-                      child: Text(
-                        "Add Account",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14.sp,
-                        ),
-                      ),
+                    onPressed: () {
+                      logoutUser(context);
+                    },
+                    child: const Text(
+                      "Log out",
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontFamily: "Urbanist",
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
-                ],
+                ),
               ),
-
             ],
           ),
         ),

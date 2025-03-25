@@ -10,6 +10,7 @@ import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
 import 'package:uthix_app/view/Student_Pages/Student_Chat/stud_chat.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../Logout.dart';
 import '../../homeRegistration/registration.dart';
 import '../Buy_Books/Coupons.dart';
 import '../Buy_Books/Wishlist.dart';
@@ -48,18 +49,6 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
       });
     }
   }
-
-  Future<void> logoutUser(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_token');
-    await prefs.remove('user_role');
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => Registration()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

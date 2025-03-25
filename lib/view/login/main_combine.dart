@@ -26,12 +26,11 @@ class _MainCombineState extends State<MainCombine> {
                     fit: BoxFit.cover),
               ),
             ),
-        
             Center(
               child: Column(
                 // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                   SizedBox(
+                  SizedBox(
                     height: 200.h,
                   ),
                   GestureDetector(
