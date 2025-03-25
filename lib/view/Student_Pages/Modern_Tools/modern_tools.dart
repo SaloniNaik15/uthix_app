@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/yourc_clasroom.dart';
 import 'package:uthix_app/view/instructor_dashboard/calender/calender.dart';
@@ -146,7 +147,8 @@ class _ModernToolsState extends State<ModernTools> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => BuyTextBooks()),
+                                    builder: (context) =>
+                                        UnderConstructionScreen()),
                               );
                               break;
                             case "MY CLASSES":

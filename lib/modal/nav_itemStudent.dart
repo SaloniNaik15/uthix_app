@@ -10,7 +10,11 @@ import 'package:uthix_app/view/Student_Pages/Student_Chat/stud_chat.dart';
 final List<Map<String, dynamic>> navStudItems = [
   {"icon": Icons.home_outlined, "title": "Home", "page": HomePages()},
   {"icon": Icons.folder_open_outlined, "title": "Files", "page": StudFiles()},
-  {"icon": Icons.find_in_page, "title": "Find", "page": ECommerce()},
+  {
+    "icon": Icons.find_in_page,
+    "title": "Find",
+    "page": UnderConstructionScreen()
+  },
   {
     "icon": Icons.chat_outlined,
     "title": "Chat",
