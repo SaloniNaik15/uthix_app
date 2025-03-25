@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
+import 'package:uthix_app/view/homeRegistration/forgot1.dart';
 import 'package:uthix_app/view/homeRegistration/mailIdPage.dart';
-import 'package:uthix_app/view/homeRegistration/new_login.dart';
+import 'package:uthix_app/view/homeRegistration/registration.dart';
 import 'package:uthix_app/view/homeRegistration/successfulregister.dart';
 import 'package:uthix_app/view/login/start_login.dart';
 
-class Registration extends StatefulWidget {
-  const Registration({super.key});
+class NewLogin extends StatefulWidget {
+  const NewLogin({super.key});
 
   @override
-  State<Registration> createState() => _RegistrationState();
+  State<NewLogin> createState() => _NewLoginState();
 }
 
-class _RegistrationState extends State<Registration> {
+class _NewLoginState extends State<NewLogin> {
   final TextEditingController _emailIdController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool ispassword = true;
@@ -53,35 +55,22 @@ class _RegistrationState extends State<Registration> {
                       ),
                       SizedBox(height: 50.h),
                       Text(
-                        "Welcome to UTHIX",
+                        "Welcome  BACK!",
                         style: GoogleFonts.urbanist(
-                          fontSize: 28.sp,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 22.sp,
+                          fontWeight: FontWeight.w600,
                           color: Colors.black,
                         ),
                       ),
                       SizedBox(height: 25.h),
                       Text(
-                        "Be part of something great. Register now",
+                        "Login to your account",
                         style: GoogleFonts.urbanist(
                             fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
                             color: Colors.black),
                       ),
                       SizedBox(height: 20.h),
-                      SizedBox(
-                        width: 225.w,
-                        child: Text(
-                          "You are just a few minutes away to access seamless online learning",
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
-                            color: Color.fromRGBO(96, 95, 95, 1),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      SizedBox(height: 30.h),
 
                       // Continue with Mail ID Button
                       const SizedBox(height: 20),
@@ -92,24 +81,38 @@ class _RegistrationState extends State<Registration> {
                       _buildPasswordField(),
                       const SizedBox(height: 20),
 
-                      SizedBox(height: 10.h),
-                      Text(
-                        "Already have an account?",
-                        style: GoogleFonts.urbanist(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Color.fromRGBO(96, 95, 95, 1),
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
-
-                      // Login Button
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Successfulregister(),
+                              builder: (context) => Forgot1(),
+                            ),
+                          );
+                        },
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 30.w),
+                            child: Text(
+                              "Forgot Password",
+                              style: GoogleFonts.urbanist(
+                                fontSize: 12.sp,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.blue,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 25.h),
+
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomePages(),
                             ),
                           );
                         },
@@ -122,7 +125,7 @@ class _RegistrationState extends State<Registration> {
                           ),
                           child: Center(
                             child: Text(
-                              "Register",
+                              "Login",
                               style: GoogleFonts.urbanist(
                                 fontSize: 20.sp,
                                 fontWeight: FontWeight.w400,
@@ -150,13 +153,13 @@ class _RegistrationState extends State<Registration> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => NewLogin(),
+                              builder: (context) => Registration(),
                             ),
                           );
                         },
                         child: Text.rich(
                           TextSpan(
-                            text: "Already have an account? ",
+                            text: "Don't have an account? ",
                             style: GoogleFonts.urbanist(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w400,
@@ -164,7 +167,7 @@ class _RegistrationState extends State<Registration> {
                             ),
                             children: [
                               TextSpan(
-                                text: "Login",
+                                text: "Register",
                                 style: GoogleFonts.urbanist(
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.w400,
@@ -179,7 +182,7 @@ class _RegistrationState extends State<Registration> {
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      SizedBox(height: 25.h),
+                      SizedBox(height: 55.h),
                     ],
                   ),
                 ),

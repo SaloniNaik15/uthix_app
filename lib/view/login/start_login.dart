@@ -31,7 +31,7 @@ class _StartLoginState extends State<StartLogin> {
             Center(
               child: Column(
                 children: [
-                   SizedBox(
+                  SizedBox(
                     height: 150.h,
                   ),
                   Image.asset(
@@ -40,7 +40,7 @@ class _StartLoginState extends State<StartLogin> {
                     height: 130.h,
                     fit: BoxFit.cover,
                   ),
-                   SizedBox(
+                  SizedBox(
                     height: 38.h,
                   ),
                   Text(
@@ -51,83 +51,11 @@ class _StartLoginState extends State<StartLogin> {
                       color: Color.fromRGBO(0, 0, 0, 1),
                     ),
                   ),
-                   SizedBox(
+                  SizedBox(
                     height: 38.h,
                   ),
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     Navigator.push(context,
-                  //         MaterialPageRoute(builder: (context) => MainCombine()));
-                  //   },
-                  //   child: Container(
-                  //     height: 50,
-                  //     width: 277,
-                  //     decoration: BoxDecoration(
-                  //       border: Border.all(
-                  //         color: Color.fromRGBO(175, 175, 175, 1),
-                  //       ),
-                  //       borderRadius: BorderRadius.circular(25),
-                  //     ),
-                  //     child: Padding(
-                  //       padding: const EdgeInsets.all(5),
-                  //       child: Row(
-                  //         children: [
-                  //           Image.asset("assets/registration/google.png"),
-                  //           const SizedBox(
-                  //             width: 30,
-                  //           ),
-                  //           Text(
-                  //             "Continue with Google",
-                  //             style: GoogleFonts.urbanist(
-                  //               fontSize: 16,
-                  //               fontWeight: FontWeight.w400,
-                  //               color: Color.fromRGBO(175, 175, 175, 1),
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                  // const SizedBox(
-                  //   height: 10,
-                  // ),
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     Navigator.push(context,
-                  //         MaterialPageRoute(builder: (context) => MainCombine()));
-                  //   },
-                  //   child: Container(
-                  //     height: 50,
-                  //     width: 277,
-                  //     decoration: BoxDecoration(
-                  //       border: Border.all(
-                  //         color: Color.fromRGBO(175, 175, 175, 1),
-                  //       ),
-                  //       borderRadius: BorderRadius.circular(25),
-                  //     ),
-                  //     child: Padding(
-                  //       padding: const EdgeInsets.all(5),
-                  //       child: Row(
-                  //         children: [
-                  //           Image.asset("assets/registration/facebook.png"),
-                  //           const SizedBox(
-                  //             width: 30,
-                  //           ),
-                  //           Text(
-                  //             "Continue with Facebook",
-                  //             style: GoogleFonts.urbanist(
-                  //               fontSize: 16,
-                  //               fontWeight: FontWeight.w400,
-                  //               color: Color.fromRGBO(175, 175, 175, 1),
-                  //             ),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
-                   SizedBox(
+
+                  SizedBox(
                     height: 10.h,
                   ),
                   GestureDetector(
@@ -146,15 +74,15 @@ class _StartLoginState extends State<StartLogin> {
                       ),
                       child: Center(
                         child: Padding(
-                          padding:  EdgeInsets.symmetric(horizontal: 15.w),
+                          padding: EdgeInsets.symmetric(horizontal: 15.w),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment
                                 .center, // Aligns content to the center
                             children: [
                               Image.asset("assets/registration/gmail.png"),
                               SizedBox(
-                                  width:
-                                      15.w), // Adds space between the image and text
+                                  width: 15
+                                      .w), // Adds space between the image and text
                               Text(
                                 "Continue with Mail Id",
                                 style: GoogleFonts.urbanist(
@@ -207,7 +135,7 @@ class _StartLoginState extends State<StartLogin> {
                   //     ),
                   //   ),
                   // ),
-                   SizedBox(
+                  SizedBox(
                     height: 100.h,
                   ),
                   GestureDetector(
