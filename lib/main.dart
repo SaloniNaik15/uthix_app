@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:uthix_app/view/homeRegistration/RoleSelection.dart';
 
 // import 'package:uthix_app/view/Student_Pages/LMS/query_provider.dart';
 import 'package:uthix_app/view/homeRegistration/splashintroScreen.dart';
