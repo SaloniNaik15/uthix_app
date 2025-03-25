@@ -1,6 +1,9 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
 import 'package:uthix_app/view/homeRegistration/forgot1.dart';
 import 'package:uthix_app/view/homeRegistration/mailIdPage.dart';
@@ -8,6 +11,9 @@ import 'package:uthix_app/view/homeRegistration/new_registration.dart';
 import 'package:uthix_app/view/homeRegistration/registration.dart';
 import 'package:uthix_app/view/homeRegistration/successfulregister.dart';
 import 'package:uthix_app/view/login/start_login.dart';
+
+import '../Seller_dashboard/dashboard.dart';
+import '../instructor_dashboard/Dashboard/instructor_dashboard.dart';
 
 class NewLogin extends StatefulWidget {
   const NewLogin({super.key});
@@ -21,173 +27,246 @@ class _NewLoginState extends State<NewLogin> {
   final TextEditingController _passwordController = TextEditingController();
   bool ispassword = true;
 
+  Future<void> saveUserSession(String token, String role) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', token);
+    await prefs.setString('user_role', role);
+  }
+
+  void _login() async {
+    String email = _emailIdController.text.trim().toLowerCase();
+    String password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Please enter email and password",
+            style: GoogleFonts.urbanist(),
+          ),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final Dio dio = Dio();
+
+      final response = await dio.post(
+        'https://admin.uthix.com/api/login',
+        options: Options(headers: {"Content-Type": "application/json"}),
+        data: {"email": email, "password": password},
+      );
+
+      log("API Response: ${response.data}");
+
+      final data = response.data;
+
+      if (response.statusCode == 200 && data.containsKey('access_token')) {
+        String token = data['access_token'];
+        String role = data['role'] ?? 'student';
+
+        await saveUserSession(token, role);
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        log("Stored Token: ${prefs.getString('auth_token')}, Role: ${prefs.getString('user_role')}");
+
+        Widget nextScreen;
+        if (role == 'seller') {
+          nextScreen = SellerDashboard();
+        } else if (role == 'instructor') {
+          nextScreen = InstructorDashboard();
+        } else {
+          nextScreen = HomePages();
+        }
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => nextScreen),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              data['message'] ?? "Invalid email or password",
+              style: GoogleFonts.urbanist(),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      log("Error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "An error occurred. Please try again.",
+            style: GoogleFonts.urbanist(),
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(320, 812),
-      builder: (_, child) => Scaffold(
-        backgroundColor: Colors.white,
-        resizeToAvoidBottomInset:
-            false, // Prevents resizing when keyboard is open
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: Opacity(
-                    opacity: 0.30,
-                    child: Image.asset(
-                      "assets/registration/splash.png",
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(height: 50.h),
-                      Image.asset(
-                        "assets/registration/book.png",
-                        width: 101.w,
-                        height: 130.h,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Registration()),
+        );
+        return false;
+      },
+      child: ScreenUtilInit(
+        designSize: const Size(320, 812),
+        builder: (_, child) => Scaffold(
+          backgroundColor: Colors.white,
+          resizeToAvoidBottomInset: false,
+          body: SafeArea(
+            child: Container(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height,
+              child: Stack(
+                children: [
+                  // Background image
+                  Positioned.fill(
+                    child: Opacity(
+                      opacity: 0.30,
+                      child: Image.asset(
+                        "assets/registration/splash.png",
                         fit: BoxFit.cover,
                       ),
-                      SizedBox(height: 50.h),
-                      Text(
-                        "Welcome  BACK!",
-                        style: GoogleFonts.urbanist(
-                          fontSize: 22.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                      SizedBox(height: 25.h),
-                      Text(
-                        "Login to your account",
-                        style: GoogleFonts.urbanist(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black),
-                      ),
-                      SizedBox(height: 20.h),
-
-                      // Continue with Mail ID Button
-                      const SizedBox(height: 20),
-                      _buildTextField(
-                          controller: _emailIdController,
-                          hint: "Please type your Email Id"),
-                      const SizedBox(height: 20),
-                      _buildPasswordField(),
-                      const SizedBox(height: 20),
-
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Forgot1(),
+                    ),
+                  ),
+                  // Centered content with scroll capability
+                  Center(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/registration/book.png",
+                               // width: 200.w,
+                               // height: 200.h,
+                              fit: BoxFit.cover,
                             ),
-                          );
-                        },
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 30.w),
-                            child: Text(
-                              "Forgot Password",
+                            SizedBox(height: 20.h),
+                            Text(
+                              "Welcome BACK!",
                               style: GoogleFonts.urbanist(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.blue,
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 25.h),
-
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomePages(),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          height: 45.h,
-                          width: 270.w,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25.r),
-                            color: Color.fromRGBO(27, 97, 122, 1),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Login",
+                            SizedBox(height: 10.h),
+                            Text(
+                              "Login to your account",
                               style: GoogleFonts.urbanist(
-                                fontSize: 20.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 15.h),
-                      Text(
-                        "OR",
-                        style: GoogleFonts.urbanist(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 15.h),
-                      Image.asset("assets/registration/google.png"),
-                      SizedBox(height: 15.h),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => NewRegistration(),
-                            ),
-                          );
-                        },
-                        child: Text.rich(
-                          TextSpan(
-                            text: "Don't have an account? ",
-                            style: GoogleFonts.urbanist(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: "Register",
-                                style: GoogleFonts.urbanist(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w400,
-                                  color: Color.fromRGBO(27, 97, 122, 1),
-                                  decoration: TextDecoration.underline,
-                                  decorationColor:
-                                      Color.fromRGBO(27, 97, 122, 1),
+                            SizedBox(height: 20.h),
+                            _buildTextField(
+                                controller: _emailIdController,
+                                hint: "Enter your Email"),
+                            SizedBox(height: 20.h),
+                            _buildPasswordField(),
+                            SizedBox(height: 20.h),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Forgot1(),
+                                  ),
+                                );
+                              },
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Padding(
+                                  padding: EdgeInsets.only(right: 10.w),
+                                  child: Text(
+                                    "Forgot Password",
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
-                          textAlign: TextAlign.center,
+                            ),
+                            SizedBox(height: 25.h),
+                            GestureDetector(
+                              onTap: _login,
+                              child: Container(
+                                height: 45.h,
+                                width: MediaQuery.of(context).size.width / 1.5,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(25.r),
+                                  color: Color.fromRGBO(27, 97, 122, 1),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Login",
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 45.h),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Registration(),
+                                  ),
+                                );
+                              },
+                              child: Text.rich(
+                                TextSpan(
+                                  text: "Already have an account? ",
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: "Register",
+                                      style: GoogleFonts.urbanist(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color.fromRGBO(27, 97, 122, 1),
+                                        decoration: TextDecoration.underline,
+                                        decorationColor:
+                                        Color.fromRGBO(27, 97, 122, 1),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            SizedBox(height: 55.h),
+                          ],
                         ),
                       ),
-                      SizedBox(height: 55.h),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -209,13 +288,12 @@ class _NewLoginState extends State<NewLogin> {
         child: TextField(
           controller: _passwordController,
           obscureText: ispassword,
-          style:
-              GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+          style: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: "Enter your Password",
             hintStyle:
-                GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+            GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
             suffixIcon: IconButton(
               icon: Icon(ispassword
                   ? Icons.visibility_off_outlined
@@ -231,51 +309,12 @@ class _NewLoginState extends State<NewLogin> {
       ),
     );
   }
-
-  // Button Widget with Responsive Design
-  Widget buildButton({
-    required VoidCallback onTap,
-    required String iconPath,
-    required String text,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 45.h,
-        width: 270.w,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Color.fromRGBO(175, 175, 175, 1),
-          ),
-          borderRadius: BorderRadius.circular(25.r),
-        ),
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(iconPath, width: 24.w, height: 24.h),
-                SizedBox(width: 10.w),
-                Text(
-                  text,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w400,
-                    color: Color.fromRGBO(175, 175, 175, 1),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
-Widget _buildTextField(
-    {required TextEditingController controller, required String hint}) {
+Widget _buildTextField({
+  required TextEditingController controller,
+  required String hint,
+}) {
   return Container(
     height: 45,
     width: double.infinity,
@@ -294,7 +333,7 @@ Widget _buildTextField(
           border: InputBorder.none,
           hintText: hint,
           hintStyle:
-              GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+          GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
         ),
       ),
     ),
