@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uthix_app/view/homeRegistration/new_login.dart';
+import 'package:uthix_app/view/homeRegistration/new_registration.dart';
 import 'package:uthix_app/view/homeRegistration/registration.dart';
 import 'package:uthix_app/view/login/email_id.dart';
 import 'package:uthix_app/view/login/main_combine.dart';
@@ -66,7 +67,7 @@ class _NewRegisterloginState extends State<NewRegisterlogin> {
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(
-                          builder: (contxet) => Registration()));
+                          builder: (contxet) => NewRegistration()));
                     },
                     child: Container(
                       height: 50.h,

@@ -31,8 +31,11 @@ class MainApp extends StatelessWidget {
             textTheme: GoogleFonts.urbanistTextTheme(),
           ),
           home: Introscreen(),
+          // home: Roleselection(),
+          // home: SellerDashboard(),
+          // home: InstructorDashboard(),
+          // home: ECommerce(),
           //home: NewRegisterlogin(),
-         
         );
       },
     );
