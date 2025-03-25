@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import 'package:uthix_app/view/Student_Pages/Modern_Tools/modern_tools.dart';
 import 'package:uthix_app/view/homeRegistration/new_registerlogin.dart';
 
@@ -39,7 +40,6 @@ class MainApp extends StatelessWidget {
           //home: SellerDashboard(),
           //home: InstructorDashboard(),
           //home: ECommerce(),
-
         );
       },
     );
