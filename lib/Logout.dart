@@ -43,9 +43,10 @@ Future<void> logoutUser(BuildContext context) async {
               await prefs.remove('auth_token');
               await prefs.remove('user_role');
 
-              Navigator.pushReplacement(
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => EmailId()),
+                    (Route<dynamic> route) => false,
               );
             },
           ),
