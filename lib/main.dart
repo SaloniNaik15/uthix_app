@@ -30,9 +30,9 @@ class MainApp extends StatelessWidget {
           theme: ThemeData(
             textTheme: GoogleFonts.urbanistTextTheme(),
           ),
-          //home: Introscreen(),
-          home: NewRegisterlogin(),
-          // home:ModernTools(),
+          home: Introscreen(),
+          //home: NewRegisterlogin(),
+         
         );
       },
     );
