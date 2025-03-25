@@ -9,9 +9,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/modal/nav_itemStudent.dart';
 import 'package:uthix_app/modal/navbarWidgetStudent.dart';
-import 'package:uthix_app/view/Ecommerce/e_commerce.dart';
+
 import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
-import 'package:uthix_app/view/Student_Pages/Files/files.dart';
+
 import 'package:uthix_app/view/Student_Pages/HomePages/drawer_classroom.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/yourc_clasroom.dart';
 import 'package:uthix_app/view/Student_Pages/Modern_Tools/modern_tools.dart';

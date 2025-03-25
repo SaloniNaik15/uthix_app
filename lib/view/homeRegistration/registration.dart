@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:uthix_app/view/homeRegistration/RoleSelection.dart';
 import 'package:uthix_app/view/homeRegistration/mailIdPage.dart';
+import 'package:uthix_app/view/homeRegistration/new_login.dart';
+import 'package:uthix_app/view/homeRegistration/successfulregister.dart';
 import 'package:uthix_app/view/login/start_login.dart';
 
 class Registration extends StatefulWidget {
@@ -14,8 +16,13 @@ class Registration extends StatefulWidget {
 }
 
 class _RegistrationState extends State<Registration> {
+  final TextEditingController _emailIdController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool ispassword = true;
+
   @override
   Widget build(BuildContext context) {
+
     return WillPopScope(
       onWillPop: () async {
         SystemNavigator.pop();
@@ -221,4 +228,31 @@ class _RegistrationState extends State<Registration> {
       ),
     );
   }
+}
+
+Widget _buildTextField(
+    {required TextEditingController controller, required String hint}) {
+  return Container(
+    height: 45,
+    width: double.infinity,
+    decoration: BoxDecoration(
+      color: Color.fromRGBO(246, 246, 246, 1),
+      borderRadius: BorderRadius.circular(50),
+      border: Border.all(color: Color.fromRGBO(210, 210, 210, 1)),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: TextField(
+        controller: controller,
+        keyboardType: TextInputType.emailAddress,
+        style: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: hint,
+          hintStyle:
+              GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+        ),
+      ),
+    ),
+  );
 }

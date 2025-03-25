@@ -16,7 +16,7 @@ class NavbarStudent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.9, // 90% of screen width
+      width: double.infinity, // 90% of screen width
       height: 59.h, // Responsive height
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
