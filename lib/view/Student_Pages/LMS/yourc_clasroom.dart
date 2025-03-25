@@ -3,7 +3,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
+
 import 'dart:developer';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,10 +12,6 @@ import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
 import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/classes.dart';
 import 'package:uthix_app/modal/nav_itemStudent.dart';
-
-import '../../../UpcomingPage.dart';
-import '../Files/files.dart';
-import '../Student Account Details/Student_AccountPage.dart';
 
 class YourClasroom extends StatefulWidget {
   const YourClasroom({super.key});
@@ -164,7 +160,7 @@ class _YourClasroomState extends State<YourClasroom> {
         }
       }
     } catch (e) {
-      print("Error: $e");
+      log("WHY:Error: $e");
       setState(() {
         hasError = true;
         isLoading = false;
@@ -186,7 +182,7 @@ class _YourClasroomState extends State<YourClasroom> {
         ),
       );
 
-      print("Response Status Code: ${response.statusCode}");
+      log("Response Status Code: ${response.statusCode}");
       log("ALLCLASROMS-Response Body: ${response.data}");
 
       if (response.statusCode == 200) {
@@ -221,17 +217,16 @@ class _YourClasroomState extends State<YourClasroom> {
         ),
       );
 
-      print("POST Status Code: ${response.statusCode}");
-      print("POST Response Body: ${response.data}");
+      log("SELECTION Status Code: ${response.statusCode}");
+      log("SELECTION Response Body: ${response.data}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("Classroom selected successfully!");
+        log("Classroom selected successfully!");
       } else {
-        print(
-            "Failed to select classroom. Status Code: ${response.statusCode}");
+        log("Failed to select classroom. Status Code: ${response.statusCode}");
       }
     } catch (e) {
-      print("Error posting selected classroom: $e");
+      log("Error posting selected classroom: $e");
     }
   }
 
