@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
 import 'package:uthix_app/view/homeRegistration/registration.dart';
 
 import '../Seller_dashboard/dashboard.dart';
@@ -44,7 +45,7 @@ class _IntroscreenState extends State<Introscreen> {
         // Default: Navigate to Student Home
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MainCombine()),
+          MaterialPageRoute(builder: (context) => HomePages()),
         );
       }
     } else {
