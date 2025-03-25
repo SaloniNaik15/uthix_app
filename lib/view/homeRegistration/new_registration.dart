@@ -7,13 +7,13 @@ import 'package:uthix_app/view/homeRegistration/successfulregister.dart';
 import 'package:uthix_app/view/login/start_login.dart';
 
 class NewRegistration extends StatefulWidget {
-  const  NewRegistration({super.key});
+  const NewRegistration({super.key});
 
   @override
-  State< NewRegistration> createState() => _NewRegistrationState();
+  State<NewRegistration> createState() => _NewRegistrationState();
 }
 
-class _NewRegistrationState extends State< NewRegistration> {
+class _NewRegistrationState extends State<NewRegistration> {
   final TextEditingController _emailIdController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool ispassword = true;

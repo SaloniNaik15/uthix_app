@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uthix_app/view/homeRegistration/new_login.dart';
 import 'package:uthix_app/view/login/email_id.dart';
 
 Future<void> logoutUser(BuildContext context) async {
@@ -43,7 +44,7 @@ Future<void> logoutUser(BuildContext context) async {
 //used for testing
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => EmailId()),
+                MaterialPageRoute(builder: (context) => NewLogin()),
                 (Route<dynamic> route) => false,
               );
             },

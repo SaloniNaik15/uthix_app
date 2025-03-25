@@ -11,6 +11,8 @@ import 'package:uthix_app/view/homeRegistration/profile.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import 'new_login.dart';
+
 class Successpage extends StatefulWidget {
   const Successpage({super.key});
 
@@ -59,17 +61,17 @@ class _SuccesspageState extends State<Successpage> {
           nextPage = InstructorDashboard();
           break;
         case 'student':
-          nextPage = StartLogin();
+          nextPage = NewLogin();
           break;
         default:
-          nextPage = StartLogin();
+          nextPage = NewLogin();
       }
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => nextPage),
       );
     } else {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => StartLogin()),
+        MaterialPageRoute(builder: (context) => NewLogin()),
       );
     }
   }

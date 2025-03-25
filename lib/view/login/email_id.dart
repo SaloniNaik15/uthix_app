@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
 import 'package:uthix_app/view/homeRegistration/RoleSelection.dart';
+import 'package:uthix_app/view/homeRegistration/forgot1.dart';
 import 'package:uthix_app/view/login/main_combine.dart';
 import 'package:uthix_app/view/login/reset_password.dart';
 
@@ -176,7 +177,7 @@ class _EmailIdState extends State<EmailId> {
                               child: GestureDetector(
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => ResetPassword()));
+                                      builder: (context) => Forgot1()));
                                 },
                                 child: Text(
                                   "Forgot password?",
@@ -196,8 +197,9 @@ class _EmailIdState extends State<EmailId> {
                   ),
                   Padding(
                     padding: EdgeInsets.only(
-                      bottom:
-                          MediaQuery.of(context).viewInsets.bottom > 0 ? 20 : 40,
+                      bottom: MediaQuery.of(context).viewInsets.bottom > 0
+                          ? 20
+                          : 40,
                     ),
                     child: GestureDetector(
                       onTap: () {
