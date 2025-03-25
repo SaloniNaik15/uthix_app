@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
 import 'package:uthix_app/view/homeRegistration/RoleSelection.dart';
 import 'package:uthix_app/view/login/main_combine.dart';
 import 'package:uthix_app/view/login/reset_password.dart';
@@ -75,11 +76,11 @@ class _EmailIdState extends State<EmailId> {
         if (role == 'seller') {
           nextScreen = SellerDashboard();
         } else if (role == 'student') {
-          nextScreen = MainCombine();
+          nextScreen = HomePages();
         } else if (role == 'instructor') {
           nextScreen = InstructorDashboard();
         } else {
-          nextScreen = MainCombine();
+          nextScreen = HomePages();
         }
 
         Navigator.pushReplacement(
@@ -108,6 +109,7 @@ class _EmailIdState extends State<EmailId> {
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
