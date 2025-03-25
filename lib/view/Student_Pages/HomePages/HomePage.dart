@@ -206,7 +206,8 @@ class _HomePagesState extends State<HomePages> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => BuyTextBooks()),
+                                builder: (context) =>
+                                    UnderConstructionScreen()),
                           );
                         } else if (dashBoard[index]["title"] == "MY CLASSES") {
                           Navigator.push(

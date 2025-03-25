@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/view/Student_Pages/Attendance/attendance.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
 import 'package:uthix_app/view/Student_Pages/Calendar/calendar.dart';
@@ -167,7 +168,7 @@ class _MyDrawerState extends State<MyDrawer> {
         page = StudRecording();
         break;
       case 6:
-        page = BuyTextBooks();
+        page = UnderConstructionScreen();
         break;
       case 7:
         page = Attendance();
