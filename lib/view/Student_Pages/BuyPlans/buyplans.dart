@@ -49,8 +49,8 @@ class _BuyPlansState extends State<BuyPlans> {
 
   Future<void> _initializeData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token'); // Retrieve token
-    log("Retrieved Token: $token"); // Log token for verification
+    String? token = prefs.getString('auth_token');
+    log("Retrieved Token: $token");
 
     setState(() {
       accessLoginToken = token;

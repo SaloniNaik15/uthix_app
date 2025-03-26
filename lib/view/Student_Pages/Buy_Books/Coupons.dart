@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +22,18 @@ class _CouponsScreenState extends State<CouponsScreen> {
   @override
   void initState() {
     super.initState();
-    loadAuthToken().then((_) => fetchCoupons());
+    _initializeData();
   }
 
+  /// Initialize data by loading the auth token and any cached coupons,
+  /// then fetch new coupons from the API.
+  Future<void> _initializeData() async {
+    await loadAuthToken();
+    await _loadCouponsFromCache();
+    fetchCoupons();
+  }
+
+  /// Load the auth token from SharedPreferences
   Future<void> loadAuthToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
@@ -31,6 +42,24 @@ class _CouponsScreenState extends State<CouponsScreen> {
     });
   }
 
+  /// Attempt to load cached coupons from SharedPreferences
+  Future<void> _loadCouponsFromCache() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? cachedCoupons = prefs.getString('cached_coupons');
+    if (cachedCoupons != null) {
+      try {
+        final List<dynamic> data = jsonDecode(cachedCoupons);
+        setState(() {
+          coupons = data;
+        });
+        log("Loaded coupons from cache.");
+      } catch (e) {
+        log("Error decoding cached coupons: $e");
+      }
+    }
+  }
+
+  /// Fetch coupons from the API, then cache them if successful
   Future<void> fetchCoupons() async {
     const String apiUrl = "https://admin.uthix.com/api/manage-coupon";
     if (_authToken == null || _authToken!.isEmpty) {
@@ -48,9 +77,15 @@ class _CouponsScreenState extends State<CouponsScreen> {
       print("Coupons API Response: ${response.data}");
 
       if (response.statusCode == 200 && response.data['status'] == true) {
+        final newCoupons = response.data['coupons'];
         setState(() {
-          coupons = response.data['coupons'];
+          coupons = newCoupons;
         });
+
+        // Cache the coupons in SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("cached_coupons", jsonEncode(newCoupons));
+
       } else {
         print("Failed to fetch coupons: ${response.statusCode}");
       }
@@ -128,7 +163,9 @@ class _CouponsScreenState extends State<CouponsScreen> {
                       child: Container(
                         margin: EdgeInsets.symmetric(horizontal: 5),
                         padding: EdgeInsets.symmetric(
-                            horizontal: 30.w, vertical: 8.h),
+                          horizontal: 30.w,
+                          vertical: 8.h,
+                        ),
                         decoration: BoxDecoration(
                           color: selectedTab == index
                               ? const Color(0xFF2B5C74)
@@ -199,7 +236,7 @@ class CouponCard extends StatelessWidget {
               ),
               SizedBox(width: 20.w),
               const DottedDividerWithIcon(
-                height: 90, // default value, will be scaled inside widget if needed
+                height: 90,
                 color: Colors.grey,
               ),
               SizedBox(width: 20.w),
@@ -225,11 +262,13 @@ class CouponCard extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // You could implement copying the code to clipboard
+                          },
                           icon: Icon(
                             Icons.copy,
                             color: Colors.grey,
-                            size: 20.sp,
+                            size: 18.sp,
                           ),
                         ),
                       ],
@@ -283,6 +322,7 @@ class DottedDividerWithIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // We create a simple dotted line with a scissors icon in the middle
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

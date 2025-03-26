@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:dio/dio.dart';
 import 'package:uthix_app/view/homeRegistration/forgot3.dart';
 
 class Forgot2 extends StatefulWidget {
@@ -17,7 +18,7 @@ class _Forgot2State extends State<Forgot2> {
   final TextEditingController _digit3Controller = TextEditingController();
   final TextEditingController _digit4Controller = TextEditingController();
 
-  // Create FocusNodes for each field
+  // FocusNodes for each digit field
   final FocusNode _digit1Focus = FocusNode();
   final FocusNode _digit2Focus = FocusNode();
   final FocusNode _digit3Focus = FocusNode();
@@ -34,6 +35,73 @@ class _Forgot2State extends State<Forgot2> {
     _digit3Focus.dispose();
     _digit4Focus.dispose();
     super.dispose();
+  }
+
+  Future<void> verifyCode() async {
+    final digit1 = _digit1Controller.text.trim();
+    final digit2 = _digit2Controller.text.trim();
+    final digit3 = _digit3Controller.text.trim();
+    final digit4 = _digit4Controller.text.trim();
+
+    if (digit1.isEmpty ||
+        digit2.isEmpty ||
+        digit3.isEmpty ||
+        digit4.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter the complete code")),
+      );
+      return;
+    }
+
+    final code = "$digit1$digit2$digit3$digit4";
+    final dio = Dio();
+    const String apiUrl = "https://admin.uthix.com/api/verify-otp";
+
+    try {
+      final response = await dio.post(apiUrl, data: {"code": code});
+
+      if (response.statusCode == 200) {
+
+        final isValid = response.data["valid"] ?? true;
+        if (isValid) {
+          // Code is correct: show success message and navigate
+          final snackBar =
+          SnackBar(content: Text("Code sent successfully"));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(snackBar)
+              .closed
+              .then((_) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Forgot3()),
+            );
+          });
+        } else {
+          // Code is incorrect
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Code is incorrect")),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Code is incorrect")),
+        );
+      }
+    } on DioError catch (dioError) {
+      String errorMessage = "An error occurred";
+      if (dioError.response != null) {
+        errorMessage = "Error: ${dioError.response?.statusMessage}";
+      } else {
+        errorMessage = "Error: ${dioError.message}";
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("An unexpected error occurred: $e")),
+      );
+    }
   }
 
   Widget _buildDigitField({
@@ -76,7 +144,6 @@ class _Forgot2State extends State<Forgot2> {
           } else if (value.isEmpty && previousFocus != null) {
             FocusScope.of(context).requestFocus(previousFocus);
           }
-          // If the last field is filled, unfocus to dismiss the keyboard.
           if (value.length == 1 && nextFocus == null) {
             focusNode.unfocus();
           }
@@ -123,8 +190,6 @@ class _Forgot2State extends State<Forgot2> {
                     children: [
                       Image.asset(
                         "assets/registration/book.png",
-                        // width: 155.w,
-                        // height: 150.h,
                         fit: BoxFit.cover,
                       ),
                       SizedBox(height: 50.h),
@@ -138,7 +203,7 @@ class _Forgot2State extends State<Forgot2> {
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 30.h),
-                      // Row of digit fields with auto-focus behavior
+                      // Row of digit fields
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -181,16 +246,9 @@ class _Forgot2State extends State<Forgot2> {
                         ],
                       ),
                       SizedBox(height: 25.h),
-                      // Verify button
+                      // Verify button that calls verifyCode
                       GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const Forgot3(),
-                            ),
-                          );
-                        },
+                        onTap: verifyCode,
                         child: Container(
                           height: 40.h,
                           width: MediaQuery.of(context).size.width / 2,

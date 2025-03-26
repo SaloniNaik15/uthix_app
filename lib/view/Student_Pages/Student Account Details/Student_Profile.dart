@@ -1,5 +1,12 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io'; // For File
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+// Image picker import
+import 'package:image_picker/image_picker.dart';
 
 class StudentProfile extends StatefulWidget {
   const StudentProfile({super.key});
@@ -9,49 +16,147 @@ class StudentProfile extends StatefulWidget {
 }
 
 class _StudentProfileState extends State<StudentProfile> {
-  final List<Map<String, dynamic>> profileData = [
-    {'icon': Icons.person, 'label': 'Name', 'hint': 'Enter your name'},
-    {'icon': Icons.phone, 'label': 'Phone', 'hint': 'Enter your phone number'},
-    {'icon': Icons.email, 'label': 'Email', 'hint': 'Enter your email'},
-    {
-      'icon': Icons.lock,
-      'label': 'Password',
-      'hint': 'Enter your password'
-    }, // Password field
-    {'icon': Icons.female, 'label': 'Gender', 'hint': 'Select your gender'},
-    {
-      'icon': Icons.location_on,
-      'label': 'Current Address',
-      'hint': 'Enter your current address'
-    },
-    {
-      'icon': Icons.school,
-      'label': 'University',
-      'hint': 'Enter your university'
-    },
-    {
-      'icon': Icons.location_on,
-      'label': 'Permanent Address',
-      'hint': 'Enter your permanent address'
-    },
-    {
-      'icon': Icons.school,
-      'label': 'Student ID',
-      'hint': 'Enter your student ID'
-    },
-  ];
+  // Token and name loaded from the API/cache
+  String? accessLoginToken;
+  String? userName;
+
+  // Controllers for each text field
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  //final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _dobController = TextEditingController();
+  String? _genderValue; // for dropdown
+  final TextEditingController _classController = TextEditingController();
+  final TextEditingController _streamController = TextEditingController();
+
+  // For handling the profile image
+  File? _profileImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  /// 1) Loads token, 2) Loads cached profile, 3) Fetches profile from API
+  Future<void> _initializeData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    log("Retrieved Token: $token");
+
+    setState(() {
+      accessLoginToken = token;
+    });
+
+    // Load cached profile if available
+    await _loadProfileFromCache();
+    // Then fetch from API
+    _fetchUserProfile();
+  }
+
+  /// Loads cached profile data from SharedPreferences
+  Future<void> _loadProfileFromCache() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? cachedProfile = prefs.getString('cached_profile');
+    if (cachedProfile != null) {
+      try {
+        final data = jsonDecode(cachedProfile);
+        _populateFields(data);
+        log("Loaded profile from cache.");
+      } catch (e) {
+        log("Error decoding cached profile: $e");
+      }
+    }
+  }
+
+  /// Fetches the user profile from the API and caches it
+  Future<void> _fetchUserProfile() async {
+    try {
+      final dio = Dio();
+      final response = await dio.get(
+        "https://admin.uthix.com/api/profile", // <-- Your endpoint
+        options: Options(
+          headers: {"Authorization": "Bearer $accessLoginToken"},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        _populateFields(data);
+
+        // Cache the profile data
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("cached_profile", jsonEncode(data));
+        log("Profile updated from API and cached.");
+      } else {
+        log("Failed to fetch user profile: ${response.statusMessage}");
+      }
+    } catch (e) {
+      log("Error fetching user profile: $e");
+    }
+  }
+
+  /// Populates the text controllers with data from the profile map
+  void _populateFields(Map<String, dynamic> data) {
+    setState(() {
+      userName = data["name"];
+      _nameController.text = data["name"] ?? "";
+      _emailController.text = data["email"] ?? "";
+      _phoneController.text = data["phone"] ?? "";
+      // We don't store password in plain text, so consider how you handle that.
+     // _passwordController.text = "";
+      _dobController.text = data["dob"] ?? "";
+      _genderValue = data["gender"];
+      _classController.text = data["class"] ?? "";
+      _streamController.text = data["stream"] ?? "";
+    });
+  }
+
+  /// Example: Submits the profile to an update endpoint
+  Future<void> _submitProfile() async {
+    // Collect data from fields
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+   // final password = _passwordController.text.trim();
+    final dob = _dobController.text.trim();
+    final gender = _genderValue;
+    final userClass = _classController.text.trim();
+    final stream = _streamController.text.trim();
+
+    // TODO: Validate fields, then make an API call to update the user profile
+    log("Submitting profile: $name, $email, $phone, $dob, $gender, $userClass, $stream");
+
+    // Example only: Show a SnackBar to confirm
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Profile submitted!")),
+    );
+  }
+
+  /// Picks an image from the gallery and updates the profile image
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       appBar: AppBar(
-        backgroundColor: Color(0xFF2B5C74),
+        backgroundColor: const Color(0xFF2B5C74),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_outlined, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
         title: const Text(
@@ -59,110 +164,131 @@ class _StudentProfileState extends State<StudentProfile> {
           style: TextStyle(
             color: Colors.white,
             fontSize: 25,
-            fontFamily: "Urbanist",
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-      body: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(
-                'assets/Seller_dashboard_images/ManageStoreBackground.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
+
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Column(
           children: [
+            // Circle Avatar (User Photo)
             Stack(
               children: [
-                ColoredBox(
-                  color: Color(0xFF2B5C74),
-                  child: SizedBox(
-                    height: 40,
-                    width: MediaQuery.sizeOf(context).width,
-                  ),
+                CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.grey.shade300,
+                  backgroundImage: _profileImage != null
+                      ? FileImage(_profileImage!) as ImageProvider
+                      : const AssetImage("assets/icons/profile.png"),
                 ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Stack(
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [Colors.white, Colors.blue],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundColor: Colors.transparent,
-                          child: CircleAvatar(
-                            radius: 45,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(45),
-                              child: Image.asset("assets/icons/profile.png"),
-                            ),
-                          ),
-                        ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: _pickImage, // Open gallery
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2B5C74),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
                       ),
-                      Positioned(
-                        bottom: -1,
-                        right: -1,
-                        child: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          radius: 18,
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              color: Colors.blue,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 4,
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.camera_alt,
-                              color: Colors.white,
-                              size: 22,
-                            ),
-                          ),
-                        ),
+                      padding: const EdgeInsets.all(6),
+                      child: const Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                        size: 18,
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            const Text(
-              "Mahima (You)",
-              style: TextStyle(
-                fontSize: 16,
-                fontFamily: "Urbanist",
-                fontWeight: FontWeight.bold,
-              ),
+            const SizedBox(height: 20),
+
+            // "Name"
+            _buildTextField(
+              label: "Name",
+              hint: "Enter your name",
+              controller: _nameController,
+              icon: Icons.person,
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ListView.builder(
-                  itemCount: profileData.length,
-                  itemBuilder: (context, index) {
-                    return ProfileField(
-                      icon: profileData[index]['icon'],
-                      label: profileData[index]['label'],
-                      hint: profileData[index]['hint'],
-                    );
-                  },
+
+            // "Email"
+            _buildTextField(
+              label: "Email",
+              hint: "Enter your email",
+              controller: _emailController,
+              icon: Icons.email,
+              keyboardType: TextInputType.emailAddress,
+            ),
+
+            // "Phone Number"
+            _buildTextField(
+              label: "Phone Number",
+              hint: "Enter your phone number",
+              controller: _phoneController,
+              icon: Icons.phone,
+              keyboardType: TextInputType.phone,
+            ),
+
+            // "Password"
+            // _buildTextField(
+            //   label: "Password",
+            //   hint: "Enter your password",
+            //   controller: _passwordController,
+            //   icon: Icons.lock,
+            //   obscureText: true,
+            // ),
+
+            // "Date of Birth"
+            _buildDateField(
+              label: "Date of Birth",
+              hint: "dd-mm-yyyy",
+              controller: _dobController,
+              icon: Icons.calendar_month,
+            ),
+
+            // "Gender" (Dropdown)
+            _buildGenderDropdown(),
+
+            // "Class"
+            _buildTextField(
+              label: "Class",
+              hint: "Enter Your Class",
+              controller: _classController,
+              icon: Icons.school,
+            ),
+
+            // "Stream"
+            _buildTextField(
+              label: "Stream",
+              hint: "eg. Maths Computer",
+              controller: _streamController,
+              icon: Icons.menu_book_outlined,
+            ),
+
+            const SizedBox(height: 20),
+
+            // "Submit Profile" Button
+            SizedBox(
+              width: MediaQuery.of(context).size.width/2,
+              height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2B5C74),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                ),
+                onPressed: _submitProfile,
+                child: const Text(
+                  "Submit Profile",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ),
@@ -171,82 +297,168 @@ class _StudentProfileState extends State<StudentProfile> {
       ),
     );
   }
-}
 
-class ProfileField extends StatefulWidget {
-  final IconData icon;
-  final String label;
-  final String hint;
-
-  const ProfileField(
-      {super.key, required this.icon, required this.label, required this.hint});
-
-  @override
-  _ProfileFieldState createState() => _ProfileFieldState();
-}
-
-class _ProfileFieldState extends State<ProfileField> {
-  late TextEditingController controller;
-  bool obscurePassword = true;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = TextEditingController();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    bool isPasswordField = widget.label == "Password";
-
+  /// Builds a simple text field with a label above it.
+  /// Always has fill color #F6F6F6 and border color #D2D2D2.
+  Widget _buildTextField({
+    required String label,
+    required String hint,
+    required TextEditingController controller,
+    required IconData icon,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Container(
-        alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 2),
-        decoration: BoxDecoration(
-          color: Color(0xFFFCFCFC),
-          borderRadius: BorderRadius.circular(50),
-          border: Border.all(color: Color(0xFFD2D2D2)),
-        ),
-        child: Row(
-          children: [
-            Icon(widget.icon, color: Colors.black54),
-            SizedBox(width: 8),
-            Expanded(
-              child: TextFormField(
-                controller: controller,
-                obscureText: isPasswordField ? obscurePassword : false,
-                decoration: InputDecoration(
-                  labelText: null, // No label, only hint text
-                  hintText: widget.hint, // Display hint text
-                  border: InputBorder.none,
-                ),
-                style: TextStyle(
-                    fontSize: 16, fontFamily: "Urbanist", color: Colors.black),
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Field label
+          Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 6),
+          // Actual text field
+          TextField(
+            controller: controller,
+            obscureText: obscureText,
+            keyboardType: keyboardType,
+            decoration: InputDecoration(
+              hintText: hint,
+              prefixIcon: Icon(icon),
+              filled: true,
+              fillColor: const Color(0xFFF6F6F6),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 14,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(40),
+                borderSide: const BorderSide(color: Color(0xFFD2D2D2)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(40),
+                borderSide: const BorderSide(color: Color(0xFFD2D2D2)),
               ),
             ),
-            if (isPasswordField)
-              IconButton(
-                icon: Icon(
-                  obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.black54,
-                ),
-                onPressed: () {
-                  setState(() {
-                    obscurePassword = !obscurePassword;
-                  });
-                },
-              )
-            else
-              IconButton(
-                icon: Icon(Icons.edit_outlined, color: Colors.black),
-                onPressed: () {
-                  // Handle edit action for this field
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds a date field with an icon button to show a date picker
+  /// Always has fill color #F6F6F6 and border color #D2D2D2.
+  Widget _buildDateField({
+    required String label,
+    required String hint,
+    required TextEditingController controller,
+    required IconData icon,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Field label
+          Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 6),
+          TextField(
+            controller: controller,
+            readOnly: true,
+            decoration: InputDecoration(
+              hintText: hint,
+              prefixIcon: Icon(icon),
+              filled: true,
+              fillColor: const Color(0xFFF6F6F6),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 14,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(40),
+                borderSide: const BorderSide(color: Color(0xFFD2D2D2)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(40),
+                borderSide: const BorderSide(color: Color(0xFFD2D2D2)),
+              ),
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.calendar_today),
+                onPressed: () async {
+                  // Show a date picker
+                  final DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(1950),
+                    lastDate: DateTime(2100),
+                  );
+                  if (pickedDate != null) {
+                    final dobString =
+                        "${pickedDate.day}-${pickedDate.month}-${pickedDate.year}";
+                    controller.text = dobString;
+                  }
                 },
               ),
-          ],
-        ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds a gender dropdown with label above it
+  /// Always has fill color #F6F6F6 and border color #D2D2D2.
+  Widget _buildGenderDropdown() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Gender",
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFF6F6F6),
+              borderRadius: BorderRadius.circular(40),
+              border: Border.all(color: const Color(0xFFD2D2D2)),
+            ),
+            child: DropdownButtonFormField<String>(
+              value: _genderValue,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(horizontal: 12),
+              ),
+              hint: const Text("Select Gender"),
+              items: const [
+                DropdownMenuItem(value: "male", child: Text("Male")),
+                DropdownMenuItem(value: "female", child: Text("Female")),
+                DropdownMenuItem(value: "other", child: Text("Other")),
+              ],
+              onChanged: (val) {
+                setState(() {
+                  _genderValue = val;
+                });
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
