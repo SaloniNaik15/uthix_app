@@ -6,6 +6,8 @@ import 'package:uthix_app/view/homeRegistration/RoleSelection.dart';
 import 'package:uthix_app/view/homeRegistration/mailIdPage.dart';
 import 'package:uthix_app/view/login/start_login.dart';
 
+import 'new_login.dart';
+
 class Registration extends StatefulWidget {
   const Registration({super.key,});
 
