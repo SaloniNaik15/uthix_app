@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_string_interpolations, deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -38,8 +39,8 @@ class _CalenderState extends State<Calender> {
           title: Text(
             "Calendar",
             style: GoogleFonts.urbanist(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
@@ -82,8 +83,8 @@ class _CalenderState extends State<Calender> {
             padding: const EdgeInsets.only(left: 15),
             child: Text(
               "Schedule a class and update Student’s Calendar",
-              style: GoogleFonts.urbanist(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w400,
                 color: Color.fromRGBO(96, 95, 95, 1),
               ),
@@ -233,7 +234,7 @@ class _CalenderState extends State<Calender> {
         child: Text(
           day.toString(),
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 12.sp,
             fontWeight: FontWeight.bold,
             color: isInMonth ? Colors.black : Colors.grey.shade400,
           ),

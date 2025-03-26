@@ -21,8 +21,8 @@ class _RecordingState extends State<Recording> {
         elevation: 0,
         title: Text(
           "Recordings",
-          style: GoogleFonts.urbanist(
-            fontSize: 20.sp,
+          style:TextStyle(
+            fontSize: 18.sp,
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -48,7 +48,7 @@ class _RecordingState extends State<Recording> {
               children: [
                 Text(
                   "The class recordings and files uploaded by you will appear here",
-                  style: GoogleFonts.urbanist(
+                  style: TextStyle(
                     fontSize: 14.sp,
                     fontWeight: FontWeight.w400,
                     color: const Color.fromRGBO(96, 95, 95, 1),
@@ -56,8 +56,8 @@ class _RecordingState extends State<Recording> {
                 ),
                 SizedBox(height: 20.h),
                 Container(
-                  height: 37.h,
-                  width: 167.w,
+                  height: 35.h,
+                  width: 160.w,
                   decoration: BoxDecoration(
                     color: const Color.fromRGBO(246, 246, 246, 1),
                     borderRadius: BorderRadius.circular(10.r),
@@ -125,7 +125,7 @@ class _RecordingState extends State<Recording> {
                           children: [
                             Text(
                               "Class Name, Topic",
-                              style: GoogleFonts.urbanist(
+                              style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.black,
@@ -134,7 +134,7 @@ class _RecordingState extends State<Recording> {
                             ),
                             Text(
                               "61 GB, Modified by Instructor on 13/01/2025",
-                              style: GoogleFonts.urbanist(
+                              style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.black,
@@ -150,7 +150,7 @@ class _RecordingState extends State<Recording> {
               },
             ),
           ),
-          SizedBox(height: 20.h),
+          //SizedBox(height: 20.h),
         ],
       ),
     );
@@ -165,7 +165,7 @@ class _RecordingState extends State<Recording> {
 
   Widget _sortButton(String text) {
     return Container(
-      height: 47.h,
+      height: 40.h,
       width: 100.w,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(38.r),
@@ -174,7 +174,7 @@ class _RecordingState extends State<Recording> {
       child: Center(
         child: Text(
           text,
-          style: GoogleFonts.urbanist(
+          style:TextStyle(
             fontSize: 14.sp,
             fontWeight: FontWeight.w700,
             color: Colors.white,

@@ -50,7 +50,7 @@ class _ChatState extends State<Chat> {
               backgroundColor: const Color(0xFF2B5C74),
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.menu, color: Colors.white),
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -58,7 +58,7 @@ class _ChatState extends State<Chat> {
               title: Text(
                 "Chat",
                 style: GoogleFonts.urbanist(
-                  fontSize: 20.sp,
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -89,8 +89,8 @@ class _ChatState extends State<Chat> {
                             ClipOval(
                               child: Image.asset(
                                 "assets/login/profile.jpeg",
-                                width: 60.w,
-                                height: 60.h,
+                                width: 50.w,
+                                height: 50.h,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -102,14 +102,14 @@ class _ChatState extends State<Chat> {
                                   Row(
                                     children: [
                                       Text("Name",
-                                          style: GoogleFonts.urbanist(
+                                          style: TextStyle(
                                               fontSize: 14.sp,
                                               fontWeight: FontWeight.w500)),
                                       const Spacer(),
                                       Text("Date",
-                                          style: GoogleFonts.urbanist(
+                                          style:TextStyle(
                                               fontSize: 14.sp,
-                                              fontWeight: FontWeight.w400)),
+                                              fontWeight: FontWeight.w500)),
                                     ],
                                   ),
                                   SizedBox(height: 5.h),
@@ -118,15 +118,15 @@ class _ChatState extends State<Chat> {
                                       Expanded(
                                         child: Text(
                                           "Lorem ipsum dolor sit amet",
-                                          style: GoogleFonts.urbanist(
-                                            fontSize: 16.sp,
+                                          style: TextStyle(
+                                            fontSize: 12.sp,
                                             fontWeight: FontWeight.w400,
                                           ),
                                         ),
                                       ),
                                       Container(
-                                        height: 22.h,
-                                        width: 22.w,
+                                        height: 20.h,
+                                        width: 20.w,
                                         decoration: const BoxDecoration(
                                           shape: BoxShape.circle,
                                           color:
@@ -135,8 +135,8 @@ class _ChatState extends State<Chat> {
                                         child: Center(
                                           child: Text(
                                             "1",
-                                            style: GoogleFonts.urbanist(
-                                              fontSize: 11.sp,
+                                            style: TextStyle(
+                                              fontSize: 10.sp,
                                               fontWeight: FontWeight.w400,
                                               color: Colors.white,
                                             ),
@@ -166,8 +166,8 @@ class _ChatState extends State<Chat> {
                     );
                   },
                   child: Container(
-                    height: 64.h,
-                    width: 64.w,
+                    height: 60.h,
+                    width: 60.w,
                     decoration: BoxDecoration(
                       color: const Color.fromRGBO(43, 92, 116, 1),
                       shape: BoxShape.circle,
@@ -182,7 +182,7 @@ class _ChatState extends State<Chat> {
                     ),
                     child: Center(
                       child: Icon(Icons.chat_bubble,
-                          size: 30.sp, color: Colors.white),
+                          size: 25.sp, color: Colors.white),
                     ),
                   ),
                 ),
