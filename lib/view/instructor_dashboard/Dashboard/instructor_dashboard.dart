@@ -42,7 +42,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   final TextEditingController _classnameController = TextEditingController();
   final TextEditingController _sectionController = TextEditingController();
 
-  final TextEditingController _classlinkController = TextEditingController();
+  //final TextEditingController _classlinkController = TextEditingController();
 
   final Dio _dio = Dio();
   final String apiUrl = "https://admin.uthix.com/api/classroom";
@@ -109,7 +109,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
       "class_name": _classnameController.text.trim(),
       "section": _sectionController.text.trim(),
       "subject_id": selectedSubjectId,
-      "link": _classlinkController.text.trim(),
+      //"link": _classlinkController.text.trim(),
     };
 
     try {
@@ -214,8 +214,8 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             children: [
               Text(
                 "Create New Class and Invite Participants",
-                style: GoogleFonts.inter(
-                  fontSize: 16,
+                style: TextStyle(
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
                   color: Colors.black,
                 ),
@@ -225,8 +225,8 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                   "eg., Class V"),
               _buildTextField("Section", _sectionController, "eg., Section B"),
               _buildDropdownField("Subject", subjects, selectedSubjectId),
-              _buildTextField("Class Link", _classlinkController,
-                  "eg., www.zoom73452670.com"),
+              //_buildTextField("Class Link", _classlinkController,
+                //  "eg., www.zoom73452670.com"),
               const SizedBox(height: 20),
               Center(
                 child: GestureDetector(
@@ -241,8 +241,8 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                     child: Center(
                       child: Text(
                         "Create",
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
+                        style: TextStyle(
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
@@ -300,8 +300,8 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                SizedBox(width: 20.w),
               Text(
                 "Hii Surnamika",
-                style: GoogleFonts.urbanist(
-                  fontSize: 16,
+                style: TextStyle(
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.w500,
                   color: const Color.fromRGBO(96, 95, 95, 1),
                 ),
@@ -309,7 +309,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             ],
           ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20.h),
       ],
     );
   }
@@ -404,14 +404,14 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
 
             title: Text(
               "Instructor Dashboard",
-              style: GoogleFonts.urbanist(
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w600,
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
                 color: const Color.fromRGBO(95, 95, 95, 1),
               ),
             ),
             centerTitle: true,
-            automaticallyImplyLeading: false, // ✅ Removes back arrow
+            automaticallyImplyLeading: false,
             elevation: 0,
           ),
           body: Stack(
@@ -461,8 +461,8 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(
-              fontSize: 16.sp, fontWeight: FontWeight.w400, color: Colors.black54),
+          style: TextStyle(
+              fontSize: 14.sp, fontWeight: FontWeight.w700, color: Colors.black54),
         ),
         const SizedBox(height: 5),
         Container(
@@ -477,15 +477,15 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               controller: controller,
-              style: GoogleFonts.urbanist(
-                  fontSize: 14,
+              style: TextStyle(
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w400,
                   color: Colors.black87),
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: hint,
-                hintStyle: GoogleFonts.urbanist(
-                    fontSize: 14,
+                hintStyle: TextStyle(
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w400,
                     color: Colors.black45),
               ),
@@ -505,8 +505,8 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(
-              fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black54),
+          style:TextStyle(
+              fontSize: 14.sp, fontWeight: FontWeight.w700, color: Colors.black54),
         ),
         const SizedBox(height: 5),
         Container(
@@ -521,13 +521,13 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             isExpanded: true,
             hint: Text("Select Subject",
                 style:
-                    GoogleFonts.urbanist(fontSize: 14, color: Colors.black45)),
+                    TextStyle(fontSize: 14.sp, color: Colors.black45)),
             items: items.map((subject) {
               return DropdownMenuItem<int>(
                 value: subject["id"],
                 child: Text(subject["name"],
-                    style: GoogleFonts.urbanist(
-                        fontSize: 14, color: Colors.black87)),
+                    style:TextStyle(
+                        fontSize: 14.sp, color: Colors.black87)),
               );
             }).toList(),
             onChanged: (value) {

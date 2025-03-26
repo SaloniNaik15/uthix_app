@@ -1,10 +1,8 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Grade extends StatefulWidget {
-  const Grade({super.key});
+  const Grade({Key? key}) : super(key: key);
 
   @override
   State<Grade> createState() => _GradeState();
@@ -20,15 +18,15 @@ class _GradeState extends State<Grade> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Container(
-          height: 39,
-          width: 86,
+          height: 35.h,
+          width: 76.w,
           alignment: Alignment.centerLeft,
           child: Text(
             criteria,
-            style: GoogleFonts.urbanist(
-              fontSize: 14,
+            style: TextStyle(
+              fontSize: 12.sp,
               fontWeight: FontWeight.w400,
-              color: const Color.fromRGBO(0, 0, 0, 1),
+              color: Colors.black,
             ),
           ),
         ),
@@ -44,13 +42,13 @@ class _GradeState extends State<Grade> {
               });
             },
             child: Container(
-              height: 34,
-              width: 87,
+              height: 34.h,
+              width: 87.w,
               decoration: BoxDecoration(
                 color: selectedGrades[criteria] == rating
                     ? const Color.fromRGBO(43, 92, 116, 1)
                     : const Color.fromRGBO(246, 246, 246, 1),
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(4.r),
                 border: Border.all(
                   color: const Color.fromRGBO(175, 175, 175, 1),
                 ),
@@ -58,10 +56,10 @@ class _GradeState extends State<Grade> {
               child: Center(
                 child: Text(
                   rating,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 14,
+                  style: TextStyle(
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.w400,
-                    color: const Color.fromRGBO(0, 0, 0, 1),
+                    color: Colors.black,
                   ),
                 ),
               ),
@@ -76,12 +74,13 @@ class _GradeState extends State<Grade> {
     TextEditingController feedbackController = TextEditingController();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_outlined,
-            size: 25,
+            size: 25.sp,
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -91,70 +90,70 @@ class _GradeState extends State<Grade> {
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Padding(
-          padding: const EdgeInsets.only(left: 15, right: 15, top: 40),
+          padding: EdgeInsets.only(left: 15.w, right: 15.w, top: 40.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
+              //SizedBox(height: 20.h),
               Text(
                 "Grading and Feedback",
-                style: GoogleFonts.urbanist(
-                  fontSize: 24,
+                style: TextStyle(
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.w600,
                   color: const Color.fromRGBO(96, 95, 95, 1),
                 ),
               ),
-              const SizedBox(height: 5),
+              SizedBox(height: 5.h),
               Text(
                 "Please grade the work according to the following criterion",
-                style: GoogleFonts.urbanist(
-                  fontSize: 14,
+                style: TextStyle(
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w300,
                   color: const Color.fromRGBO(96, 95, 95, 1),
                 ),
               ),
-              const SizedBox(height: 40),
-              gradeRow(
-                  "Course Engagement", ["Excellent", "Well Done", "Basic"]),
-              const SizedBox(height: 18),
+              SizedBox(height: 20.h),
+              gradeRow("Course Engagement", ["Excellent", "Well Done", "Basic"]),
+              SizedBox(height: 18.h),
               gradeRow("Class Attendance", ["Excellent", "Well Done", "Basic"]),
-              const SizedBox(height: 18),
+              SizedBox(height: 18.h),
               gradeRow("Problem Solving", ["Excellent", "Well Done", "Basic"]),
-              const SizedBox(height: 18),
+              SizedBox(height: 18.h),
               gradeRow("Quick Thinking", ["Excellent", "Well Done", "Basic"]),
-              const SizedBox(height: 18),
+              SizedBox(height: 18.h),
               gradeRow("Course Knowledge", ["Excellent", "Well Done", "Basic"]),
-              const SizedBox(height: 18),
+              SizedBox(height: 18.h),
               gradeRow("Detailed Work", ["Excellent", "Well Done", "Basic"]),
-              const SizedBox(height: 18),
-              gradeRow(
-                  "Presentation Skills", ["Excellent", "Well Done", "Basic"]),
-              const SizedBox(height: 30),
-              const Divider(
-                thickness: 2,
-                color: Color.fromRGBO(217, 217, 217, 1),
+              SizedBox(height: 18.h),
+              gradeRow("Presentation Skills", ["Excellent", "Well Done", "Basic"]),
+              SizedBox(height: 30.h),
+              Divider(
+                thickness: 2.h,
+                color: const Color.fromRGBO(217, 217, 217, 1),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
                 child: Row(
                   children: [
-                    const Icon(Icons.menu,
-                        color: Color.fromRGBO(96, 95, 95, 1)),
-                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.menu,
+                      color: const Color.fromRGBO(96, 95, 95, 1),
+                    ),
+                    SizedBox(width: 5.w),
                     Expanded(
                       child: TextField(
                         controller: feedbackController,
                         keyboardType: TextInputType.text,
-                        style: GoogleFonts.urbanist(
-                          fontSize: 14,
+                        style: TextStyle(
+                          fontSize: 10.sp,
                           fontWeight: FontWeight.w400,
                           color: const Color.fromRGBO(96, 95, 95, 1),
                         ),
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Feedback Note",
-                          hintStyle: GoogleFonts.urbanist(
-                            fontSize: 14,
+                          hintStyle: TextStyle(
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.w400,
                             color: const Color.fromRGBO(96, 95, 95, 1),
                           ),
@@ -164,26 +163,26 @@ class _GradeState extends State<Grade> {
                   ],
                 ),
               ),
-              const Divider(
-                thickness: 2,
-                color: Color.fromRGBO(217, 217, 217, 1),
+              Divider(
+                thickness: 2.h,
+                color: const Color.fromRGBO(217, 217, 217, 1),
               ),
-              const SizedBox(height: 30),
+              SizedBox(height: 30.h),
               Center(
                 child: Container(
-                  height: 42,
-                  width: 170,
+                  height: 42.h,
+                  width: 170.w,
                   decoration: BoxDecoration(
                     color: const Color.fromRGBO(43, 92, 116, 1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Center(
                     child: Text(
                       "Submit",
-                      style: GoogleFonts.urbanist(
-                        fontSize: 16,
+                      style: TextStyle(
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.w500,
-                        color: const Color.fromRGBO(255, 255, 255, 1),
+                        color: Colors.white,
                       ),
                     ),
                   ),
