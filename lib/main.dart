@@ -3,12 +3,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:uthix_app/view/Student_Pages/Modern_Tools/modern_tools.dart';
 import 'package:uthix_app/view/homeRegistration/new_registerlogin.dart';
 
+import 'package:uthix_app/view/Student_Pages/Modern_Tools/modern_tools.dart';
+import 'package:uthix_app/view/homeRegistration/new_registerlogin.dart';
+
 // import 'package:uthix_app/view/Student_Pages/LMS/query_provider.dart';
 import 'package:uthix_app/view/homeRegistration/splashintroScreen.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 import 'package:uthix_app/view/homeRegistration/welcome_screen.dart';
 import 'package:uthix_app/view/instructor_dashboard/panding.dart'; // Import ScreenUti
+
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,6 +43,11 @@ class MainApp extends StatelessWidget {
           // home: InstructorDashboard(),
           // home: ECommerce(),
           //home: NewRegisterlogin(),
+
+          //home: SellerDashboard(),
+          //home: InstructorDashboard(),
+          //home: ECommerce(),
+
         );
       },
     );

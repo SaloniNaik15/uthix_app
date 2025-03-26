@@ -10,7 +10,9 @@ import 'package:uthix_app/view/homeRegistration/mailIdPage.dart';
 import 'package:uthix_app/view/homeRegistration/new_registration.dart';
 import 'package:uthix_app/view/homeRegistration/registration.dart';
 import 'package:uthix_app/view/homeRegistration/successfulregister.dart';
+
 import 'package:uthix_app/view/instructor_dashboard/panding.dart';
+
 import 'package:uthix_app/view/login/start_login.dart';
 
 import '../Seller_dashboard/dashboard.dart';
@@ -62,7 +64,6 @@ class _NewLoginState extends State<NewLogin> {
       log("API Response: ${response.data}");
 
       final data = response.data;
-
       if (response.statusCode == 403 &&
           data['status']?.toLowerCase() == 'pending') {
         Navigator.pushReplacement(
@@ -107,6 +108,7 @@ class _NewLoginState extends State<NewLogin> {
           ),
         );
       }
+
     } on DioError catch (dioError) {
       // 👇 Handle specific API failure
       if (dioError.response != null) {
@@ -147,7 +149,7 @@ class _NewLoginState extends State<NewLogin> {
         SnackBar(
           content: Text(
             "An unexpected error occurred. Please try again.",
-            style: GoogleFonts.urbanist(),
+         style: GoogleFonts.urbanist(),
           ),
         ),
       );
@@ -335,13 +337,16 @@ class _NewLoginState extends State<NewLogin> {
         child: TextField(
           controller: _passwordController,
           obscureText: ispassword,
+
           style:
               GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: "Enter your Password",
             hintStyle:
+
                 GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+
             suffixIcon: IconButton(
               icon: Icon(ispassword
                   ? Icons.visibility_off_outlined
@@ -381,7 +386,9 @@ Widget _buildTextField({
           border: InputBorder.none,
           hintText: hint,
           hintStyle:
+
               GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+
         ),
       ),
     ),
