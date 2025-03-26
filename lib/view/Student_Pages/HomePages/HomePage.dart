@@ -1,17 +1,14 @@
-// ignore_for_file: deprecated_member_use
-
+import 'dart:convert';
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
 import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/modal/nav_itemStudent.dart';
 import 'package:uthix_app/modal/navbarWidgetStudent.dart';
-
 import 'package:uthix_app/view/Student_Pages/Buy_Books/Buy_TextBooks.dart';
-
 import 'package:uthix_app/view/Student_Pages/HomePages/drawer_classroom.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/yourc_clasroom.dart';
 import 'package:uthix_app/view/Student_Pages/Modern_Tools/modern_tools.dart';
@@ -26,29 +23,17 @@ class HomePages extends StatefulWidget {
 
 class _HomePagesState extends State<HomePages> {
   int selectedIndex = 0;
+  String? accessLoginToken;
+  String? userName;
 
   final List<Map<String, String>> dashBoard = [
     {"image": "assets/Student_Home_icons/Buy_Books.png", "title": "BUY BOOKS"},
-    {
-      "image": "assets/Student_Home_icons/My_Classes.png",
-      "title": "MY CLASSES"
-    },
-    {
-      "image": "assets/Student_Home_icons/My_Progress.png",
-      "title": "MY PROGRESS"
-    },
+    {"image": "assets/Student_Home_icons/My_Classes.png", "title": "MY CLASSES"},
+    {"image": "assets/Student_Home_icons/My_Progress.png", "title": "MY PROGRESS"},
     {"image": "assets/Student_Home_icons/Community.png", "title": "COMMUNITY"},
-    {
-      "image": "assets/Student_Home_icons/Modern_tools.png",
-      "title": "MODERN TOOLS"
-    },
-    {
-      "image": "assets/Student_Home_icons/Demo_Classes.png",
-      "title": "DEMO CLASSES"
-    },
+    {"image": "assets/Student_Home_icons/Modern_tools.png", "title": "MODERN TOOLS"},
+    {"image": "assets/Student_Home_icons/Demo_Classes.png", "title": "DEMO CLASSES"},
   ];
-
-  String? accessLoginToken;
 
   @override
   void initState() {
@@ -58,12 +43,61 @@ class _HomePagesState extends State<HomePages> {
 
   Future<void> _initializeData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token'); // Retrieve token
-    log("Retrieved Token: $token"); // Log token for verification
+    String? token = prefs.getString('auth_token');
+    log("Retrieved Token: $token");
 
     setState(() {
       accessLoginToken = token;
     });
+
+    // Load cached profile first
+    await _loadProfileFromCache();
+    // Then fetch updated profile data from API
+    _fetchUserProfile();
+  }
+
+  Future<void> _loadProfileFromCache() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? cachedProfile = prefs.getString("cached_profile");
+    if (cachedProfile != null) {
+      try {
+        final data = jsonDecode(cachedProfile);
+        setState(() {
+          userName = data["name"];
+        });
+        log("Loaded profile from cache.");
+      } catch (e) {
+        log("Error decoding cached profile: $e");
+      }
+    }
+  }
+
+  Future<void> _fetchUserProfile() async {
+    try {
+      final dio = Dio();
+      // Replace with your actual API endpoint.
+      final response = await dio.get(
+        "https://admin.uthix.com/api/profile",
+        options: Options(
+          headers: {"Authorization": "Bearer $accessLoginToken"},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        setState(() {
+          userName = data["name"];
+        });
+        // Cache the fetched profile data.
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("cached_profile", jsonEncode(data));
+        log("Profile updated from API and cached.");
+      } else {
+        log("Failed to fetch user profile: ${response.statusMessage}");
+      }
+    } catch (e) {
+      log("Error fetching user profile: $e");
+    }
   }
 
   void onItemTapped(int index) {
@@ -100,12 +134,11 @@ class _HomePagesState extends State<HomePages> {
         child: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
-          titleSpacing: 0, // Ensures elements are properly aligned
+          titleSpacing: 0,
           leading: Builder(
             builder: (context) => IconButton(
               icon: Icon(Icons.menu, color: Colors.black),
-              onPressed: () =>
-                  Scaffold.of(context).openDrawer(), // Open MyDrawer
+              onPressed: () => Scaffold.of(context).openDrawer(),
             ),
           ),
           title: Row(
@@ -113,36 +146,24 @@ class _HomePagesState extends State<HomePages> {
             children: [
               const Spacer(),
               Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Display fetched userName; fallback to placeholder if not available.
                   Text(
-                    "Mahima Mandal",
+                    userName ?? "...",
                     style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: "Urbanist",
-                      fontWeight: FontWeight.w500,
-                      color: Color.fromRGBO(96, 95, 95, 1),
-                    ),
-                  ),
-                  Text(
-                    "MAHIMA 007",
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontFamily: "Urbanist",
-                      fontWeight: FontWeight.w500,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
                       color: Color.fromRGBO(96, 95, 95, 1),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(
-                width: 15,
-              ),
-              // Profile Image
+              const SizedBox(width: 15),
               Container(
-                height: 45,
-                width: 45,
+                height: 50,
+                width: 50,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(19),
@@ -161,9 +182,7 @@ class _HomePagesState extends State<HomePages> {
                   ),
                 ),
               ),
-              const SizedBox(
-                width: 15,
-              ),
+              const SizedBox(width: 15),
             ],
           ),
         ),
@@ -193,11 +212,10 @@ class _HomePagesState extends State<HomePages> {
                     crossAxisCount: 2,
                     crossAxisSpacing: 15,
                     mainAxisSpacing: 15,
-                    childAspectRatio: 1, // Adjust ratio to fit content better
+                    childAspectRatio: 1,
                   ),
                   shrinkWrap: true,
-                  physics:
-                      const NeverScrollableScrollPhysics(), // Prevents nested scrolling issues
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: dashBoard.length,
                   itemBuilder: (context, index) {
                     return GestureDetector(
@@ -206,42 +224,43 @@ class _HomePagesState extends State<HomePages> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    UnderConstructionScreen()),
+                              builder: (context) => UnderConstructionScreen(),
+                            ),
                           );
                         } else if (dashBoard[index]["title"] == "MY CLASSES") {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => YourClasroom()),
+                              builder: (context) => YourClasroom(),
+                            ),
                           );
-                        } else if (dashBoard[index]["title"] ==
-                            "MODERN TOOLS") {
+                        } else if (dashBoard[index]["title"] == "MODERN TOOLS") {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ModernTools()),
+                              builder: (context) => ModernTools(),
+                            ),
                           );
                         } else if (dashBoard[index]["title"] == "MY PROGRESS") {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ProgressTracking()),
+                              builder: (context) => ProgressTracking(),
+                            ),
                           );
                         } else if (dashBoard[index]["title"] == "COMMUNITY") {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    UnderConstructionScreen()),
+                              builder: (context) => UnderConstructionScreen(),
+                            ),
                           );
-                        } else if (dashBoard[index]["title"] ==
-                            "DEMO CLASSES") {
+                        } else if (dashBoard[index]["title"] == "DEMO CLASSES") {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    UnderConstructionScreen()),
+                              builder: (context) => UnderConstructionScreen(),
+                            ),
                           );
                         }
                       },
@@ -268,7 +287,7 @@ class _HomePagesState extends State<HomePages> {
                               child: Text(
                                 dashBoard[index]["title"]!,
                                 textAlign: TextAlign.center,
-                                style: GoogleFonts.urbanist(
+                                style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                   color: const Color.fromRGBO(96, 95, 95, 1),

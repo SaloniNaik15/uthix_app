@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
 import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/modal/nav_itemStudent.dart';
 import 'package:uthix_app/modal/navbarWidgetStudent.dart';
@@ -32,6 +35,82 @@ class StudentAccountPages extends StatefulWidget {
 
 class _StudentAccountPagesState extends State<StudentAccountPages> {
   int selectedIndex = 4;
+  String? accessLoginToken;
+  String? userName;
+
+  final List<Map<String, dynamic>> dashBoard = [
+    {"image": "assets/Student_Home_icons/Buy_Books.png", "title": "BUY BOOKS"},
+    {"image": "assets/Student_Home_icons/My_Classes.png", "title": "MY CLASSES"},
+    {"image": "assets/Student_Home_icons/My_Progress.png", "title": "MY PROGRESS"},
+    {"image": "assets/Student_Home_icons/Community.png", "title": "COMMUNITY"},
+    {"image": "assets/Student_Home_icons/Modern_tools.png", "title": "MODERN TOOLS"},
+    {"image": "assets/Student_Home_icons/Demo_Classes.png", "title": "DEMO CLASSES"},
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    log("Retrieved Token: $token");
+
+    setState(() {
+      accessLoginToken = token;
+    });
+
+    // Load cached profile first (if available)
+    await _loadProfileFromCache();
+    // Then fetch the latest profile from the API
+    _fetchUserProfile();
+  }
+
+  Future<void> _loadProfileFromCache() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? cachedProfile = prefs.getString('cached_profile');
+    if (cachedProfile != null) {
+      try {
+        final data = jsonDecode(cachedProfile);
+        setState(() {
+          userName = data["name"];
+        });
+        log("Loaded profile from cache.");
+      } catch (e) {
+        log("Error decoding cached profile: $e");
+      }
+    }
+  }
+
+  Future<void> _fetchUserProfile() async {
+    try {
+      final dio = Dio();
+      // Replace with your actual API endpoint for fetching the user profile.
+      final response = await dio.get(
+        "https://admin.uthix.com/api/profile",
+        options: Options(
+          headers: {"Authorization": "Bearer $accessLoginToken"},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        setState(() {
+          userName = data["name"]; // For example: "kirti"
+        });
+        // Cache the profile data
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("cached_profile", jsonEncode(data));
+        log("Profile updated from API and cached.");
+      } else {
+        log("Failed to fetch user profile: ${response.statusMessage}");
+      }
+    } catch (e) {
+      log("Error fetching user profile: $e");
+    }
+  }
 
   void onItemTapped(int index) {
     setState(() {
@@ -49,6 +128,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,19 +149,17 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(
-                bottom: 100), // Creates space before navbar
+            padding: const EdgeInsets.only(bottom: 100), // Space for navbar
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 20),
                     child: Text(
                       "Your Profile",
                       style: TextStyle(
-                        fontSize: 20,
-                        fontFamily: "Urbanist",
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -91,7 +169,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                     height: 130,
                     width: 420,
                     decoration: BoxDecoration(
-                      color: Color.fromRGBO(229, 243, 255, 1),
+                      color: const Color.fromRGBO(229, 243, 255, 1),
                     ),
                     child: Stack(
                       children: [
@@ -101,9 +179,10 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
+                              // Use fetched userName; show fallback if null
                               Text(
-                                "Mahima",
-                                style: GoogleFonts.urbanist(
+                                userName ?? "...",
+                                style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w600,
                                   color: const Color.fromRGBO(0, 0, 0, 1),
@@ -113,7 +192,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                                 width: 250,
                                 child: Text(
                                   "Congratulations! You are our premium member now",
-                                  style: GoogleFonts.urbanist(
+                                  style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                     color: const Color.fromRGBO(0, 0, 0, 1),
@@ -141,37 +220,33 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Padding(
-                    padding: EdgeInsets.all(15),
+                    padding: const EdgeInsets.all(15),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Color(0xFFF4F4F4),
+                        color: const Color(0xFFF4F4F4),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Color(0xFFD9D9D9), width: 1),
+                        border: Border.all(color: const Color(0xFFD9D9D9), width: 1),
                       ),
-                      padding: EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
                       child: Column(
                         children: [
                           GridView.count(
                             shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
+                            physics: const NeverScrollableScrollPhysics(),
                             crossAxisCount: 2,
                             crossAxisSpacing: 5,
                             mainAxisSpacing: 10,
                             childAspectRatio: 3.5,
                             children: [
-                              _buildGridItem(Icons.inventory_2_outlined,
-                                  "Orders", context, OrdersTrackingPage()),
-                              _buildGridItem(Icons.local_offer_outlined,
-                                  "Coupons", context, CouponsScreen()),
-                              _buildGridItem(Icons.favorite_border, "Wishlist",
-                                  context, Wishlist()),
-                              _buildGridItem(Icons.person_outline, "Profile",
-                                  context, StudentProfile()),
+                              _buildGridItem(Icons.inventory_2_outlined, "Orders", context, UnderConstructionScreen()),
+                              _buildGridItem(Icons.local_offer_outlined, "Coupons", context, CouponsScreen()),
+                              _buildGridItem(Icons.favorite_border, "Wishlist", context, UnderConstructionScreen()),
+                              _buildGridItem(Icons.person_outline, "Profile", context, StudentProfile()),
                             ],
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           const Divider(height: 1),
                           Column(
                             children: [
@@ -186,8 +261,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                               _buildListTile(
                                 icon: Icons.wallet_outlined,
                                 title: "Wallet",
-                                subtitle:
-                                    "Wallet money & saved payment methods",
+                                subtitle: "Wallet money & saved payment methods",
                                 navigateTo: StudentWallet(),
                                 context: context,
                               ),
@@ -196,9 +270,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                                 icon: Icons.location_on_outlined,
                                 title: "My Addresses",
                                 subtitle: "Add or edit your addresses",
-                                navigateTo: StudentAddress(
-                                  address: {},
-                                ),
+                                navigateTo: UnderConstructionScreen(),
                                 context: context,
                               ),
                               const Divider(height: 1),
@@ -223,6 +295,14 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                                 title: "Settings",
                                 subtitle: "Get notifications",
                                 navigateTo: StudentSettings(),
+                                context: context,
+                              ),
+                              const Divider(height: 1),
+                              _buildListTile(
+                                icon: Icons.currency_exchange_outlined,
+                                title: "Subscription Details",
+                                subtitle: "You can see the plans details",
+                                navigateTo: UnderConstructionScreen(),
                                 context: context,
                               ),
                             ],
@@ -251,7 +331,6 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                           "Log out",
                           style: TextStyle(
                               color: Colors.red,
-                              fontFamily: "Urbanist",
                               fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -261,7 +340,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
               ),
             ),
           ),
-          // Custom Bottom Navigation Bar (Always Above Background)
+          // Custom Bottom Navigation Bar
           Positioned(
             bottom: 15,
             left: 0,
@@ -289,20 +368,17 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
       leading: Icon(icon, color: Colors.black),
       title: Text(title),
       subtitle: subtitle.isNotEmpty ? Text(subtitle) : null,
-      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
       onTap: () {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => navigateTo));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => navigateTo));
       },
     );
   }
 
-  Widget _buildGridItem(
-      IconData icon, String title, BuildContext context, Widget navigateTo) {
+  Widget _buildGridItem(IconData icon, String title, BuildContext context, Widget navigateTo) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => navigateTo));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => navigateTo));
       },
       child: Center(
         child: ListTile(
