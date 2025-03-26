@@ -46,7 +46,7 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.all(10.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -65,7 +65,7 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
                     height: 50.h,
                     width: 220.w,
                     child: const Text(
-                        "Please contact us and we will be \n  happy to help you"),
+                        "Please contact us and we will be happy to help you"),
                   ),
                   Card(
                     child: Image.asset(
@@ -134,7 +134,7 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
                 textAlign: TextAlign.left,
                 textAlignVertical: TextAlignVertical.top,
               ),
-              SizedBox(height: 25.h),
+              SizedBox(height: 20.h),
               Container(
                 alignment: Alignment.center,
                 child: Text(
@@ -142,7 +142,7 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
                   style: TextStyle(fontSize: 14.sp),
                 ),
               ),
-              SizedBox(height: 80.h),
+              SizedBox(height: 70.h),
               Center(
                 child: Padding(
                   padding: EdgeInsets.only(bottom: 10.h),
