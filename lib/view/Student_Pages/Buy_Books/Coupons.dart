@@ -230,16 +230,18 @@ class CouponCard extends StatelessWidget {
                 child: Image.asset(
                   "assets/Student_Home_icons/couponBook.png",
                   width: 100.w,
-                  height: 120.h,
+                  height: 100.h,
                   fit: BoxFit.cover,
                 ),
               ),
-              SizedBox(width: 20.w),
-              const DottedDividerWithIcon(
-                height: 90,
+
+              SizedBox(width: 10.w),
+               DottedDividerWithIcon(
+                height: 50,
+
                 color: Colors.grey,
               ),
-              SizedBox(width: 20.w),
+              SizedBox(width: 10.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -282,21 +284,21 @@ class CouponCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 5.h),
-                    TextButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size(0, 30.h),
-                      ),
-                      child: Text(
-                        "View Products",
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
+                    // SizedBox(height: 5.h),
+                    // TextButton(
+                    //   onPressed: () {},
+                    //   style: TextButton.styleFrom(
+                    //     padding: EdgeInsets.zero,
+                    //     minimumSize: Size(0, 30.h),
+                    //   ),
+                    //   child: Text(
+                    //     "View Products",
+                    //     style: TextStyle(
+                    //       fontSize: 16.sp,
+                    //       color: Colors.grey,
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
@@ -313,9 +315,9 @@ class DottedDividerWithIcon extends StatelessWidget {
   final Color color;
   final IconData icon;
 
-  const DottedDividerWithIcon({
+   DottedDividerWithIcon({
     super.key,
-    this.height = 90,
+    this.height = 50,
     this.color = Colors.grey,
     this.icon = CupertinoIcons.scissors_alt,
   });
