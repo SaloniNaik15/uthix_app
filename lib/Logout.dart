@@ -36,7 +36,7 @@ Future<void> logoutUser(BuildContext context) async {
             ),
             child: Text("Yes, Logout"),
             onPressed: () async {
-              Navigator.of(context).pop(); // Close the dialog first
+              Navigator.of(context).pop();
 
               SharedPreferences prefs = await SharedPreferences.getInstance();
               await prefs.remove('auth_token');

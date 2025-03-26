@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
 import '../../../Logout.dart';
 import '../../login/start_login.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class StudentManageAccount extends StatefulWidget {
   const StudentManageAccount({super.key});
@@ -14,6 +16,8 @@ class StudentManageAccount extends StatefulWidget {
 
 class _StudentManageAccountState extends State<StudentManageAccount> {
   String? accessLoginToken;
+  // Holds the fetched profile data
+  Map<String, dynamic>? profile;
 
   @override
   void initState() {
@@ -23,6 +27,7 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
 
   Future<void> _initializeData() async {
     await _loadUserCredentials();
+    await _fetchProfile();
   }
 
   Future<void> _loadUserCredentials() async {
@@ -34,6 +39,37 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
       accessLoginToken = token;
     });
   }
+
+  Future<void> _fetchProfile() async {
+    try {
+      final dio = Dio();
+      // Replace with your actual API endpoint.
+      final response = await dio.get(
+        "https://admin.uthix.com/api/profile",
+        options: Options(
+          headers: {"Authorization": "Bearer $accessLoginToken"},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          profile = response.data;
+        });
+        log("Profile fetched: ${response.data}");
+      } else {
+        log("Failed to fetch profile: ${response.statusMessage}");
+        setState(() {
+          profile = null;
+        });
+      }
+    } catch (e) {
+      log("Error fetching profile: $e");
+      setState(() {
+        profile = null;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,16 +110,20 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
                 ),
               ),
               SizedBox(height: 10.h),
+              // Use the fetched profile name; if not yet available, show a placeholder.
               Text(
-                "Mahima Mandal",
+                profile != null ? profile!["name"] ?? "null" : "Loading...",
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF2B5C74),
                 ),
               ),
+              // Optionally, you can show more details from the profile if available.
               Text(
-                "Class X B\nDelhi Public School, New Delhi\n+91 XXXXXX XXXXX",
+                profile != null
+                    ? "Class X B\nDelhi Public School, New Delhi\n+91 ${profile!["phone"] ?? "null"}"
+                    : "Loading...",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14.sp,
@@ -93,10 +133,14 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
               SizedBox(height: 20.h),
 
               // Profile fields
-              _buildProfileField(Icons.person, "Mahima"),
-              _buildProfileField(Icons.phone, "+91 XXXXXX XXXXX"),
-              _buildProfileField(Icons.location_on, "IP Extension, New Delhi"),
-              _buildProfileField(Icons.school, "Banaras Hindu University"),
+              // Here we use the fetched API data. For missing fields, "null" is shown.
+              _buildProfileField(
+                  Icons.person, profile != null ? profile!["name"] ?? "null" : "Loading..."),
+              _buildProfileField(
+                  Icons.phone, profile != null ? profile!["phone"]?.toString() ?? "null" : "Loading..."),
+              // The sample API does not provide location or school. So we display "null".
+              _buildProfileField(Icons.location_on, "null"),
+              _buildProfileField(Icons.school, "null"),
 
               SizedBox(height: 30.h),
 
@@ -104,13 +148,13 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: SizedBox(
-                  height: 50,
+                  height: 50.h,
                   width: MediaQuery.sizeOf(context).width,
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: Colors.red, width: 1),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     onPressed: () {
@@ -120,7 +164,7 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
                       "Log out",
                       style: TextStyle(
                           color: Colors.red,
-                          fontFamily: "Urbanist",
+                          fontSize: 16,
                           fontWeight: FontWeight.bold),
                     ),
                   ),
