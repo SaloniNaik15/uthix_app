@@ -30,9 +30,7 @@ class _RegistrationState extends State<Registration> {
         SystemNavigator.pop();
         return false;
       },
-      child: ScreenUtilInit(
-        designSize: const Size(375, 812),
-        builder: (_, child) => Scaffold(
+      child:  Scaffold(
           backgroundColor: Colors.white,
           resizeToAvoidBottomInset:
           false, // Prevents resizing when keyboard is open
@@ -186,7 +184,6 @@ class _RegistrationState extends State<Registration> {
             ),
           ),
         ),
-      ),
     );
   }
 

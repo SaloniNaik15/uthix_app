@@ -1,0 +1,2 @@
+/Users/deepak/Desktop/project/uthix_app/android/app/.cxx/RelWithDebInfo/416k5u50/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/deepak/Desktop/project/uthix_app/android/app/.cxx/RelWithDebInfo/416k5u50/arm64-v8a/CMakeFiles/rebuild_cache.dir

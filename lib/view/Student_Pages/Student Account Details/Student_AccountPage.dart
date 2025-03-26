@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'package:uthix_app/UpcomingPage.dart';
@@ -20,6 +21,7 @@ import '../Buy_Books/Wishlist.dart';
 import 'Order_Tracking.dart';
 import 'Student_Address.dart';
 import 'Student_FAQ.dart';
+import 'Student_HelpDesk.dart';
 import 'Student_ManageAccount.dart';
 import 'Student_Order_HelpDesk.dart';
 import 'Student_Profile.dart';
@@ -154,17 +156,17 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
+                   Padding(
                     padding: EdgeInsets.only(left: 20),
                     child: Text(
                       "Your Profile",
                       style: TextStyle(
-                        fontSize: 22,
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                   SizedBox(height: 10.h),
                   Container(
                     height: 130,
                     width: 420,
@@ -254,7 +256,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                                 icon: Icons.headset_mic_outlined,
                                 title: "Help Desk",
                                 subtitle: "Connect with us",
-                                navigateTo: StudentOrderHelpdesk(),
+                                navigateTo: StudentHelpdesk(),
                                 context: context,
                               ),
                               const Divider(height: 1),
