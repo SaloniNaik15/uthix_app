@@ -79,14 +79,14 @@ class _FilesState extends State<Files> {
         elevation: 0,
         title: Text(
           "Files",
-          style: GoogleFonts.urbanist(
-            fontSize: 20,
+          style: TextStyle(
+            fontSize: 18.sp,
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.menu, color: Colors.white, size: 25),
+          icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 25),
           onPressed: () {},
         ),
         actions: [
@@ -103,7 +103,7 @@ class _FilesState extends State<Files> {
             icon: Icon(Icons.search, color: Colors.white, size: 25),
             onPressed: () {},
           ),
-          const SizedBox(width: 15),
+           SizedBox(width: 15.w),
         ],
       ),
       body: Stack(
@@ -118,7 +118,7 @@ class _FilesState extends State<Files> {
                     SizedBox(height: 10.h),
                     Text(
                       "The class recordings and files uploaded by you will appear here",
-                      style: GoogleFonts.urbanist(
+                      style: TextStyle(
                         fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
                         color: const Color.fromRGBO(96, 95, 95, 1),
@@ -126,8 +126,8 @@ class _FilesState extends State<Files> {
                     ),
                     SizedBox(height: 20.h),
                     Container(
-                      height: 37.h,
-                      width: 167.w,
+                      height: 40.h,
+                      width: 160.w,
                       decoration: BoxDecoration(
                         color: Color.fromRGBO(246, 246, 246, 1),
                         borderRadius: BorderRadius.circular(10.r),
@@ -141,7 +141,7 @@ class _FilesState extends State<Files> {
                           children: [
                             Text(
                               "Selected Class",
-                              style: GoogleFonts.urbanist(
+                              style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w600,
                                 color: const Color.fromRGBO(96, 95, 95, 1),
@@ -166,8 +166,8 @@ class _FilesState extends State<Files> {
                               });
                             },
                             child: Container(
-                              height: 47.h,
-                              width: 110.w,
+                              height: 40.h,
+                              width: 100.w,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(38.r),
                                 color: selectedIndex == index
@@ -179,8 +179,8 @@ class _FilesState extends State<Files> {
                               child: Center(
                                 child: Text(
                                   sortOptions[index],
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 16.sp,
+                                  style:TextStyle(
+                                    fontSize: 14.sp,
                                     fontWeight: FontWeight.w700,
                                     color: selectedIndex == index
                                         ? Colors.white
@@ -189,6 +189,7 @@ class _FilesState extends State<Files> {
                                 ),
                               ),
                             ),
+
                           ),
                         ),
                       ),
@@ -235,7 +236,7 @@ class _FilesState extends State<Files> {
                                   children: [
                                     Text(
                                       file["title"]!,
-                                      style: GoogleFonts.urbanist(
+                                      style: TextStyle(
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w500,
                                         color: const Color.fromRGBO(0, 0, 0, 1),
@@ -243,7 +244,7 @@ class _FilesState extends State<Files> {
                                     ),
                                     Text(
                                       file["description"]!,
-                                      style: GoogleFonts.urbanist(
+                                      style:TextStyle(
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w400,
                                         color: const Color.fromRGBO(0, 0, 0, 1),

@@ -1,18 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PersonalChat extends StatefulWidget {
-  const PersonalChat({super.key});
+  const PersonalChat({Key? key}) : super(key: key);
 
   @override
   State<PersonalChat> createState() => _PersonalChatState();
 }
 
 class _PersonalChatState extends State<PersonalChat> {
+  /// Example messages. Replace with your own data or fetch from API/db.
   final List<Message> _messages = [
-    // Sample messages for demonstration
-    Message(text: "Hello!", isSender: false, time: "10:00 AM"),
-    Message(text: "Hi there!", isSender: true, time: "10:01 AM"),
+    Message(
+      text: "Hi. What can I help you with?",
+      isSender: false,
+      time: "08:23 PM",
+    ),
+    Message(
+      text:
+      "Well, I noticed that you have a collection of competitive exam books and I would like to meet you in person and discuss exchange of books!",
+      isSender: true,
+      time: "08:32 PM",
+    ),
+    Message(
+      text:
+      "Indeed. I just saw that we are from the same Uni. How about meeting up at the cafeteria tomorrow?",
+      isSender: false,
+      time: "08:32 PM",
+    ),
   ];
 
   final TextEditingController _messageController = TextEditingController();
@@ -22,8 +37,16 @@ class _PersonalChatState extends State<PersonalChat> {
     final String text = _messageController.text.trim();
     if (text.isNotEmpty) {
       setState(() {
-        // Insert at the beginning because ListView is reversed.
-        _messages.insert(0, Message(text: text, isSender: true, time: "Now"));
+        // Insert new message at the "bottom" of the list, so it appears last.
+        // Because the ListView is reversed, we actually insert at index 0.
+        _messages.insert(
+          0,
+          Message(
+            text: text,
+            isSender: true,
+            time: "Now",
+          ),
+        );
       });
       _messageController.clear();
       _focusNode.unfocus();
@@ -33,200 +56,173 @@ class _PersonalChatState extends State<PersonalChat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF3F4F6),
-      body: Column(
-        children: [
-          // Header Section
-          Padding(
-            padding: const EdgeInsets.only(left: 30, right: 30, top: 50),
-            child: SizedBox(
-              height: 80,
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
-                              offset: const Offset(0, 4),
-                              blurRadius: 8,
-                            ),
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              offset: const Offset(0, 0),
-                              blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: IconButton(
-                            icon: const Icon(Icons.arrow_back, size: 25),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Text(
-                        "Ravi Pradhan",
-                        style: GoogleFonts.urbanist(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: const Color.fromRGBO(43, 92, 116, 1),
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Container(
-                        height: 14,
-                        width: 14,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color.fromRGBO(120, 170, 23, 1),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    "Chat",
-                    style: GoogleFonts.urbanist(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: const Color.fromRGBO(43, 92, 116, 1),
-                    ),
-                  ),
-                ],
+      // Matches background from your design
+      backgroundColor: const Color(0xFFF3F4F6),
+
+      // ------------------- AppBar -------------------
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
+          children: [
+            Text(
+              "Ravi Pradhan",
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.w600,
+                color: const Color.fromRGBO(43, 92, 116, 1),
               ),
             ),
-          ),
-          const Divider(
-            thickness: 3,
-            color: Color.fromRGBO(200, 209, 215, 1),
-          ),
-          // Chat Message List
+            SizedBox(width: 5.w),
+            // Small green circle to show "online"
+            Container(
+              height: 8.h,
+              width: 8.h,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color.fromRGBO(120, 170, 23, 1),
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      // ------------------- Body -------------------
+      body: Column(
+        children: [
+          // -------- Messages List --------
           Expanded(
             child: ListView.builder(
-              reverse: true, // Latest messages at the bottom
+              reverse: true,
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 return MessageBubble(message: _messages[index]);
               },
             ),
           ),
-          // Bottom Input Container: Icons at left and TextField at right
+
+          // -------- Bottom Input Bar --------
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             color: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
             child: Row(
               children: [
-                // Icons container
-                Container(
-                  child: Row(
-                    children: [
-                      // "Add" icon inside a circular container.
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.grey, // Border color
-                            width: 1.0, // Border width
-                          ),
-                        ),
-                        child: IconButton(
-                          icon: ShaderMask(
-                            shaderCallback: (Rect bounds) {
-                              return const LinearGradient(
-                                colors: [
-                                  Color.fromRGBO(51, 152, 247, 1),
-                                  Color.fromRGBO(43, 92, 116, 1),
-                                ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ).createShader(bounds);
-                            },
-                            blendMode: BlendMode.srcIn,
-                            child: const Icon(Icons.add, size: 25),
-                          ),
-                          padding: EdgeInsets.zero,
-                          constraints:
-                              const BoxConstraints(minWidth: 0, minHeight: 0),
-                          onPressed: () {
-                            // Add functionality for the add button here.
-                          },
+                // Left icons (Add, Mic)
+                Row(
+                  children: [
+                    // "Add" icon
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1.w,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      child: IconButton(
+                        icon: ShaderMask(
+                          shaderCallback: (Rect bounds) {
+                            return const LinearGradient(
+                              colors: [
+                                Color.fromRGBO(51, 152, 247, 1),
+                                Color.fromRGBO(43, 92, 116, 1),
+                              ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ).createShader(bounds);
+                          },
+                          blendMode: BlendMode.srcIn,
+                          child: Icon(Icons.add, size: 22.sp),
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(
+                          minWidth: 0.w,
+                          minHeight: 0.h,
+                        ),
+                        onPressed: () {
+                          // TODO: Handle "Add" action
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 5.w),
 
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.grey, // Border color
-                            width: 1.0, // Border width
-                          ),
-                        ),
-                        child: IconButton(
-                          icon: ShaderMask(
-                            shaderCallback: (Rect bounds) {
-                              return const LinearGradient(
-                                colors: [
-                                  Color.fromRGBO(51, 152, 247, 1),
-                                  Color.fromRGBO(43, 92, 116, 1),
-                                ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ).createShader(bounds);
-                            },
-                            blendMode: BlendMode.srcIn,
-                            child: const Icon(Icons.mic, size: 25),
-                          ),
-                          padding: EdgeInsets.zero,
-                          constraints:
-                              const BoxConstraints(minWidth: 0, minHeight: 0),
-                          onPressed: () {
-                            // Add functionality for the add button here.
-                          },
+                    // Mic icon
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1.w,
                         ),
                       ),
-                    ],
-                  ),
+                      child: IconButton(
+                        icon: ShaderMask(
+                          shaderCallback: (Rect bounds) {
+                            return const LinearGradient(
+                              colors: [
+                                Color.fromRGBO(51, 152, 247, 1),
+                                Color.fromRGBO(43, 92, 116, 1),
+                              ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ).createShader(bounds);
+                          },
+                          blendMode: BlendMode.srcIn,
+                          child: Icon(Icons.mic, size: 22.sp),
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints(
+                          minWidth: 0.w,
+                          minHeight: 0.h,
+                        ),
+                        onPressed: () {
+                          // TODO: Handle "Mic" action
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 10),
 
+                SizedBox(width: 8.w),
+
+                // Text Field
                 Expanded(
                   child: TextField(
                     controller: _messageController,
                     focusNode: _focusNode,
                     decoration: InputDecoration(
                       hintText: "Type a message...",
-                      hintStyle: GoogleFonts.urbanist(
-                          fontSize: 16, color: Colors.grey),
+                      hintStyle: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.grey,
+                      ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(20.r),
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
                       fillColor: const Color.fromRGBO(246, 246, 246, 1),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 22.w,
+                        vertical: 12.h,
+                      ),
                     ),
                     onSubmitted: (value) => _sendMessage(),
                   ),
                 ),
-                const SizedBox(width: 10),
+
+                SizedBox(width: 10.w),
+
                 // Send button
                 GestureDetector(
                   onTap: _sendMessage,
                   child: Container(
-                    height: 50,
-                    width: 50,
+                    height: 40.h,
+                    width: 40.w,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
@@ -238,8 +234,8 @@ class _PersonalChatState extends State<PersonalChat> {
                         end: Alignment.bottomCenter,
                       ),
                     ),
-                    padding: const EdgeInsets.all(10),
-                    child: const Icon(Icons.send, color: Colors.white),
+                    padding: EdgeInsets.all(10.w),
+                    child: Icon(Icons.send, color: Colors.white, size: 18.sp),
                   ),
                 ),
               ],
@@ -251,92 +247,118 @@ class _PersonalChatState extends State<PersonalChat> {
   }
 }
 
+// ------------------- Model -------------------
 class Message {
   final String text;
   final bool isSender;
   final String time;
 
-  Message({required this.text, required this.isSender, required this.time});
+  Message({
+    required this.text,
+    required this.isSender,
+    required this.time,
+  });
 }
 
+// ------------------- Message Bubble -------------------
 class MessageBubble extends StatelessWidget {
   final Message message;
 
-  const MessageBubble({super.key, required this.message});
+  const MessageBubble({Key? key, required this.message}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final isSender = message.isSender;
+
     return Align(
-      alignment:
-          message.isSender ? Alignment.centerRight : Alignment.centerLeft,
-      child: Row(
-        mainAxisAlignment:
-            message.isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
-        children: [
-          if (!message.isSender)
-            ClipOval(
-              child: Image.asset(
-                'assets/login/profile.jpeg',
-                height: 40,
-                width: 40,
-                fit: BoxFit.cover,
+      alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+        child: Row(
+          mainAxisAlignment:
+          isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Sender's avatar only on left side if not sender
+            if (!isSender)
+              ClipOval(
+                child: Image.asset(
+                  'assets/login/profile.jpeg', // or a network image
+                  height: 40.h,
+                  width: 40.h,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: message.isSender
-                ? CrossAxisAlignment.end
-                : CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (!message.isSender)
-                    Text(
-                      'Ravi Pradhan',
-                      style: GoogleFonts.urbanist(
-                          fontSize: 12,
+            if (!isSender) SizedBox(width: 8.w),
+
+            // Column for name/time and bubble
+            Column(
+              crossAxisAlignment:
+              isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                // Name + time
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (!isSender)
+                      Text(
+                        'Ravi Pradhan',
+                        style: TextStyle(
+                          fontSize: 10.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black),
+                          color: Colors.black,
+                        ),
+                      ),
+                    if (!isSender) SizedBox(width: 5.w),
+                    Text(
+                      message.time,
+                      style: TextStyle(
+                        fontSize: 8.sp,
+                        color: Colors.grey,
+                      ),
                     ),
-                  if (!message.isSender) const SizedBox(width: 5),
-                  Text(
-                    message.time,
-                    style:
-                        GoogleFonts.urbanist(fontSize: 10, color: Colors.grey),
+                    if (isSender) SizedBox(width: 5.w),
+                    if (isSender)
+                      Text(
+                        'You',
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                  ],
+                ),
+
+                SizedBox(height: 2.h),
+
+                // Actual message bubble
+                Container(
+                  // The message bubble won’t exceed 60% of screen width
+                  constraints: BoxConstraints(maxWidth: 0.6.sw),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 10.h,
+                    horizontal: 15.w,
                   ),
-                  if (message.isSender) const SizedBox(width: 5),
-                  if (message.isSender)
-                    Text(
-                      'You',
-                      style: GoogleFonts.urbanist(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black),
+                  margin: EdgeInsets.symmetric(vertical: 5.h),
+                  decoration: BoxDecoration(
+                    color: isSender
+                        ? const Color.fromRGBO(255, 255, 255, 1)
+                        : const Color.fromRGBO(43, 92, 116, 1),
+                    borderRadius: BorderRadius.circular(15.r),
+                  ),
+                  child: Text(
+                    message.text,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: isSender ? Colors.black : Colors.white,
                     ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                margin: const EdgeInsets.symmetric(vertical: 5),
-                decoration: BoxDecoration(
-                  color: message.isSender
-                      ? const Color.fromRGBO(255, 255, 255, 1)
-                      : const Color.fromRGBO(43, 92, 116, 1),
-                  borderRadius: BorderRadius.circular(15),
+                  ),
                 ),
-                child: Text(
-                  message.text,
-                  style: GoogleFonts.urbanist(
-                      fontSize: 16,
-                      color: message.isSender ? Colors.black : Colors.white),
-                ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
