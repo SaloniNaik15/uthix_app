@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -70,10 +68,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(400, 780), // Base design size
-      builder: (context, child) {
-        return Scaffold(
+    return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
             backgroundColor: Colors.white,
@@ -100,9 +95,9 @@ class _ProfileAccountState extends State<ProfileAccount> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Text(
-                            "Mahima",
-                            style: GoogleFonts.urbanist(
-                              fontSize: 24.sp,
+                            "Instructor",
+                            style:TextStyle(
+                              fontSize: 20.sp,
                               fontWeight: FontWeight.w600,
                               color: Colors.black,
                             ),
@@ -111,7 +106,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
                             width: 250.w,
                             child: Text(
                               "Congratulations! You are our premium member now",
-                              style: GoogleFonts.urbanist(
+                              style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.black,
@@ -123,13 +118,13 @@ class _ProfileAccountState extends State<ProfileAccount> {
                     ),
                     Positioned(
                       top: 0,
-                      left: 272.w,
+                      left: 260.w,
                       child: Transform.rotate(
                         angle: -1.12 * (3.14159 / 180),
                         child: Image.asset(
                           'assets/instructor/premium.png',
                           width: 128.w,
-                          height: 128.h,
+                          height: 130.h,
                         ),
                       ),
                     ),
@@ -202,7 +197,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
                                 children: [
                                   Text(
                                     item["title"]!,
-                                    style: GoogleFonts.urbanist(
+                                    style: TextStyle(
                                         fontSize: 14.sp,
                                         fontWeight: FontWeight.w600,
                                         color: Colors.black),
@@ -210,7 +205,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
                                   if (item.containsKey("subtitle"))
                                     Text(
                                       item["subtitle"]!,
-                                      style: GoogleFonts.urbanist(
+                                      style:TextStyle(
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.w500,
                                           color: Colors.black),
@@ -241,11 +236,11 @@ class _ProfileAccountState extends State<ProfileAccount> {
                     onPressed: () {
                       logoutUser(context);
                     },
-                    child: const Text(
+                    child: Text(
                       "Log out",
                       style: TextStyle(
                           color: Colors.red,
-                          fontFamily: "Urbanist",
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -254,7 +249,5 @@ class _ProfileAccountState extends State<ProfileAccount> {
             ],
           ),
         );
-      },
-    );
   }
 }
