@@ -8,6 +8,8 @@ import 'package:uthix_app/view/homeRegistration/new_login.dart';
 import 'package:uthix_app/view/homeRegistration/successfulregister.dart';
 import 'package:uthix_app/view/login/start_login.dart';
 
+import 'new_login.dart';
+
 class Registration extends StatefulWidget {
   const Registration({super.key,});
 

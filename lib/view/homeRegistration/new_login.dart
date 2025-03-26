@@ -10,6 +10,9 @@ import 'package:uthix_app/view/homeRegistration/mailIdPage.dart';
 import 'package:uthix_app/view/homeRegistration/new_registration.dart';
 import 'package:uthix_app/view/homeRegistration/registration.dart';
 import 'package:uthix_app/view/homeRegistration/successfulregister.dart';
+
+import 'package:uthix_app/view/instructor_dashboard/panding.dart';
+
 import 'package:uthix_app/view/login/start_login.dart';
 
 import '../Seller_dashboard/dashboard.dart';
@@ -61,8 +64,18 @@ class _NewLoginState extends State<NewLogin> {
       log("API Response: ${response.data}");
 
       final data = response.data;
+      if (response.statusCode == 403 &&
+          data['status']?.toLowerCase() == 'pending') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => panding()),
+        );
+        return;
+      }
 
-      if (response.statusCode == 200 && data.containsKey('access_token')) {
+      if (response.statusCode == 200 &&
+          data['status']?.toLowerCase() == 'approved' &&
+          data.containsKey('access_token')) {
         String token = data['access_token'];
         String role = data['role'] ?? 'student';
 
@@ -72,6 +85,7 @@ class _NewLoginState extends State<NewLogin> {
         log("Stored Token: ${prefs.getString('auth_token')}, Role: ${prefs.getString('user_role')}");
 
         Widget nextScreen;
+
         if (role == 'seller') {
           nextScreen = SellerDashboard();
         } else if (role == 'instructor') {
@@ -94,13 +108,48 @@ class _NewLoginState extends State<NewLogin> {
           ),
         );
       }
+
+    } on DioError catch (dioError) {
+      // 👇 Handle specific API failure
+      if (dioError.response != null) {
+        log("Dio Error Response: ${dioError.response?.data}");
+        final data = dioError.response?.data;
+
+        if (dioError.response?.statusCode == 403 &&
+            data?['status']?.toLowerCase() == 'pending') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => panding()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                data?['message'] ?? "Invalid email or password",
+                style: GoogleFonts.urbanist(),
+              ),
+            ),
+          );
+        }
+      } else {
+        // 👇 Network error / timeout
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Network error. Please check your connection.",
+              style: GoogleFonts.urbanist(),
+            ),
+          ),
+        );
+      }
     } catch (e) {
-      log("Error: $e");
+      // 👇 Fallback for any other unexpected errors
+      log("Unexpected Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            "An error occurred. Please try again.",
-            style: GoogleFonts.urbanist(),
+            "An unexpected error occurred. Please try again.",
+         style: GoogleFonts.urbanist(),
           ),
         ),
       );
@@ -149,8 +198,8 @@ class _NewLoginState extends State<NewLogin> {
                           children: [
                             Image.asset(
                               "assets/registration/book.png",
-                               // width: 200.w,
-                               // height: 200.h,
+                              // width: 200.w,
+                              // height: 200.h,
                               fit: BoxFit.cover,
                             ),
                             SizedBox(height: 20.h),
@@ -251,7 +300,7 @@ class _NewLoginState extends State<NewLogin> {
                                         color: Color.fromRGBO(27, 97, 122, 1),
                                         decoration: TextDecoration.underline,
                                         decorationColor:
-                                        Color.fromRGBO(27, 97, 122, 1),
+                                            Color.fromRGBO(27, 97, 122, 1),
                                       ),
                                     ),
                                   ],
@@ -288,12 +337,16 @@ class _NewLoginState extends State<NewLogin> {
         child: TextField(
           controller: _passwordController,
           obscureText: ispassword,
-          style: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+
+          style:
+              GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: "Enter your Password",
             hintStyle:
-            GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+
+                GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+
             suffixIcon: IconButton(
               icon: Icon(ispassword
                   ? Icons.visibility_off_outlined
@@ -333,7 +386,9 @@ Widget _buildTextField({
           border: InputBorder.none,
           hintText: hint,
           hintStyle:
-          GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+
+              GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+
         ),
       ),
     ),

@@ -1,10 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
-
-import 'package:uthix_app/view/homeRegistration/successPage.dart';
+import 'new_login.dart';
 
 class Mailidpage extends StatefulWidget {
   final String role;
@@ -38,47 +37,49 @@ class _MailidpageState extends State<Mailidpage> {
       return;
     }
 
-    final url = Uri.parse("https://admin.uthix.com/api/register");
-    final headers = {"Content-Type": "application/json"};
-    final body = jsonEncode({
+    final dio = Dio();
+    final url = "https://admin.uthix.com/api/register";
+    final body = {
       "name": _userNameController.text,
       "email": _emailIdController.text,
       "password": _passwordController.text,
       "role": _selectedRole,
-    });
+    };
 
     try {
-      final response = await http.post(url, headers: headers, body: body);
-      log(" SAUU Response Code: ${response.statusCode}");
-      log("Response Body: ${response.body}");
+
+      final response = await dio.post(url,
+          data: jsonEncode(body),
+          options: Options(headers: {
+            "Content-Type": "application/json",
+          }));
+
+      log("Response Code: ${response.statusCode}");
+      log("Response Body: ${response.data}");
+
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-
-
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Registration Successful!")),
         );
 
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Successpage()),
+          MaterialPageRoute(builder: (context) => NewLogin()),
         );
       } else {
-        log("Error: ${response.body}");
+        log("Error: ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registration Failed: ${response.body}")),
+          SnackBar(content: Text("Registration Failed: ${response.data}")),
         );
       }
     } catch (e) {
-      debugPrint("Error: $e");
+      log("Dio Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: $e")),
       );
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
