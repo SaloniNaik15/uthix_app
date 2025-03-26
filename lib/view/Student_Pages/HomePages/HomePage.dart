@@ -153,7 +153,7 @@ class _HomePagesState extends State<HomePages> {
                   Text(
                     userName ?? "...",
                     style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
                       color: Color.fromRGBO(96, 95, 95, 1),
                     ),

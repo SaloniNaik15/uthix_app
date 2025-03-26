@@ -519,20 +519,20 @@ class _YourClasroomState extends State<YourClasroom> {
               ),
             ),
           ),
-          Positioned(
-            bottom: 120, // Adjust to position FAB above Navbar
-            right: 30, // Adjust for proper alignment
-            child: FloatingActionButton(
-              onPressed: () async {
-                await fetchClassrooms();
-                showClassDetailsDialog(); // Show dialog after fetching data
-              },
-              backgroundColor:
-                  Color.fromRGBO(43, 92, 116, 1), // Custom FAB color
-              shape: CircleBorder(),
-              child: Icon(Icons.add, color: Colors.white), // White add icon
-            ),
-          ),
+          // Positioned(
+          //   bottom: 120, // Adjust to position FAB above Navbar
+          //   right: 30, // Adjust for proper alignment
+          //   child: FloatingActionButton(
+          //     onPressed: () async {
+          //       await fetchClassrooms();
+          //       showClassDetailsDialog(); // Show dialog after fetching data
+          //     },
+          //     backgroundColor:
+          //         Color.fromRGBO(43, 92, 116, 1), // Custom FAB color
+          //     shape: CircleBorder(),
+          //     child: Icon(Icons.add, color: Colors.white), // White add icon
+          //   ),
+          // ),
         ],
       ),
       // Bottom right position
