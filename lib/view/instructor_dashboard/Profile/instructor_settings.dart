@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class InstructorSettings extends StatefulWidget {
-  const InstructorSettings({super.key});
+  const InstructorSettings({Key? key}) : super(key: key);
 
   @override
   State<InstructorSettings> createState() => _InstructorSettingsState();
@@ -19,9 +20,10 @@ class _InstructorSettingsState extends State<InstructorSettings> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back_ios_outlined,
-            color: Color(0xFF605F5F),
+            color: const Color(0xFF605F5F),
+            size: 24.sp,
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -33,37 +35,37 @@ class _InstructorSettingsState extends State<InstructorSettings> {
         children: [
           // Title "Settings"
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.w),
             child: Text(
               "Settings",
               style: TextStyle(
-                fontSize: 22,
-                fontFamily: "Urbanist",
+                fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
-
           // Divider below title
-          Divider(thickness: 1, color: Colors.grey[300]),
-
+          Divider(
+            thickness: 1.h,
+            color: Colors.grey[300],
+          ),
           // First Checkbox ListTile
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: CheckboxListTile(
-              title: const Text(
+              title: Text(
                 "Notifications",
                 style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: "Urbanist",
-                    fontWeight: FontWeight.w600),
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              subtitle: const Text(
+              subtitle: Text(
                 "This will not affect any order updates",
                 style: TextStyle(
-                    fontSize: 14,
-                    fontFamily: "Urbanist",
-                    fontWeight: FontWeight.w400),
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
               value: isNotificationsEnabled,
               onChanged: (bool? newValue) {
@@ -74,27 +76,28 @@ class _InstructorSettingsState extends State<InstructorSettings> {
               activeColor: Colors.blue,
             ),
           ),
-
           // Divider below checkbox
-          Divider(thickness: 1, color: Colors.grey[300]),
-
+          Divider(
+            thickness: 1.h,
+            color: Colors.grey[300],
+          ),
           // Second Checkbox ListTile
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
             child: CheckboxListTile(
-              title: const Text(
+              title: Text(
                 "Optimized Experience",
                 style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: "Urbanist",
-                    fontWeight: FontWeight.w600),
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              subtitle: const Text(
+              subtitle: Text(
                 "For optimized connection quality",
                 style: TextStyle(
-                    fontSize: 14,
-                    fontFamily: "Urbanist",
-                    fontWeight: FontWeight.w400),
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
               value: isOptimizedExperienceEnabled,
               onChanged: (bool? newValue) {
@@ -105,9 +108,11 @@ class _InstructorSettingsState extends State<InstructorSettings> {
               activeColor: Colors.blue,
             ),
           ),
-
           // Final Divider
-          Divider(thickness: 1, color: Colors.grey[300]),
+          Divider(
+            thickness: 1.h,
+            color: Colors.grey[300],
+          ),
         ],
       ),
     );

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DetailProfile extends StatefulWidget {
-  const DetailProfile({super.key});
+  const DetailProfile({Key? key}) : super(key: key);
 
   @override
   State<DetailProfile> createState() => _DetailProfileState();
@@ -17,7 +17,7 @@ class _DetailProfileState extends State<DetailProfile> {
       'icon': Icons.lock,
       'label': 'Password',
       'hint': 'Enter your password'
-    }, // Password field
+    },
     {'icon': Icons.female, 'label': 'Gender', 'hint': 'Select your gender'},
     {
       'icon': Icons.location_on,
@@ -35,36 +35,41 @@ class _DetailProfileState extends State<DetailProfile> {
       'hint': 'Enter your university'
     },
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Color(0xFF2B5C74),
+        backgroundColor: const Color(0xFF2B5C74),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_outlined, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back_ios_outlined,
+            color: Colors.white,
+            size: 24.sp,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         centerTitle: true,
-        title: const Text(
+        title: Text(
           "Profile",
           style: TextStyle(
             color: Colors.white,
-            fontSize: 25,
-            fontFamily: "Urbanist",
+            fontSize: 20.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
       body: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage(
-                'assets/Seller_dashboard_images/ManageStoreBackground.png'),
+              'assets/Seller_dashboard_images/ManageStoreBackground.png',
+            ),
             fit: BoxFit.cover,
           ),
         ),
@@ -73,10 +78,10 @@ class _DetailProfileState extends State<DetailProfile> {
             Stack(
               children: [
                 ColoredBox(
-                  color: Color(0xFF2B5C74),
+                  color: const Color(0xFF2B5C74),
                   child: SizedBox(
-                    height: 40,
-                    width: MediaQuery.sizeOf(context).width,
+                    height: 40.h,
+                    width: MediaQuery.of(context).size.width,
                   ),
                 ),
                 Align(
@@ -84,50 +89,50 @@ class _DetailProfileState extends State<DetailProfile> {
                   child: Stack(
                     children: [
                       Container(
-                        width: 100,
-                        height: 100,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [Colors.white, Colors.blue],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
+                        width: 80.w,
+                        height: 80.w,
+                        // decoration: BoxDecoration(
+                        //   shape: BoxShape.circle,
+                        //   // gradient: const LinearGradient(
+                        //   //   colors: [Colors.white, Colors.blue],
+                        //   //   begin: Alignment.topLeft,
+                        //   //   end: Alignment.bottomRight,
+                        //   // ),
+                        // ),
                         child: CircleAvatar(
-                          radius: 50,
+                          radius: 50.r,
                           backgroundColor: Colors.transparent,
                           child: CircleAvatar(
-                            radius: 45,
+                            radius: 45.r,
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(45),
+                              borderRadius: BorderRadius.circular(45.r),
                               child: Image.asset("assets/icons/profile.png"),
                             ),
                           ),
                         ),
                       ),
                       Positioned(
-                        bottom: -1,
-                        right: -1,
+                        bottom: -1.h,
+                        right: -1.w,
                         child: CircleAvatar(
                           backgroundColor: Colors.white,
-                          radius: 18,
+                          radius: 18.r,
                           child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
+                            padding: EdgeInsets.all(4.w),
+                            decoration: BoxDecoration(
                               color: Colors.blue,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black26,
-                                  blurRadius: 4,
+                                  blurRadius: 4.r,
                                 ),
                               ],
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.camera_alt,
                               color: Colors.white,
-                              size: 22,
+                              size: 20.sp,
                             ),
                           ),
                         ),
@@ -137,18 +142,17 @@ class _DetailProfileState extends State<DetailProfile> {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-            const Text(
-              "Mahima (You)",
+            SizedBox(height: 10.h),
+            Text(
+              "You",
               style: TextStyle(
-                fontSize: 16,
-                fontFamily: "Urbanist",
+                fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(16.w),
                 child: ListView.builder(
                   itemCount: profileData.length,
                   itemBuilder: (context, index) {
@@ -173,8 +177,12 @@ class ProfileField extends StatefulWidget {
   final String label;
   final String hint;
 
-  const ProfileField(
-      {super.key, required this.icon, required this.label, required this.hint});
+  const ProfileField({
+    Key? key,
+    required this.icon,
+    required this.label,
+    required this.hint,
+  }) : super(key: key);
 
   @override
   _ProfileFieldState createState() => _ProfileFieldState();
@@ -195,30 +203,32 @@ class _ProfileFieldState extends State<ProfileField> {
     bool isPasswordField = widget.label == "Password";
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: EdgeInsets.symmetric(vertical: 10.h),
       child: Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 2),
+        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 2.h),
         decoration: BoxDecoration(
-          color: Color(0xFFFCFCFC),
-          borderRadius: BorderRadius.circular(50),
-          border: Border.all(color: Color(0xFFD2D2D2)),
+          color: const Color(0xFFFCFCFC),
+          borderRadius: BorderRadius.circular(50.r),
+          border: Border.all(color: const Color(0xFFD2D2D2)),
         ),
         child: Row(
           children: [
-            Icon(widget.icon, color: Colors.black54),
-            SizedBox(width: 8),
+            Icon(widget.icon, color: Colors.black54, size: 20.sp),
+            SizedBox(width: 8.w),
             Expanded(
               child: TextFormField(
                 controller: controller,
                 obscureText: isPasswordField ? obscurePassword : false,
                 decoration: InputDecoration(
-                  labelText: null, // No label, only hint text
-                  hintText: widget.hint, // Display hint text
+                  labelText: null,
+                  hintText: widget.hint,
                   border: InputBorder.none,
                 ),
                 style: TextStyle(
-                    fontSize: 16, fontFamily: "Urbanist", color: Colors.black),
+                  fontSize: 14.sp,
+                  color: Colors.black,
+                ),
               ),
             ),
             if (isPasswordField)
@@ -226,6 +236,7 @@ class _ProfileFieldState extends State<ProfileField> {
                 icon: Icon(
                   obscurePassword ? Icons.visibility_off : Icons.visibility,
                   color: Colors.black54,
+                  size: 20.sp,
                 ),
                 onPressed: () {
                   setState(() {
@@ -237,18 +248,22 @@ class _ProfileFieldState extends State<ProfileField> {
               Row(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.edit_outlined,
-                        size: 20, color: Colors.black),
+                    icon: Icon(
+                      Icons.edit_outlined,
+                      size: 20.sp,
+                      color: Colors.black,
+                    ),
                     onPressed: () {
                       // Handle edit action for this field
                     },
                   ),
                   Text(
                     "Edit",
-                    style: GoogleFonts.urbanist(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Color.fromRGBO(96, 95, 95, 1)),
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w600,
+                      color: const Color.fromRGBO(96, 95, 95, 1),
+                    ),
                   ),
                 ],
               ),
