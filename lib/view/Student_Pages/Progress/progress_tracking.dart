@@ -13,24 +13,174 @@ class ProgressTracking extends StatefulWidget {
 }
 
 class _ProgressTrackingState extends State<ProgressTracking> {
-  Widget _buildCategoryContainer(String title) {
+  Widget buildInfoContainer(String title, String value) {
     return Container(
-      height: 30.h,
-      width: 129.w,
+      height: 102.h,
+      width: 102.w,
       decoration: BoxDecoration(
-        color: Color.fromRGBO(245, 245, 245, 1),
-        border: Border.all(color: Color.fromRGBO(217, 217, 217, 1)),
-        borderRadius: BorderRadius.circular(77),
+        color: Color.fromRGBO(246, 246, 246, 1),
+        border: Border.all(
+          color: Color.fromRGBO(217, 217, 217, 1),
+        ),
+        borderRadius: BorderRadius.circular(17),
       ),
-      child: Center(
-        child: Text(
-          title,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.urbanist(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w600,
+              color: const Color.fromRGBO(96, 95, 95, 1),
+            ),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.urbanist(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              color: const Color.fromRGBO(96, 95, 95, 1),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildCategoryContainer(String title) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(246, 246, 246, 1),
+        border: Border.all(color: Color.fromRGBO(217, 217, 217, 1)),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        title,
+        style: GoogleFonts.urbanist(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w600,
+          color: const Color.fromRGBO(96, 95, 95, 1),
+        ),
+      ),
+    );
+  }
+
+  Widget buildLegend(String text) {
+    return Row(
+      children: [
+        Container(
+          height: 15.h,
+          width: 15.w,
+          decoration:
+              BoxDecoration(shape: BoxShape.circle, color: Colors.green),
+        ),
+        SizedBox(width: 3.w),
+        Text(
+          text,
           style: GoogleFonts.urbanist(
-            fontSize: 14,
+            fontSize: 14.sp,
             fontWeight: FontWeight.w600,
-            color: Color.fromRGBO(96, 95, 95, 1),
+            color: const Color.fromRGBO(96, 95, 95, 1),
           ),
         ),
+      ],
+    );
+  }
+
+  Widget buildBarChart() {
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10.h),
+        child: BarChart(
+          BarChartData(
+            alignment: BarChartAlignment.center,
+            maxY: 100,
+            barTouchData: BarTouchData(enabled: false),
+            titlesData: FlTitlesData(
+              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles:
+                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) {
+                    List<String> labels = [
+                      "Jan XX",
+                      "Jan YY",
+                      "Feb XX",
+                      "Feb YY",
+                      "Mar XX",
+                      "Mar YY",
+                      "Apr XX",
+                      "Apr YY",
+                      "May XX",
+                      "May YY",
+                      "Jun XX"
+                    ];
+
+                    return (value.toInt() < 0 || value.toInt() >= labels.length)
+                        ? Container()
+                        : Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              labels[value.toInt()],
+                              style: GoogleFonts.urbanist(
+                                  fontSize: 6.sp, fontWeight: FontWeight.w700),
+                            ),
+                          );
+                  },
+                  reservedSize: 50.h,
+                ),
+              ),
+            ),
+            borderData: FlBorderData(show: false),
+            gridData: FlGridData(show: false),
+            barGroups: _getBarGroups(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildStatisticsContainer() {
+    return Container(
+      height: 310.h,
+      width: 340.w,
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(246, 246, 246, 1),
+        border: Border.all(color: Color.fromRGBO(217, 217, 217, 1)),
+        borderRadius: BorderRadius.circular(17),
+      ),
+      child: Column(
+        children: [
+          SizedBox(height: 20.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              buildCategoryContainer("Upcoming Exams"),
+              buildCategoryContainer("Track Scores"),
+            ],
+          ),
+          SizedBox(height: 20.h),
+          buildBarChart(),
+          Divider(
+            thickness: 1,
+            color: Color.fromRGBO(217, 217, 217, 1),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 30.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                buildLegend("XX-YEAR 1"),
+                buildLegend("XX-YEAR 1"),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -59,15 +209,17 @@ class _ProgressTrackingState extends State<ProgressTracking> {
         Scaffold(
           backgroundColor: Colors.white,
           appBar: PreferredSize(
-            preferredSize:  Size.fromHeight(80.h), // Custom AppBar height
+            preferredSize: Size.fromHeight(80.h), // Custom AppBar height
             child: AppBar(
               backgroundColor: const Color.fromRGBO(43, 92, 116, 1),
               elevation: 0, // Removes shadow
 
               automaticallyImplyLeading: false, // Removes default back arrow
               flexibleSpace: Padding(
-                padding:  EdgeInsets.only(
-                    top: 10.h, left: 10.w, right: 10.w), // Adjust for top alignment
+                padding: EdgeInsets.only(
+                    top: 10.h,
+                    left: 10.w,
+                    right: 10.w), // Adjust for top alignment
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -140,7 +292,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                         color: const Color.fromRGBO(96, 95, 95, 1),
                       ),
                     ),
-                     SizedBox(
+                    SizedBox(
                       height: 30.h,
                     ),
                     Padding(
@@ -148,106 +300,13 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Container(
-                            height: 102.h,
-                            width: 102.w,
-                            decoration: BoxDecoration(
-                              color: Color.fromRGBO(246, 246, 246, 1),
-                              border: Border.all(
-                                color: Color.fromRGBO(217, 217, 217, 1),
-                              ),
-                              borderRadius: BorderRadius.circular(17),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text(
-                                  "Last Grade",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color.fromRGBO(96, 95, 95, 1),
-                                  ),
-                                ),
-                                Text(
-                                  "70%",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color.fromRGBO(96, 95, 95, 1),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            height: 102.h,
-                            width: 102.w,
-                            decoration: BoxDecoration(
-                              color: Color.fromRGBO(246, 246, 246, 1),
-                              border: Border.all(
-                                color: Color.fromRGBO(217, 217, 217, 1),
-                              ),
-                              borderRadius: BorderRadius.circular(17),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text(
-                                  "Assignment",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color.fromRGBO(96, 95, 95, 1),
-                                  ),
-                                ),
-                                Text(
-                                  "5/8",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color.fromRGBO(96, 95, 95, 1),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            height: 102.h,
-                            width: 102.w,
-                            decoration: BoxDecoration(
-                              color: Color.fromRGBO(246, 246, 246, 1),
-                              border: Border.all(
-                                color: Color.fromRGBO(217, 217, 217, 1),
-                              ),
-                              borderRadius: BorderRadius.circular(17),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text(
-                                  "Attendance",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color.fromRGBO(96, 95, 95, 1),
-                                  ),
-                                ),
-                                Text(
-                                  "77%",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color.fromRGBO(96, 95, 95, 1),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          buildInfoContainer("Last Grade", "70%"),
+                          buildInfoContainer("Assignment", "5/8"),
+                          buildInfoContainer("Attendance", "77%"),
                         ],
                       ),
                     ),
-                     SizedBox(
+                    SizedBox(
                       height: 20.h,
                     ),
                     Padding(
@@ -264,153 +323,10 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                         ),
                       ),
                     ),
-                     SizedBox(
+                    SizedBox(
                       height: 20.h,
                     ),
-                    Container(
-                      height: 310.h,
-                      width: 340.w,
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(246, 246, 246, 1),
-                        border: Border.all(
-                          color: Color.fromRGBO(217, 217, 217, 1),
-                        ),
-                        borderRadius: BorderRadius.circular(17),
-                      ),
-                      child: Column(
-                        children: [
-                           SizedBox(height: 20.h),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              _buildCategoryContainer("Upcoming Exams"),
-                              _buildCategoryContainer("Track Scores"),
-                            ],
-                          ),
-                           SizedBox(height: 20.h),
-                          Expanded(
-                            child: Padding(
-                              padding:  EdgeInsets.symmetric(horizontal: 10.h),
-                              child: BarChart(
-                                BarChartData(
-                                  alignment: BarChartAlignment.center,
-                                  maxY: 100,
-                                  barTouchData: BarTouchData(enabled: false),
-                                  titlesData: FlTitlesData(
-                                    leftTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                          showTitles:
-                                              false), // Hide left (Y-axis)
-                                    ),
-                                    rightTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                          showTitles:
-                                              false), // Hide right (Y-axis)
-                                    ),
-                                    topTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                          showTitles: false), // Hide top titles
-                                    ),
-                                    bottomTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                        showTitles:
-                                            true, // Show only bottom labels (months)
-                                        getTitlesWidget: (value, meta) {
-                                          List<String> labels = [
-                                            "Jan XX",
-                                            "Jan YY",
-                                            "Feb XX",
-                                            "Feb YY",
-                                            "Mar XX",
-                                            "Mar YY",
-                                            "Apr XX",
-                                            "Apr YY",
-                                            "May XX",
-                                            "May YY",
-                                            "Jun XX"
-                                          ];
-            
-                                          // Ensure the index is within bounds
-                                          if (value.toInt() < 0 ||
-                                              value.toInt() >= labels.length) {
-                                            return Container(); // Return an empty widget if out of range
-                                          }
-            
-                                          return Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 6),
-                                            child: Text(
-                                              labels[value.toInt()],
-                                              style: GoogleFonts.urbanist(
-                                                  fontSize: 6.sp,
-                                                  fontWeight: FontWeight.w700),
-                                            ),
-                                          );
-                                        },
-                                        reservedSize:
-                                            50.h, // Adjust space for bottom labels
-                                      ),
-                                    ),
-                                  ),
-                                  borderData: FlBorderData(show: false),
-                                  gridData: FlGridData(show: false),
-                                  barGroups:
-                                      _getBarGroups(), // Ensure _getBarGroups() returns wider bars
-                                ),
-                              ),
-                            ),
-                          ),
-                          Divider(
-                            thickness: 1,
-                            color: Color.fromRGBO(217, 217, 217, 1),
-                          ),
-                          Row(
-                            children: [
-                               SizedBox(
-                                width: 60.w,
-                              ),
-                              Container(
-                                height: 15.h,
-                                width: 15.w,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.green,
-                                ),
-                              ),
-                              SizedBox(width: 3.w,),
-                              Text(
-                                "XX-YEAR 1",
-                                style: GoogleFonts.urbanist(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color.fromRGBO(96, 95, 95, 1),
-                                ),
-                              ),
-                               SizedBox(
-                                width: 30.w,
-                              ),
-                              Container(
-                                height: 15.h,
-                                width: 15.w,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.green,
-                                ),
-                              ),
-                              SizedBox(width: 3.w,),
-                              Text(
-                                "XX-YEAR 1",
-                                style: GoogleFonts.urbanist(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color.fromRGBO(96, 95, 95, 1),
-                                ),
-                              )
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
+                    buildStatisticsContainer()
                   ],
                 ),
               ],
