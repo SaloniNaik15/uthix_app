@@ -234,9 +234,11 @@ class CouponCard extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
+
               SizedBox(width: 10.w),
                DottedDividerWithIcon(
                 height: 50,
+
                 color: Colors.grey,
               ),
               SizedBox(width: 10.w),
