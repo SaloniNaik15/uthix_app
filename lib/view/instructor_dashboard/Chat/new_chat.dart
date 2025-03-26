@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class NewChat extends StatefulWidget {
@@ -83,8 +84,8 @@ class _NewChatState extends State<NewChat> {
           const SizedBox(width: 15),
           Text(
             "New Chat",
-            style: GoogleFonts.urbanist(
-              fontSize: 20,
+            style: TextStyle(
+              fontSize: 18.sp,
               fontWeight: FontWeight.w600,
               color: const Color.fromRGBO(43, 92, 116, 1),
             ),
@@ -103,8 +104,8 @@ class _NewChatState extends State<NewChat> {
         children: [
           Text(
             "To:",
-            style: GoogleFonts.urbanist(
-              fontSize: 14,
+            style: TextStyle(
+              fontSize: 14.sp,
               fontWeight: FontWeight.w400,
               color: const Color.fromRGBO(96, 95, 95, 1),
             ),
@@ -123,8 +124,8 @@ class _NewChatState extends State<NewChat> {
                 focusedBorder: const UnderlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue),
                 ),
-                hintStyle: GoogleFonts.urbanist(
-                  fontSize: 14,
+                hintStyle: TextStyle(
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w400,
                   color: const Color.fromRGBO(96, 95, 95, 1),
                 ),
@@ -141,8 +142,8 @@ class _NewChatState extends State<NewChat> {
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: Text(
         "Suggestions",
-        style: GoogleFonts.urbanist(
-          fontSize: 14,
+        style: TextStyle(
+          fontSize: 14.sp,
           fontWeight: FontWeight.w500,
           color: const Color.fromRGBO(0, 0, 0, 1),
         ),
@@ -158,8 +159,8 @@ class _NewChatState extends State<NewChat> {
           Row(
             children: [
               SizedBox(
-                width: 50,
-                height: 50,
+                width: 50.w,
+                height: 50.h,
                 child: ClipOval(
                   child: Image.asset("assets/login/profile.jpeg",
                       fit: BoxFit.cover),
@@ -183,8 +184,8 @@ class _NewChatState extends State<NewChat> {
                         const Spacer(),
                         Text(
                           "Date",
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14,
+                          style: TextStyle(
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.w400,
                             color: const Color.fromRGBO(0, 0, 0, 1),
                           ),
@@ -197,25 +198,26 @@ class _NewChatState extends State<NewChat> {
                         Expanded(
                           child: Text(
                             "Lorem ipsum dolor sit amet",
-                            style: GoogleFonts.urbanist(
-                              fontSize: 16,
+                            style: TextStyle(
+                              fontSize: 12.sp,
                               fontWeight: FontWeight.w400,
                               color: const Color.fromRGBO(0, 0, 0, 1),
                             ),
                           ),
                         ),
                         Container(
-                          height: 22,
-                          width: 22,
+                          height: 20.h,
+                          width: 20.w,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Color.fromRGBO(51, 152, 246, 1),
+                            color:
+                            Color.fromRGBO(51, 152, 246, 1),
                           ),
                           child: Center(
                             child: Text(
                               "1",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 11,
+                              style: TextStyle(
+                                fontSize: 10.sp,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.white,
                               ),

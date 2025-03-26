@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Upload extends StatefulWidget {
-  const Upload({super.key});
+  const Upload({Key? key}) : super(key: key);
 
   @override
   State<Upload> createState() => _UploadState();
@@ -12,249 +12,79 @@ class _UploadState extends State<Upload> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(255, 255, 255, 1),
+      backgroundColor: Colors.white,
+      // ------------------- AppBar -------------------
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios,
+            size: 20.sp,
+            color: Colors.black,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          "Upload Files",
+          style: TextStyle(
+            fontSize: 18.sp,
+            fontWeight: FontWeight.w600,
+            color: const Color.fromRGBO(96, 95, 95, 1),
+          ),
+        ),
+      ),
+      // ------------------- Body -------------------
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(height: 40.h),
           Padding(
-            padding: const EdgeInsets.only(top: 40, left: 30),
-            child: Row(
-              children: [
-                Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        offset: const Offset(0, 4),
-                        blurRadius: 8,
-                      ),
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        offset: const Offset(0, 0),
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, size: 25),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                Text(
-                  "Upload Files",
-                  style: GoogleFonts.urbanist(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: const Color.fromRGBO(96, 95, 95, 1),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(
-            height: 40,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 50, right: 50),
+            padding: EdgeInsets.symmetric(horizontal: 50.w),
             child: Column(
               children: [
+                // First row of options
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      children: [
-                        Container(
-                          height: 90,
-                          width: 90,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(11),
-                            border: Border.all(
-                                color: Color.fromRGBO(217, 217, 217, 1),
-                                width: 1),
-                            color: Color.fromRGBO(246, 246, 246, 1),
-                          ),
-                          child: Image.asset(
-                              "assets/files_icons/document_pdf.png"),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "Document",
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: const Color.fromRGBO(0, 0, 0, 1),
-                          ),
-                        ),
-                      ],
+                    _uploadOption(
+                      imagePath: "assets/files_icons/document_pdf.png",
+                      title: "Document",
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          height: 90,
-                          width: 90,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(11),
-                            border: Border.all(
-                                color: Color.fromRGBO(217, 217, 217, 1),
-                                width: 1),
-                            color: Color.fromRGBO(246, 246, 246, 1),
-                          ),
-                          child: Image.asset("assets/files_icons/image.png"),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "Gallery",
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: const Color.fromRGBO(0, 0, 0, 1),
-                          ),
-                        ),
-                      ],
+                    _uploadOption(
+                      imagePath: "assets/files_icons/image.png",
+                      title: "Gallery",
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          height: 90,
-                          width: 90,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(11),
-                            border: Border.all(
-                                color: Color.fromRGBO(217, 217, 217, 1),
-                                width: 1),
-                            color: Color.fromRGBO(246, 246, 246, 1),
-                          ),
-                          child: Image.asset(
-                              "assets/files_icons/document_pdf.png"),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "Camera",
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: const Color.fromRGBO(0, 0, 0, 1),
-                          ),
-                        ),
-                      ],
+                    _uploadOption(
+                      imagePath: "assets/files_icons/document_pdf.png",
+                      title: "Camera",
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 30,
-                ),
+                SizedBox(height: 30.h),
+                // Second row of options
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      children: [
-                        Container(
-                          height: 90,
-                          width: 90,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(11),
-                            border: Border.all(
-                                color: Color.fromRGBO(217, 217, 217, 1),
-                                width: 1),
-                            color: Color.fromRGBO(246, 246, 246, 1),
-                          ),
-                          child: Image.asset(
-                              "assets/files_icons/document_pdf.png"),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "Video",
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: const Color.fromRGBO(0, 0, 0, 1),
-                          ),
-                        ),
-                      ],
+                    _uploadOption(
+                      imagePath: "assets/files_icons/document_pdf.png",
+                      title: "Video",
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          height: 90,
-                          width: 90,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(11),
-                            border: Border.all(
-                                color: Color.fromRGBO(217, 217, 217, 1),
-                                width: 1),
-                            color: Color.fromRGBO(246, 246, 246, 1),
-                          ),
-                          child: Image.asset("assets/files_icons/image.png"),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "Link",
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: const Color.fromRGBO(0, 0, 0, 1),
-                          ),
-                        ),
-                      ],
+                    _uploadOption(
+                      imagePath: "assets/files_icons/image.png",
+                      title: "Link",
                     ),
-                    Column(
-                      children: [
-                        Container(
-                          height: 90,
-                          width: 90,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(11),
-                            border: Border.all(
-                                color: Color.fromRGBO(217, 217, 217, 1),
-                                width: 1),
-                            color: Color.fromRGBO(246, 246, 246, 1),
-                          ),
-                          child: Image.asset(
-                              "assets/files_icons/document_pdf.png"),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          "Audio",
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: const Color.fromRGBO(0, 0, 0, 1),
-                          ),
-                        ),
-                      ],
+                    _uploadOption(
+                      imagePath: "assets/files_icons/document_pdf.png",
+                      title: "Audio",
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 50,
-                ),
+                SizedBox(height: 50.h),
                 Text(
-                  "The files uploaded by you will be accessible by all the participants of the class ",
-                  style: GoogleFonts.urbanist(
-                    fontSize: 14,
+                  "The files uploaded by you will be accessible by all the participants of the class",
+                  style: TextStyle(
+                    fontSize: 14.sp,
                     fontWeight: FontWeight.w500,
                     color: const Color.fromRGBO(96, 95, 95, 1),
                   ),
@@ -264,6 +94,36 @@ class _UploadState extends State<Upload> {
           ),
         ],
       ),
+    );
+  }
+
+  // A helper widget for each upload option
+  Widget _uploadOption({required String imagePath, required String title}) {
+    return Column(
+      children: [
+        Container(
+          height: 80.h,
+          width: 80.w,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(11.r),
+            border: Border.all(
+              color: const Color.fromRGBO(217, 217, 217, 1),
+              width: 1.w,
+            ),
+            color: const Color.fromRGBO(246, 246, 246, 1),
+          ),
+          child: Image.asset(imagePath),
+        ),
+        SizedBox(height: 5.h),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
+        ),
+      ],
     );
   }
 }
