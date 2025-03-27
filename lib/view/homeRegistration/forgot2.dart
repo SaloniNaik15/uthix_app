@@ -190,7 +190,8 @@ class _Forgot2State extends State<Forgot2> {
                     children: [
                       Image.asset(
                         "assets/registration/book.png",
-                        fit: BoxFit.cover,
+                        width: 90.w,
+                        height:114.h,
                       ),
                       SizedBox(height: 50.h),
                       Text(

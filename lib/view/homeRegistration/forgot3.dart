@@ -57,8 +57,8 @@ class _Forgot3State extends State<Forgot3> {
                             // Book Image
                             Image.asset(
                               "assets/registration/book.png",
-                              // width: 155.w,
-                              // height: 150.h,
+                              width: 90.w,
+                              height:114.h,
                               fit: BoxFit.cover,
                             ),
                             SizedBox(height: 50.h),

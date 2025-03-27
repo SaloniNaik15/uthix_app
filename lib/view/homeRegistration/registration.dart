@@ -106,8 +106,9 @@ class _RegistrationState extends State<Registration> {
                               iconPath: "assets/registration/gmail.png",
                               text: "Continue with Mail Id",
                             ),
-
-                            SizedBox(height: 10.h),
+                            SizedBox(height: 110.h),
+                            Divider(height: 1,),
+                            Text("or", style: TextStyle(fontSize: 20.sp),),
                             Text(
                               "Already have an account?",
                               style: GoogleFonts.urbanist(
@@ -116,7 +117,7 @@ class _RegistrationState extends State<Registration> {
                                 color: Color.fromRGBO(96, 95, 95, 1),
                               ),
                             ),
-                            SizedBox(height: 20.h),
+                            SizedBox(height: 5.h),
 
                             // Login Button
                             GestureDetector(
@@ -130,7 +131,7 @@ class _RegistrationState extends State<Registration> {
                               },
                               child: Container(
                                 height: 45.h,
-                                width: 270.w,
+                                width: 200.w,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(25.r),
                                   color: Color.fromRGBO(27, 97, 122, 1),
@@ -197,7 +198,7 @@ class _RegistrationState extends State<Registration> {
       onTap: onTap,
       child: Container(
         height: 45.h,
-        width: 270.w,
+        width: 250.w,
         decoration: BoxDecoration(
           border: Border.all(
             color: Color.fromRGBO(175, 175, 175, 1),

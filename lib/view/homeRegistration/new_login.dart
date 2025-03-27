@@ -198,8 +198,8 @@ class _NewLoginState extends State<NewLogin> {
                           children: [
                             Image.asset(
                               "assets/registration/book.png",
-                              // width: 200.w,
-                              // height: 200.h,
+                              width: 90.w,
+                              height:114.h,
                               fit: BoxFit.cover,
                             ),
                             SizedBox(height: 20.h),
