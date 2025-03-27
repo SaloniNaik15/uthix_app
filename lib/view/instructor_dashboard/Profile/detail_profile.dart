@@ -9,37 +9,26 @@ class DetailProfile extends StatefulWidget {
 }
 
 class _DetailProfileState extends State<DetailProfile> {
+
   final List<Map<String, dynamic>> profileData = [
-    {'icon': Icons.person, 'label': 'Name', 'hint': 'Enter your name'},
-    {'icon': Icons.phone, 'label': 'Phone', 'hint': 'Enter your phone number'},
-    {'icon': Icons.email, 'label': 'Email', 'hint': 'Enter your email'},
-    {
-      'icon': Icons.lock,
-      'label': 'Password',
-      'hint': 'Enter your password'
-    },
-    {'icon': Icons.female, 'label': 'Gender', 'hint': 'Select your gender'},
-    {
-      'icon': Icons.location_on,
-      'label': 'Current Address',
-      'hint': 'Enter your current address'
-    },
-    {
-      'icon': Icons.school,
-      'label': 'University',
-      'hint': 'Enter your university'
-    },
-    {
-      'icon': Icons.school,
-      'label': 'University',
-      'hint': 'Enter your university'
-    },
+    {'icon': Icons.person, 'label': 'You', 'hint': ''},
+    {'icon': Icons.phone, 'label': '+91 XXXXX XXXXX', 'hint': ''},
+    {'icon': Icons.email, 'label': 'mahimavardhan16@gmail.com', 'hint': ''},
+    {'icon': Icons.lock, 'label': '********', 'hint': ''},  // Password field
+    {'icon': Icons.female, 'label': 'Female', 'hint': ''},
+    {'icon': Icons.location_on, 'label': 'Ip Extention, New Delhi', 'hint': ''},
+    {'icon': Icons.school, 'label': 'Banaras Hindu University', 'hint': ''},
+    {'icon': Icons.add, 'label': '+ Add Field', 'hint': ''},
+    {'icon': Icons.school, 'label': 'B.Sc in Physics', 'hint': ''},
+    {'icon': Icons.add, 'label': '+ Add Field', 'hint': ''},
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
+      /// App Bar
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B5C74),
         elevation: 0,
@@ -49,9 +38,7 @@ class _DetailProfileState extends State<DetailProfile> {
             color: Colors.white,
             size: 24.sp,
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
         title: Text(
@@ -63,6 +50,8 @@ class _DetailProfileState extends State<DetailProfile> {
           ),
         ),
       ),
+
+      /// Background image
       body: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
@@ -75,6 +64,7 @@ class _DetailProfileState extends State<DetailProfile> {
         ),
         child: Column(
           children: [
+            /// Top color strip + profile image
             Stack(
               children: [
                 ColoredBox(
@@ -88,24 +78,15 @@ class _DetailProfileState extends State<DetailProfile> {
                   alignment: Alignment.center,
                   child: Stack(
                     children: [
-                      Container(
+                      SizedBox(
                         width: 80.w,
                         height: 80.w,
-                        // decoration: BoxDecoration(
-                        //   shape: BoxShape.circle,
-                        //   // gradient: const LinearGradient(
-                        //   //   colors: [Colors.white, Colors.blue],
-                        //   //   begin: Alignment.topLeft,
-                        //   //   end: Alignment.bottomRight,
-                        //   // ),
-                        // ),
                         child: CircleAvatar(
-                          radius: 50.r,
                           backgroundColor: Colors.transparent,
                           child: CircleAvatar(
-                            radius: 45.r,
+                            radius: 40.r,
                             child: ClipRRect(
-                              borderRadius: BorderRadius.circular(45.r),
+                              borderRadius: BorderRadius.circular(40.r),
                               child: Image.asset("assets/icons/profile.png"),
                             ),
                           ),
@@ -142,24 +123,29 @@ class _DetailProfileState extends State<DetailProfile> {
                 ),
               ],
             ),
+
+            /// User name (e.g., "Mahima (You)")
             SizedBox(height: 10.h),
             Text(
-              "You",
+              "(You)",
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
+
+            /// Profile fields
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(16.w),
                 child: ListView.builder(
                   itemCount: profileData.length,
                   itemBuilder: (context, index) {
+                    final item = profileData[index];
                     return ProfileField(
-                      icon: profileData[index]['icon'],
-                      label: profileData[index]['label'],
-                      hint: profileData[index]['hint'],
+                      icon: item['icon'],
+                      label: item['label'],
+                      hint: item['hint'],
                     );
                   },
                 ),
@@ -168,10 +154,39 @@ class _DetailProfileState extends State<DetailProfile> {
           ],
         ),
       ),
+
+      /// Submit Profile button at the bottom
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF2B5C74),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            minimumSize: Size(double.infinity, 45.h),
+          ),
+          onPressed: () {
+            // Handle submission logic here
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Profile submitted!")),
+            );
+          },
+          child: Text(
+            "Submit Profile",
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
 
+/// Individual profile row
 class ProfileField extends StatefulWidget {
   final IconData icon;
   final String label;
@@ -185,7 +200,7 @@ class ProfileField extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ProfileFieldState createState() => _ProfileFieldState();
+  State<ProfileField> createState() => _ProfileFieldState();
 }
 
 class _ProfileFieldState extends State<ProfileField> {
@@ -195,12 +210,12 @@ class _ProfileFieldState extends State<ProfileField> {
   @override
   void initState() {
     super.initState();
-    controller = TextEditingController();
+    controller = TextEditingController(text: widget.label);
   }
 
   @override
   Widget build(BuildContext context) {
-    bool isPasswordField = widget.label == "Password";
+    final bool isPasswordField = widget.label == "********";
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -208,7 +223,7 @@ class _ProfileFieldState extends State<ProfileField> {
         alignment: Alignment.center,
         padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 2.h),
         decoration: BoxDecoration(
-          color: const Color(0xFFFCFCFC),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(50.r),
           border: Border.all(color: const Color(0xFFD2D2D2)),
         ),
@@ -221,9 +236,9 @@ class _ProfileFieldState extends State<ProfileField> {
                 controller: controller,
                 obscureText: isPasswordField ? obscurePassword : false,
                 decoration: InputDecoration(
-                  labelText: null,
-                  hintText: widget.hint,
                   border: InputBorder.none,
+                  hintText: widget.hint,
+                  isDense: true,
                 ),
                 style: TextStyle(
                   fontSize: 14.sp,
@@ -254,7 +269,7 @@ class _ProfileFieldState extends State<ProfileField> {
                       color: Colors.black,
                     ),
                     onPressed: () {
-                      // Handle edit action for this field
+                      // Optional: handle an "edit" action
                     },
                   ),
                   Text(
