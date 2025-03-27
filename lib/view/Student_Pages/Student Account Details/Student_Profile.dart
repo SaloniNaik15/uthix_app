@@ -16,15 +16,14 @@ class StudentProfile extends StatefulWidget {
 }
 
 class _StudentProfileState extends State<StudentProfile> {
-  // Token and name loaded from the API/cache
   String? accessLoginToken;
   String? userName;
+  String? networkImageUrl;
 
   // Controllers for each text field
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  //final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
   String? _genderValue; // for dropdown
   final TextEditingController _classController = TextEditingController();
@@ -48,34 +47,27 @@ class _StudentProfileState extends State<StudentProfile> {
     setState(() {
       accessLoginToken = token;
     });
-
-    // Load cached profile if available
-    await _loadProfileFromCache();
-    // Then fetch from API
     _fetchUserProfile();
+    _fetchstudentProfile();
   }
 
-  /// Loads cached profile data from SharedPreferences
-  Future<void> _loadProfileFromCache() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? cachedProfile = prefs.getString('cached_profile');
-    if (cachedProfile != null) {
-      try {
-        final data = jsonDecode(cachedProfile);
-        _populateFields(data);
-        log("Loaded profile from cache.");
-      } catch (e) {
-        log("Error decoding cached profile: $e");
-      }
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
     }
   }
 
-  /// Fetches the user profile from the API and caches it
   Future<void> _fetchUserProfile() async {
     try {
       final dio = Dio();
       final response = await dio.get(
-        "https://admin.uthix.com/api/profile", // <-- Your endpoint
+        "https://admin.uthix.com/api/profile",
         options: Options(
           headers: {"Authorization": "Bearer $accessLoginToken"},
         ),
@@ -103,9 +95,7 @@ class _StudentProfileState extends State<StudentProfile> {
       userName = data["name"];
       _nameController.text = data["name"] ?? "";
       _emailController.text = data["email"] ?? "";
-      _phoneController.text = data["phone"] ?? "";
-      // We don't store password in plain text, so consider how you handle that.
-     // _passwordController.text = "";
+      _phoneController.text = data["phone"]?.toString() ?? "";
       _dobController.text = data["dob"] ?? "";
       _genderValue = data["gender"];
       _classController.text = data["class"] ?? "";
@@ -113,44 +103,121 @@ class _StudentProfileState extends State<StudentProfile> {
     });
   }
 
-  /// Example: Submits the profile to an update endpoint
   Future<void> _submitProfile() async {
-    // Collect data from fields
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final phone = _phoneController.text.trim();
-   // final password = _passwordController.text.trim();
     final dob = _dobController.text.trim();
     final gender = _genderValue;
     final userClass = _classController.text.trim();
     final stream = _streamController.text.trim();
 
-    // TODO: Validate fields, then make an API call to update the user profile
-    log("Submitting profile: $name, $email, $phone, $dob, $gender, $userClass, $stream");
+    if (name.isEmpty ||
+        email.isEmpty ||
+        phone.isEmpty ||
+        dob.isEmpty ||
+        gender == null ||
+        userClass.isEmpty ||
+        stream.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill all fields.")),
+      );
+      return;
+    }
 
-    // Example only: Show a SnackBar to confirm
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Profile submitted!")),
-    );
-  }
+    try {
+      final dio = Dio();
 
-  /// Picks an image from the gallery and updates the profile image
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _profileImage = File(pickedFile.path);
+      final formData = FormData.fromMap({
+        "name": name,
+        "email": email,
+        "phone": phone,
+        "dob": dob,
+        "gender": gender,
+        "class": userClass,
+        "stream": stream,
+        if (_profileImage != null)
+          "image": await MultipartFile.fromFile(
+            _profileImage!.path,
+            filename: "profile.jpg",
+          ),
       });
+      final response = await dio.post(
+        "https://admin.uthix.com/api/student-profile",
+        data: formData,
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $accessLoginToken",
+            "Accept": "application/json",
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        log("✅ Profile submitted successfully.");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Profile updated successfully!")),
+        );
+
+        // Cache updated profile
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("cached_profile", jsonEncode(response.data));
+      } else {
+        log("❌ Failed to submit profile: ${response.statusCode}");
+        log("Response body: ${response.data}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to update profile.")),
+        );
+      }
+    } catch (e) {
+      log("❌ Error submitting profile: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("An error occurred.")),
+      );
     }
   }
+  Future<void> _fetchstudentProfile() async {
+    try {
+      final dio = Dio();
+      final response = await dio.get(
+        "https://admin.uthix.com/api/student-profile",
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $accessLoginToken",
+          },
+        ),
+      );
 
+      if (response.statusCode == 200 && response.data["status"] == true) {
+        final profileData = response.data["data"][0];
+        final user = profileData["user"];
+
+        setState(() {
+          _phoneController.text = user["phone"]?.toString() ?? "";
+          _dobController.text = user["dob"] ?? "";
+          _genderValue = user["gender"];
+          _classController.text = profileData["class"] ?? "";
+          _streamController.text = profileData["stream"] ?? "";
+
+          if (user["image"] != null && user["image"].toString().isNotEmpty) {
+            networkImageUrl = "https://admin.uthix.com/storage/images/student/${user["image"]}";
+          } else {
+            networkImageUrl = null;
+          }
+        });
+
+        log("✅ Profile fields loaded successfully.");
+      } else {
+        log("❌ Failed to load profile: ${response.statusCode}");
+      }
+    } catch (e) {
+      log("❌ Error fetching profile: $e");
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B5C74),
         elevation: 0,
@@ -168,7 +235,6 @@ class _StudentProfileState extends State<StudentProfile> {
           ),
         ),
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Column(
@@ -180,8 +246,15 @@ class _StudentProfileState extends State<StudentProfile> {
                   radius: 50,
                   backgroundColor: Colors.grey.shade300,
                   backgroundImage: _profileImage != null
-                      ? FileImage(_profileImage!) as ImageProvider
-                      : const AssetImage("assets/icons/profile.png"),
+                      ? FileImage(_profileImage!)
+                      : (networkImageUrl != null
+                      ? NetworkImage(networkImageUrl!)
+                      : const AssetImage("assets/icons/profile.png")) as ImageProvider,
+                  onBackgroundImageError: (_, __) {
+                    setState(() {
+                      networkImageUrl = null;
+                    });
+                  },
                 ),
                 Positioned(
                   bottom: 0,
@@ -254,12 +327,7 @@ class _StudentProfileState extends State<StudentProfile> {
             _buildGenderDropdown(),
 
             // "Class"
-            _buildTextField(
-              label: "Class",
-              hint: "Enter Your Class",
-              controller: _classController,
-              icon: Icons.school,
-            ),
+            _buildClassDropdown(),
 
             // "Stream"
             _buildTextField(
@@ -273,7 +341,7 @@ class _StudentProfileState extends State<StudentProfile> {
 
             // "Submit Profile" Button
             SizedBox(
-              width: MediaQuery.of(context).size.width/2,
+              width: MediaQuery.of(context).size.width / 2,
               height: 50,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -298,8 +366,63 @@ class _StudentProfileState extends State<StudentProfile> {
     );
   }
 
-  /// Builds a simple text field with a label above it.
-  /// Always has fill color #F6F6F6 and border color #D2D2D2.
+  Widget _buildClassDropdown() {
+    final List<String> classOptions = [
+      "Class 5",
+      "Class 6",
+      "Class 7",
+      "Class 8",
+      "Class 9",
+      "Class 10",
+      "Class 11",
+      "Class 12"
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Class",
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFF6F6F6), // Background white
+              borderRadius: BorderRadius.circular(40),
+              border: Border.all(color: Color(0xFFD2D2D2)),
+            ),
+            child: DropdownButtonFormField<String>(
+              value: _classController.text.isNotEmpty
+                  ? _classController.text
+                  : null,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(horizontal: 12),
+              ),
+              hint: const Text("Select Class"),
+              dropdownColor: Colors.white,
+              items: classOptions
+                  .map((className) => DropdownMenuItem(
+                      value: className, child: Text(className)))
+                  .toList(),
+              onChanged: (val) {
+                setState(() {
+                  _classController.text = val!;
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTextField({
     required String label,
     required String hint,
@@ -351,8 +474,6 @@ class _StudentProfileState extends State<StudentProfile> {
     );
   }
 
-  /// Builds a date field with an icon button to show a date picker
-  /// Always has fill color #F6F6F6 and border color #D2D2D2.
   Widget _buildDateField({
     required String label,
     required String hint,
@@ -396,12 +517,31 @@ class _StudentProfileState extends State<StudentProfile> {
               suffixIcon: IconButton(
                 icon: const Icon(Icons.calendar_today),
                 onPressed: () async {
-                  // Show a date picker
                   final DateTime? pickedDate = await showDatePicker(
                     context: context,
                     initialDate: DateTime.now(),
                     firstDate: DateTime(1950),
                     lastDate: DateTime(2100),
+                    builder: (context, child) {
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          dialogBackgroundColor: Colors.white, // background
+                          colorScheme: const ColorScheme.light(
+                            primary:
+                                Color(0xFF2B5C74), // header & selected date
+                            onPrimary: Colors.white, // text on selected date
+                            onSurface: Colors.black, // text color on calendar
+                          ),
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(
+                              foregroundColor:
+                                  Color(0xFF2B5C74), // OK/Cancel color
+                            ),
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    },
                   );
                   if (pickedDate != null) {
                     final dobString =
@@ -417,8 +557,6 @@ class _StudentProfileState extends State<StudentProfile> {
     );
   }
 
-  /// Builds a gender dropdown with label above it
-  /// Always has fill color #F6F6F6 and border color #D2D2D2.
   Widget _buildGenderDropdown() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -446,6 +584,7 @@ class _StudentProfileState extends State<StudentProfile> {
                 contentPadding: EdgeInsets.symmetric(horizontal: 12),
               ),
               hint: const Text("Select Gender"),
+              dropdownColor: Colors.white,
               items: const [
                 DropdownMenuItem(value: "male", child: Text("Male")),
                 DropdownMenuItem(value: "female", child: Text("Female")),
