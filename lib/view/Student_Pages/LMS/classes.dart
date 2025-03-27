@@ -62,7 +62,7 @@ class _ClassesState extends State<Classes> {
         ),
       );
 
-      print('Response Code: ${response.statusCode}');
+      log('SAloni Response Code: ${response.statusCode}');
       log('Response Body: ${response.data}');
 
       if (response.statusCode == 200) {
@@ -72,7 +72,7 @@ class _ClassesState extends State<Classes> {
           isLoading = false;
         });
       } else {
-        print("Error: Invalid response structure");
+        log("Error: Invalid response structure");
         setState(() {
           isLoading = false;
         });

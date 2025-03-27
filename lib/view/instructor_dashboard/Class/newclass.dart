@@ -268,7 +268,7 @@ class _NewclassState extends State<Newclass> {
               ),
               const SizedBox(height: 16),
               Text(
-                "Start a New Class",
+                "Add new Chapter to class",
                 style: GoogleFonts.urbanist(
                   fontSize: 28,
                   fontWeight: FontWeight.w600,

@@ -171,25 +171,25 @@ class _NewLoginState extends State<NewLogin> {
         builder: (_, child) => Scaffold(
           backgroundColor: Colors.white,
           resizeToAvoidBottomInset: false,
-          body: SafeArea(
-            child: Container(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height,
-              child: Stack(
-                children: [
-                  // Background image
-                  Positioned.fill(
-                    child: Opacity(
-                      opacity: 0.30,
-                      child: Image.asset(
-                        "assets/registration/splash.png",
-                        fit: BoxFit.cover,
+          body: SingleChildScrollView(
+            child: SafeArea(
+              child: Container(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height,
+                child: Stack(
+                  children: [
+                    // Background image
+                    Positioned.fill(
+                      child: Opacity(
+                        opacity: 0.30,
+                        child: Image.asset(
+                          "assets/registration/splash.png",
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
-                  ),
-                  // Centered content with scroll capability
-                  Center(
-                    child: SingleChildScrollView(
+                    // Centered content with scroll capability
+                    Center(
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20.w),
                         child: Column(
@@ -219,102 +219,120 @@ class _NewLoginState extends State<NewLogin> {
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,
                               ),
-                            ),
-                            SizedBox(height: 20.h),
-                            _buildTextField(
-                                controller: _emailIdController,
-                                hint: "Enter your Email"),
-                            SizedBox(height: 20.h),
-                            _buildPasswordField(),
-                            SizedBox(height: 20.h),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Forgot1(),
-                                  ),
-                                );
-                              },
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: Padding(
-                                  padding: EdgeInsets.only(right: 10.w),
-                                  child: Text(
-                                    "Forgot Password",
-                                    style: GoogleFonts.urbanist(
-                                      fontSize: 10.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.blue,
-                                    ),
-                                  ),
+                              SizedBox(height: 20.h),
+                              Text(
+                                "Welcome BACK!",
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 22.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 25.h),
-                            GestureDetector(
-                              onTap: _login,
-                              child: Container(
-                                height: 45.h,
-                                width: MediaQuery.of(context).size.width / 1.5,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(25.r),
-                                  color: Color.fromRGBO(27, 97, 122, 1),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "Login",
-                                    style: GoogleFonts.urbanist(
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                              SizedBox(height: 10.h),
+                              Text(
+                                "Login to your account",
+                                style: GoogleFonts.urbanist(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
                                 ),
                               ),
-                            ),
-                            SizedBox(height: 45.h),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Registration(),
-                                  ),
-                                );
-                              },
-                              child: Text.rich(
-                                TextSpan(
-                                  text: "Already have an account? ",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: "Register",
+                              SizedBox(height: 20.h),
+                              _buildTextField(
+                                  controller: _emailIdController,
+                                  hint: "Enter your Email"),
+                              SizedBox(height: 20.h),
+                              _buildPasswordField(),
+                              SizedBox(height: 20.h),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Forgot1(),
+                                    ),
+                                  );
+                                },
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(right: 10.w),
+                                    child: Text(
+                                      "Forgot Password",
                                       style: GoogleFonts.urbanist(
-                                        fontSize: 12.sp,
+                                        fontSize: 10.sp,
                                         fontWeight: FontWeight.w400,
-                                        color: Color.fromRGBO(27, 97, 122, 1),
-                                        decoration: TextDecoration.underline,
-                                        decorationColor:
-                                            Color.fromRGBO(27, 97, 122, 1),
+                                        color: Colors.blue,
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
-                                textAlign: TextAlign.center,
                               ),
-                            ),
-                            SizedBox(height: 55.h),
-                          ],
+                              SizedBox(height: 25.h),
+                              GestureDetector(
+                                onTap: _login,
+                                child: Container(
+                                  height: 45.h,
+                                  width: MediaQuery.of(context).size.width / 1.5,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(25.r),
+                                    color: Color.fromRGBO(27, 97, 122, 1),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      "Login",
+                                      style: GoogleFonts.urbanist(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 45.h),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Registration(),
+                                    ),
+                                  );
+                                },
+                                child: Text.rich(
+                                  TextSpan(
+                                    text: "Already have an account? ",
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.black,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: "Register",
+                                        style: GoogleFonts.urbanist(
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color.fromRGBO(27, 97, 122, 1),
+                                          decoration: TextDecoration.underline,
+                                          decorationColor:
+                                              Color.fromRGBO(27, 97, 122, 1),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                              SizedBox(height: 55.h),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ],
+
+                  ],
+                ),
               ),
             ),
           ),

@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uthix_app/view/instructor_dashboard/Class/class.dart'; // Ensure this import points to your InstructorClass widget
+import 'package:uthix_app/view/instructor_dashboard/Class/class.dart';
 
 class MyClasses extends StatefulWidget {
   final String classroomId; // Add the classroomId parameter
@@ -16,10 +16,10 @@ class MyClasses extends StatefulWidget {
 class _MyClassesState extends State<MyClasses> {
   final TextEditingController _emailController = TextEditingController();
   final Dio _dio = Dio();
-  // You might want to update this URL to include widget.classroomId if your API supports filtering.
   final String apiUrl = "https://admin.uthix.com/api/manage-classes";
   String? token;
   List<dynamic> classes = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -35,15 +35,17 @@ class _MyClassesState extends State<MyClasses> {
     });
     debugPrint("Token loaded: $token");
     if (token != null) {
-      _fetchClassroom();
+      await _fetchClassroom();
     } else {
       debugPrint("Access token not found. User may not be logged in.");
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
   Future<void> _fetchClassroom() async {
     try {
-      // Optionally, modify the API URL here to fetch only data for widget.classroomId
       final response = await _dio.get(
         apiUrl,
         options: Options(
@@ -53,20 +55,35 @@ class _MyClassesState extends State<MyClasses> {
           },
         ),
       );
-
       debugPrint("Response Code: ${response.statusCode}");
       debugPrint("Response Data: ${response.data}");
-
       if (response.statusCode == 200 && response.data["status"] == true) {
         setState(() {
           classes = response.data['data'];
+          isLoading = false;
         });
       } else {
         debugPrint("Error: ${response.data["message"]}");
+        setState(() {
+          isLoading = false;
+        });
       }
     } catch (e) {
       debugPrint("Error fetching classes: $e");
+      setState(() {
+        isLoading = false;
+      });
     }
+  }
+
+  // Filter chapters for the given classroom id.
+  List<dynamic> get filteredClasses {
+    return classes.where((chapter) {
+      if (chapter["classroom"] != null && chapter["classroom"]["id"] != null) {
+        return chapter["classroom"]["id"].toString() == widget.classroomId;
+      }
+      return false;
+    }).toList();
   }
 
   // Modal to invite a participant (can be reused as needed)

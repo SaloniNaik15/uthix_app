@@ -93,9 +93,7 @@ class _YourClasroomState extends State<YourClasroom> {
           },
         ),
       );
-
       log("STUDENT-Response Body:\n\${response.data}\n");
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = response.data;
 
@@ -157,6 +155,7 @@ class _YourClasroomState extends State<YourClasroom> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
         backgroundColor: Colors.white,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(70.h),
@@ -200,6 +199,7 @@ class _YourClasroomState extends State<YourClasroom> {
                     child: Image.asset(
                       "assets/Student_Home_icons/stud_logo.png",
                       fit: BoxFit.cover,
+
                     ),
                   ),
                 ),
@@ -287,6 +287,7 @@ class _YourClasroomState extends State<YourClasroom> {
                                       ],
                                     ),
                                   ],
+
                                 ),
                               ),
                             ],

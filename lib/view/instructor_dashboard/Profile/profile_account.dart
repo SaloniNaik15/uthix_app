@@ -103,9 +103,9 @@ class _ProfileAccountState extends State<ProfileAccount> {
                             ),
                           ),
                           SizedBox(
-                            width: 250.w,
+                            width: 220.w,
                             child: Text(
-                              "Congratulations! You are our premium member now",
+                              "Congratulations! You are member now",
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,

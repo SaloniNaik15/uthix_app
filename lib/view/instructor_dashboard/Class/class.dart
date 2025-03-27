@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:time/time.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/view/instructor_dashboard/Class/announcement.dart';
@@ -31,11 +33,11 @@ class _InstructorClassState extends State<InstructorClass> {
     _loadToken();
   }
 
-  // Load token from SharedPreferences and call the API methods if available.
+  // Load token from SharedPreferences
   Future<void> _loadToken() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      // Changed from 'access_token' to 'auth_token'
+
       token = prefs.getString('auth_token');
     });
     if (token != null) {
@@ -88,7 +90,7 @@ class _InstructorClassState extends State<InstructorClass> {
     try {
       print("Fetching class data...");
       var response = await Dio().get(
-        'https://admin.uthix.com/api/subject-classes/1',
+        'https://admin.uthix.com/api/subject-classes/5',
         options: Options(
           headers: {
             "Authorization": "Bearer $token",
@@ -136,9 +138,9 @@ class _InstructorClassState extends State<InstructorClass> {
         backgroundColor: Colors.white,
         elevation: 2,
         leading: IconButton(
-          icon: const Icon(
+          icon:  Icon(
             Icons.arrow_back_ios_outlined,
-            size: 25,
+            size: 25.sp,
             color: Colors.black,
           ),
           onPressed: () {
@@ -147,8 +149,8 @@ class _InstructorClassState extends State<InstructorClass> {
         ),
         actions: [
           Container(
-            width: 40,
-            height: 40,
+            width: 35.w,
+            height: 35.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: const Color.fromRGBO(43, 93, 116, 1),
@@ -165,9 +167,9 @@ class _InstructorClassState extends State<InstructorClass> {
                 ),
               ],
             ),
-            child: const Icon(
+            child:  Icon(
               Icons.add,
-              size: 35,
+              size: 35.sp,
               color: Colors.white,
             ),
           ),
@@ -177,12 +179,12 @@ class _InstructorClassState extends State<InstructorClass> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => UnderConstructionScreen()),
+                    builder: (context) => LiveClasses()),
               );
             },
             child: Container(
-              width: 70,
-              height: 40,
+              width: 70.w,
+              height: 40.h,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 color: const Color.fromRGBO(217, 217, 217, 1),
@@ -202,7 +204,7 @@ class _InstructorClassState extends State<InstructorClass> {
               child: Center(
                 child: Text(
                   "Go Live",
-                  style: GoogleFonts.urbanist(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                     color: const Color.fromRGBO(96, 95, 95, 1),
@@ -211,7 +213,7 @@ class _InstructorClassState extends State<InstructorClass> {
               ),
             ),
           ),
-          const SizedBox(width: 15),
+           SizedBox(width: 15.h),
         ],
       ),
       body: SingleChildScrollView(
@@ -223,7 +225,7 @@ class _InstructorClassState extends State<InstructorClass> {
                     ? const Center(child: Text("No classes available"))
                     : Column(
                         children: [
-                          const SizedBox(height: 40),
+                          SizedBox(height: 40.h),
                           ClassCard(
                             subject: classData[currentIndex]["classroom"]
                                     ?["subject"]?["name"] ??
@@ -254,8 +256,8 @@ class _InstructorClassState extends State<InstructorClass> {
                           children: [
                             Text(
                               "Teacher",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 14,
+                              style: TextStyle(
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.black,
                               ),
@@ -275,8 +277,8 @@ class _InstructorClassState extends State<InstructorClass> {
                             ),
                             Text(
                               "Mahima",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 14,
+                              style: TextStyle(
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.w300,
                                 color: Colors.black,
                               ),
@@ -288,23 +290,23 @@ class _InstructorClassState extends State<InstructorClass> {
                           children: [
                             Text(
                               "Participants",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 14,
+                              style: TextStyle(
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.black,
                               ),
                             ),
                             SizedBox(
-                              height: 40,
-                              width: 80,
+                              height: 40.h,
+                              width: 80.w,
                               child: Stack(
                                 clipBehavior: Clip.none,
                                 children: List.generate(4, (index) {
                                   return Positioned(
                                     right: 15 * index.toDouble(),
                                     child: Container(
-                                      width: 39,
-                                      height: 39,
+                                      width: 39.w,
+                                      height: 39.h,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: Colors.black,
@@ -325,8 +327,8 @@ class _InstructorClassState extends State<InstructorClass> {
                             ),
                             Text(
                               "30 +",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 18,
+                              style: TextStyle(
+                                fontSize: 12.sp,
                                 fontWeight: FontWeight.w300,
                                 color: Colors.black,
                               ),
@@ -335,7 +337,7 @@ class _InstructorClassState extends State<InstructorClass> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
                     GestureDetector(
                       onTap: () async {
                         final result = await Navigator.push(
@@ -348,8 +350,8 @@ class _InstructorClassState extends State<InstructorClass> {
                         }
                       },
                       child: Container(
-                        height: 75,
-                        width: 340,
+                        height: 60.h,
+                        width: MediaQuery.sizeOf(context).width/0.5,
                         decoration: BoxDecoration(
                           color: const Color.fromRGBO(246, 246, 246, 1),
                           borderRadius: BorderRadius.circular(7),
@@ -362,8 +364,8 @@ class _InstructorClassState extends State<InstructorClass> {
                           child: Row(
                             children: [
                               Container(
-                                width: 45,
-                                height: 45,
+                                width: 45.w,
+                                height: 45.h,
                                 decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
                                 ),
@@ -374,11 +376,11 @@ class _InstructorClassState extends State<InstructorClass> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              SizedBox(width: 10.w),
                               Text(
                                 "Announce something to your class",
-                                style: GoogleFonts.urbanist(
-                                  fontSize: 14,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
                                   fontWeight: FontWeight.w400,
                                   color: const Color.fromRGBO(142, 140, 140, 1),
                                 ),
@@ -389,153 +391,157 @@ class _InstructorClassState extends State<InstructorClass> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    SizedBox(
-                      height: 350,
-                      child: isAnnouncementsLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : ListView.builder(
-                              itemCount: announcementsData.length,
-                              itemBuilder: (context, index) {
-                                var announcement = announcementsData[index];
-                                return GestureDetector(
-                                  onTap: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //       builder: (context) => Submission()),
-                                    // );
-                                  },
-                                  child: Container(
-                                    width: 400,
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 8, horizontal: 10),
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromRGBO(
-                                          246, 246, 246, 1),
-                                      borderRadius: BorderRadius.circular(7),
-                                      border: Border.all(
+                    SafeArea(
+                      child: Container(
+                        height: 500.h,
+                        child: isAnnouncementsLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : ListView.builder(
+                                itemCount: announcementsData.length,
+                                itemBuilder: (context, index) {
+                                  var announcement = announcementsData[index];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //       builder: (context) => Submission()),
+                                      // );
+                                    },
+                                    child: Container(
+                                      width: 400.h,
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 8, horizontal: 10),
+                                      decoration: BoxDecoration(
                                         color: const Color.fromRGBO(
-                                            217, 217, 217, 1),
-                                        width: 1,
+                                            246, 246, 246, 1),
+                                        borderRadius: BorderRadius.circular(7),
+                                        border: Border.all(
+                                          color: const Color.fromRGBO(
+                                              217, 217, 217, 1),
+                                          width: 1,
+                                        ),
                                       ),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              ClipOval(
-                                                child: Image.asset(
-                                                  "assets/login/profile.jpeg",
-                                                  width: 45,
-                                                  height: 45,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Text(
-                                                announcement["instructor"]
-                                                        ["name"] ??
-                                                    "No Name",
-                                                style: GoogleFonts.urbanist(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                              const Spacer(),
-                                              const Icon(Icons.more_vert),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            announcement["title"] ?? "No Title",
-                                            style: GoogleFonts.urbanist(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 10),
-                                          (announcement["attachments"] !=
-                                                      null &&
-                                                  announcement["attachments"]
-                                                          .length >
-                                                      0)
-                                              ? Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: List.generate(
-                                                      announcement[
-                                                              "attachments"]
-                                                          .length, (index) {
-                                                    final attachment =
-                                                        announcement[
-                                                                "attachments"]
-                                                            [index];
-                                                    final attachmentUrl =
-                                                        "https://admin.uthix.com/uploads/${attachment['attachment_file']}";
-                                                    return Padding(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          vertical: 4.0),
-                                                      child: GestureDetector(
-                                                        onTap: () =>
-                                                            _openAttachment(
-                                                                context,
-                                                                attachmentUrl),
-                                                        child: Row(
-                                                          children: [
-                                                            const Icon(
-                                                                Icons
-                                                                    .attach_file,
-                                                                color: Colors
-                                                                    .grey),
-                                                            const SizedBox(
-                                                                width: 5),
-                                                            Expanded(
-                                                              child: Text(
-                                                                attachment[
-                                                                    "attachment_file"],
-                                                                style: GoogleFonts
-                                                                    .urbanist(
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                  color: Colors
-                                                                      .black,
-                                                                ),
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }),
-                                                )
-                                              : Text(
-                                                  "No attachments",
-                                                  style: GoogleFonts.urbanist(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: const Color.fromRGBO(
-                                                        142, 140, 140, 1),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                ClipOval(
+                                                  child: Image.asset(
+                                                    "assets/login/profile.jpeg",
+                                                    width: 45,
+                                                    height: 45,
+                                                    fit: BoxFit.cover,
                                                   ),
                                                 ),
-                                        ],
+                                                SizedBox(width: 10.w),
+                                                Text(
+                                                  announcement["instructor"]
+                                                          ["name"] ??
+                                                      "No Name",
+                                                  style: TextStyle(
+                                                    fontSize: 14.sp,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                const Spacer(),
+                                                const Icon(Icons.more_vert),
+                                              ],
+                                            ),
+                                             SizedBox(height: 8.h),
+                                            Text(
+                                              announcement["title"] ?? "No Title",
+                                              style: TextStyle(
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                           SizedBox(height: 10.h),
+                                            (announcement["attachments"] !=
+                                                        null &&
+                                                    announcement["attachments"]
+                                                            .length >
+                                                        0)
+                                                ? Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                    children: List.generate(
+                                                        announcement[
+                                                                "attachments"]
+                                                            .length, (index) {
+                                                      final attachment =
+                                                          announcement[
+                                                                  "attachments"]
+                                                              [index];
+                                                      final attachmentUrl =
+                                                          "https://admin.uthix.com/uploads/${attachment['attachment_file']}";
+                                                      return Padding(
+                                                        padding: const EdgeInsets
+                                                            .symmetric(
+                                                            vertical: 4.0),
+                                                        child: GestureDetector(
+                                                          onTap: () =>
+                                                              _openAttachment(
+                                                                  context,
+                                                                  attachmentUrl),
+                                                          child: Row(
+                                                            children: [
+                                                              const Icon(
+                                                                  Icons
+                                                                      .attach_file,
+                                                                  color: Colors
+                                                                      .grey),
+                                                              const SizedBox(
+                                                                  width: 5),
+                                                              Expanded(
+                                                                child: Text(
+                                                                  attachment[
+                                                                      "attachment_file"],
+                                                                  style: TextStyle(
+                                                                    fontSize: 12.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                    color: Colors
+                                                                        .black,
+                                                                  ),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }),
+                                                  )
+                                                : Text(
+                                                    "No attachments",
+                                                    style: TextStyle(
+                                                      fontSize: 12.sp,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: const Color.fromRGBO(
+                                                          142, 140, 140, 1),
+                                                    ),
+                                                  ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
+                                  );
+                                },
+                              ),
+                      ),
+
                     ),
+
+
                   ],
                 ),
               ),
@@ -574,7 +580,7 @@ class ClassCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 170,
+      height: 170.h,
       width: double.infinity,
       decoration: BoxDecoration(
         color: const Color.fromRGBO(43, 92, 116, 1),
