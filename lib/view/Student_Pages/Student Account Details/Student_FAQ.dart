@@ -1,6 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StudentFaq extends StatefulWidget {
   const StudentFaq({super.key});
@@ -10,8 +11,59 @@ class StudentFaq extends StatefulWidget {
 }
 
 class _StudentFaqState extends State<StudentFaq> {
-  // List to store the expanded state for each list item
-  final List<bool> _expandedStates = List.filled(8, false);
+  List<dynamic> _faqList = [];
+  List<bool> _expandedStates = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchFaqList();
+  }
+
+  Future<void> fetchFaqList() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Auth token not found. Please login.")),
+        );
+        return;
+      }
+
+      Dio dio = Dio();
+      const String apiUrl = "https://admin.uthix.com/api/faqs/active"; // 🔁 Replace
+
+      final response = await dio.get(
+        apiUrl,
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _faqList = response.data; // ✅ JSON is a list
+          _expandedStates = List.filled(_faqList.length, false);
+          isLoading = false;
+        });
+      } else {
+        throw Exception("Failed to load FAQs");
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error fetching FAQs: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +91,7 @@ class _StudentFaqState extends State<StudentFaq> {
               top: 40.h,
               right: -10.w,
               child: Image.asset(
-                'assets/icons/FrequentlyAsked Questions.png', // Replace with your image path
+                'assets/icons/FrequentlyAsked Questions.png',
                 width: 80.w,
                 height: 80.h,
               ),
@@ -47,7 +99,11 @@ class _StudentFaqState extends State<StudentFaq> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _faqList.isEmpty
+          ? const Center(child: Text("No FAQs available."))
+          : SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 10.w),
           child: Column(
@@ -65,28 +121,19 @@ class _StudentFaqState extends State<StudentFaq> {
                 decoration: BoxDecoration(
                   color: const Color(0xFFF4F4F4),
                   borderRadius: BorderRadius.circular(5.r),
-                  border: Border.all(color: const Color(0xFFD9D9D9), width: 1.w),
+                  border: Border.all(
+                      color: const Color(0xFFD9D9D9), width: 1.w),
                 ),
                 child: Column(
-                  children: List.generate(8, (index) {
+                  children: List.generate(_faqList.length, (index) {
+                    final item = _faqList[index];
                     return Column(
                       children: [
                         _buildListTile(
                           index: index,
-                          title:
-                          "What is the required time duration for an order to get delivered?",
+                          question: item["question"],
+                          answer: item["answer"],
                         ),
-                        if (_expandedStates[index])
-                          Padding(
-                            padding: EdgeInsets.all(10.w),
-                            child: Text(
-                              "What is the required time duration for an order to get delivered?",
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
                         Divider(height: 1.h),
                       ],
                     );
@@ -102,29 +149,45 @@ class _StudentFaqState extends State<StudentFaq> {
 
   Widget _buildListTile({
     required int index,
-    required String title,
+    required String question,
+    required String answer,
   }) {
-    return ListTile(
-      title: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16.sp,
-          color: Colors.black,
-          fontWeight: FontWeight.w600,
+    return Column(
+      children: [
+        ListTile(
+          title: Text(
+            question,
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          trailing: Icon(
+            _expandedStates[index]
+                ? Icons.keyboard_arrow_up_outlined
+                : Icons.keyboard_arrow_down_outlined,
+            size: 25.sp,
+            color: Colors.black,
+          ),
+          onTap: () {
+            setState(() {
+              _expandedStates[index] = !_expandedStates[index];
+            });
+          },
         ),
-      ),
-      trailing: Icon(
-        _expandedStates[index]
-            ? Icons.keyboard_arrow_up_outlined
-            : Icons.keyboard_arrow_down_outlined,
-        size: 25.sp,
-        color: Colors.black,
-      ),
-      onTap: () {
-        setState(() {
-          _expandedStates[index] = !_expandedStates[index];
-        });
-      },
+        if (_expandedStates[index])
+          Padding(
+            padding: EdgeInsets.all(10.w),
+            child: Text(
+              answer,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: Colors.black,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

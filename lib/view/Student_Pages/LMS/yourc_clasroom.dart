@@ -93,8 +93,7 @@ class _YourClasroomState extends State<YourClasroom> {
           },
         ),
       );
-
-      log("API Response: ${response.data}");
+      log("STUDENT-Response Body:\n\${response.data}\n");
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = response.data;
 
@@ -156,179 +155,163 @@ class _YourClasroomState extends State<YourClasroom> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70.h),
-        child: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: Padding(
-            padding: EdgeInsets.only(left: 20.w),
-            child: IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: Icon(Icons.arrow_back_ios_outlined,
-                  color: Colors.black, size: 20.sp),
+
+        backgroundColor: Colors.white,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(70.h),
+          child: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: Padding(
+              padding: EdgeInsets.only(left: 20.w),
+              child: IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: Icon(Icons.arrow_back_ios_outlined, color: Colors.black, size: 20.sp),
+              ),
             ),
-          ),
-          title: Text(
-            "Your Classroom",
-            style: GoogleFonts.urbanist(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.w600,
-              color: Color.fromRGBO(96, 95, 95, 1),
+            title: Text(
+              "Your Classroom",
+              style: GoogleFonts.urbanist(
+                fontSize: 20.sp,
+                fontWeight: FontWeight.w600,
+                color: Color.fromRGBO(96, 95, 95, 1),
+              ),
             ),
-          ),
-          centerTitle: true,
-          actions: [
-            Padding(
-              padding: EdgeInsets.only(right: 20.w),
-              child: Container(
-                height: 42.h,
-                width: 42.w,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(21.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
-                      offset: Offset(0, 4),
-                      blurRadius: 8,
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    "assets/Student_Home_icons/stud_logo.png",
-                    fit: BoxFit.cover,
+            centerTitle: true,
+            actions: [
+              Padding(
+                padding: EdgeInsets.only(right: 20.w),
+                child: Container(
+                  height: 42.h,
+                  width: 42.w,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(21.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        offset: Offset(0, 4),
+                        blurRadius: 8,
+                      ),
+                    ],
                   ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      "assets/Student_Home_icons/stud_logo.png",
+                      fit: BoxFit.cover,
+
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                Divider(thickness: 1.h, color: Color.fromRGBO(217, 217, 217, 1)),
+                Expanded(
+                  child: isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : classList.isEmpty
+                      ? Center(child: Text("No classrooms assigned yet"))
+                      : ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                    itemCount: classList.length,
+                    itemBuilder: (context, index) {
+                      final classData = classList[index];
+                      return GestureDetector(
+                        onTap: () {
+                          int classroomId = classData["classroomId"];
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Classes(classroomId: classroomId),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(bottom: 16.h),
+                          padding: EdgeInsets.all(12.w),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 6,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      classData["className"] ?? "Unknown Class",
+                                      style: GoogleFonts.urbanist(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color.fromRGBO(96, 95, 95, 1),
+                                      ),
+                                    ),
+                                    SizedBox(height: 4.h),
+                                    Text(
+                                      "Teacher Name : ${classData["instructor"] ?? "N/A"}",
+                                      style: GoogleFonts.urbanist(
+                                        fontSize: 13.sp,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                    SizedBox(height: 8.h),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.group, size: 16.sp, color: Colors.blueGrey),
+                                        SizedBox(width: 4.w),
+                                        Text("1000", style: TextStyle(fontSize: 12.sp)),
+                                        SizedBox(width: 12.w),
+                                        Icon(Icons.star, size: 16.sp, color: Colors.orange),
+                                        SizedBox(width: 4.w),
+                                        Text("4.0", style: TextStyle(fontSize: 12.sp)),
+                                        SizedBox(width: 12.w),
+                                        Icon(Icons.access_time, size: 16.sp, color: Colors.teal),
+                                        SizedBox(width: 4.w),
+                                        Text("45 Hours", style: TextStyle(fontSize: 12.sp)),
+                                      ],
+                                    ),
+                                  ],
+
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              bottom: 30.h,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: NavbarStudent(
+                  onItemTapped: onItemTapped,
+                  selectedIndex: selectedIndex,
                 ),
               ),
             ),
           ],
         ),
-      ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Divider(thickness: 1.h, color: Color.fromRGBO(217, 217, 217, 1)),
-              Expanded(
-                child: isLoading
-                    ? Center(child: CircularProgressIndicator())
-                    : classList.isEmpty
-                        ? Center(child: Text("No classrooms assigned yet"))
-                        : ListView.builder(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 16.w, vertical: 10.h),
-                            itemCount: classList.length,
-                            itemBuilder: (context, index) {
-                              final classData = classList[index];
-                              return GestureDetector(
-                                onTap: () {
-                                  int classroomId = classData["classroomId"];
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          Classes(classroomId: classroomId),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(bottom: 16.h),
-                                  padding: EdgeInsets.all(12.w),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.05),
-                                        blurRadius: 6,
-                                        offset: Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              classData["className"] ??
-                                                  "Unknown Class",
-                                              style: GoogleFonts.urbanist(
-                                                fontSize: 16.sp,
-                                                fontWeight: FontWeight.w600,
-                                                color: Color.fromRGBO(
-                                                    96, 95, 95, 1),
-                                              ),
-                                            ),
-                                            SizedBox(height: 4.h),
-                                            Text(
-                                              "Teacher Name : ${classData["instructor"] ?? "N/A"}",
-                                              style: GoogleFonts.urbanist(
-                                                fontSize: 13.sp,
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.grey[700],
-                                              ),
-                                            ),
-                                            SizedBox(height: 8.h),
-                                            Row(
-                                              children: [
-                                                Icon(Icons.group,
-                                                    size: 16.sp,
-                                                    color: Colors.blueGrey),
-                                                SizedBox(width: 4.w),
-                                                Text("1000",
-                                                    style: TextStyle(
-                                                        fontSize: 12.sp)),
-                                                SizedBox(width: 12.w),
-                                                Icon(Icons.star,
-                                                    size: 16.sp,
-                                                    color: Colors.orange),
-                                                SizedBox(width: 4.w),
-                                                Text("4.0",
-                                                    style: TextStyle(
-                                                        fontSize: 12.sp)),
-                                                SizedBox(width: 12.w),
-                                                Icon(Icons.access_time,
-                                                    size: 16.sp,
-                                                    color: Colors.teal),
-                                                SizedBox(width: 4.w),
-                                                Text("45 Hours",
-                                                    style: TextStyle(
-                                                        fontSize: 12.sp)),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-              ),
-            ],
-          ),
-          Positioned(
-            bottom: 30.h,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: NavbarStudent(
-                onItemTapped: onItemTapped,
-                selectedIndex: selectedIndex,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
