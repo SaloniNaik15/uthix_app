@@ -20,7 +20,7 @@ class _ClassDataState extends State<ClassData> {
   List<dynamic> classes = [];
   List<Map<String, dynamic>> subjects = [];
   bool isLoading = true;
-  String? token; // Access token loaded from SharedPreferences
+  String? token;
   final String apiUrl = "https://admin.uthix.com/api/classroom";
   final String subjectsApiUrl = "https://admin.uthix.com/api/subject";
 
@@ -83,16 +83,14 @@ class _ClassDataState extends State<ClassData> {
         subjectsApiUrl,
         options: Options(
           headers: {
-            "Authorization":
-                "Bearer 15|px3G0ncBD1lRY4ZkPQSA96JqtQBdgSmmDlOReFFf183ba939"
+            "Authorization": "Bearer 345|nAW96QnsVX0ECAc94qyk4QfVC99uWdzdQr6yN9RQ18129cfa"
           },
         ),
       );
       if (response.statusCode == 200 && response.data["subjects"] != null) {
         setState(() {
           subjects = List<Map<String, dynamic>>.from(response.data["subjects"]);
-          isLoading =
-              false; // Mark loading complete once both classes and subjects are fetched.
+          isLoading = false; // Mark loading complete once both classes and subjects are fetched.
         });
       } else {
         log("Error fetching subjects: ${response.data["message"]}");
@@ -112,7 +110,7 @@ class _ClassDataState extends State<ClassData> {
   String _getSubjectName(dynamic subjectId) {
     try {
       final subject = subjects.firstWhere(
-        (subj) => subj["id"] == subjectId,
+            (subj) => subj["id"] == subjectId,
         orElse: () => {},
       );
       return subject["name"] ?? "N/A";
@@ -182,256 +180,254 @@ class _ClassDataState extends State<ClassData> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
-              itemCount: classes.length,
-              itemBuilder: (context, index) {
-                final classItem = classes[index];
-                // Extract the classroom ID (ensure your API returns an "id" field)
-                final classroomId = classItem['id'].toString();
-                return Padding(
-                  padding: const EdgeInsets.only(
-                      top: 15, left: 20, right: 20, bottom: 15),
-                  child: GestureDetector(
-                    onTap: () {
-                      // Navigate to the Newclass page with the classroom ID.
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Newclass(
-                            classroomId: classroomId,
+        itemCount: classes.length,
+        itemBuilder: (context, index) {
+          final classItem = classes[index];
+          // Extract the classroom ID (ensure your API returns an "id" field)
+          final classroomId = classItem['id'].toString();
+          return Padding(
+            padding: const EdgeInsets.only(
+                top: 15, left: 20, right: 20, bottom: 15),
+            child: GestureDetector(
+              onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => Newclass(
+                //       classroomId: classroomId,
+                //     ),
+                //   ),
+                // );
+              },
+              child: Container(
+                width: 290,
+                height: 170,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color.fromRGBO(217, 217, 217, 1),
+                  ),
+                  color: const Color.fromRGBO(246, 246, 246, 1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Class name and section row.
+                      Row(
+                        children: [
+                          Text(
+                            classItem['class_name'] ?? "Unknown Class",
+                            style: GoogleFonts.urbanist(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: 290,
-                      height: 170,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: const Color.fromRGBO(217, 217, 217, 1),
-                        ),
-                        color: const Color.fromRGBO(246, 246, 246, 1),
-                        borderRadius: BorderRadius.circular(10),
+                          const SizedBox(width: 5),
+                          Text(
+                            classItem['section'] ?? "No section",
+                            style: GoogleFonts.urbanist(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          // Removed the three-dot icon here.
+                        ],
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Class name and section row.
-                            Row(
+                      const SizedBox(height: 5),
+                      // Subject information (displays subject name by looking it up).
+                      Text(
+                        "Subject: ${_getSubjectName(classItem['subject_id'])}",
+                        style: GoogleFonts.urbanist(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      // Participant avatars row.
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 80,
+                            height: 23,
+                            child: Stack(
+                              clipBehavior: Clip.none,
                               children: [
-                                Text(
-                                  classItem['class_name'] ?? "Unknown Class",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
+                                Positioned(
+                                  left: 0,
+                                  child: Container(
+                                    width: 23,
+                                    height: 23,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.black,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(1.0),
+                                      child: ClipOval(
+                                        child: Image.asset(
+                                          "assets/login/profile.jpeg",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  classItem['section'] ?? "No section",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
+                                Positioned(
+                                  left: 15,
+                                  child: Container(
+                                    width: 23,
+                                    height: 23,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.black,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(1.0),
+                                      child: ClipOval(
+                                        child: Image.asset(
+                                          "assets/login/profile.jpeg",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                const Spacer(),
-                                const Icon(Icons.more_vert),
+                                Positioned(
+                                  left: 30,
+                                  child: Container(
+                                    width: 23,
+                                    height: 23,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.black,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(1.0),
+                                      child: ClipOval(
+                                        child: Image.asset(
+                                          "assets/login/profile.jpeg",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 45,
+                                  child: Container(
+                                    width: 23,
+                                    height: 23,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.black,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(1.0),
+                                      child: ClipOval(
+                                        child: Image.asset(
+                                          "assets/login/profile.jpeg",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
-                            const SizedBox(height: 5),
-                            // Subject information now displays the subject name by looking it up.
-                            Text(
-                              "Subject: ${_getSubjectName(classItem['subject_id'])}",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      // Row of two buttons: Add Chapter and View All Details.
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              // Navigate to Add Chapter page with the specific classroom ID.
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Newclass(
+                                    classroomId: classroomId,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 39,
+                              width: 140,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color:
+                                  const Color.fromRGBO(43, 92, 116, 1),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Add Chapter",
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color.fromRGBO(
+                                        43, 92, 116, 1),
+                                  ),
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 5),
-                            // Participant avatars row.
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 80,
-                                  height: 23,
-                                  child: Stack(
-                                    clipBehavior: Clip.none,
-                                    children: [
-                                      Positioned(
-                                        left: 0,
-                                        child: Container(
-                                          width: 23,
-                                          height: 23,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.black,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(1.0),
-                                            child: ClipOval(
-                                              child: Image.asset(
-                                                "assets/login/profile.jpeg",
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        left: 15,
-                                        child: Container(
-                                          width: 23,
-                                          height: 23,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.black,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(1.0),
-                                            child: ClipOval(
-                                              child: Image.asset(
-                                                "assets/login/profile.jpeg",
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        left: 30,
-                                        child: Container(
-                                          width: 23,
-                                          height: 23,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.black,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(1.0),
-                                            child: ClipOval(
-                                              child: Image.asset(
-                                                "assets/login/profile.jpeg",
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        left: 45,
-                                        child: Container(
-                                          width: 23,
-                                          height: 23,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.black,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(1.0),
-                                            child: ClipOval(
-                                              child: Image.asset(
-                                                "assets/login/profile.jpeg",
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              // Navigate to MyClasses page with the specific classroom ID so that the chapters for that classroom are shown.
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MyClasses(
+                                    classroomId: classroomId,
                                   ),
                                 ),
-                              ],
+                              );
+                            },
+                            child: Container(
+                              height: 39,
+                              width: 140,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color:
+                                  const Color.fromRGBO(43, 92, 116, 1),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "View All Chapters",
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color.fromRGBO(
+                                        43, 92, 116, 1),
+                                  ),
+                                ),
+                              ),
                             ),
-                            const SizedBox(height: 10),
-                            // Row of two buttons: Add Chapter and View All Details.
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    // Navigate to Add Chapter page with the specific classroom ID.
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Newclass(
-                                          classroomId: classroomId,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    height: 39,
-                                    width: 140,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                        color: const Color.fromRGBO(
-                                            43, 92, 116, 1),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        "Add Chapter",
-                                        style: GoogleFonts.urbanist(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color: const Color.fromRGBO(
-                                              43, 92, 116, 1),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    // Navigate to MyClasses page with the specific classroom ID so that the chapters for that classroom are shown.
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => MyClasses(
-                                          classroomId: classroomId,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    height: 39,
-                                    width: 140,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                        color: const Color.fromRGBO(
-                                            43, 92, 116, 1),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        "View All Details",
-                                        style: GoogleFonts.urbanist(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color: const Color.fromRGBO(
-                                              43, 92, 116, 1),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ),
+                    ],
                   ),
-                );
-              },
+                ),
+              ),
             ),
+          );
+        },
+      ),
     );
   }
 }

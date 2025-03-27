@@ -21,7 +21,7 @@ final List<Map<String, dynamic>> navItems = [
   {
     "icon": Icons.chat_outlined,
     "title": "Chat",
-    "page": UnderConstructionScreen(),
+    "page": Chat(),
   },
   {
     "icon": Icons.person_outline,

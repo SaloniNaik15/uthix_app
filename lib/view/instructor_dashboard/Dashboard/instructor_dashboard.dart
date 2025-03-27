@@ -301,7 +301,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
               Text(
                 "Hii Surnamika",
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
                   color: const Color.fromRGBO(96, 95, 95, 1),
                 ),
@@ -462,7 +462,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         Text(
           label,
           style: TextStyle(
-              fontSize: 14.sp, fontWeight: FontWeight.w700, color: Colors.black54),
+              fontSize: 13.sp, fontWeight: FontWeight.w700, color: Colors.black54),
         ),
         const SizedBox(height: 5),
         Container(
@@ -478,7 +478,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             child: TextField(
               controller: controller,
               style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 12.sp,
                   fontWeight: FontWeight.w400,
                   color: Colors.black87),
               decoration: InputDecoration(
@@ -506,7 +506,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         Text(
           label,
           style:TextStyle(
-              fontSize: 14.sp, fontWeight: FontWeight.w700, color: Colors.black54),
+              fontSize: 12.sp, fontWeight: FontWeight.w700, color: Colors.black54),
         ),
         const SizedBox(height: 5),
         Container(
@@ -521,13 +521,13 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             isExpanded: true,
             hint: Text("Select Subject",
                 style:
-                    TextStyle(fontSize: 14.sp, color: Colors.black45)),
+                    TextStyle(fontSize: 12.sp, color: Colors.black45)),
             items: items.map((subject) {
               return DropdownMenuItem<int>(
                 value: subject["id"],
                 child: Text(subject["name"],
                     style:TextStyle(
-                        fontSize: 14.sp, color: Colors.black87)),
+                        fontSize: 12.sp, color: Colors.black87)),
               );
             }).toList(),
             onChanged: (value) {
@@ -537,7 +537,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             },
           ),
         ),
-        const SizedBox(height: 10),
+        //const SizedBox(height: 10),
       ],
     );
   }
