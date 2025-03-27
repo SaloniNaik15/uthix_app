@@ -191,16 +191,33 @@ class _NewLoginState extends State<NewLogin> {
                     // Centered content with scroll capability
                     Center(
                       child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.w),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                "assets/registration/book.png",
-                                // width: 200.w,
-                                // height: 200.h,
-                                fit: BoxFit.cover,
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              "assets/registration/book.png",
+                              width: 90.w,
+                              height:114.h,
+                              fit: BoxFit.cover,
+                            ),
+                            SizedBox(height: 20.h),
+                            Text(
+                              "Welcome BACK!",
+                              style: GoogleFonts.urbanist(
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 10.h),
+                            Text(
+                              "Login to your account",
+                              style: GoogleFonts.urbanist(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
                               ),
                               SizedBox(height: 20.h),
                               Text(
