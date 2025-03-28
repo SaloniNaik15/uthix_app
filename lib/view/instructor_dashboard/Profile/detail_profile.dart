@@ -1,5 +1,11 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DetailProfile extends StatefulWidget {
   const DetailProfile({Key? key}) : super(key: key);
@@ -9,87 +15,267 @@ class DetailProfile extends StatefulWidget {
 }
 
 class _DetailProfileState extends State<DetailProfile> {
+  String? accessLoginToken;
+  File? _selectedImage;
+  String? profileImageUrl;
 
-  final List<Map<String, dynamic>> profileData = [
-    {'icon': Icons.person, 'label': 'You', 'hint': ''},
-    {'icon': Icons.phone, 'label': '+91 XXXXX XXXXX', 'hint': ''},
-    {'icon': Icons.email, 'label': 'mahimavardhan16@gmail.com', 'hint': ''},
-    {'icon': Icons.lock, 'label': '********', 'hint': ''},  // Password field
-    {'icon': Icons.female, 'label': 'Female', 'hint': ''},
-    {'icon': Icons.location_on, 'label': 'Ip Extention, New Delhi', 'hint': ''},
-    {'icon': Icons.school, 'label': 'Banaras Hindu University', 'hint': ''},
-    {'icon': Icons.add, 'label': '+ Add Field', 'hint': ''},
-    {'icon': Icons.school, 'label': 'B.Sc in Physics', 'hint': ''},
-    {'icon': Icons.add, 'label': '+ Add Field', 'hint': ''},
-  ];
+  // Controllers
+  final Map<String, TextEditingController> controllers = {
+    'name': TextEditingController(),
+    'phone': TextEditingController(),
+    'email': TextEditingController(),
+    'bio': TextEditingController(),
+    'gender': TextEditingController(),
+    'qualification': TextEditingController(),
+    'experience': TextEditingController(),
+    'specialization': TextEditingController(),
+  };
+
+  // Editable states
+  final Map<String, bool> editable = {
+    'name': false,
+    'phone': false,
+    'email': false,
+    'bio': false,
+    'gender': false,
+    'qualification': false,
+    'experience': false,
+    'specialization': false,
+  };
+
+  final Map<String, String> fieldHints = {
+    'name': 'Your name',
+    'phone': 'Phone Number',
+    'email': 'Email',
+    'bio': 'Bio',
+    'gender': 'Gender',
+    'qualification': 'Qualification',
+    'experience': 'Experience in years',
+    'specialization': 'Specialization',
+  };
+
+  final Map<String, IconData> fieldIcons = {
+    'name': Icons.person,
+    'phone': Icons.phone,
+    'email': Icons.email,
+    'bio': Icons.info,
+    'gender': Icons.female,
+    'qualification': Icons.school,
+    'experience': Icons.school,
+    'specialization': Icons.school,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    log("Retrieved Token: $token");
+
+    if (token != null && token.isNotEmpty) {
+      setState(() {
+        accessLoginToken = token;
+      });
+      await fetchProfile();
+    } else {
+      debugPrint("❌ No token found in SharedPreferences");
+      // Optionally redirect to login or show a message
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> fetchProfile() async {
+    try {
+      final dio = Dio();
+      final response = await dio.get(
+        "https://admin.uthix.com/api/instructor-profile",
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $accessLoginToken",
+          },
+        ),
+      );
+      if (response.statusCode == 200 && response.data['status'] == true) {
+        final user = response.data['data'][0];
+        final userInfo = user['user'];
+
+        setState(() {
+          controllers['name']?.text = userInfo['name'] ?? '';
+          controllers['phone']?.text = userInfo['phone']?.toString() ?? '';
+          controllers['email']?.text = userInfo['email'] ?? '';
+          controllers['gender']?.text = userInfo['gender'] ?? '';
+          controllers['bio']?.text = user['bio'] ?? '';
+          controllers['qualification']?.text = user['qualification'] ?? '';
+          controllers['experience']?.text = user['experience']?.toString() ?? '';
+          controllers['specialization']?.text = user['specialization'] ?? '';
+          final profileImageName =
+              user["profile_image"] ?? userInfo["image"]; // fallback
+          if (profileImageName != null &&
+              profileImageName.toString().toLowerCase() != "null" &&
+              profileImageName.toString().isNotEmpty) {
+            setState(() {
+              profileImageUrl =
+                  "https://admin.uthix.com/storage/images/instructor/${userInfo["image"]}";
+              log("Profile Image URL: $profileImageUrl");
+            });
+          }else {
+            setState(() {
+              profileImageUrl = null; // fallback to default image
+            });
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint("Error fetching profile: $e");
+    }
+  }
+
+  Future<void> updateProfile() async {
+    if (accessLoginToken == null || accessLoginToken!.isEmpty) {
+      debugPrint("❌ No token, cannot update profile.");
+      return;
+    }
+
+    try {
+      // Step 1: Start with base map
+      final Map<String, dynamic> formMap = {
+        "name": controllers['name']?.text?.trim(),
+        "phone": controllers['phone']?.text?.trim(),
+        "email": controllers['email']?.text?.trim(),
+        "gender": controllers['gender']?.text?.trim(),
+        "bio": controllers['bio']?.text?.trim(),
+        "qualification": controllers['qualification']?.text?.trim(),
+      };
+
+      // Step 2: Conditionally add experience
+      final experienceText = controllers['experience']?.text?.trim();
+      if (experienceText != null && experienceText.isNotEmpty) {
+        final parsedExperience = int.tryParse(experienceText);
+        if (parsedExperience != null) {
+          formMap["experience"] = parsedExperience;
+        }
+      }
+
+      // Step 3: Conditionally add specialization
+      final specialization = controllers['specialization']?.text?.trim();
+      if (specialization != null && specialization.isNotEmpty) {
+        formMap["specialization"] = specialization;
+      }
+
+      // Step 4: Add profile image if selected
+      if (_selectedImage != null) {
+        formMap["profile_image"] = await MultipartFile.fromFile(
+          _selectedImage!.path,
+          filename: "profile.jpg",
+        );
+      }
+
+      final formData = FormData.fromMap(formMap);
+      log("✅ Sending body: $formMap");
+
+      final dioInstance = Dio();
+      final response = await dioInstance.post(
+        "https://admin.uthix.com/api/instructor-profile",
+        data: formData,
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $accessLoginToken",
+            "Accept": "application/json",
+          },
+        ),
+      );
+
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data['status'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Profile submitted!")),
+        );
+        setState(() {
+          editable.updateAll((key, value) => false);
+        });
+      } else {
+        debugPrint("❌ Failed to update: ${response.data}");
+      }
+    } catch (e) {
+      debugPrint("❌ Error submitting profile: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
-      /// App Bar
       appBar: AppBar(
         backgroundColor: const Color(0xFF2B5C74),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_outlined,
-            color: Colors.white,
-            size: 24.sp,
-          ),
+          icon: Icon(Icons.arrow_back_ios_outlined,
+              color: Colors.white, size: 24.sp),
           onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
         title: Text(
           "Profile",
           style: TextStyle(
-            color: Colors.white,
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-          ),
+              color: Colors.white,
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold),
         ),
       ),
-
-      /// Background image
       body: Container(
         width: double.infinity,
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage(
-              'assets/Seller_dashboard_images/ManageStoreBackground.png',
-            ),
+                'assets/Seller_dashboard_images/ManageStoreBackground.png'),
             fit: BoxFit.cover,
           ),
         ),
         child: Column(
           children: [
-            /// Top color strip + profile image
+            /// Profile Image Section
             Stack(
               children: [
                 ColoredBox(
                   color: const Color(0xFF2B5C74),
                   child: SizedBox(
-                    height: 40.h,
-                    width: MediaQuery.of(context).size.width,
-                  ),
+                      height: 40.h, width: MediaQuery.of(context).size.width),
                 ),
                 Align(
                   alignment: Alignment.center,
                   child: Stack(
                     children: [
-                      SizedBox(
-                        width: 80.w,
-                        height: 80.w,
+                      GestureDetector(
+                        onTap: _pickImage,
                         child: CircleAvatar(
-                          backgroundColor: Colors.transparent,
-                          child: CircleAvatar(
-                            radius: 40.r,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(40.r),
-                              child: Image.asset("assets/icons/profile.png"),
-                            ),
-                          ),
+                          radius: 40.r,
+                          backgroundImage: _selectedImage != null
+                              ? FileImage(_selectedImage!)
+                              : (profileImageUrl != null
+                                      ? NetworkImage(profileImageUrl!)
+                                      : const AssetImage(
+                                          "assets/icons/profile.png"))
+                                  as ImageProvider,
+                          backgroundColor: Colors.grey.shade200,
+                          onBackgroundImageError: (_, __) {
+                            setState(() {
+                              profileImageUrl = null;
+                            });
+                          },
                         ),
                       ),
                       Positioned(
@@ -98,24 +284,8 @@ class _DetailProfileState extends State<DetailProfile> {
                         child: CircleAvatar(
                           backgroundColor: Colors.white,
                           radius: 18.r,
-                          child: Container(
-                            padding: EdgeInsets.all(4.w),
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 4.r,
-                                ),
-                              ],
-                            ),
-                            child: Icon(
-                              Icons.camera_alt,
-                              color: Colors.white,
-                              size: 20.sp,
-                            ),
-                          ),
+                          child: Icon(Icons.camera_alt,
+                              color: Colors.blue, size: 20.sp),
                         ),
                       ),
                     ],
@@ -124,99 +294,57 @@ class _DetailProfileState extends State<DetailProfile> {
               ],
             ),
 
-            /// User name (e.g., "Mahima (You)")
             SizedBox(height: 10.h),
-            Text(
-              "(You)",
-              style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text("(You)",
+                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
 
-            /// Profile fields
+            /// Profile Fields
             Expanded(
               child: Padding(
                 padding: EdgeInsets.all(16.w),
-                child: ListView.builder(
-                  itemCount: profileData.length,
-                  itemBuilder: (context, index) {
-                    final item = profileData[index];
-                    return ProfileField(
-                      icon: item['icon'],
-                      label: item['label'],
-                      hint: item['hint'],
+                child: ListView(
+                  children: controllers.keys.map((key) {
+                    return buildProfileField(
+                      icon: fieldIcons[key]!,
+                      hint: fieldHints[key]!,
+                      controller: controllers[key]!,
+                      fieldKey: key,
                     );
-                  },
+                  }).toList(),
                 ),
               ),
             ),
           ],
         ),
       ),
-
-      /// Submit Profile button at the bottom
       bottomNavigationBar: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF2B5C74),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.r),
-            ),
+                borderRadius: BorderRadius.circular(8.r)),
             minimumSize: Size(double.infinity, 45.h),
           ),
-          onPressed: () {
-            // Handle submission logic here
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Profile submitted!")),
-            );
-          },
+          onPressed: updateProfile,
           child: Text(
             "Submit Profile",
             style: TextStyle(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.white),
           ),
         ),
       ),
     );
   }
-}
 
-/// Individual profile row
-class ProfileField extends StatefulWidget {
-  final IconData icon;
-  final String label;
-  final String hint;
-
-  const ProfileField({
-    Key? key,
-    required this.icon,
-    required this.label,
-    required this.hint,
-  }) : super(key: key);
-
-  @override
-  State<ProfileField> createState() => _ProfileFieldState();
-}
-
-class _ProfileFieldState extends State<ProfileField> {
-  late TextEditingController controller;
-  bool obscurePassword = true;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = TextEditingController(text: widget.label);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isPasswordField = widget.label == "********";
-
+  Widget buildProfileField({
+    required IconData icon,
+    required String hint,
+    required TextEditingController controller,
+    required String fieldKey,
+  }) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10.h),
       child: Container(
@@ -229,59 +357,28 @@ class _ProfileFieldState extends State<ProfileField> {
         ),
         child: Row(
           children: [
-            Icon(widget.icon, color: Colors.black54, size: 20.sp),
+            Icon(icon, color: Colors.black54, size: 20.sp),
             SizedBox(width: 8.w),
             Expanded(
               child: TextFormField(
                 controller: controller,
-                obscureText: isPasswordField ? obscurePassword : false,
+                enabled: editable[fieldKey] ?? false,
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText: widget.hint,
+                  hintText: hint,
                   isDense: true,
                 ),
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  color: Colors.black,
-                ),
+                style: TextStyle(fontSize: 14.sp, color: Colors.black),
               ),
             ),
-            if (isPasswordField)
-              IconButton(
-                icon: Icon(
-                  obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.black54,
-                  size: 20.sp,
-                ),
-                onPressed: () {
-                  setState(() {
-                    obscurePassword = !obscurePassword;
-                  });
-                },
-              )
-            else
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.edit_outlined,
-                      size: 20.sp,
-                      color: Colors.black,
-                    ),
-                    onPressed: () {
-                      // Optional: handle an "edit" action
-                    },
-                  ),
-                  Text(
-                    "Edit",
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w600,
-                      color: const Color.fromRGBO(96, 95, 95, 1),
-                    ),
-                  ),
-                ],
-              ),
+            IconButton(
+              icon: Icon(Icons.edit_outlined, size: 20.sp, color: Colors.black),
+              onPressed: () {
+                setState(() {
+                  editable[fieldKey] = !(editable[fieldKey] ?? false);
+                });
+              },
+            ),
           ],
         ),
       ),
