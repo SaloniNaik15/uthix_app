@@ -27,7 +27,6 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   String? token;
   String instructorName = 'No Name';
   String? instructorImageUrl;
-
   Future<void> loadProfileInfo() async {
     final prefs = await SharedPreferences.getInstance();
     final name = prefs.getString('instructor_name') ?? 'No Name';
@@ -38,11 +37,13 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
       instructorImageUrl = imageUrl;
     });
   }
+
   final List<Map<String, String>> dashBoard = [
     {"image": "assets/instructor/create_class.png", "title": "Create Class"},
     {"image": "assets/instructor/my_classes.png", "title": "My Classes"},
     {"image": "assets/instructor/calender.png", "title": "Calender"},
     {"image": "assets/instructor/study_materials.png", "title": "Study Material"},
+
   ];
 
   // New dropdown options for class and section.
@@ -62,7 +63,6 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     "Section C",
     "Section D"
   ];
-
   // Selected values for dropdowns.
   String? selectedClass;
   String? selectedSection;
