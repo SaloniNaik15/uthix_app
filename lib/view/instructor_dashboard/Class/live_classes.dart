@@ -22,32 +22,32 @@ class LiveClasses extends StatelessWidget {
         ),
         actions: [
           // Circle with a plus icon
-          Container(
-            width: 40,
-            height: 40,
-            margin: const EdgeInsets.only(right: 15),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: const Color.fromRGBO(43, 93, 116, 1),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
-                  offset: const Offset(0, 2),
-                  blurRadius: 4,
-                ),
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  offset: const Offset(0, 0),
-                  blurRadius: 6,
-                ),
-              ],
-            ),
-            child: const Icon(
-              Icons.add,
-              size: 35,
-              color: Colors.white,
-            ),
-          ),
+          // Container(
+          //   width: 40,
+          //   height: 40,
+          //   margin: const EdgeInsets.only(right: 15),
+          //   decoration: BoxDecoration(
+          //     shape: BoxShape.circle,
+          //     color: const Color.fromRGBO(43, 93, 116, 1),
+          //     boxShadow: [
+          //       BoxShadow(
+          //         color: Colors.black.withOpacity(0.06),
+          //         offset: const Offset(0, 2),
+          //         blurRadius: 4,
+          //       ),
+          //       BoxShadow(
+          //         color: Colors.black.withOpacity(0.04),
+          //         offset: const Offset(0, 0),
+          //         blurRadius: 6,
+          //       ),
+          //     ],
+          //   ),
+          //   child: const Icon(
+          //     Icons.add,
+          //     size: 35,
+          //     color: Colors.white,
+          //   ),
+          // ),
         ],
       ),
       body: SingleChildScrollView(

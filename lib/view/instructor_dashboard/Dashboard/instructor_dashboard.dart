@@ -26,23 +26,36 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   int selectedIndex = 0;
   String? token;
 
-  // Added the Submission card as an additional entry.
+
   final List<Map<String, String>> dashBoard = [
     {"image": "assets/instructor/create_class.png", "title": "Create Class"},
     {"image": "assets/instructor/my_classes.png", "title": "My Classes"},
     {"image": "assets/instructor/calender.png", "title": "Calender"},
-    {
-      "image": "assets/instructor/study_materials.png",
-      "title": "Study Material"
-    },
-    {"image": "assets/instructor/Submission.png", "title": "Submission"},
+    {"image": "assets/instructor/study_materials.png", "title": "Study Material"},
   ];
 
-  // Controllers for class creation fields
-  final TextEditingController _classnameController = TextEditingController();
-  final TextEditingController _sectionController = TextEditingController();
+  // New dropdown options for class and section.
+  final List<String> classOptions = [
+    "Class 5th",
+    "Class 6th",
+    "Class 7th",
+    "Class 8th",
+    "Class 9th",
+    "Class 10th",
+    "Class 11th",
+    "Class 12th"
+  ];
+  final List<String> sectionOptions = [
+    "Section A",
+    "Section B",
+    "Section C",
+    "Section D"
+  ];
 
-  //final TextEditingController _classlinkController = TextEditingController();
+  // Selected values for dropdowns.
+  String? selectedClass;
+  String? selectedSection;
+
 
   final Dio _dio = Dio();
   final String apiUrl = "https://admin.uthix.com/api/classroom";
@@ -70,7 +83,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         options: Options(
           headers: {
             "Authorization":
-                "Bearer 345|nAW96QnsVX0ECAc94qyk4QfVC99uWdzdQr6yN9RQ18129cfa"
+            "Bearer 345|nAW96QnsVX0ECAc94qyk4QfVC99uWdzdQr6yN9RQ18129cfa"
           },
         ),
       );
@@ -98,6 +111,16 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
           const SnackBar(content: Text("Please select a subject!")));
       return;
     }
+    if (selectedClass == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select a class!")));
+      return;
+    }
+    if (selectedSection == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please select a section!")));
+      return;
+    }
     if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("User not logged in. Please log in.")));
@@ -106,10 +129,9 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
 
     final requestData = {
       "instructor_id": 2,
-      "class_name": _classnameController.text.trim(),
-      "section": _sectionController.text.trim(),
+      "class_name": selectedClass,
+      "section": selectedSection,
       "subject_id": selectedSubjectId,
-      //"link": _classlinkController.text.trim(),
     };
 
     try {
@@ -221,12 +243,22 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                 ),
               ),
               const SizedBox(height: 20),
-              _buildTextField("Class Name (required)", _classnameController,
-                  "eg., Class V"),
-              _buildTextField("Section", _sectionController, "eg., Section B"),
+              // Dropdown for Class selection (Class 5th to Class 12th)
+              _buildStringDropdownField("Class", classOptions, selectedClass,
+                      (val) {
+                    setState(() {
+                      selectedClass = val;
+                    });
+                  }),
+              // Dropdown for Section selection (Section A to Section D)
+              _buildStringDropdownField("Section", sectionOptions, selectedSection,
+                      (val) {
+                    setState(() {
+                      selectedSection = val;
+                    });
+                  }),
+              // Existing subject dropdown remains unchanged
               _buildDropdownField("Subject", subjects, selectedSubjectId),
-              //_buildTextField("Class Link", _classlinkController,
-                //  "eg., www.zoom73452670.com"),
               const SizedBox(height: 20),
               Center(
                 child: GestureDetector(
@@ -297,7 +329,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                       fit: BoxFit.cover),
                 ),
               ),
-               SizedBox(width: 20.w),
+              SizedBox(width: 20.w),
               Text(
                 "Hii Surnamika",
                 style: TextStyle(
@@ -316,188 +348,70 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
 
   // Build the dashboard grid.
   Widget _buildDashboardGrid() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 30, right: 30, top: 15),
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 15,
-          mainAxisSpacing: 15,
-        ),
-        shrinkWrap: true,
-        itemCount: dashBoard.length,
-        itemBuilder: (context, index) {
-          final item = dashBoard[index];
-          return GestureDetector(
-            onTap: () {
-              switch (item["title"]) {
-                case "Create Class":
-                  showCreateClassModal();
-                  break;
-                case "My Classes":
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ClassData()));
-                  break;
-                case "Calender":
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Calender()));
-                  break;
-                case "Study Material":
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Files()));
-                  break;
-                case "Submission":
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Submission()));
-                  break;
-              }
-            },
-            child: Container(
-              height: 162,
-              width: 162,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  // For the "Submission" card, set a fixed image height.
-                  item["title"] == "Submission"
-                      ? Image.asset(
-                          item["image"]!,
-                          height: 100,
-                          fit: BoxFit.contain,
-                        )
-                      : Image.asset(item["image"]!),
-                  Text(
-                    item["title"]!,
-                    style: GoogleFonts.urbanist(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: const Color.fromRGBO(96, 95, 95, 1),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(left: 30, right: 30, top: 100),
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 15,
+            mainAxisSpacing: 15,
+          ),
+          shrinkWrap: true,
+          itemCount: dashBoard.length,
+          itemBuilder: (context, index) {
+            final item = dashBoard[index];
+            return GestureDetector(
+              onTap: () {
+                switch (item["title"]) {
+                  case "Create Class":
+                    showCreateClassModal();
+                    break;
+                  case "My Classes":
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => ClassData()));
+                    break;
+                  case "Calender":
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Calender()));
+                    break;
+                  case "Study Material":
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Files()));
+                    break;
+                }
+              },
+              child: Container(
+                height: 162.h,
+                width: 162.w,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Image.asset(item["image"]!, fit: BoxFit.contain),
+                    Text(
+                      item["title"]!,
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                        color: const Color.fromRGBO(96, 95, 95, 1),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
 
-  // Build the bottom navigation bar.
 
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        SystemNavigator.pop();
-        return false;
-      },
-      child: Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            toolbarHeight: 30.h,
-            backgroundColor: Colors.white,
-
-            title: Text(
-              "Instructor Dashboard",
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-                color: const Color.fromRGBO(95, 95, 95, 1),
-              ),
-            ),
-            centerTitle: true,
-            automaticallyImplyLeading: false,
-            elevation: 0,
-          ),
-          body: Stack(
-            children: [
-              /// Background Image Covering Full Screen
-              Positioned.fill(
-                top: 100,
-                child: Image.asset(
-                  "assets/instructor/background.png",
-                  fit: BoxFit.cover,
-                ),
-              ),
-      
-              /// Scrollable Dashboard Content
-              Column(
-                children: [
-                  _buildHeader(),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: BouncingScrollPhysics(),
-                      child: _buildDashboardGrid(),
-                    ),
-                  ),
-                ],
-              ),
-      
-              /// Fixed Bottom Navigation Bar
-              Positioned(
-                bottom: 15.h,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Navbar(
-                      onItemTapped: onItemTapped, selectedIndex: selectedIndex),
-                ),
-              ),
-            ],
-          )),
-    );
-  }
-
-  // Reusable text field builder.
-  Widget _buildTextField(
-      String label, TextEditingController controller, String hint) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-              fontSize: 13.sp, fontWeight: FontWeight.w700, color: Colors.black54),
-        ),
-        const SizedBox(height: 5),
-        Container(
-          height: 45,
-          width: 341,
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(246, 246, 246, 1),
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: const Color.fromRGBO(210, 210, 210, 1)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: controller,
-              style: TextStyle(
-                  fontSize: 12.sp,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.black87),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: hint,
-                hintStyle: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.black45),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 10),
-      ],
-    );
-  }
-
-  // Reusable dropdown builder.
+  // Reusable dropdown builder for integer values (for Subject).
   Widget _buildDropdownField(
       String label, List<Map<String, dynamic>> items, int? selectedValue) {
     return Column(
@@ -505,7 +419,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
       children: [
         Text(
           label,
-          style:TextStyle(
+          style: TextStyle(
               fontSize: 12.sp, fontWeight: FontWeight.w700, color: Colors.black54),
         ),
         const SizedBox(height: 5),
@@ -519,14 +433,15 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
           child: DropdownButton<int>(
             value: selectedValue,
             isExpanded: true,
+            dropdownColor: Colors.white,
             hint: Text("Select Subject",
                 style:
-                    TextStyle(fontSize: 12.sp, color: Colors.black45)),
+                TextStyle(fontSize: 12.sp, color: Colors.black45)),
             items: items.map((subject) {
               return DropdownMenuItem<int>(
                 value: subject["id"],
                 child: Text(subject["name"],
-                    style:TextStyle(
+                    style: TextStyle(
                         fontSize: 12.sp, color: Colors.black87)),
               );
             }).toList(),
@@ -537,8 +452,110 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             },
           ),
         ),
-        //const SizedBox(height: 10),
       ],
+    );
+  }
+
+  // Reusable dropdown builder for String values.
+  Widget _buildStringDropdownField(String label, List<String> items,
+      String? selectedValue, ValueChanged<String?> onChanged) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+              fontSize: 14.sp, fontWeight: FontWeight.w700, color: Colors.black54),
+        ),
+        const SizedBox(height: 5),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(246, 246, 246, 1),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: const Color.fromRGBO(210, 210, 210, 1)),
+          ),
+          child: DropdownButton<String>(
+            value: selectedValue,
+            isExpanded: true,
+            dropdownColor: Colors.white,
+            hint: Text("Select $label",
+                style: TextStyle(fontSize: 12.sp, color: Colors.black45)),
+            items: items.map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value,
+                    style:
+                    TextStyle(fontSize: 12.sp, color: Colors.black87)),
+              );
+            }).toList(),
+            onChanged: onChanged,
+          ),
+        ),
+        const SizedBox(height: 10),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        SystemNavigator.pop();
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          toolbarHeight: 30.h,
+          backgroundColor: Colors.white,
+          title: Text(
+            "Instructor Dashboard",
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color.fromRGBO(95, 95, 95, 1),
+            ),
+          ),
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          elevation: 0,
+        ),
+        body: Stack(
+          children: [
+            // Background Image Covering Full Screen
+            Positioned.fill(
+              top: 100,
+              child: Image.asset(
+                "assets/instructor/background.png",
+                fit: BoxFit.cover,
+              ),
+            ),
+            // Scrollable Dashboard Content
+            Column(
+              children: [
+                _buildHeader(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: _buildDashboardGrid(),
+                  ),
+                ),
+              ],
+            ),
+            // Fixed Bottom Navigation Bar
+            Positioned(
+              bottom: 15.h,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Navbar(
+                    onItemTapped: onItemTapped, selectedIndex: selectedIndex),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
