@@ -8,6 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 // Image picker import
 import 'package:image_picker/image_picker.dart';
 
+import '../HomePages/HomePage.dart';
+
 class StudentProfile extends StatefulWidget {
   const StudentProfile({super.key});
 
@@ -162,6 +164,10 @@ class _StudentProfileState extends State<StudentProfile> {
         // Cache updated profile
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString("cached_profile", jsonEncode(response.data));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePages()), // 👈 Your Dashboard screen
+        );
       } else {
         log("❌ Failed to submit profile: ${response.statusCode}");
         log("Response body: ${response.data}");

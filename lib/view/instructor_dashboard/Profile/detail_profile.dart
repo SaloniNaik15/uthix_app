@@ -7,6 +7,8 @@ import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Dashboard/instructor_dashboard.dart';
+
 class DetailProfile extends StatefulWidget {
   const DetailProfile({Key? key}) : super(key: key);
 
@@ -192,7 +194,7 @@ class _DetailProfileState extends State<DetailProfile> {
 
       // Step 4: Add profile image if selected
       if (_selectedImage != null) {
-        formMap["profile_image"] = await MultipartFile.fromFile(
+        formMap["image"] = await MultipartFile.fromFile(
           _selectedImage!.path,
           filename: "profile.jpg",
         );
@@ -221,6 +223,10 @@ class _DetailProfileState extends State<DetailProfile> {
         setState(() {
           editable.updateAll((key, value) => false);
         });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => InstructorDashboard()), // 👈 Your Dashboard screen
+        );
       } else {
         debugPrint("❌ Failed to update: ${response.data}");
       }

@@ -16,7 +16,9 @@ import 'package:uthix_app/view/instructor_dashboard/panding.dart';
 import 'package:uthix_app/view/login/start_login.dart';
 
 import '../Seller_dashboard/dashboard.dart';
+import '../Student_Pages/Student Account Details/Student_Profile.dart';
 import '../instructor_dashboard/Dashboard/instructor_dashboard.dart';
+import '../instructor_dashboard/Profile/detail_profile.dart';
 
 class NewLogin extends StatefulWidget {
   const NewLogin({super.key});
@@ -89,9 +91,9 @@ class _NewLoginState extends State<NewLogin> {
         if (role == 'seller') {
           nextScreen = SellerDashboard();
         } else if (role == 'instructor') {
-          nextScreen = InstructorDashboard();
+          nextScreen = DetailProfile();
         } else {
-          nextScreen = HomePages();
+          nextScreen = StudentProfile();
         }
 
         Navigator.pushReplacement(
