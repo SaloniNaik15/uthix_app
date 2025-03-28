@@ -219,24 +219,7 @@ class _NewLoginState extends State<NewLogin> {
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,
                               ),
-                              SizedBox(height: 20.h),
-                              Text(
-                                "Welcome BACK!",
-                                style: GoogleFonts.urbanist(
-                                  fontSize: 22.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              SizedBox(height: 10.h),
-                              Text(
-                                "Login to your account",
-                                style: GoogleFonts.urbanist(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
-                                ),
-                              ),
+                            ),
                               SizedBox(height: 20.h),
                               _buildTextField(
                                   controller: _emailIdController,
