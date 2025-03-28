@@ -39,9 +39,7 @@ Future<void> logoutUser(BuildContext context) async {
               Navigator.of(context).pop();
 
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              await prefs.remove('auth_token');
-              await prefs.remove('user_role');
-//used for testing
+              await prefs.clear();
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => NewLogin()),

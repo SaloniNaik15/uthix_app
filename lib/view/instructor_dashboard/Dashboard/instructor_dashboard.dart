@@ -27,6 +27,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   String? token;
   String instructorName = 'No Name';
   String? instructorImageUrl;
+
   Future<void> loadProfileInfo() async {
     final prefs = await SharedPreferences.getInstance();
     final name = prefs.getString('instructor_name') ?? 'No Name';
@@ -349,7 +350,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                 child: ClipOval(
                   child: instructorImageUrl != null
                       ? Image.network(instructorImageUrl!, fit: BoxFit.cover)
-                      : Image.asset("assets/login/profile.jpeg", fit: BoxFit.cover)
+                      : Image.asset("assets/icons/profile.png", fit: BoxFit.cover)
                 ),
               ),
             ],
