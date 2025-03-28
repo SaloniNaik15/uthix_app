@@ -25,8 +25,19 @@ class InstructorDashboard extends StatefulWidget {
 class _InstructorDashboardState extends State<InstructorDashboard> {
   int selectedIndex = 0;
   String? token;
+  String instructorName = 'No Name';
+  String? instructorImageUrl;
 
+  Future<void> loadProfileInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    final name = prefs.getString('instructor_name') ?? 'No Name';
+    final imageUrl = prefs.getString('instructor_image_url');
 
+    setState(() {
+      instructorName = name;
+      instructorImageUrl = imageUrl;
+    });
+  }
   final List<Map<String, String>> dashBoard = [
     {"image": "assets/instructor/create_class.png", "title": "Create Class"},
     {"image": "assets/instructor/my_classes.png", "title": "My Classes"},
@@ -67,6 +78,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     super.initState();
     _loadToken();
     _fetchSubjects();
+    loadProfileInfo();
   }
 
   Future<void> _loadToken() async {
@@ -128,7 +140,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     }
 
     final requestData = {
-      "instructor_id": 2,
+      //"instructor_id": 2,
       "class_name": selectedClass,
       "section": selectedSection,
       "subject_id": selectedSubjectId,
@@ -302,9 +314,19 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         ),
         const SizedBox(height: 20),
         Padding(
-          padding: const EdgeInsets.only(left: 35),
+          padding:  EdgeInsets.only(right: 30.w),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              Text(
+                "Hi $instructorName",
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: const Color.fromRGBO(96, 95, 95, 1),
+                ),
+              ),
+              SizedBox(width: 18.w),
               Container(
                 height: 40,
                 width: 40,
@@ -325,17 +347,9 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                   ],
                 ),
                 child: ClipOval(
-                  child: Image.asset("assets/login/profile.jpeg",
-                      fit: BoxFit.cover),
-                ),
-              ),
-              SizedBox(width: 20.w),
-              Text(
-                "Hii Surnamika",
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: const Color.fromRGBO(96, 95, 95, 1),
+                  child: instructorImageUrl != null
+                      ? Image.network(instructorImageUrl!, fit: BoxFit.cover)
+                      : Image.asset("assets/login/profile.jpeg", fit: BoxFit.cover)
                 ),
               ),
             ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InstructorManage extends StatefulWidget {
   const InstructorManage({Key? key}) : super(key: key);
@@ -9,6 +10,38 @@ class InstructorManage extends StatefulWidget {
 }
 
 class _InstructorManageState extends State<InstructorManage> {
+  String instructorName = 'No Name';
+  String? instructorImageUrl;
+  String phoneNumber = "Not Provided";
+  String email = "Not Provided";
+  String specialization = "Not Specified";
+  String experience = "Not Specified";
+
+  Future<void> loadProfileInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    final name = prefs.getString('instructor_name') ?? 'No Name';
+    final imageUrl = prefs.getString('instructor_image_url');
+    final phone = prefs.getString('instructor_phone');
+    final mail = prefs.getString('instructor_email');
+    final spec = prefs.getString('instructor_specialization');
+    final exp = prefs.getString('instructor_experience');
+
+    setState(() {
+      instructorName = name;
+      instructorImageUrl = imageUrl;
+      phoneNumber = phone ?? 'Not Provided';
+      email = mail ?? 'Not Provided';
+      specialization = spec ?? 'Not Specified';
+      experience = exp ?? 'Not Specified';
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadProfileInfo();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,42 +74,45 @@ class _InstructorManageState extends State<InstructorManage> {
                 ),
               ),
               SizedBox(height: 20.h),
+
               // Profile Image
               CircleAvatar(
-                radius: 50.r,
-                backgroundImage: const AssetImage(
-                    "assets/Seller_dashboard_images/ManageStoreBackground.png"),
+                radius: 60.r,
+                backgroundImage: instructorImageUrl != null &&
+                    instructorImageUrl!.isNotEmpty
+                    ? NetworkImage(instructorImageUrl!)
+                    : const AssetImage("assets/login/profile.jpeg")
+                as ImageProvider,
+                backgroundColor: Colors.grey[200],
               ),
               SizedBox(height: 10.h),
+
               Text(
-                "Teacher",
+                instructorName,
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 20.sp,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF2B5C74),
                 ),
               ),
-              Text(
-                "Class X B\nDelhi Public School, New Delhi\n+91 XXXXXX XXXXX",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
               SizedBox(height: 20.h),
+
               // Profile Fields
-              _buildProfileField(Icons.person, "Teacher"),
-              _buildProfileField(Icons.phone, "+91 XXXXXX XXXXX"),
-              _buildProfileField(Icons.location_on, "IP Extension, New Delhi"),
-              _buildProfileField(Icons.school, "Banaras Hindu University"),
+              _buildProfileField(Icons.email, email),
+              _buildProfileField(Icons.phone, phoneNumber),
+              _buildProfileField(Icons.school, specialization),
+              _buildProfileField(Icons.school, experience),
+
               SizedBox(height: 30.h),
+
               // Log Out Button
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        // TODO: Implement logout logic
+                      },
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: Colors.red, width: 1.w),
                         padding: EdgeInsets.symmetric(vertical: 14.h),
@@ -99,10 +135,12 @@ class _InstructorManageState extends State<InstructorManage> {
     );
   }
 
-  Widget _buildProfileField(IconData icon, String text) {
+  Widget _buildProfileField(IconData icon, String value) {
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
       child: TextField(
+        controller: TextEditingController(text: value),
+        enabled: false,
         decoration: InputDecoration(
           filled: true,
           fillColor: const Color(0xFFFCFCFC),
@@ -111,13 +149,6 @@ class _InstructorManageState extends State<InstructorManage> {
             color: Colors.grey,
             size: 24.sp,
           ),
-          hintText: text,
-          hintStyle: TextStyle(
-            color: const Color(0xFF605F5F),
-            fontWeight: FontWeight.w500,
-            fontSize: 14.sp,
-          ),
-          enabled: false,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30.r),
             borderSide: BorderSide(
@@ -132,6 +163,10 @@ class _InstructorManageState extends State<InstructorManage> {
               width: 1.w,
             ),
           ),
+        ),
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 14.sp,
         ),
       ),
     );
