@@ -138,10 +138,24 @@ class _DetailProfileState extends State<DetailProfile> {
             });
           }
         });
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('instructor_name', userInfo['name'] ?? '');
+        await prefs.setString('instructor_phone', userInfo['phone']?.toString() ?? '');
+        await prefs.setString('instructor_email', userInfo['email'] ?? '');
+        await prefs.setString('instructor_specialization', user['specialization'] ?? '');
+        await prefs.setString('instructor_experience', user['experience']?.toString() ?? '');
+        final imageName = user["profile_image"] ?? userInfo["image"];
+        if (imageName != null && imageName.toString().toLowerCase() != "null") {
+          await prefs.setString('instructor_image_url',
+              "https://admin.uthix.com/storage/images/instructor/$imageName");
+        } else {
+          await prefs.remove('instructor_image_url');
+        }
       }
     } catch (e) {
       debugPrint("Error fetching profile: $e");
     }
+
   }
 
   Future<void> updateProfile() async {
