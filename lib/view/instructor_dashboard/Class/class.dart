@@ -148,31 +148,31 @@ class _InstructorClassState extends State<InstructorClass> {
           },
         ),
         actions: [
-          Container(
-            width: 35.w,
-            height: 35.h,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: const Color.fromRGBO(43, 93, 116, 1),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
-                  offset: const Offset(0, 2),
-                  blurRadius: 4,
-                ),
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  offset: const Offset(0, 0),
-                  blurRadius: 6,
-                ),
-              ],
-            ),
-            child:  Icon(
-              Icons.add,
-              size: 35.sp,
-              color: Colors.white,
-            ),
-          ),
+          // Container(
+          //   width: 35.w,
+          //   height: 35.h,
+          //   decoration: BoxDecoration(
+          //     shape: BoxShape.circle,
+          //     color: const Color.fromRGBO(43, 93, 116, 1),
+          //     boxShadow: [
+          //       BoxShadow(
+          //         color: Colors.black.withOpacity(0.06),
+          //         offset: const Offset(0, 2),
+          //         blurRadius: 4,
+          //       ),
+          //       BoxShadow(
+          //         color: Colors.black.withOpacity(0.04),
+          //         offset: const Offset(0, 0),
+          //         blurRadius: 6,
+          //       ),
+          //     ],
+          //   ),
+          //   child:  Icon(
+          //     Icons.add,
+          //     size: 35.sp,
+          //     color: Colors.white,
+          //   ),
+          // ),
           const SizedBox(width: 15),
           GestureDetector(
             onTap: () {
