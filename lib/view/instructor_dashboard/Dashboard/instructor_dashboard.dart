@@ -13,6 +13,7 @@ import 'package:uthix_app/view/instructor_dashboard/Profile/profile_account.dart
 import 'package:uthix_app/view/instructor_dashboard/calender/calender.dart';
 import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
 import 'package:uthix_app/view/instructor_dashboard/submission/submission.dart';
+import '../Profile/detail_profile.dart';
 import 'ClassData.dart';
 
 class InstructorDashboard extends StatefulWidget {
@@ -43,8 +44,10 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     {"image": "assets/instructor/create_class.png", "title": "Create Class"},
     {"image": "assets/instructor/my_classes.png", "title": "My Classes"},
     {"image": "assets/instructor/calender.png", "title": "Calender"},
-    {"image": "assets/instructor/study_materials.png", "title": "Study Material"},
-
+    {
+      "image": "assets/instructor/study_materials.png",
+      "title": "Study Material"
+    },
   ];
 
   // New dropdown options for class and section.
@@ -67,7 +70,6 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   // Selected values for dropdowns.
   String? selectedClass;
   String? selectedSection;
-
 
   final Dio _dio = Dio();
   final String apiUrl = "https://admin.uthix.com/api/classroom";
@@ -98,10 +100,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
       Response response = await _dio.get(
         "https://admin.uthix.com/api/instructor-get-subject",
         options: Options(
-          headers: {
-            "Authorization":
-            "Bearer $token"
-          },
+          headers: {"Authorization": "Bearer $token"},
         ),
       );
       if (response.statusCode == 200 && response.data != null) {
@@ -145,7 +144,6 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     }
 
     final requestData = {
-
       "class_name": selectedClass,
       "section": selectedSection,
       "subject_id": selectedSubjectId,
@@ -262,18 +260,18 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
               const SizedBox(height: 20),
               // Dropdown for Class selection (Class 5th to Class 12th)
               _buildStringDropdownField("Class", classOptions, selectedClass,
-                      (val) {
-                    setState(() {
-                      selectedClass = val;
-                    });
-                  }),
+                  (val) {
+                setState(() {
+                  selectedClass = val;
+                });
+              }),
               // Dropdown for Section selection (Section A to Section D)
-              _buildStringDropdownField("Section", sectionOptions, selectedSection,
-                      (val) {
-                    setState(() {
-                      selectedSection = val;
-                    });
-                  }),
+              _buildStringDropdownField(
+                  "Section", sectionOptions, selectedSection, (val) {
+                setState(() {
+                  selectedSection = val;
+                });
+              }),
               // Existing subject dropdown remains unchanged
               _buildDropdownField("Subject", subjects, selectedSubjectId),
               const SizedBox(height: 20),
@@ -319,7 +317,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         ),
         const SizedBox(height: 20),
         Padding(
-          padding:  EdgeInsets.only(right: 30.w),
+          padding: EdgeInsets.only(right: 30.w),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -351,10 +349,19 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                     ),
                   ],
                 ),
-                child: ClipOval(
-                  child: instructorImageUrl != null
-                      ? Image.network(instructorImageUrl!, fit: BoxFit.cover)
-                      : Image.asset("assets/icons/profile.png", fit: BoxFit.cover)
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DetailProfile()),
+                    );
+                  },
+                  child: ClipOval(
+                      child: instructorImageUrl != null
+                          ? Image.network(instructorImageUrl!,
+                              fit: BoxFit.cover)
+                          : Image.asset("assets/icons/profile.png",
+                              fit: BoxFit.cover)),
                 ),
               ),
             ],
@@ -429,7 +436,6 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     );
   }
 
-
   // Reusable dropdown builder for integer values (for Subject).
   Widget _buildDropdownField(
       String label, List<Map<String, dynamic>> items, int? selectedValue) {
@@ -439,7 +445,9 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         Text(
           label,
           style: TextStyle(
-              fontSize: 12.sp, fontWeight: FontWeight.w700, color: Colors.black54),
+              fontSize: 12.sp,
+              fontWeight: FontWeight.w700,
+              color: Colors.black54),
         ),
         const SizedBox(height: 5),
         Container(
@@ -454,14 +462,12 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             isExpanded: true,
             dropdownColor: Colors.white,
             hint: Text("Select Subject",
-                style:
-                TextStyle(fontSize: 12.sp, color: Colors.black45)),
+                style: TextStyle(fontSize: 12.sp, color: Colors.black45)),
             items: items.map((subject) {
               return DropdownMenuItem<int>(
                 value: subject["id"],
                 child: Text(subject["name"],
-                    style: TextStyle(
-                        fontSize: 12.sp, color: Colors.black87)),
+                    style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
               );
             }).toList(),
             onChanged: (value) {
@@ -484,7 +490,9 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         Text(
           label,
           style: TextStyle(
-              fontSize: 14.sp, fontWeight: FontWeight.w700, color: Colors.black54),
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w700,
+              color: Colors.black54),
         ),
         const SizedBox(height: 5),
         Container(
@@ -504,8 +512,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(value,
-                    style:
-                    TextStyle(fontSize: 12.sp, color: Colors.black87)),
+                    style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
               );
             }).toList(),
             onChanged: onChanged,

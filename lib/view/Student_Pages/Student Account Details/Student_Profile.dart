@@ -211,6 +211,10 @@ class _StudentProfileState extends State<StudentProfile> {
             networkImageUrl = null;
           }
         });
+        if (networkImageUrl != null) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString("student_profile_image_url", networkImageUrl!);
+        }
 
         log("✅ Profile fields loaded successfully.");
       } else {
