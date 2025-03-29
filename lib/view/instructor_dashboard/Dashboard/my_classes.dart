@@ -421,10 +421,10 @@ class _MyClassesState extends State<MyClasses> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  InstructorClass(classId: classId),
+                              builder: (context) => InstructorClass(classId: classId),
                             ),
                           );
+
                         },
                         child: Container(
                           width: MediaQuery.of(context).size.width,
@@ -460,6 +460,7 @@ class _MyClassesState extends State<MyClasses> {
                                     ),
                                     const Spacer(),
                                     PopupMenuButton<String>(
+                                      color: Colors.white,
                                       onSelected: (value) {
                                         if (value == 'view_submission') {
                                           Navigator.push(
