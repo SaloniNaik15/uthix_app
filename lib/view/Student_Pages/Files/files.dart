@@ -156,7 +156,7 @@ class _StudFilesState extends State<StudFiles> {
           Column(
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.w),
+                padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -164,37 +164,9 @@ class _StudFilesState extends State<StudFiles> {
                     Text(
                       "The class recordings and files uploaded by you will appear here",
                       style: GoogleFonts.urbanist(
-                        fontSize: 14.sp,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.w400,
                         color: const Color.fromRGBO(96, 95, 95, 1),
-                      ),
-                    ),
-                    SizedBox(height: 20.h),
-                    Container(
-                      height: 40.h,
-                      width: 150.w,
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(246, 246, 246, 1),
-                        borderRadius: BorderRadius.circular(10.r),
-                        border: Border.all(
-                            color: Color.fromRGBO(175, 175, 175, 1),
-                            width: 1.w),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(5.w),
-                        child: Row(
-                          children: [
-                            Text(
-                              "Selected Class",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 12.sp,
-                                fontWeight: FontWeight.w600,
-                                color: const Color.fromRGBO(96, 95, 95, 1),
-                              ),
-                            ),
-                            Icon(Icons.arrow_drop_down)
-                          ],
-                        ),
                       ),
                     ),
                     SizedBox(height: 20.h),
@@ -207,7 +179,7 @@ class _StudFilesState extends State<StudFiles> {
                           (index) => Padding(
                             padding: EdgeInsets.only(
                                 right:
-                                    index < sortOptions.length - 1 ? 10.w : 0),
+                                    index < sortOptions.length - 1 ? 10 : 0),
                             child: GestureDetector(
                               onTap: () {
                                 setState(() {
@@ -218,7 +190,7 @@ class _StudFilesState extends State<StudFiles> {
                                 height: 45.h,
                                 width: 100.w,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(38.r),
+                                  borderRadius: BorderRadius.circular(38),
                                   color: selectedIndex == index
                                       ? Color.fromRGBO(43, 92, 116, 1)
                                       : Colors.transparent,
@@ -229,7 +201,7 @@ class _StudFilesState extends State<StudFiles> {
                                   child: Text(
                                     sortOptions[index],
                                     style: GoogleFonts.urbanist(
-                                      fontSize: 16.sp,
+                                      fontSize: 14.sp,
                                       fontWeight: FontWeight.w700,
                                       color: selectedIndex == index
                                           ? Colors.white
@@ -250,14 +222,14 @@ class _StudFilesState extends State<StudFiles> {
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(
-                      bottom: 70.h), // Prevents overlap with navbar
+                      bottom: 85), // Prevents overlap with navbar
                   child: ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w),
+                    padding: EdgeInsets.symmetric(horizontal: 10),
                     itemCount: files.length,
                     itemBuilder: (context, index) {
                       final file = files[index];
                       return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.h),
+                        padding: EdgeInsets.symmetric(vertical: 8),
                         child: GestureDetector(
                           onTap: () {
                             if (file["title"] == "Recordings") {
@@ -278,7 +250,7 @@ class _StudFilesState extends State<StudFiles> {
                                   fit: BoxFit.cover,
                                 ),
                               ),
-                              SizedBox(width: 30.w),
+                              SizedBox(width: 30),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,7 +258,7 @@ class _StudFilesState extends State<StudFiles> {
                                     Text(
                                       file["title"]!,
                                       style: GoogleFonts.urbanist(
-                                        fontSize: 14.sp,
+                                        fontSize: 16.sp,
                                         fontWeight: FontWeight.w500,
                                         color: const Color.fromRGBO(0, 0, 0, 1),
                                       ),

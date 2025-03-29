@@ -18,7 +18,7 @@ final List<Map<String, dynamic>> navStudItems = [
   {
     "icon": Icons.chat_outlined,
     "title": "Chat",
-    "page": UnderConstructionScreen()
+    "page": StudChat()
   },
   {
     "icon": Icons.person_outline,

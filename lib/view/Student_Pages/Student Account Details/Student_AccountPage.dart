@@ -40,14 +40,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
   String? accessLoginToken;
   String? userName;
 
-  final List<Map<String, dynamic>> dashBoard = [
-    {"image": "assets/Student_Home_icons/Buy_Books.png", "title": "BUY BOOKS"},
-    {"image": "assets/Student_Home_icons/My_Classes.png", "title": "MY CLASSES"},
-    {"image": "assets/Student_Home_icons/My_Progress.png", "title": "MY PROGRESS"},
-    {"image": "assets/Student_Home_icons/Community.png", "title": "COMMUNITY"},
-    {"image": "assets/Student_Home_icons/Modern_tools.png", "title": "MODERN TOOLS"},
-    {"image": "assets/Student_Home_icons/Demo_Classes.png", "title": "DEMO CLASSES"},
-  ];
+
 
   @override
   void initState() {
@@ -151,7 +144,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 100), // Space for navbar
+            padding: const EdgeInsets.only(bottom: 85), // Space for navbar
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
