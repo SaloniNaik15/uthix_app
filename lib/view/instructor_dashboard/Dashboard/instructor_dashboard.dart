@@ -77,44 +77,48 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   @override
   void initState() {
     super.initState();
-    _loadToken();
-    _fetchSubjects();
+    _loadTokenAndSubjects();
     loadProfileInfo();
   }
 
-  Future<void> _loadToken() async {
+  Future<void> _loadTokenAndSubjects() async {
     final prefs = await SharedPreferences.getInstance();
+    final storedToken = prefs.getString('auth_token');
     setState(() {
-      token = prefs.getString('auth_token');
+      token = storedToken;
     });
+
+    if (storedToken != null) {
+      await _fetchSubjects();
+    }
   }
 
   Future<void> _fetchSubjects() async {
     try {
       Response response = await _dio.get(
-        "https://admin.uthix.com/api/subject",
+        "https://admin.uthix.com/api/instructor-get-subject",
         options: Options(
           headers: {
             "Authorization":
-            "Bearer 345|nAW96QnsVX0ECAc94qyk4QfVC99uWdzdQr6yN9RQ18129cfa"
+            "Bearer $token"
           },
         ),
       );
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
-        if (data["subjects"] != null) {
+        if (data["subject"] != null) {
           setState(() {
-            subjects = List<Map<String, dynamic>>.from(data["subjects"]);
+            subjects = List<Map<String, dynamic>>.from(data["subject"]);
           });
         } else {
           debugPrint("Subjects key is missing in the response: $data");
         }
       } else {
         debugPrint(
-            "Failed to fetch subjects: ${response.statusCode} ${response.data}");
+            "Failed to fetch subject: ${response.statusCode} ${response.data}");
       }
     } catch (e) {
-      debugPrint("Error fetching subjects: $e");
+      debugPrint("Error fetching subject: $e");
     }
   }
 
@@ -141,7 +145,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     }
 
     final requestData = {
-      //"instructor_id": 2,
+
       "class_name": selectedClass,
       "section": selectedSection,
       "subject_id": selectedSubjectId,

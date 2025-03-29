@@ -47,22 +47,20 @@ class _MailidpageState extends State<Mailidpage> {
     };
 
     try {
-
       final response = await dio.post(url,
-          data: jsonEncode(body),
-          options: Options(headers: {
-            "Content-Type": "application/json",
-          }));
+        data: jsonEncode(body),
+        options: Options(headers: {
+          "Content-Type": "application/json",
+        }),
+      );
 
       log("Response Code: ${response.statusCode}");
       log("Response Body: ${response.data}");
-
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Registration Successful!")),
         );
-
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => NewLogin()),
@@ -73,10 +71,11 @@ class _MailidpageState extends State<Mailidpage> {
           SnackBar(content: Text("Registration Failed: ${response.data}")),
         );
       }
-    } catch (e) {
+    } on DioException catch (e) {
       log("Dio Error: $e");
+      log("Full error response: ${e.response?.data}");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+          SnackBar(content: Text("Registration Failed: ${e.response?.data}")),
       );
     }
   }
