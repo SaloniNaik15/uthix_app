@@ -36,8 +36,8 @@ class MainApp extends StatelessWidget {
           theme: ThemeData(
             textTheme: GoogleFonts.urbanistTextTheme(),
           ),
+          // home: Introscreen(),
           home: Introscreen(),
-          //home: panding(),
           // home: Roleselection(),
           // home: SellerDashboard(),
           // home: InstructorDashboard(),

@@ -28,7 +28,8 @@ class _ClassDataState extends State<ClassData> {
   final String subjectsCacheKey = "cached_subjects";
 
   final String apiUrl = "https://admin.uthix.com/api/classroom";
-  final String subjectsApiUrl = "https://admin.uthix.com/api/subject";
+  final String subjectsApiUrl =
+      "https://admin.uthix.com/api/instructor-get-subject";
 
   @override
   void initState() {
@@ -127,20 +128,20 @@ class _ClassDataState extends State<ClassData> {
         subjectsApiUrl,
         options: Options(
           headers: {
-            "Authorization":
-                "Bearer 345|nAW96QnsVX0ECAc94qyk4QfVC99uWdzdQr6yN9RQ18129cfa"
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json",
           },
         ),
       );
-      if (response.statusCode == 200 && response.data["subjects"] != null) {
+      if (response.statusCode == 200 && response.data["subject"] != null) {
         setState(() {
-          subjects = List<Map<String, dynamic>>.from(response.data["subjects"]);
+          subjects = List<Map<String, dynamic>>.from(response.data["subject"]);
           isLoading = false; // Both fetched; loading complete.
         });
         // Cache the subjects data.
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(
-            subjectsCacheKey, jsonEncode(response.data["subjects"]));
+            subjectsCacheKey, jsonEncode(response.data["subject"]));
       } else {
         log("Error fetching subjects: ${response.data["message"]}");
         setState(() {
@@ -148,7 +149,7 @@ class _ClassDataState extends State<ClassData> {
         });
       }
     } catch (e) {
-      log("Error fetching subjects: $e");
+      log("Error fetching subject: $e");
       setState(() {
         isLoading = false;
       });
