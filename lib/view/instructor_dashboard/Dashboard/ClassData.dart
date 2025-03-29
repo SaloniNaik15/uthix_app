@@ -204,24 +204,24 @@ class _ClassDataState extends State<ClassData> {
                     color: Colors.white,
                   ),
                 ),
-                const Spacer(),
-                Container(
-                  width: 45,
-                  height: 45,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: ClipOval(
-                      child: Image.asset(
-                        "assets/login/profile.jpeg",
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
+                // const Spacer(),
+                // Container(
+                //   width: 45,
+                //   height: 45,
+                //   decoration: const BoxDecoration(
+                //     shape: BoxShape.circle,
+                //     color: Colors.white,
+                //   ),
+                //   child: Padding(
+                //     padding: const EdgeInsets.all(3.0),
+                //     child: ClipOval(
+                //       child: Image.asset(
+                //         "assets/login/profile.jpeg",
+                //         fit: BoxFit.cover,
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -264,7 +264,7 @@ class _ClassDataState extends State<ClassData> {
                         },
                         child: Container(
                           width: 290,
-                          height: 170,
+                          height: 150,
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: const Color.fromRGBO(217, 217, 217, 1),
@@ -307,106 +307,106 @@ class _ClassDataState extends State<ClassData> {
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                const SizedBox(height: 5),
+                                const SizedBox(height: 20),
                                 // Participant avatars row.
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 80,
-                                      height: 23,
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          Positioned(
-                                            left: 0,
-                                            child: Container(
-                                              width: 23,
-                                              height: 23,
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.black,
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(1.0),
-                                                child: ClipOval(
-                                                  child: Image.asset(
-                                                    "assets/login/profile.jpeg",
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            left: 15,
-                                            child: Container(
-                                              width: 23,
-                                              height: 23,
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.black,
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(1.0),
-                                                child: ClipOval(
-                                                  child: Image.asset(
-                                                    "assets/login/profile.jpeg",
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            left: 30,
-                                            child: Container(
-                                              width: 23,
-                                              height: 23,
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.black,
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(1.0),
-                                                child: ClipOval(
-                                                  child: Image.asset(
-                                                    "assets/login/profile.jpeg",
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            left: 45,
-                                            child: Container(
-                                              width: 23,
-                                              height: 23,
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.black,
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(1.0),
-                                                child: ClipOval(
-                                                  child: Image.asset(
-                                                    "assets/login/profile.jpeg",
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
+                                // Row(
+                                //   children: [
+                                //     SizedBox(
+                                //       width: 80,
+                                //       height: 23,
+                                //       child: Stack(
+                                //         clipBehavior: Clip.none,
+                                //         children: [
+                                //           Positioned(
+                                //             left: 0,
+                                //             child: Container(
+                                //               width: 23,
+                                //               height: 23,
+                                //               decoration: const BoxDecoration(
+                                //                 shape: BoxShape.circle,
+                                //                 color: Colors.black,
+                                //               ),
+                                //               child: Padding(
+                                //                 padding:
+                                //                     const EdgeInsets.all(1.0),
+                                //                 child: ClipOval(
+                                //                   child: Image.asset(
+                                //                     "assets/login/profile.jpeg",
+                                //                     fit: BoxFit.cover,
+                                //                   ),
+                                //                 ),
+                                //               ),
+                                //             ),
+                                //           ),
+                                //           Positioned(
+                                //             left: 15,
+                                //             child: Container(
+                                //               width: 23,
+                                //               height: 23,
+                                //               decoration: const BoxDecoration(
+                                //                 shape: BoxShape.circle,
+                                //                 color: Colors.black,
+                                //               ),
+                                //               child: Padding(
+                                //                 padding:
+                                //                     const EdgeInsets.all(1.0),
+                                //                 child: ClipOval(
+                                //                   child: Image.asset(
+                                //                     "assets/login/profile.jpeg",
+                                //                     fit: BoxFit.cover,
+                                //                   ),
+                                //                 ),
+                                //               ),
+                                //             ),
+                                //           ),
+                                //           Positioned(
+                                //             left: 30,
+                                //             child: Container(
+                                //               width: 23,
+                                //               height: 23,
+                                //               decoration: const BoxDecoration(
+                                //                 shape: BoxShape.circle,
+                                //                 color: Colors.black,
+                                //               ),
+                                //               child: Padding(
+                                //                 padding:
+                                //                     const EdgeInsets.all(1.0),
+                                //                 child: ClipOval(
+                                //                   child: Image.asset(
+                                //                     "assets/login/profile.jpeg",
+                                //                     fit: BoxFit.cover,
+                                //                   ),
+                                //                 ),
+                                //               ),
+                                //             ),
+                                //           ),
+                                //           Positioned(
+                                //             left: 45,
+                                //             child: Container(
+                                //               width: 23,
+                                //               height: 23,
+                                //               decoration: const BoxDecoration(
+                                //                 shape: BoxShape.circle,
+                                //                 color: Colors.black,
+                                //               ),
+                                //               child: Padding(
+                                //                 padding:
+                                //                     const EdgeInsets.all(1.0),
+                                //                 child: ClipOval(
+                                //                   child: Image.asset(
+                                //                     "assets/login/profile.jpeg",
+                                //                     fit: BoxFit.cover,
+                                //                   ),
+                                //                 ),
+                                //               ),
+                                //             ),
+                                //           ),
+                                //         ],
+                                //       ),
+                                //     ),
+                                //   ],
+                                // ),
+                                // const SizedBox(height: 10),
                                 // Row of two buttons: Add Chapter and View All Chapters.
                                 Row(
                                   mainAxisAlignment:

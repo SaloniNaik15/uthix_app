@@ -362,24 +362,7 @@ class _MyClassesState extends State<MyClasses> {
                     color: Colors.white,
                   ),
                 ),
-                const Spacer(),
-                Container(
-                  width: 45,
-                  height: 45,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: ClipOval(
-                      child: Image.asset(
-                        "assets/login/profile.jpeg",
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
+
               ],
             ),
           ),
@@ -426,169 +409,116 @@ class _MyClassesState extends State<MyClasses> {
                           );
 
                         },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 140.h,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color.fromRGBO(217, 217, 217, 1),
+                          child: Container(
+                            width: double.infinity,
+                            height: 130.h,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: const Color.fromRGBO(217, 217, 217, 1),
+                              ),
+                              color: const Color.fromRGBO(246, 246, 246, 1),
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            color: const Color.fromRGBO(246, 246, 246, 1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Row with "Chapter:" text.
-                                Row(
-                                  children: [
-                                    Text(
-                                      "Chapter: ",
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      classItem['title'] ?? "No title",
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    PopupMenuButton<String>(
-                                      color: Colors.white,
-                                      onSelected: (value) {
-                                        if (value == 'view_submission') {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Submission(),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                      itemBuilder: (BuildContext context) {
-                                        return [
-                                          PopupMenuItem<String>(
-                                            value: 'view_submission',
-                                            child: Text("View Submission"),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    height: 40.h,
+                                    width: double.infinity,
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          "Chapter: ",
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                        ];
-                                      },
-                                      icon: const Icon(Icons.more_vert),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 15.h),
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 80,
-                                      height: 23,
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          Positioned(
-                                            left: 0,
-                                            child: Container(
-                                              width: 23,
-                                              height: 23,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.black,
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(1.0),
-                                                child: ClipOval(
-                                                  child: Image.asset(
-                                                    "assets/login/profile.jpeg",
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            left: 15,
-                                            child: Container(
-                                              width: 23,
-                                              height: 23,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.black,
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(1.0),
-                                                child: ClipOval(
-                                                  child: Image.asset(
-                                                    "assets/login/profile.jpeg",
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const Spacer(),
-                                // "Add Participant" button aligned at the bottom right.
-                                Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      showCenteredModal();
-                                    },
-                                    child: Container(
-                                      height: 40,
-                                      width: 130,
-                                      decoration: BoxDecoration(
-                                        color: const Color.fromRGBO(
-                                            255, 255, 255, 1),
-                                        borderRadius: BorderRadius.circular(10),
-                                        border: Border.all(
-                                          color: const Color.fromRGBO(
-                                              43, 92, 116, 1),
-                                          width: 1,
                                         ),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: const [
-                                          Icon(
-                                            Icons.add,
-                                            color:
-                                                Color.fromRGBO(43, 92, 116, 1),
-                                          ),
-                                          SizedBox(width: 2),
-                                          Text(
-                                            "Add Participant",
+                                        SizedBox(width: 8.w,),
+                                        Expanded(
+                                          child: Text(
+                                            classItem['title'] ?? "No title",
                                             style: TextStyle(
-                                              fontSize: 12,
+                                              fontSize: 14.sp,
                                               fontWeight: FontWeight.w500,
-                                              color: Color.fromRGBO(
-                                                  43, 92, 116, 1),
                                             ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                        ],
+                                        ),
+                                        PopupMenuButton<String>(
+                                          color: Colors.white,
+                                          onSelected: (value) {
+                                            if (value == 'view_submission') {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => const Submission(),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          itemBuilder: (BuildContext context) {
+                                            return [
+                                              PopupMenuItem<String>(
+                                                value: 'view_submission',
+                                                child: Text("View Submission"),
+                                              ),
+                                            ];
+                                          },
+                                          icon: const Icon(Icons.more_vert),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(height: 25.h),
+                                  // "Add Participant" button aligned at the bottom right.
+                                  Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        showCenteredModal();
+                                      },
+                                      child: Container(
+                                        height: 40.h,
+                                        width: 150.w,
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromRGBO(255, 255, 255, 1),
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: const Color.fromRGBO(43, 92, 116, 1),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: const [
+                                            Icon(
+                                              Icons.add,
+                                              color: Color.fromRGBO(43, 92, 116, 1),
+                                            ),
+                                            SizedBox(width: 2),
+                                            Text(
+                                              "Add Participant",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                                color: Color.fromRGBO(43, 92, 116, 1),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ),
+                          )
+
+
                       ),
                     );
                   },
