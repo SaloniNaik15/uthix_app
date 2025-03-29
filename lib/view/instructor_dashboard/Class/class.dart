@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart'; // For opening attachment URLs
 // Remove or adjust these imports if they're not in your project:
-import '../submission/submission.dart';
-import '../submission/view_assignmnets.dart';
 import 'live_classes.dart';
 import 'new_announcement.dart';
 
@@ -29,8 +26,8 @@ class _InstructorClassState extends State<InstructorClass> {
   bool isAnnouncementsLoading = false;
   int currentIndex = 0;
 
-  // Unique cache key based on the chapter id.
-  String get cacheKey => "chapter_${widget.classId}_data";
+  // Unique cache key for announcements data for this chapter.
+  String get cacheKey => "chapter_${widget.classId}_announcements";
 
   @override
   void initState() {
@@ -49,20 +46,21 @@ class _InstructorClassState extends State<InstructorClass> {
     final cachedData = prefs.getString(cacheKey);
     if (cachedData != null) {
       try {
-        // The cached data is expected to be the entire chapter object.
-        final Map<String, dynamic> chapter = jsonDecode(cachedData);
-        setState(() {
-          classData = [
-            {
-              "classroom": {
-                "subject": {"name": chapter["title"]},
-                "instructor": {"name": chapter["instructor_name"] ?? "No Mentor"},
-              },
-              "title": chapter["description"],
-            }
-          ];
-          announcementsData = chapter["announcements"] ?? [];
-        });
+        final List<dynamic> jsonData = jsonDecode(cachedData);
+        if (jsonData.isNotEmpty) {
+          setState(() {
+            announcementsData = jsonData;
+            classData = jsonData.map((item) {
+              return {
+                "classroom": {
+                  "subject": {"name": item['chapter']['title']},
+                  "instructor": {"name": item['instructor']['name']},
+                },
+                "title": item['chapter']['description'],
+              };
+            }).toList();
+          });
+        }
       } catch (e) {
         log("Error decoding cached data: $e");
       }
@@ -99,27 +97,24 @@ class _InstructorClassState extends State<InstructorClass> {
       );
       debugPrint("Response Code: ${response.statusCode}");
       if (response.statusCode == 200 && response.data['status'] == true) {
-        // Extract the chapter details from the response.
-        final Map<String, dynamic> chapter = response.data["chapter_title"];
-        final List announcements = chapter["announcements"] ?? [];
-        final instructorName = response.data["instructor_name"] ?? "No Mentor";
-
-        setState(() {
-          classData = [
-            {
-              "classroom": {
-                "subject": {"name": chapter["title"]},
-                "instructor": {"name": instructorName},
-              },
-              "title": chapter["description"],
-            }
-          ];
-          announcementsData = announcements;
-        });
-
-        // Update the cache with the new chapter data.
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(cacheKey, jsonEncode(chapter));
+        final List data = response.data['data'];
+        if (data.isNotEmpty) {
+          setState(() {
+            classData = data.map((item) {
+              return {
+                "classroom": {
+                  "subject": {"name": item['chapter']['title']},
+                  "instructor": {"name": item['instructor']['name']},
+                },
+                "title": item['chapter']['description'],
+              };
+            }).toList();
+            announcementsData = data;
+          });
+          // Update the cache with the new data.
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString(cacheKey, jsonEncode(data));
+        }
       } else {
         debugPrint("Error: ${response.statusCode}");
       }
@@ -130,16 +125,6 @@ class _InstructorClassState extends State<InstructorClass> {
         isLoading = false;
         isAnnouncementsLoading = false;
       });
-    }
-  }
-
-  /// Opens the attachment URL using url_launcher.
-  Future<void> _openAttachment(String attachmentUrl) async {
-    final Uri url = Uri.parse(attachmentUrl);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
-    } else {
-      debugPrint("Could not launch $attachmentUrl");
     }
   }
 
@@ -215,7 +200,7 @@ class _InstructorClassState extends State<InstructorClass> {
             else
               Column(
                 children: [
-                  SizedBox(height: 20.h),
+                  SizedBox(height: 40.h),
                   // ClassCard populated with the fetched chapter details.
                   ClassCard(
                     subject: subjectName,
@@ -226,183 +211,251 @@ class _InstructorClassState extends State<InstructorClass> {
                   ),
                 ],
               ),
-            // Announcements & Teacher/Participants Section.
+            // Announcements & Teacher/Participants Section
             Padding(
               padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  SizedBox(height: 20.h),
-                  // "Announce something to your class" section.
-                  GestureDetector(
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => NewAnnouncement(classId: widget.classId),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    // Teacher & Participants row
+                    // Row(
+                    //   children: [
+                    //     Column(
+                    //       children: [
+                    //         Text(
+                    //           "Teacher",
+                    //           style: TextStyle(
+                    //             fontSize: 14.sp,
+                    //             fontWeight: FontWeight.w500,
+                    //             color: Colors.black,
+                    //           ),
+                    //         ),
+                    //         Container(
+                    //           width: 45,
+                    //           height: 45,
+                    //           decoration: const BoxDecoration(
+                    //             shape: BoxShape.circle,
+                    //           ),
+                    //           child: ClipOval(
+                    //             child: Image.asset(
+                    //               "assets/login/profile.jpeg",
+                    //               fit: BoxFit.cover,
+                    //             ),
+                    //           ),
+                    //         ),
+                    //         Text(
+                    //           "Mahima", // You can also replace this with dynamic teacher data if available.
+                    //           style: TextStyle(
+                    //             fontSize: 14.sp,
+                    //             fontWeight: FontWeight.w300,
+                    //             color: Colors.black,
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //     const Spacer(),
+                    //     Column(
+                    //       children: [
+                    //         Text(
+                    //           "Participants",
+                    //           style: TextStyle(
+                    //             fontSize: 14.sp,
+                    //             fontWeight: FontWeight.w500,
+                    //             color: Colors.black,
+                    //           ),
+                    //         ),
+                    //         SizedBox(
+                    //           height: 40.h,
+                    //           width: 80.w,
+                    //           child: Stack(
+                    //             clipBehavior: Clip.none,
+                    //             children: List.generate(4, (index) {
+                    //               return Positioned(
+                    //                 right: 15 * index.toDouble(),
+                    //                 child: Container(
+                    //                   width: 39.w,
+                    //                   height: 39.h,
+                    //                   decoration: BoxDecoration(
+                    //                     shape: BoxShape.circle,
+                    //                     color: Colors.black,
+                    //                   ),
+                    //                   child: Padding(
+                    //                     padding: const EdgeInsets.all(1.0),
+                    //                     child: ClipOval(
+                    //                       child: Image.asset(
+                    //                         "assets/login/profile.jpeg",
+                    //                         fit: BoxFit.cover,
+                    //                       ),
+                    //                     ),
+                    //                   ),
+                    //                 ),
+                    //               );
+                    //             }),
+                    //           ),
+                    //         ),
+                    //         Text(
+                    //           "30 +",
+                    //           style: TextStyle(
+                    //             fontSize: 10.sp,
+                    //             fontWeight: FontWeight.w300,
+                    //             color: Colors.black,
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ],
+                    // ),
+                    SizedBox(height: 20.h),
+                    // "Announce something to your class" section
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const NewAnnouncement(classId: '',)),
                       ),
-                    ),
-                    child: Container(
-                      height: 60.h,
-                      width: MediaQuery.of(context).size.width / 0.5,
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(246, 246, 246, 1),
-                        borderRadius: BorderRadius.circular(7),
-                        border: Border.all(
-                          color: const Color.fromRGBO(217, 217, 217, 1),
-                          width: 1,
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 45.w,
-                              height: 45.h,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                              ),
-                              child: ClipOval(
-                                child: Image.asset(
-                                  "assets/login/profile.jpeg",
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 10.w),
-                            Text(
-                              "Announce something to your class",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: const Color.fromRGBO(142, 140, 140, 1),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // Announcements list built from the fetched data.
-                  SafeArea(
-                    child: Container(
-                      height: 450.h,
-                      child: isAnnouncementsLoading
-                          ? const Center(child: CircularProgressIndicator())
-                          : announcementsData.isEmpty
-                          ? Center(
-                        child: Text(
-                          "No assignment posted yet!",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
+                      child: Container(
+                        height: 60.h,
+                        width: MediaQuery.sizeOf(context).width / 0.5,
+                        decoration: BoxDecoration(
+                          color: const Color.fromRGBO(246, 246, 246, 1),
+                          borderRadius: BorderRadius.circular(7),
+                          border: Border.all(
+                            color: const Color.fromRGBO(217, 217, 217, 1),
+                            width: 1,
                           ),
                         ),
-                      )
-                          : ListView.builder(
-                        itemCount: announcementsData.length,
-                        itemBuilder: (context, index) {
-                          final announcement = announcementsData[index];
-                          // Use mentorName for all announcements.
-                          final instructorName = mentorName;
-                          final titleText = announcement["title"] ?? "No Title";
-                          final attachments = announcement["attachments"] as List<dynamic>;
-                          final announcementId = announcement["id"].toString();
-
-                          return GestureDetector(
-                            onTap: () {},
-                            child: Container(
-                              width: 400.h,
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: const Color.fromRGBO(246, 246, 246, 1),
-                                borderRadius: BorderRadius.circular(7),
-                                border: Border.all(
-                                  color: const Color.fromRGBO(217, 217, 217, 1),
-                                  width: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 45.w,
+                                height: 45.h,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                ),
+                                child: ClipOval(
+                                  child: Image.asset(
+                                    "assets/login/profile.jpeg",
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Instructor row.
-                                    Row(
-                                      children: [
-                                        ClipOval(
-                                          child: Image.asset(
-                                            "assets/login/profile.jpeg",
-                                            width: 45,
-                                            height: 45,
-                                            fit: BoxFit.cover,
+                              SizedBox(width: 10.w),
+                              Text(
+                                "Announce something to your class",
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color.fromRGBO(142, 140, 140, 1),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // Announcements list built from the fetched data.
+                    SafeArea(
+                      child: Container(
+                        height: 500.h,
+                        child: isAnnouncementsLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : ListView.builder(
+                          itemCount: announcementsData.length,
+                          itemBuilder: (context, index) {
+                            final announcement = announcementsData[index];
+                            final instructorName = announcement["instructor"]?["name"] ?? "No Name";
+                            final titleText = announcement["title"] ?? "No Title";
+                            final attachments = announcement["attachments"] as List<dynamic>;
+
+                            return GestureDetector(
+                              onTap: () {
+                                // Navigate to detailed view if required.
+                              },
+                              child: Container(
+                                width: 400.h,
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 10),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromRGBO(246, 246, 246, 1),
+                                  borderRadius: BorderRadius.circular(7),
+                                  border: Border.all(
+                                    color: const Color.fromRGBO(217, 217, 217, 1),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Instructor row.
+                                      Row(
+                                        children: [
+                                          ClipOval(
+                                            child: Image.asset(
+                                              "assets/login/profile.jpeg",
+                                              width: 45,
+                                              height: 45,
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(width: 10.w),
-                                        Text(
-                                          instructorName,
-                                          style: TextStyle(
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black,
+                                          SizedBox(width: 10.w),
+                                          Text(
+                                            instructorName,
+                                            style: TextStyle(
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black,
+                                            ),
                                           ),
-                                        ),
-                                        Spacer(),
-                                        PopupMenuButton<String>(
-                                          color: Colors.white,
-                                          onSelected: (value) {
-                                            if (value == 'view_submission') {
-                                              Navigator.push(
-                                                context,
-                                                  MaterialPageRoute(
-                                                  builder: (context) => ViewAssignmnets(
-                                                announcementId: announcementId,
-                                              ),
-                                              ),
-                                              );
-                                            }
-                                          },
-                                          itemBuilder: (BuildContext context) {
-                                            return [
-                                              PopupMenuItem<String>(
-                                                value: 'view_submission',
-                                                child: Text("View Submission"),
-                                              ),
-                                            ];
-                                          },
-                                          icon: const Icon(Icons.more_vert),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 8.h),
-                                    // Announcement title.
-                                    Text(
-                                      titleText,
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500,
+                                          const Spacer(),
+                                          // Example: If you wish to set a white background for the popup menu:
+                                          PopupMenuButton<String>(
+                                            color: Colors.white,
+                                            onSelected: (value) {
+                                              if (value == 'view_submission') {
+                                                // Navigate if needed.
+                                              }
+                                            },
+                                            itemBuilder: (BuildContext context) {
+                                              return [
+                                                PopupMenuItem<String>(
+                                                  value: 'view_submission',
+                                                  child: Text("View Submission"),
+                                                ),
+                                              ];
+                                            },
+                                            icon: const Icon(Icons.more_vert),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    SizedBox(height: 10.h),
-                                    // Attachments display.
-                                    attachments.isNotEmpty
-                                        ? Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: attachments.map((attach) {
-                                        final String attachmentUrl =
-                                            "https://admin.uthix.com/${attach["attachment_file"]}";
-                                        return GestureDetector(
-                                          onTap: () => _openAttachment(attachmentUrl),
-                                          child: Padding(
-                                            padding: EdgeInsets.only(bottom: 12.h),
+                                      SizedBox(height: 8.h),
+                                      // Announcement title.
+                                      Text(
+                                        titleText,
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      SizedBox(height: 10.h),
+                                      // Attachments (if any).
+                                      attachments.isNotEmpty
+                                          ? Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: attachments.map((attach) {
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 4.0),
                                             child: Row(
                                               children: [
-                                                const Icon(Icons.attach_file, color: Colors.grey, size: 14),
-                                                SizedBox(width: 5.w),
+                                                const Icon(Icons.attach_file, color: Colors.grey),
+                                                const SizedBox(width: 5),
                                                 Expanded(
                                                   child: Text(
-                                                    attach["attachment_file"] ?? "No file",
+                                                    attach.toString(),
                                                     style: TextStyle(
                                                       fontSize: 12.sp,
                                                       fontWeight: FontWeight.w400,
@@ -413,28 +466,28 @@ class _InstructorClassState extends State<InstructorClass> {
                                                 ),
                                               ],
                                             ),
-                                          ),
-                                        );
-                                      }).toList(),
-                                    )
-                                        : Text(
-                                      "No attachments",
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: const Color.fromRGBO(142, 140, 140, 1),
+                                          );
+                                        }).toList(),
+                                      )
+                                          : Text(
+                                        "No attachments",
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: const Color.fromRGBO(142, 140, 140, 1),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -479,16 +532,12 @@ class ClassCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Expanded(
-                  child: Text(
-                    subject,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                Text(
+                  subject,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
                 ),
                 const Spacer(),
@@ -515,7 +564,7 @@ class ClassCard extends StatelessWidget {
                 const Spacer(),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
