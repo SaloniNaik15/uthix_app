@@ -21,7 +21,6 @@ class _SubmissionState extends State<Submission> {
   }
 
   Future<void> _loadDummyAssignment() async {
-    // Instead of fetching from an API, we set up static dummy data.
     assignment = {
       "title": "Submit your Report here",
       "total_submissions": 15,
