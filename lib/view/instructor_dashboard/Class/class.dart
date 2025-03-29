@@ -54,7 +54,9 @@ class _InstructorClassState extends State<InstructorClass> {
             {
               "classroom": {
                 "subject": {"name": chapter["title"]},
-                "instructor": {"name": chapter["instructor_name"] ?? "No Mentor"},
+                "instructor": {
+                  "name": chapter["instructor_name"] ?? "No Mentor"
+                },
               },
               "title": chapter["description"],
             }
@@ -84,7 +86,8 @@ class _InstructorClassState extends State<InstructorClass> {
       isAnnouncementsLoading = true;
     });
 
-    final String url = "https://admin.uthix.com/api/chapter/${widget.classId}/announcements";
+    final String url =
+        "https://admin.uthix.com/api/chapter/${widget.classId}/announcements";
 
     try {
       final response = await _dio.get(
@@ -145,8 +148,10 @@ class _InstructorClassState extends State<InstructorClass> {
   Widget build(BuildContext context) {
     // Extract current class data (if available)
     final currentClass = classData.isNotEmpty ? classData[currentIndex] : null;
-    final subjectName = currentClass?["classroom"]?["subject"]?["name"] ?? "Unknown";
-    final mentorName = currentClass?["classroom"]?["instructor"]?["name"] ?? "No Mentor";
+    final subjectName =
+        currentClass?["classroom"]?["subject"]?["name"] ?? "Unknown";
+    final mentorName =
+        currentClass?["classroom"]?["instructor"]?["name"] ?? "No Mentor";
     final chapterTitle = currentClass?["title"] ?? "No description";
 
     return Scaffold(
@@ -235,7 +240,8 @@ class _InstructorClassState extends State<InstructorClass> {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => NewAnnouncement(classId: widget.classId),
+                        builder: (context) =>
+                            NewAnnouncement(classId: widget.classId),
                       ),
                     ),
                     child: Container(
@@ -288,124 +294,159 @@ class _InstructorClassState extends State<InstructorClass> {
                       child: isAnnouncementsLoading
                           ? const Center(child: CircularProgressIndicator())
                           : announcementsData.isEmpty
-                          ? Center(
-                        child: Text(
-                          "No assignment posted yet!",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      )
-                          : ListView.builder(
-                        itemCount: announcementsData.length,
-                        itemBuilder: (context, index) {
-                          final announcement = announcementsData[index];
-                          // Use mentorName for all announcements.
-                          final instructorName = mentorName;
-                          final titleText = announcement["title"] ?? "No Title";
-                          final attachments = announcement["attachments"] as List<dynamic>;
+                              ? Center(
+                                  child: Text(
+                                    "No assignment posted yet!",
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                )
+                              : ListView.builder(
+                                  itemCount: announcementsData.length,
+                                  itemBuilder: (context, index) {
+                                    final announcement =
+                                        announcementsData[index];
+                                    // Use mentorName for all announcements.
+                                    final instructorName = mentorName;
+                                    final titleText =
+                                        announcement["title"] ?? "No Title";
+                                    final attachments =
+                                        announcement["attachments"]
+                                            as List<dynamic>;
 
-                          return GestureDetector(
-                            onTap: () {
-                              // Navigate to detailed view if required.
-                            },
-                            child: Container(
-                              width: 400.h,
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 8, horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: const Color.fromRGBO(246, 246, 246, 1),
-                                borderRadius: BorderRadius.circular(7),
-                                border: Border.all(
-                                  color: const Color.fromRGBO(217, 217, 217, 1),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Instructor row.
-                                    Row(
-                                      children: [
-                                        ClipOval(
-                                          child: Image.asset(
-                                            "assets/login/profile.jpeg",
-                                            width: 45,
-                                            height: 45,
-                                            fit: BoxFit.cover,
+                                    return GestureDetector(
+                                      onTap: () {
+                                        // Navigate to detailed view if required.
+                                      },
+                                      child: Container(
+                                        width: 400.h,
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 8, horizontal: 10),
+                                        decoration: BoxDecoration(
+                                          color: const Color.fromRGBO(
+                                              246, 246, 246, 1),
+                                          borderRadius:
+                                              BorderRadius.circular(7),
+                                          border: Border.all(
+                                            color: const Color.fromRGBO(
+                                                217, 217, 217, 1),
+                                            width: 1,
                                           ),
                                         ),
-                                        SizedBox(width: 10.w),
-                                        Text(
-                                          instructorName,
-                                          style: TextStyle(
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 8.h),
-                                    // Announcement title.
-                                    Text(
-                                      titleText,
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    SizedBox(height: 10.h),
-                                    // Attachments display.
-                                    attachments.isNotEmpty
-                                        ? Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: attachments.map((attach) {
-                                        final String attachmentUrl =
-                                            "https://admin.uthix.com/${attach["attachment_file"]}";
-                                        return GestureDetector(
-                                          onTap: () => _openAttachment(attachmentUrl),
-                                          child: Padding(
-                                            padding: EdgeInsets.only(bottom: 12.h),
-                                            child: Row(
-                                              children: [
-                                                const Icon(Icons.attach_file, color: Colors.grey, size: 14),
-                                                SizedBox(width: 5.w),
-                                                Expanded(
-                                                  child: Text(
-                                                    attach["attachment_file"] ?? "No file",
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              // Instructor row.
+                                              Row(
+                                                children: [
+                                                  ClipOval(
+                                                    child: Image.asset(
+                                                      "assets/login/profile.jpeg",
+                                                      width: 45,
+                                                      height: 45,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 10.w),
+                                                  Text(
+                                                    instructorName,
                                                     style: TextStyle(
-                                                      fontSize: 12.sp,
-                                                      fontWeight: FontWeight.w400,
+                                                      fontSize: 14.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                       color: Colors.black,
                                                     ),
-                                                    overflow: TextOverflow.ellipsis,
                                                   ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 8.h),
+                                              // Announcement title.
+                                              Text(
+                                                titleText,
+                                                style: TextStyle(
+                                                  fontSize: 14.sp,
+                                                  fontWeight: FontWeight.w500,
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                              SizedBox(height: 10.h),
+                                              // Attachments display.
+                                              attachments.isNotEmpty
+                                                  ? Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: attachments
+                                                          .map((attach) {
+                                                        final String
+                                                            attachmentUrl =
+                                                            "https://admin.uthix.com/${attach["attachment_file"]}";
+                                                        return GestureDetector(
+                                                          onTap: () =>
+                                                              _openAttachment(
+                                                                  attachmentUrl),
+                                                          child: Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    bottom:
+                                                                        12.h),
+                                                            child: Row(
+                                                              children: [
+                                                                const Icon(
+                                                                    Icons
+                                                                        .attach_file,
+                                                                    color: Colors
+                                                                        .grey,
+                                                                    size: 14),
+                                                                SizedBox(
+                                                                    width: 5.w),
+                                                                Expanded(
+                                                                  child: Text(
+                                                                    attach["attachment_file"] ??
+                                                                        "No file",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          12.sp,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                      color: Colors
+                                                                          .black,
+                                                                    ),
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }).toList(),
+                                                    )
+                                                  : Text(
+                                                      "No attachments",
+                                                      style: TextStyle(
+                                                        fontSize: 12.sp,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: const Color
+                                                            .fromRGBO(
+                                                            142, 140, 140, 1),
+                                                      ),
+                                                    ),
+                                            ],
                                           ),
-                                        );
-                                      }).toList(),
-                                    )
-                                        : Text(
-                                      "No attachments",
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: const Color.fromRGBO(142, 140, 140, 1),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    );
+                                  },
                                 ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
                     ),
                   ),
                 ],

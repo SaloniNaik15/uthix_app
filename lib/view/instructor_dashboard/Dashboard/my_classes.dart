@@ -362,7 +362,6 @@ class _MyClassesState extends State<MyClasses> {
                     color: Colors.white,
                   ),
                 ),
-
               ],
             ),
           ),
@@ -400,15 +399,15 @@ class _MyClassesState extends State<MyClasses> {
                       padding: const EdgeInsets.only(
                           top: 15, left: 20, right: 20, bottom: 15),
                       child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => InstructorClass(classId: classId),
-                            ),
-                          );
-
-                        },
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    InstructorClass(classId: classId),
+                              ),
+                            );
+                          },
                           child: Container(
                             width: double.infinity,
                             height: 130.h,
@@ -436,7 +435,9 @@ class _MyClassesState extends State<MyClasses> {
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        SizedBox(width: 8.w,),
+                                        SizedBox(
+                                          width: 8.w,
+                                        ),
                                         Expanded(
                                           child: Text(
                                             classItem['title'] ?? "No title",
@@ -455,7 +456,8 @@ class _MyClassesState extends State<MyClasses> {
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) => const Submission(),
+                                                  builder: (context) =>
+                                                      const Submission(),
                                                 ),
                                               );
                                             }
@@ -485,19 +487,24 @@ class _MyClassesState extends State<MyClasses> {
                                         height: 40.h,
                                         width: 150.w,
                                         decoration: BoxDecoration(
-                                          color: const Color.fromRGBO(255, 255, 255, 1),
-                                          borderRadius: BorderRadius.circular(10),
+                                          color: const Color.fromRGBO(
+                                              255, 255, 255, 1),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                           border: Border.all(
-                                            color: const Color.fromRGBO(43, 92, 116, 1),
+                                            color: const Color.fromRGBO(
+                                                43, 92, 116, 1),
                                             width: 1,
                                           ),
                                         ),
                                         child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: const [
                                             Icon(
                                               Icons.add,
-                                              color: Color.fromRGBO(43, 92, 116, 1),
+                                              color: Color.fromRGBO(
+                                                  43, 92, 116, 1),
                                             ),
                                             SizedBox(width: 2),
                                             Text(
@@ -505,7 +512,8 @@ class _MyClassesState extends State<MyClasses> {
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w500,
-                                                color: Color.fromRGBO(43, 92, 116, 1),
+                                                color: Color.fromRGBO(
+                                                    43, 92, 116, 1),
                                               ),
                                             ),
                                           ],
@@ -516,10 +524,7 @@ class _MyClassesState extends State<MyClasses> {
                                 ],
                               ),
                             ),
-                          )
-
-
-                      ),
+                          )),
                     );
                   },
                 ),
