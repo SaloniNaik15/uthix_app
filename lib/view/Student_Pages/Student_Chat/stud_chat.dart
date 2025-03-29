@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:developer';
+import 'package:dio/dio.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -50,25 +51,30 @@ class _StudChatState extends State<StudChat> {
 
   Future<void> fetchMessages() async {
     try {
-      final response = await http.get(
-        Uri.parse('https://admin.uthix.com/api/get-messages'),
-        headers: {
-          'Authorization':
-              'Bearer $accessLoginToken', // Replace with actual token
-          'Content-Type': 'application/json',
-        },
+      Dio dio = Dio();
+
+      final response = await dio.get(
+        'https://admin.uthix.com/api/get-messages',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessLoginToken', // Replace with actual token
+            'Content-Type': 'application/json',
+          },
+        ),
       );
-      log("Response Body: ${response.body}");
+
+      log("Response Body: ${response.data}");
+
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
         setState(() {
-          messages = data['messages'];
+          messages = response.data['messages'];
           isLoading = false;
         });
       } else {
         throw Exception('Failed to load messages');
       }
     } catch (e) {
+      log("Error fetching messages: $e");
       setState(() {
         hasError = true;
         isLoading = false;
@@ -104,7 +110,7 @@ class _StudChatState extends State<StudChat> {
               backgroundColor: const Color(0xFF2B5C74),
               elevation: 0,
               leading: IconButton(
-                icon: const Icon(Icons.menu, color: Colors.white),
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                 onPressed: () {
                   Navigator.pop(context);
                 },
