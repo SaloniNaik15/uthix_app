@@ -72,7 +72,6 @@ class _MyDrawerState extends State<MyDrawer> {
                 padding: const EdgeInsets.only(left: 15),
                 child: Row(
                   children: [
-                    Icon(Icons.arrow_back_ios),
                     const SizedBox(width: 15),
                     Text(
                       "Your Classroom",

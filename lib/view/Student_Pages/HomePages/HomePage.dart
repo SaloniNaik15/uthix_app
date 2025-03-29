@@ -14,6 +14,8 @@ import 'package:uthix_app/view/Student_Pages/LMS/yourc_clasroom.dart';
 import 'package:uthix_app/view/Student_Pages/Modern_Tools/modern_tools.dart';
 import 'package:uthix_app/view/Student_Pages/Progress/progress_tracking.dart';
 
+import '../Student Account Details/Student_Profile.dart';
+
 class HomePages extends StatefulWidget {
   const HomePages({super.key});
 
@@ -25,6 +27,7 @@ class _HomePagesState extends State<HomePages> {
   int selectedIndex = 0;
   String? accessLoginToken;
   String? userName;
+  String? profileImageUrl;
 
   final List<Map<String, String>> dashBoard = [
     {"image": "assets/Student_Home_icons/Buy_Books.png", "title": "BUY BOOKS"},
@@ -44,15 +47,18 @@ class _HomePagesState extends State<HomePages> {
   Future<void> _initializeData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
+    String? imageUrl = prefs.getString('student_profile_image_url');
     log("Retrieved Token: $token");
+    log("Retrieved Image URL: $imageUrl");
 
     setState(() {
       accessLoginToken = token;
+      profileImageUrl = imageUrl;
     });
 
     // Load cached profile first
     await _loadProfileFromCache();
-    // Then fetch updated profile data from API
+
     _fetchUserProfile();
   }
 
@@ -175,10 +181,27 @@ class _HomePagesState extends State<HomePages> {
                     ),
                   ],
                 ),
-                child: ClipOval(
-                  child: Image.asset(
-                    "assets/login/profile.jpeg",
-                    fit: BoxFit.cover,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const StudentProfile()),
+                    );
+                  },
+                  child: ClipOval(
+                    child: profileImageUrl != null
+                        ? Image.network(
+                      profileImageUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Image.asset(
+                        "assets/login/profile.jpeg",
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                        : Image.asset(
+                      "assets/login/profile.jpeg",
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
