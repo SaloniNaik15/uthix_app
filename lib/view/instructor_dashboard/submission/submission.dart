@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/instructor_dashboard/submission/view_assignmnets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -13,53 +11,47 @@ class Submission extends StatefulWidget {
 }
 
 class _SubmissionState extends State<Submission> {
-  String? token;
   bool isLoading = true;
   Map<String, dynamic>? assignment;
 
   @override
   void initState() {
     super.initState();
-    _loadTokenAndFetch();
+    _loadDummyAssignment();
   }
 
-  Future<void> _loadTokenAndFetch() async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<void> _loadDummyAssignment() async {
+    // Instead of fetching from an API, we set up static dummy data.
+    assignment = {
+      "title": "Submit your Report here",
+      "total_submissions": 15,
+      "uploads": [
+        {
+          "student": {"name": "John Doe", "profile_image": null},
+          "submitted_at": "2025-01-20 10:00 AM",
+          "comment": "Here is my report",
+          "attachments": [
+            {"file_path": "report_john.pdf"}
+          ]
+        },
+        {
+          "student": {"name": "Jane Smith", "profile_image": null},
+          "submitted_at": "2025-01-20 11:00 AM",
+          "comment": "My report attached",
+          "attachments": [
+            {"file_path": "report_jane.pdf"}
+          ]
+        }
+      ]
+    };
+    // Simulate a short delay to mimic loading time.
+    await Future.delayed(const Duration(milliseconds: 500));
     setState(() {
-      token = prefs.getString('auth_token');
+      isLoading = false;
     });
-    if (token != null) {
-      _fetchSubmission();
-    } else {
-      print("No token found. User may not be logged in.");
-    }
   }
 
-  Future<void> _fetchSubmission() async {
-    try {
-      final response = await Dio().get(
-        'https://admin.uthix.com/api/assignments/1/submissions',
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Content-Type": "application/json",
-          },
-        ),
-      );
-      if (response.statusCode == 200 && response.data["status"] == true) {
-        setState(() {
-          assignment = response.data["assignment"];
-          isLoading = false;
-        });
-      } else {
-        print("Error: Invalid submission response");
-      }
-    } catch (e) {
-      print("Error fetching submission: $e");
-    }
-  }
-
-  // Function to open the attachment URL
+  // Function to open the attachment URL.
   Future<void> _openAttachment(String attachmentUrl) async {
     final Uri url = Uri.parse(attachmentUrl);
     if (await canLaunchUrl(url)) {
@@ -155,8 +147,7 @@ class _SubmissionState extends State<Submission> {
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,
-                                color:
-                                const Color.fromRGBO(142, 140, 140, 1),
+                                color: const Color.fromRGBO(142, 140, 140, 1),
                               ),
                             ),
                             const Spacer(),
@@ -165,8 +156,7 @@ class _SubmissionState extends State<Submission> {
                               style: TextStyle(
                                 fontSize: 14.sp,
                                 fontWeight: FontWeight.w500,
-                                color:
-                                const Color.fromRGBO(142, 140, 140, 1),
+                                color: const Color.fromRGBO(142, 140, 140, 1),
                               ),
                             ),
                           ],
@@ -177,7 +167,7 @@ class _SubmissionState extends State<Submission> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ViewAssignmnets(),
+                                builder: (context) => const ViewAssignmnets(),
                               ),
                             );
                           },
@@ -275,11 +265,9 @@ class _SubmissionState extends State<Submission> {
                               child: Padding(
                                 padding: EdgeInsets.all(1.w),
                                 child: ClipOval(
-                                  child: upload["student"]["profile_image"] !=
-                                      null
+                                  child: upload["student"]["profile_image"] != null
                                       ? Image.network(
-                                    upload["student"]
-                                    ["profile_image"],
+                                    upload["student"]["profile_image"],
                                     fit: BoxFit.cover,
                                   )
                                       : Image.asset(
@@ -292,14 +280,12 @@ class _SubmissionState extends State<Submission> {
                             SizedBox(width: 15.w),
                             Expanded(
                               child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
                                     children: [
                                       Text(
-                                        upload["student"]["name"] ??
-                                            "No Name",
+                                        upload["student"]["name"] ?? "No Name",
                                         style: TextStyle(
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.w600,
@@ -312,8 +298,7 @@ class _SubmissionState extends State<Submission> {
                                         style: TextStyle(
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.w600,
-                                          color: const Color.fromRGBO(
-                                              96, 95, 95, 1),
+                                          color: const Color.fromRGBO(96, 95, 95, 1),
                                         ),
                                       ),
                                     ],
@@ -337,17 +322,14 @@ class _SubmissionState extends State<Submission> {
                                       upload["attachments"].length,
                                           (attIndex) {
                                         final attachment =
-                                        upload["attachments"]
-                                        [attIndex];
+                                        upload["attachments"][attIndex];
                                         final attachmentUrl =
                                             "https://admin.uthix.com/uploads/${attachment['file_path']}";
                                         return Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 4.h),
+                                          padding: EdgeInsets.symmetric(vertical: 4.h),
                                           child: GestureDetector(
                                             onTap: () {
-                                              _openAttachment(
-                                                  attachmentUrl);
+                                              _openAttachment(attachmentUrl);
                                             },
                                             child: Row(
                                               children: [
@@ -357,18 +339,13 @@ class _SubmissionState extends State<Submission> {
                                                 SizedBox(width: 5.w),
                                                 Expanded(
                                                   child: Text(
-                                                    attachment[
-                                                    "file_path"],
+                                                    attachment["file_path"],
                                                     style: TextStyle(
                                                       fontSize: 14.sp,
-                                                      fontWeight:
-                                                      FontWeight
-                                                          .w400,
+                                                      fontWeight: FontWeight.w400,
                                                       color: Colors.black,
                                                     ),
-                                                    overflow:
-                                                    TextOverflow
-                                                        .ellipsis,
+                                                    overflow: TextOverflow.ellipsis,
                                                   ),
                                                 ),
                                               ],
@@ -390,7 +367,6 @@ class _SubmissionState extends State<Submission> {
                 },
               ),
             ),
-            //SizedBox(height: 20.h),
           ],
         ),
       ),
