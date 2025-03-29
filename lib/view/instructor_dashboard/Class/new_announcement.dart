@@ -166,18 +166,10 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
     return Scaffold(
       backgroundColor: Colors.white, // Entire background white.
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_outlined,
-            color: Colors.black,
-            size: 25.sp,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+
         title: const Text("New Announcement"),
+        backgroundColor: Colors.white, // AppBar background white.
+
         elevation: 1,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
