@@ -21,6 +21,8 @@ class _StudentProfileState extends State<StudentProfile> {
   String? accessLoginToken;
   String? userName;
   String? networkImageUrl;
+  List<Map<String, dynamic>> _classOptions = [];
+  String? _selectedClass;
 
   // Controllers for each text field
   final TextEditingController _nameController = TextEditingController();
@@ -49,8 +51,37 @@ class _StudentProfileState extends State<StudentProfile> {
     setState(() {
       accessLoginToken = token;
     });
+    await fetchClasses();
     _fetchUserProfile();
     _fetchstudentProfile();
+  }
+
+  List<Map<String, dynamic>> classOptions = [];
+  bool isLoading = true;
+
+  Future<void> fetchClasses() async {
+    try {
+      final dio = Dio();
+      dio.options.headers['Authorization'] = 'Bearer $accessLoginToken';
+
+      final response =
+          await dio.get('https://admin.uthix.com/api/all-classroom');
+
+      if (response.statusCode == 200 && response.data["status"] == true) {
+        setState(() {
+          classOptions = List<Map<String, dynamic>>.from(
+            response.data["classrooms"].map((classroom) =>
+                {"id": classroom["id"], "name": classroom["class_name"]}),
+          );
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching classes: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _pickImage() async {
@@ -144,6 +175,15 @@ class _StudentProfileState extends State<StudentProfile> {
             filename: "profile.jpg",
           ),
       });
+      log("Saloni:${formData}");
+
+      // Log the data before sending
+      log("📤 Posting Profile Data:");
+      formData.fields.forEach((field) => log("${field.key}: ${field.value}"));
+      if (_profileImage != null) {
+        log("📸 Profile Image: ${_profileImage!.path}");
+      }
+
       final response = await dio.post(
         "https://admin.uthix.com/api/student-profile",
         data: formData,
@@ -157,6 +197,8 @@ class _StudentProfileState extends State<StudentProfile> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         log("✅ Profile submitted successfully.");
+        log("🔄 Server Response: ${response.data}");
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Profile updated successfully!")),
         );
@@ -166,7 +208,7 @@ class _StudentProfileState extends State<StudentProfile> {
         prefs.setString("cached_profile", jsonEncode(response.data));
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomePages()), // 👈 Your Dashboard screen
+          MaterialPageRoute(builder: (context) => HomePages()),
         );
       } else {
         log("❌ Failed to submit profile: ${response.statusCode}");
@@ -182,6 +224,7 @@ class _StudentProfileState extends State<StudentProfile> {
       );
     }
   }
+
   Future<void> _fetchstudentProfile() async {
     try {
       final dio = Dio();
@@ -206,7 +249,8 @@ class _StudentProfileState extends State<StudentProfile> {
           _streamController.text = profileData["stream"] ?? "";
 
           if (user["image"] != null && user["image"].toString().isNotEmpty) {
-            networkImageUrl = "https://admin.uthix.com/storage/images/student/${user["image"]}";
+            networkImageUrl =
+                "https://admin.uthix.com/storage/images/student/${user["image"]}";
           } else {
             networkImageUrl = null;
           }
@@ -224,6 +268,7 @@ class _StudentProfileState extends State<StudentProfile> {
       log("❌ Error fetching profile: $e");
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -258,8 +303,9 @@ class _StudentProfileState extends State<StudentProfile> {
                   backgroundImage: _profileImage != null
                       ? FileImage(_profileImage!)
                       : (networkImageUrl != null
-                      ? NetworkImage(networkImageUrl!)
-                      : const AssetImage("assets/icons/profile.png")) as ImageProvider,
+                              ? NetworkImage(networkImageUrl!)
+                              : const AssetImage("assets/icons/profile.png"))
+                          as ImageProvider,
                   onBackgroundImageError: (_, __) {
                     setState(() {
                       networkImageUrl = null;
@@ -377,17 +423,6 @@ class _StudentProfileState extends State<StudentProfile> {
   }
 
   Widget _buildClassDropdown() {
-    final List<String> classOptions = [
-      "Class 5",
-      "Class 6",
-      "Class 7",
-      "Class 8",
-      "Class 9",
-      "Class 10",
-      "Class 11",
-      "Class 12"
-    ];
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Column(
@@ -403,30 +438,34 @@ class _StudentProfileState extends State<StudentProfile> {
           const SizedBox(height: 6),
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFFF6F6F6), // Background white
+              color: const Color(0xFFF6F6F6),
               borderRadius: BorderRadius.circular(40),
               border: Border.all(color: Color(0xFFD2D2D2)),
             ),
-            child: DropdownButtonFormField<String>(
-              value: _classController.text.isNotEmpty
-                  ? _classController.text
-                  : null,
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 12),
-              ),
-              hint: const Text("Select Class"),
-              dropdownColor: Colors.white,
-              items: classOptions
-                  .map((className) => DropdownMenuItem(
-                      value: className, child: Text(className)))
-                  .toList(),
-              onChanged: (val) {
-                setState(() {
-                  _classController.text = val!;
-                });
-              },
-            ),
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : DropdownButtonFormField<String>(
+                    value: _classController.text.isNotEmpty
+                        ? _classController.text
+                        : null,
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                    ),
+                    hint: const Text("Select Class"),
+                    dropdownColor: Colors.white,
+                    items: classOptions
+                        .map((classItem) => DropdownMenuItem(
+                              value: classItem["id"].toString(),
+                              child: Text(classItem["name"]),
+                            ))
+                        .toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        _classController.text = val!;
+                      });
+                    },
+                  ),
           ),
         ],
       ),
