@@ -164,12 +164,6 @@ class _ClassesState extends State<Classes> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu, size: 25),
-          onPressed: () {
-            // Add menu functionality here
-          },
-        ),
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
@@ -229,103 +223,103 @@ class _ClassesState extends State<Classes> {
                       ],
                     ),
 
-          Padding(
-            padding: const EdgeInsets.all(40),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            "Teacher",
-                            style: GoogleFonts.urbanist(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: const Color.fromRGBO(0, 0, 0, 1),
-                            ),
-                          ),
-                          Container(
-                            width: 45,
-                            height: 45,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                            ),
-                            child: ClipOval(
-                              child: Image.asset(
-                                "assets/login/profile.jpeg",
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            "Mahima",
-                            style: GoogleFonts.urbanist(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w300,
-                              color: const Color.fromRGBO(96, 95, 95, 1),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      Column(
-                        children: [
-                          Text(
-                            "Participants",
-                            style: GoogleFonts.urbanist(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: const Color.fromRGBO(0, 0, 0, 1),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 40,
-                            width: 80,
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: List.generate(4, (index) {
-                                return Positioned(
-                                  right: 15 * index.toDouble(),
-                                  child: Container(
-                                    width: 39,
-                                    height: 39,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.black,
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(1.0),
-                                      child: ClipOval(
-                                        child: Image.asset(
-                                          "assets/login/profile.jpeg",
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ),
-                          ),
-                          Text(
-                            "30 +",
-                            style: GoogleFonts.urbanist(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w300,
-                              color: const Color.fromRGBO(96, 95, 95, 1),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.all(40),
+          //   child: SingleChildScrollView(
+          //     scrollDirection: Axis.vertical,
+          //     child: Column(
+          //       children: [
+          //         Row(
+          //           children: [
+          //             Column(
+          //               children: [
+          //                 Text(
+          //                   "Teacher",
+          //                   style: GoogleFonts.urbanist(
+          //                     fontSize: 14,
+          //                     fontWeight: FontWeight.w500,
+          //                     color: const Color.fromRGBO(0, 0, 0, 1),
+          //                   ),
+          //                 ),
+          //                 Container(
+          //                   width: 45,
+          //                   height: 45,
+          //                   decoration: BoxDecoration(
+          //                     shape: BoxShape.circle,
+          //                   ),
+          //                   child: ClipOval(
+          //                     child: Image.asset(
+          //                       "assets/login/profile.jpeg",
+          //                       fit: BoxFit.cover,
+          //                     ),
+          //                   ),
+          //                 ),
+          //                 Text(
+          //                   "Mahima",
+          //                   style: GoogleFonts.urbanist(
+          //                     fontSize: 14,
+          //                     fontWeight: FontWeight.w300,
+          //                     color: const Color.fromRGBO(96, 95, 95, 1),
+          //                   ),
+          //                 ),
+          //               ],
+          //             ),
+          //             const Spacer(),
+          //             Column(
+          //               children: [
+          //                 Text(
+          //                   "Participants",
+          //                   style: GoogleFonts.urbanist(
+          //                     fontSize: 14,
+          //                     fontWeight: FontWeight.w500,
+          //                     color: const Color.fromRGBO(0, 0, 0, 1),
+          //                   ),
+          //                 ),
+          //                 SizedBox(
+          //                   height: 40,
+          //                   width: 80,
+          //                   child: Stack(
+          //                     clipBehavior: Clip.none,
+          //                     children: List.generate(4, (index) {
+          //                       return Positioned(
+          //                         right: 15 * index.toDouble(),
+          //                         child: Container(
+          //                           width: 39,
+          //                           height: 39,
+          //                           decoration: BoxDecoration(
+          //                             shape: BoxShape.circle,
+          //                             color: Colors.black,
+          //                           ),
+          //                           child: Padding(
+          //                             padding: const EdgeInsets.all(1.0),
+          //                             child: ClipOval(
+          //                               child: Image.asset(
+          //                                 "assets/login/profile.jpeg",
+          //                                 fit: BoxFit.cover,
+          //                               ),
+          //                             ),
+          //                           ),
+          //                         ),
+          //                       );
+          //                     }),
+          //                   ),
+          //                 ),
+          //                 Text(
+          //                   "30 +",
+          //                   style: GoogleFonts.urbanist(
+          //                     fontSize: 18,
+          //                     fontWeight: FontWeight.w300,
+          //                     color: const Color.fromRGBO(96, 95, 95, 1),
+          //                   ),
+          //                 ),
+          //               ],
+          //             ),
+          //           ],
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
 
           //First post.
           Expanded(
