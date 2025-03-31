@@ -29,72 +29,59 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   String instructorName = 'No Name';
   String? instructorImageUrl;
 
+  // List of classroom objects fetched from API.
+  List<Map<String, dynamic>> classroomsFromApi = [];
+  // Selected classroom id.
+  int? selectedClassId;
+
+  // For subjects.
+  List<Map<String, dynamic>> subjects = [];
+  int? selectedSubjectId;
+
+  // Updated API URL for posting classroom data.
+  final String apiUrl = "https://admin.uthix.com/api/instructor-classroom";
+  final Dio _dio = Dio();
+
   Future<void> loadProfileInfo() async {
     final prefs = await SharedPreferences.getInstance();
     final name = prefs.getString('instructor_name') ?? 'No Name';
     final imageUrl = prefs.getString('instructor_image_url');
-
     setState(() {
       instructorName = name;
       instructorImageUrl = imageUrl;
     });
   }
 
-  final List<Map<String, String>> dashBoard = [
-    {"image": "assets/instructor/create_class.png", "title": "Create Class"},
-    {"image": "assets/instructor/my_classes.png", "title": "My Classes"},
-    {"image": "assets/instructor/calender.png", "title": "Calender"},
-    {
-      "image": "assets/instructor/study_materials.png",
-      "title": "Study Material"
-    },
-  ];
-
-  // New dropdown options for class and section.
-  final List<String> classOptions = [
-    "Class 5th",
-    "Class 6th",
-    "Class 7th",
-    "Class 8th",
-    "Class 9th",
-    "Class 10th",
-    "Class 11th",
-    "Class 12th"
-  ];
-  final List<String> sectionOptions = [
-    "Section A",
-    "Section B",
-    "Section C",
-    "Section D"
-  ];
-  // Selected values for dropdowns.
-  String? selectedClass;
-  String? selectedSection;
-
-  final Dio _dio = Dio();
-  final String apiUrl = "https://admin.uthix.com/api/classroom";
-  List<Map<String, dynamic>> subjects = [];
-  int? selectedSubjectId;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadTokenAndSubjects();
-    loadProfileInfo();
-  }
-
-  Future<void> _loadTokenAndSubjects() async {
-    final prefs = await SharedPreferences.getInstance();
-    final storedToken = prefs.getString('auth_token');
-    setState(() {
-      token = storedToken;
-    });
-
-    if (storedToken != null) {
-      await _fetchSubjects();
+  // Fetch classrooms using token.
+  Future<void> _fetchClasses() async {
+    try {
+      Response response = await _dio.get(
+        "https://admin.uthix.com/api/all-classroom",
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+        ),
+      );
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data;
+        if (data["classrooms"] != null) {
+          List classrooms = data["classrooms"];
+          setState(() {
+            // Save the full classroom objects so we can use their id.
+            classroomsFromApi = List<Map<String, dynamic>>.from(classrooms);
+          });
+        } else {
+          debugPrint("Key 'classrooms' not found in response: $data");
+        }
+      } else {
+        debugPrint(
+            "Failed to fetch classrooms: ${response.statusCode} ${response.data}");
+      }
+    } catch (e) {
+      debugPrint("Error fetching classrooms: $e");
     }
   }
 
+  // Fetch subjects for the instructor.
   Future<void> _fetchSubjects() async {
     try {
       Response response = await _dio.get(
@@ -121,20 +108,29 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     }
   }
 
+  // Load token and fetch both subjects and classrooms.
+  Future<void> _loadTokenAndSubjects() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedToken = prefs.getString('auth_token');
+    setState(() {
+      token = storedToken;
+    });
+    if (storedToken != null) {
+      await _fetchSubjects();
+      await _fetchClasses();
+    }
+  }
+
+  // Create a new classroom by posting classroom_id and subject_id.
   Future<void> _createClass() async {
     if (selectedSubjectId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Please select a subject!")));
       return;
     }
-    if (selectedClass == null) {
+    if (selectedClassId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Please select a class!")));
-      return;
-    }
-    if (selectedSection == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select a section!")));
       return;
     }
     if (token == null) {
@@ -144,8 +140,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     }
 
     final requestData = {
-      "class_name": selectedClass,
-      "section": selectedSection,
+      "classroom_id": selectedClassId,
       "subject_id": selectedSubjectId,
     };
 
@@ -161,16 +156,12 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         ),
         data: requestData,
       );
-
       final responseData = response.data;
       if (response.statusCode == 201 && responseData["status"] == true) {
-        // Extract the classroom id from the response.
-        final classroomId = responseData["data"]["id"];
-
-        // Store the classroom id in SharedPreferences.
+        // Extract the classroom details from the response.
+        final classroom = responseData["classroom"];
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("classroom_id", classroomId.toString());
-
+        await prefs.setString("classroom_id", classroom["classroom_id"].toString());
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(responseData["message"])));
         Navigator.pushReplacement(
@@ -186,16 +177,16 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
       if (e is DioException) {
         debugPrint("Dio Error Code: ${e.response?.statusCode}");
         debugPrint("Error Data: ${e.response?.data}");
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Error: ${e.response?.data}")));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Error: ${e.response?.data}")));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Unexpected Error: ${e.toString()}")));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Unexpected Error: ${e.toString()}")));
       }
     }
   }
 
-  // Navigation callback
+  // Navigation callback for bottom navbar.
   void onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
@@ -212,9 +203,8 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     }
   }
 
-  // Displays a modal dialog for class creation.
+  // Displays a modal dialog for classroom creation.
   void showCreateClassModal() {
-    _fetchSubjects();
     showGeneralDialog(
       context: context,
       barrierLabel: "Create Class",
@@ -258,21 +248,9 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Dropdown for Class selection (Class 5th to Class 12th)
-              _buildStringDropdownField("Class", classOptions, selectedClass,
-                  (val) {
-                setState(() {
-                  selectedClass = val;
-                });
-              }),
-              // Dropdown for Section selection (Section A to Section D)
-              _buildStringDropdownField(
-                  "Section", sectionOptions, selectedSection, (val) {
-                setState(() {
-                  selectedSection = val;
-                });
-              }),
-              // Existing subject dropdown remains unchanged
+              // Dropdown for Classroom selection fetched from API.
+              _buildClassDropdown(),
+              // Dropdown for Subject selection.
               _buildDropdownField("Subject", subjects, selectedSubjectId),
               const SizedBox(height: 20),
               Center(
@@ -303,6 +281,99 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
           ),
         ),
       ),
+    );
+  }
+
+  // Build the dropdown for Classroom using API data.
+  Widget _buildClassDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Class",
+          style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w700,
+              color: Colors.black54),
+        ),
+        const SizedBox(height: 5),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(246, 246, 246, 1),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: const Color.fromRGBO(210, 210, 210, 1)),
+          ),
+          child: DropdownButtonFormField<int>(
+            // onTap callback to refresh classroom data.
+            onTap: () {
+              _fetchClasses();
+            },
+            items: classroomsFromApi.map((classroom) {
+              return DropdownMenuItem<int>(
+                value: classroom["id"],
+                child: Text(
+                  classroom["class_name"],
+                  style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                ),
+              );
+            }).toList(),
+            value: selectedClassId,
+            isExpanded: true,
+            decoration: const InputDecoration(border: InputBorder.none),
+            hint: Text(
+              "Select Class",
+              style: TextStyle(fontSize: 12.sp, color: Colors.black45),
+            ),
+            onChanged: (int? val) {
+              setState(() {
+                selectedClassId = val;
+              });
+            },
+            dropdownColor: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 10),
+      ],
+    );
+  }
+
+  // Build the reusable dropdown for Subject selection.
+  Widget _buildDropdownField(String label, List<Map<String, dynamic>> items, int? selectedValue) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w700, color: Colors.black54),
+        ),
+        const SizedBox(height: 5),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(246, 246, 246, 1),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: const Color.fromRGBO(210, 210, 210, 1)),
+          ),
+          child: DropdownButton<int>(
+            value: selectedValue,
+            isExpanded: true,
+            dropdownColor: Colors.white,
+            hint: Text("Select Subject", style: TextStyle(fontSize: 12.sp, color: Colors.black45)),
+            items: items.map((subject) {
+              return DropdownMenuItem<int>(
+                value: subject["id"],
+                child: Text(subject["name"], style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
+              );
+            }).toList(),
+            onChanged: (value) {
+              setState(() {
+                selectedSubjectId = value;
+              });
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -358,10 +429,8 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                   },
                   child: ClipOval(
                       child: instructorImageUrl != null
-                          ? Image.network(instructorImageUrl!,
-                              fit: BoxFit.cover)
-                          : Image.asset("assets/icons/profile.png",
-                              fit: BoxFit.cover)),
+                          ? Image.network(instructorImageUrl!, fit: BoxFit.cover)
+                          : Image.asset("assets/icons/profile.png", fit: BoxFit.cover)),
                 ),
               ),
             ],
@@ -394,16 +463,22 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                     showCreateClassModal();
                     break;
                   case "My Classes":
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => ClassData()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ClassData()),
+                    );
                     break;
                   case "Calender":
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Calender()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Calender()),
+                    );
                     break;
                   case "Study Material":
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Files()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Files()),
+                    );
                     break;
                 }
               },
@@ -436,91 +511,19 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     );
   }
 
-  // Reusable dropdown builder for integer values (for Subject).
-  Widget _buildDropdownField(
-      String label, List<Map<String, dynamic>> items, int? selectedValue) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w700,
-              color: Colors.black54),
-        ),
-        const SizedBox(height: 5),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(246, 246, 246, 1),
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: const Color.fromRGBO(210, 210, 210, 1)),
-          ),
-          child: DropdownButton<int>(
-            value: selectedValue,
-            isExpanded: true,
-            dropdownColor: Colors.white,
-            hint: Text("Select Subject",
-                style: TextStyle(fontSize: 12.sp, color: Colors.black45)),
-            items: items.map((subject) {
-              return DropdownMenuItem<int>(
-                value: subject["id"],
-                child: Text(subject["name"],
-                    style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                selectedSubjectId = value;
-              });
-            },
-          ),
-        ),
-      ],
-    );
-  }
+  // Dashboard items.
+  final List<Map<String, String>> dashBoard = [
+    {"image": "assets/instructor/create_class.png", "title": "Create Class"},
+    {"image": "assets/instructor/my_classes.png", "title": "My Classes"},
+    {"image": "assets/instructor/calender.png", "title": "Calender"},
+    {"image": "assets/instructor/study_materials.png", "title": "Study Material"},
+  ];
 
-  // Reusable dropdown builder for String values.
-  Widget _buildStringDropdownField(String label, List<String> items,
-      String? selectedValue, ValueChanged<String?> onChanged) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w700,
-              color: Colors.black54),
-        ),
-        const SizedBox(height: 5),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(246, 246, 246, 1),
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: const Color.fromRGBO(210, 210, 210, 1)),
-          ),
-          child: DropdownButton<String>(
-            value: selectedValue,
-            isExpanded: true,
-            dropdownColor: Colors.white,
-            hint: Text("Select $label",
-                style: TextStyle(fontSize: 12.sp, color: Colors.black45)),
-            items: items.map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value,
-                    style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
-              );
-            }).toList(),
-            onChanged: onChanged,
-          ),
-        ),
-        const SizedBox(height: 10),
-      ],
-    );
+  @override
+  void initState() {
+    super.initState();
+    _loadTokenAndSubjects();
+    loadProfileInfo();
   }
 
   @override
@@ -549,7 +552,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         ),
         body: Stack(
           children: [
-            // Background Image Covering Full Screen
+            // Background Image Covering Full Screen.
             Positioned.fill(
               top: 100,
               child: Image.asset(
@@ -557,7 +560,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                 fit: BoxFit.cover,
               ),
             ),
-            // Scrollable Dashboard Content
+            // Scrollable Dashboard Content.
             Column(
               children: [
                 _buildHeader(),
@@ -569,14 +572,13 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                 ),
               ],
             ),
-            // Fixed Bottom Navigation Bar
+            // Fixed Bottom Navigation Bar.
             Positioned(
               bottom: 15.h,
               left: 0,
               right: 0,
               child: Center(
-                child: Navbar(
-                    onItemTapped: onItemTapped, selectedIndex: selectedIndex),
+                child: Navbar(onItemTapped: onItemTapped, selectedIndex: selectedIndex),
               ),
             ),
           ],

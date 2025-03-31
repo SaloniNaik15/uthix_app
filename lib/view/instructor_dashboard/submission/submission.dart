@@ -166,7 +166,7 @@ class _SubmissionState extends State<Submission> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const ViewAssignmnets(),
+                                builder: (context) => const ViewAssignmnets(announcementId: '',),
                               ),
                             );
                           },
