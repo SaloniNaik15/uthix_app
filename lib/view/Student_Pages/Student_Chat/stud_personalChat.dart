@@ -43,7 +43,7 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
   // Load the token from SharedPreferences.
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('access_token');
+    String? token = prefs.getString('auth_token');
     log("Retrieved Token: $token");
     setState(() {
       accessLoginToken = token;
@@ -70,7 +70,6 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
     }
   }
 
-  // Fetch conversation from API and update _messages list.
   Future<void> fetchConversation() async {
     try {
       final url =
@@ -82,20 +81,25 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
           'Content-Type': 'application/json',
         },
       );
+
       log("Conversation API Response: ${response.body}");
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final List<dynamic> messagesJson = data['messages'];
+
         setState(() {
           _messages = messagesJson.map((json) {
             ChatMessage msg = ChatMessage.fromJson(json);
-            // Force isSender true if this message's id is in _sentMessageIds
-            // or its senderId equals currentUserId.
             bool senderFlag = _sentMessageIds.contains(msg.id) ||
                 (msg.senderId == currentUserId);
-            log("Mapping message id: ${msg.id}, sender_id: ${msg.senderId}, _sentMessageIds: $_sentMessageIds, senderFlag: $senderFlag");
             return msg.copyWith(isSender: senderFlag);
           }).toList();
+
+          // Sort messages by createdAt timestamp
+          _messages.sort((a, b) => DateTime.parse(a.createdAt)
+              .compareTo(DateTime.parse(b.createdAt)));
+
           isLoading = false;
         });
       } else {

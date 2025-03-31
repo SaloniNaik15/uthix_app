@@ -53,16 +53,26 @@ class _StudChatState extends State<StudChat> {
       final response = await http.get(
         Uri.parse('https://admin.uthix.com/api/get-messages'),
         headers: {
-          'Authorization':
-              'Bearer $accessLoginToken', // Replace with actual token
+          'Authorization': 'Bearer $accessLoginToken',
           'Content-Type': 'application/json',
         },
       );
       log("Response Body: ${response.body}");
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        List<dynamic> rawMessages = data['messages'];
+
+        // Group messages by senderId, keeping only the latest message per sender
+        Map<int, dynamic> groupedMessages = {};
+
+        for (var message in rawMessages) {
+          int senderId = message['receiver']['id'];
+          groupedMessages[senderId] = message; // This keeps the latest message
+        }
+
         setState(() {
-          messages = data['messages'];
+          messages = groupedMessages.values.toList();
           isLoading = false;
         });
       } else {
