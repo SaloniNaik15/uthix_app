@@ -177,7 +177,12 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
             Navigator.pop(context);
           },
         ),
-        title: const Text("New Announcement"),
+        title:  Text("New Announcement",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w400,
+            color: Colors.black,
+          ),),
         elevation: 1,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
@@ -225,8 +230,8 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
                   Expanded(
                     child: TextField(
                       controller: _announceController,
-                      style: GoogleFonts.urbanist(
-                        fontSize: 14.sp,
+                      style: TextStyle(
+                        fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: Colors.black,
                       ),
@@ -234,7 +239,7 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
                         border: InputBorder.none,
                         hintText: "Announce something to your class",
                         hintStyle: TextStyle(
-                          fontSize: 14.sp,
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey,
                         ),
@@ -260,7 +265,7 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
                         Text(
                           "Add Attachment",
                           style: TextStyle(
-                            fontSize: 14.sp,
+                            fontSize: 14,
                             fontWeight: FontWeight.w400,
                             color: Colors.grey,
                           ),
@@ -284,7 +289,7 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
                               child: Text(
                                 file.path.split('/').last,
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w400,
                                   color: Colors.grey,
                                 ),
@@ -312,7 +317,7 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
                           ? "Due Date"
                           : "Due Date: ${DateFormat("dd-MM-yy").format(_dueDate!)}",
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: Colors.grey,
                       ),
