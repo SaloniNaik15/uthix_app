@@ -252,7 +252,7 @@ class _DetailProfileState extends State<DetailProfile> {
           "Profile",
           style: TextStyle(
               color: Colors.white,
-              fontSize: 20.sp,
+              fontSize: 20,
               fontWeight: FontWeight.bold),
         ),
       ),
@@ -316,12 +316,12 @@ class _DetailProfileState extends State<DetailProfile> {
 
             SizedBox(height: 10.h),
             Text("(You)",
-                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
 
             /// Profile Fields
             Expanded(
               child: Padding(
-                padding: EdgeInsets.all(16.w),
+                padding: EdgeInsets.all(10),
                 child: ListView(
                   children: controllers.keys.map((key) {
                     return buildProfileField(
@@ -338,7 +338,7 @@ class _DetailProfileState extends State<DetailProfile> {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF2B5C74),
@@ -350,7 +350,7 @@ class _DetailProfileState extends State<DetailProfile> {
           child: Text(
             "Submit Profile",
             style: TextStyle(
-                fontSize: 16.sp,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Colors.white),
           ),
@@ -366,10 +366,10 @@ class _DetailProfileState extends State<DetailProfile> {
     required String fieldKey,
   }) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 10.h),
+      padding: EdgeInsets.symmetric(vertical: 10),
       child: Container(
         alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 2.h),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2.h),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(50.r),
@@ -388,7 +388,7 @@ class _DetailProfileState extends State<DetailProfile> {
                   hintText: hint,
                   isDense: true,
                 ),
-                style: TextStyle(fontSize: 14.sp, color: Colors.black),
+                style: TextStyle(fontSize: 14, color: Colors.black),
               ),
             ),
             IconButton(

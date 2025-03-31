@@ -62,14 +62,14 @@ class _InstructorManageState extends State<InstructorManage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
+          padding: EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             children: [
               SizedBox(height: 10.h),
               Text(
                 "Manage your Account",
                 style: TextStyle(
-                  fontSize: 18.sp,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -90,7 +90,7 @@ class _InstructorManageState extends State<InstructorManage> {
               Text(
                 instructorName,
                 style: TextStyle(
-                  fontSize: 20.sp,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF2B5C74),
                 ),
@@ -115,13 +115,13 @@ class _InstructorManageState extends State<InstructorManage> {
                       },
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: Colors.red, width: 1.w),
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                        padding: EdgeInsets.symmetric(vertical: 15.h),
                       ),
                       child: Text(
                         "Log out",
                         style: TextStyle(
                           color: Colors.red,
-                          fontSize: 16.sp,
+                          fontSize: 16,
                         ),
                       ),
                     ),
@@ -166,7 +166,7 @@ class _InstructorManageState extends State<InstructorManage> {
         ),
         style: TextStyle(
           color: Colors.black,
-          fontSize: 14.sp,
+          fontSize: 14,
         ),
       ),
     );

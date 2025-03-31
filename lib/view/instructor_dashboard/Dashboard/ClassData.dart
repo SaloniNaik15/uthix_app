@@ -193,7 +193,7 @@ class _ClassDataState extends State<ClassData> {
           // Get subject name using the helper function.
           final subjectName = _getSubjectName(classItem);
           return Padding(
-            padding: const EdgeInsets.only(top: 15, left: 20, right: 20, bottom: 15),
+            padding: const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 15),
             child: GestureDetector(
               onTap: () {
                 // Navigation if needed.
@@ -216,7 +216,7 @@ class _ClassDataState extends State<ClassData> {
                       // Class name row.
                       Text(
                         className,
-                        style: GoogleFonts.urbanist(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                         ),
@@ -225,7 +225,7 @@ class _ClassDataState extends State<ClassData> {
                       // Subject information.
                       Text(
                         "Subject: $subjectName",
-                        style: GoogleFonts.urbanist(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),

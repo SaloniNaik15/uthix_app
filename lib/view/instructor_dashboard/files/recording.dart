@@ -22,7 +22,7 @@ class _RecordingState extends State<Recording> {
         title: Text(
           "Recordings",
           style:TextStyle(
-            fontSize: 18.sp,
+            fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -42,14 +42,14 @@ class _RecordingState extends State<Recording> {
         children: [
           SizedBox(height: 10.h),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 30.w),
+            padding: EdgeInsets.symmetric(horizontal: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "The class recordings and files uploaded by you will appear here",
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 16,
                     fontWeight: FontWeight.w400,
                     color: const Color.fromRGBO(96, 95, 95, 1),
                   ),
@@ -72,8 +72,8 @@ class _RecordingState extends State<Recording> {
                       children: [
                         Text(
                           selectedClass,
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14.sp,
+                          style: TextStyle(
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: const Color.fromRGBO(96, 95, 95, 1),
                           ),
@@ -103,7 +103,7 @@ class _RecordingState extends State<Recording> {
           Expanded(
             child: ListView.builder(
               itemCount: 10,
-              padding: EdgeInsets.symmetric(horizontal: 30.w),
+              padding: EdgeInsets.symmetric(horizontal: 10.w),
               itemBuilder: (context, index) {
                 return Padding(
                   padding: EdgeInsets.only(bottom: 15.h),
@@ -126,7 +126,7 @@ class _RecordingState extends State<Recording> {
                             Text(
                               "Class Name, Topic",
                               style: TextStyle(
-                                fontSize: 14.sp,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.black,
                               ),
@@ -135,7 +135,7 @@ class _RecordingState extends State<Recording> {
                             Text(
                               "61 GB, Modified by Instructor on 13/01/2025",
                               style: TextStyle(
-                                fontSize: 14.sp,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.black,
                               ),
@@ -175,7 +175,7 @@ class _RecordingState extends State<Recording> {
         child: Text(
           text,
           style:TextStyle(
-            fontSize: 14.sp,
+            fontSize: 14,
             fontWeight: FontWeight.w700,
             color: Colors.white,
           ),

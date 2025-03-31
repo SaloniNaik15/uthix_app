@@ -94,14 +94,14 @@ class _InstructorFaqState extends State<InstructorFaq> {
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 "Frequently Asked Questions",
                 style: TextStyle(
-                  fontSize: 18.sp,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -148,8 +148,8 @@ class _InstructorFaqState extends State<InstructorFaq> {
                             padding: const EdgeInsets.all(10.0),
                             child: Text(
                               faq["answer"],
-                              style: GoogleFonts.urbanist(
-                                fontSize: 14.sp,
+                              style: TextStyle(
+                                fontSize: 14,
                                 color: Colors.black,
                               ),
                             ),

@@ -16,29 +16,19 @@ class ViewAssignmnets extends StatefulWidget {
 }
 
 class _ViewAssignmnetsState extends State<ViewAssignmnets> {
-  /// Indicates whether data is still loading.
   bool isLoading = true;
-
-  /// Total number of submissions from the API response.
   int totalSubmissions = 0;
-
-  /// A list of submissions from the API. Each submission is a JSON object.
   List<dynamic> uploads = [];
-
-  /// Token for authorization (fetched from SharedPreferences).
   String? token;
-
-  /// Cache key used to store the API response.
-  String get cacheKey => "assignment_submission_${widget.announcementId}";
 
   @override
   void initState() {
     super.initState();
-    _loadTokenAndCacheData();
+    _loadTokenAndFetchSubmissions();
   }
 
-  /// Loads the token and cached submission data from SharedPreferences.
-  Future<void> _loadTokenAndCacheData() async {
+  /// Loads the token from SharedPreferences and then fetches submissions.
+  Future<void> _loadTokenAndFetchSubmissions() async {
     final prefs = await SharedPreferences.getInstance();
     token = prefs.getString('auth_token');
 
@@ -50,29 +40,12 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
       return;
     }
 
-    // Try to load cached data.
-    final cachedData = prefs.getString(cacheKey);
-    if (cachedData != null) {
-      try {
-        final Map<String, dynamic> assignment = jsonDecode(cachedData);
-        setState(() {
-          totalSubmissions = assignment["total_submissions"] ?? 0;
-          uploads = assignment["uploads"] ?? [];
-          isLoading = false;
-        });
-      } catch (e) {
-        debugPrint("Error decoding cached data: $e");
-      }
-    }
-
-    // Fetch fresh data in background.
     await _fetchSubmissions();
   }
 
-  /// Fetches the submissions for the given announcementId from your API.
   Future<void> _fetchSubmissions() async {
     final String url =
-        "https://admin.uthix.com/api/assignments/${widget.announcementId}/submission";
+        "https://admin.uthix.com/api/assignments/${widget.announcementId}/submissions";
 
     setState(() {
       isLoading = true;
@@ -89,26 +62,16 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
         ),
       );
 
-      // Expected API response structure:
-      // {
-      //   "status": true,
-      //   "assignment": {
-      //       "id": 29,
-      //       "title": "complete differentiation",
-      //       "due_date": "2031-03-25",
-      //       "total_submissions": 3,
-      //       "uploads": [ { ... }, { ... }, { ... } ]
-      //   }
-      // }
+      debugPrint("Response status code: ${response.statusCode}");
+      debugPrint("Response data: ${response.data}");
+
+
       if (response.statusCode == 200 && response.data["status"] == true) {
         final assignment = response.data["assignment"];
         setState(() {
           totalSubmissions = assignment["total_submissions"] ?? 0;
           uploads = assignment["uploads"] ?? [];
         });
-        // Update the cache.
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(cacheKey, jsonEncode(assignment));
       } else {
         debugPrint("Error: Invalid submission response");
       }
@@ -121,11 +84,10 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
     }
   }
 
-  /// Opens the attachment URL using url_launcher.
   Future<void> _openAttachment(String attachmentUrl) async {
     final Uri url = Uri.parse(attachmentUrl);
     if (await canLaunchUrl(url)) {
-      await launchUrl(url);
+      await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {
       debugPrint("Could not launch $attachmentUrl");
     }
@@ -135,90 +97,71 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70.h),
-        child: AppBar(
-          backgroundColor: Colors.white,
-          leading: IconButton(
-            icon: Icon(
-              Icons.arrow_back_ios_outlined,
-              color: Colors.black,
-              size: 25.sp,
-            ),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Column(
-            children: [
-              Text(
-                "All Submissions",
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w600,
-                  color: const Color.fromRGBO(96, 95, 95, 1),
-                ),
-              ),
-              Text(
-                "$totalSubmissions submissions",
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w300,
-                  color: const Color.fromRGBO(96, 95, 95, 1),
-                ),
-              ),
-            ],
-          ),
-          centerTitle: true,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_outlined, color: Colors.black, size: 25.sp),
+          onPressed: () => Navigator.pop(context),
         ),
+        title: Column(
+          children: [
+            Text(
+              "All Submissions",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: const Color.fromRGBO(96, 95, 95, 1),
+              ),
+            ),
+            Text(
+              "$totalSubmissions submissions",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w300,
+                color: const Color.fromRGBO(96, 95, 95, 1),
+              ),
+            ),
+          ],
+        ),
+        centerTitle: true,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : uploads.isEmpty
           ? Center(
-        child: Text(
-          "No submissions found.",
-          style: TextStyle(fontSize: 16.sp),
-        ),
+        child: Text("No submissions found.", style: TextStyle(fontSize: 16)),
       )
           : Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: ListView.builder(
           itemCount: uploads.length,
           itemBuilder: (context, index) {
             final upload = uploads[index];
-
             final student = upload["student"];
             final studentName = student?["name"] ?? "No Name";
             final profileImage = student?["profile_image"];
-            final studentClass = "Class: X B"; // Placeholder
-
-            final submissionDescription = upload["title"] ??
-                (upload["comment"] ?? "No Description");
-
+            // Placeholder as the API doesn't provide class info.
+            final studentClass = "X B";
+            final submissionDescription =
+                upload["title"] ?? (upload["comment"] ?? "No Description");
             final attachments = upload["attachments"] as List<dynamic>? ?? [];
             final hasAttachment = attachments.isNotEmpty;
-            final filePath = hasAttachment
-                ? attachments[0]["file_path"] ?? ""
-                : "";
-            final fileName = filePath.isNotEmpty
-                ? filePath.split("/").last
-                : "No attachment";
+            final filePath = hasAttachment ? attachments[0]["file_path"] ?? "" : "";
+            final fileName = filePath.isNotEmpty ? filePath.split("/").last : "No attachment";
             final attachmentUrl = filePath.isNotEmpty
-                ? "https://admin.uthix.com/$filePath"
+                ? "https://admin.uthix.com/storage/$filePath"
                 : "";
 
             return Padding(
-              padding: EdgeInsets.only(bottom: 15.h),
+              padding: EdgeInsets.only(bottom: 15,),
               child: Container(
-                height: 203.h,
                 decoration: BoxDecoration(
                   color: const Color.fromRGBO(246, 246, 246, 1),
-                  border: Border.all(
-                    color: const Color.fromRGBO(217, 217, 217, 1),
-                  ),
+                  border: Border.all(color: const Color.fromRGBO(217, 217, 217, 1)),
                   borderRadius: BorderRadius.circular(7.r),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(8.h),
+                  padding: EdgeInsets.all(10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -233,12 +176,8 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
                                 : null,
                             child: (profileImage == null)
                                 ? Text(
-                              studentName.isNotEmpty
-                                  ? studentName[0]
-                                  : "N",
-                              style: TextStyle(
-                                  fontSize: 16.sp,
-                                  color: Colors.white),
+                              studentName.isNotEmpty ? studentName[0] : "N",
+                              style: TextStyle(fontSize: 16, color: Colors.white),
                             )
                                 : null,
                           ),
@@ -249,7 +188,7 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
                               Text(
                                 "Name: $studentName",
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.black,
                                 ),
@@ -257,7 +196,7 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
                               Text(
                                 "Class: $studentClass",
                                 style: TextStyle(
-                                  fontSize: 12.sp,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w400,
                                   color: Colors.black54,
                                 ),
@@ -270,7 +209,9 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => Grade(),
+                                  builder: (context) => Grade(
+                                    uploadId: upload["id"].toString(),
+                                  ),
                                 ),
                               );
                             },
@@ -285,7 +226,7 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
                                 child: Text(
                                   "Grade",
                                   style: TextStyle(
-                                    fontSize: 14.sp,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: const Color.fromRGBO(255, 255, 255, 1),
                                   ),
@@ -293,6 +234,7 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
                               ),
                             ),
                           ),
+
                         ],
                       ),
                       SizedBox(height: 20.h),
@@ -300,58 +242,57 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
                       Text(
                         "Description: $submissionDescription",
                         style: TextStyle(
-                          fontSize: 14.sp,
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: Colors.black,
                         ),
                       ),
                       SizedBox(height: 20.h),
-                      // Attachment row.
+                      // Attachment column: each attachment appears on its own line.
                       if (hasAttachment)
-                        GestureDetector(
-                          onTap: () {
-                            if (attachmentUrl.isNotEmpty) {
-                              _openAttachment(attachmentUrl);
-                            }
-                          },
-                          child: Row(
-                            children: [
-                              Container(
-                                height: 26.h,
-                                width: 120.w,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: const Color.fromRGBO(217, 217, 217, 1),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: attachments.map<Widget>((att) {
+                            final filePath = att["file_path"] ?? "";
+                            final fileName = filePath.isNotEmpty ? filePath.split("/").last : "No attachment";
+                            final attachmentUrl = filePath.isNotEmpty
+                                ? "https://admin.uthix.com/storage/$filePath"
+                                : "";
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: 10.h),
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (attachmentUrl.isNotEmpty) {
+                                    _openAttachment(attachmentUrl);
+                                  }
+                                },
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: const Color.fromRGBO(217, 217, 217, 1)),
+                                    borderRadius: BorderRadius.circular(20.r),
+                                    color: Colors.white,
                                   ),
-                                  borderRadius: BorderRadius.circular(13.r),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Transform.rotate(
-                                      angle: 45 * 3.1415927 / 180,
-                                      child: Image.asset(
-                                        "assets/instructor/link.png",
-                                        scale: 2,
-                                        color: const Color.fromRGBO(96, 95, 94, 1),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Text(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Icon(Icons.insert_drive_file, size: 14.sp, color: Colors.grey.shade600),
+                                      Text(
                                         fileName,
                                         style: TextStyle(
-                                          fontSize: 12.sp,
+                                          fontSize: 12,
                                           fontWeight: FontWeight.w300,
                                           color: const Color.fromRGBO(96, 95, 95, 1),
                                         ),
-                                        overflow: TextOverflow.ellipsis,
+                                        overflow: TextOverflow.visible,
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
+                            );
+                          }).toList(),
                         ),
                     ],
                   ),
