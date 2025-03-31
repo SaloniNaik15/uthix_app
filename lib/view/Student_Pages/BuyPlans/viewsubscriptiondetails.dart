@@ -54,9 +54,7 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
                               fontSize: 20.sp, fontWeight: FontWeight.w600),
                         ),
                         SizedBox(height: 10.h),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 40),
-                          child: Column(
+                        Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _buildFeature("Downloadable Materials"),
@@ -64,13 +62,12 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
                               _buildFeature("Unlimited Courses"),
                             ],
                           ),
-                        )
                       ],
                     ),
                   ),
                   SizedBox(height: 20.h), // Spacing before buttons
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Expanded(
                         child: _buildButton("Cancel Subscription", Colors.red),
@@ -101,7 +98,7 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
             Text("Current Plan",
                 style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500)),
             Text("You are currently on the Standard plan",
-                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500)),
+                style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500)),
           ],
         ),
         const Spacer(),
@@ -133,8 +130,8 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
 
   Widget _buildStatusContainer(String text, Color color) {
     return Container(
-      height: 25.h,
-      width: 71.w,
+      height: 20.h,
+      width: 65.w,
       decoration:
           BoxDecoration(color: color, borderRadius: BorderRadius.circular(20)),
       child: Center(
@@ -194,7 +191,7 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+        padding: EdgeInsets.symmetric(horizontal: 5 .w, vertical: 12.h),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),

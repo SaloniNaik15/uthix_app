@@ -104,6 +104,7 @@ class _StudChatState extends State<StudChat> {
     return Stack(
       children: [
         Scaffold(
+          backgroundColor: Colors.white,
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(80.h),
             child: AppBar(
