@@ -107,11 +107,11 @@ class _MyClassesState extends State<MyClasses> {
     }
   }
 
-  // Filter chapters for the given classroom id using the "classroom_id" field.
+  // Filter chapters for the given classroom id using the "instructor_classroom_id" field.
   List<dynamic> get filteredClasses {
     return classes.where((chapter) {
-      if (chapter["classroom_id"] != null) {
-        return chapter["classroom_id"].toString() == widget.classroomId;
+      if (chapter["instructor_classroom_id"] != null) {
+        return chapter["instructor_classroom_id"].toString() == widget.classroomId;
       }
       return false;
     }).toList();
@@ -168,7 +168,7 @@ class _MyClassesState extends State<MyClasses> {
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(
                                     color:
-                                        const Color.fromRGBO(210, 210, 210, 1)),
+                                    const Color.fromRGBO(210, 210, 210, 1)),
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
@@ -187,7 +187,7 @@ class _MyClassesState extends State<MyClasses> {
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
                                       color:
-                                          const Color.fromRGBO(96, 95, 95, 1),
+                                      const Color.fromRGBO(96, 95, 95, 1),
                                     ),
                                   ),
                                 ),
@@ -257,7 +257,7 @@ class _MyClassesState extends State<MyClasses> {
                                 const SizedBox(height: 30),
                                 Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
                                   children: [
                                     Container(
                                       height: 37,
@@ -362,7 +362,6 @@ class _MyClassesState extends State<MyClasses> {
                     color: Colors.white,
                   ),
                 ),
-
               ],
             ),
           ),
@@ -371,158 +370,137 @@ class _MyClassesState extends State<MyClasses> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : filteredClasses.isEmpty
-              ? Center(
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              "assets/instructor/UnableToLoadData.png",
+              width: 250,
+              height: 250,
+            ),
+            SizedBox(height: 20.h),
+            Text(
+              "You don't have any chapter for this class.",
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      )
+          : ListView.builder(
+        itemCount: filteredClasses.length,
+        itemBuilder: (context, index) {
+          final classItem = filteredClasses[index];
+          final classId = classItem['id'].toString();
+          return Padding(
+            padding: const EdgeInsets.only(
+                top: 15, left: 20, right: 20, bottom: 15),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        InstructorClass(classId: classId),
+                  ),
+                );
+              },
+              child: Container(
+                width: double.infinity,
+                height: 130.h,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color.fromRGBO(217, 217, 217, 1),
+                  ),
+                  color: const Color.fromRGBO(246, 246, 246, 1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset(
-                        "assets/instructor/UnableToLoadData.png",
-                        width: 250,
-                        height: 250,
+                      Container(
+                        height: 45,
+                        width: double.infinity,
+                        child: Row(
+                          children: [
+                            Text(
+                              "Chapter: ",
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 8.w,
+                            ),
+                            Expanded(
+                              child: Text(
+                                classItem['title'] ?? "No title",
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      SizedBox(height: 20.h),
-                      Text(
-                        "You don't have any chapter for this class.",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.bold,
+                      SizedBox(height: 25.h),
+                      // "Add Participant" button aligned at the bottom right.
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: GestureDetector(
+                          onTap: () {
+                            showCenteredModal();
+                          },
+                          child: Container(
+                            height: 40.h,
+                            width: 150.w,
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(255, 255, 255, 1),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: const Color.fromRGBO(43, 92, 116, 1),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.center,
+                              children: const [
+                                Icon(
+                                  Icons.add,
+                                  color: Color.fromRGBO(43, 92, 116, 1),
+                                ),
+                                SizedBox(width: 2),
+                                Text(
+                                  "Add Participant",
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color.fromRGBO(43, 92, 116, 1),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                )
-              : ListView.builder(
-                  itemCount: filteredClasses.length,
-                  itemBuilder: (context, index) {
-                    final classItem = filteredClasses[index];
-                    final classId = classItem['id'].toString();
-                    return Padding(
-                      padding: const EdgeInsets.only(
-                          top: 15, left: 20, right: 20, bottom: 15),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => InstructorClass(classId: classId),
-                            ),
-                          );
-
-                        },
-                          child: Container(
-                            width: double.infinity,
-                            height: 130.h,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color.fromRGBO(217, 217, 217, 1),
-                              ),
-                              color: const Color.fromRGBO(246, 246, 246, 1),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    height: 40.h,
-                                    width: double.infinity,
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          "Chapter: ",
-                                          style: TextStyle(
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        SizedBox(width: 8.w,),
-                                        Expanded(
-                                          child: Text(
-                                            classItem['title'] ?? "No title",
-                                            style: TextStyle(
-                                              fontSize: 14.sp,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                        PopupMenuButton<String>(
-                                          color: Colors.white,
-                                          onSelected: (value) {
-                                            if (value == 'view_submission') {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => const Submission(),
-                                                ),
-                                              );
-                                            }
-                                          },
-                                          itemBuilder: (BuildContext context) {
-                                            return [
-                                              PopupMenuItem<String>(
-                                                value: 'view_submission',
-                                                child: Text("View Submission"),
-                                              ),
-                                            ];
-                                          },
-                                          icon: const Icon(Icons.more_vert),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(height: 25.h),
-                                  // "Add Participant" button aligned at the bottom right.
-                                  Align(
-                                    alignment: Alignment.bottomRight,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        showCenteredModal();
-                                      },
-                                      child: Container(
-                                        height: 40.h,
-                                        width: 150.w,
-                                        decoration: BoxDecoration(
-                                          color: const Color.fromRGBO(255, 255, 255, 1),
-                                          borderRadius: BorderRadius.circular(10),
-                                          border: Border.all(
-                                            color: const Color.fromRGBO(43, 92, 116, 1),
-                                            width: 1,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: const [
-                                            Icon(
-                                              Icons.add,
-                                              color: Color.fromRGBO(43, 92, 116, 1),
-                                            ),
-                                            SizedBox(width: 2),
-                                            Text(
-                                              "Add Participant",
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500,
-                                                color: Color.fromRGBO(43, 92, 116, 1),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-
-
-                      ),
-                    );
-                  },
                 ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
