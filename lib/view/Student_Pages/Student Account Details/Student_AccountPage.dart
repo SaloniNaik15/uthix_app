@@ -170,9 +170,9 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                           },
                           style: FilledButton.styleFrom(
                             backgroundColor: Color(0xFF2B5C74),
-                            padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.r),
+                              borderRadius: BorderRadius.circular(25),
                             ),
                           ),
                           child: Text(
