@@ -37,7 +37,7 @@ class MainApp extends StatelessWidget {
             textTheme: GoogleFonts.urbanistTextTheme(),
           ),
           // home: Introscreen(),
-          home: Introscreen(),
+          home: child,
           // home: Roleselection(),
           // home: SellerDashboard(),
           // home: InstructorDashboard(),
@@ -47,7 +47,9 @@ class MainApp extends StatelessWidget {
           //home: InstructorDashboard(),
           //home: ECommerce(),
         );
+
       },
+        child: Introscreen(),
     );
   }
 }

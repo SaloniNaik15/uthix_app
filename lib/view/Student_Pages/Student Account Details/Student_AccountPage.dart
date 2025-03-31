@@ -16,6 +16,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../Logout.dart';
 import '../../homeRegistration/registration.dart';
+import '../BuyPlans/buyplans.dart';
+import '../BuyPlans/viewsubscriptiondetails.dart';
 import '../Buy_Books/Coupons.dart';
 import '../Buy_Books/Wishlist.dart';
 import 'Order_Tracking.dart';
@@ -39,15 +41,6 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
   int selectedIndex = 4;
   String? accessLoginToken;
   String? userName;
-
-  final List<Map<String, dynamic>> dashBoard = [
-    {"image": "assets/Student_Home_icons/Buy_Books.png", "title": "BUY BOOKS"},
-    {"image": "assets/Student_Home_icons/My_Classes.png", "title": "MY CLASSES"},
-    {"image": "assets/Student_Home_icons/My_Progress.png", "title": "MY PROGRESS"},
-    {"image": "assets/Student_Home_icons/Community.png", "title": "COMMUNITY"},
-    {"image": "assets/Student_Home_icons/Modern_tools.png", "title": "MODERN TOOLS"},
-    {"image": "assets/Student_Home_icons/Demo_Classes.png", "title": "DEMO CLASSES"},
-  ];
 
   @override
   void initState() {
@@ -151,22 +144,50 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 100), // Space for navbar
+            padding: const EdgeInsets.only(bottom: 85), // Space for navbar
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   Padding(
-                    padding: EdgeInsets.only(left: 20),
-                    child: Text(
-                      "Your Profile",
-                      style: TextStyle(
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.bold,
+                  Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 20),
+                        child: Text(
+                          "Your Profile",
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    ),
+                      Spacer(),
+                      Padding(
+                        padding: EdgeInsets.only(right: 20),
+                        child: FilledButton(
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> BuyPlans()));
+                          },
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Color(0xFF2B5C74),
+                            padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 10.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                          ),
+                          child: Text(
+                            "Buy Plan",
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                      ),
+                    ],
                   ),
-                   SizedBox(height: 10.h),
+                  SizedBox(height: 10.h),
                   Container(
                     height: 130,
                     width: 420,
@@ -229,7 +250,8 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                       decoration: BoxDecoration(
                         color: const Color(0xFFF4F4F4),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: const Color(0xFFD9D9D9), width: 1),
+                        border: Border.all(
+                            color: const Color(0xFFD9D9D9), width: 1),
                       ),
                       padding: const EdgeInsets.all(10),
                       child: Column(
@@ -242,10 +264,14 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                             mainAxisSpacing: 10,
                             childAspectRatio: 3.5,
                             children: [
-                              _buildGridItem(Icons.inventory_2_outlined, "Orders", context, UnderConstructionScreen()),
-                              _buildGridItem(Icons.local_offer_outlined, "Coupons", context, CouponsScreen()),
-                              _buildGridItem(Icons.favorite_border, "Wishlist", context, UnderConstructionScreen()),
-                              _buildGridItem(Icons.person_outline, "Profile", context, StudentProfile()),
+                              _buildGridItem(Icons.inventory_2_outlined,
+                                  "Orders", context, UnderConstructionScreen()),
+                              _buildGridItem(Icons.local_offer_outlined,
+                                  "Coupons", context, CouponsScreen()),
+                              _buildGridItem(Icons.favorite_border, "Wishlist",
+                                  context, UnderConstructionScreen()),
+                              _buildGridItem(Icons.person_outline, "Profile",
+                                  context, StudentProfile()),
                             ],
                           ),
                           const SizedBox(height: 10),
@@ -263,7 +289,8 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                               _buildListTile(
                                 icon: Icons.wallet_outlined,
                                 title: "Wallet",
-                                subtitle: "Wallet money & saved payment methods",
+                                subtitle:
+                                    "Wallet money & saved payment methods",
                                 navigateTo: StudentWallet(),
                                 context: context,
                               ),
@@ -304,7 +331,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                                 icon: Icons.currency_exchange_outlined,
                                 title: "Subscription Details",
                                 subtitle: "You can see the plans details",
-                                navigateTo: UnderConstructionScreen(),
+                                navigateTo: ViewSubscriptionDetails(),
                                 context: context,
                               ),
                             ],
@@ -332,8 +359,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                         child: const Text(
                           "Log out",
                           style: TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold),
+                              color: Colors.red, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -370,17 +396,21 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
       leading: Icon(icon, color: Colors.black),
       title: Text(title),
       subtitle: subtitle.isNotEmpty ? Text(subtitle) : null,
-      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
+      trailing:
+          const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => navigateTo));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => navigateTo));
       },
     );
   }
 
-  Widget _buildGridItem(IconData icon, String title, BuildContext context, Widget navigateTo) {
+  Widget _buildGridItem(
+      IconData icon, String title, BuildContext context, Widget navigateTo) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => navigateTo));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => navigateTo));
       },
       child: Center(
         child: ListTile(

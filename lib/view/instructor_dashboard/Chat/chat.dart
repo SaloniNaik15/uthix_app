@@ -1,6 +1,10 @@
+import 'dart:developer';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/UpcomingPage.dart';
 import 'package:uthix_app/modal/nav_items.dart';
 import 'package:uthix_app/modal/navbarWidgetInstructor.dart';
@@ -19,6 +23,10 @@ class Chat extends StatefulWidget {
 
 class _ChatState extends State<Chat> {
   int selectedIndex = 2;
+  String? accessLoginToken;
+  List<dynamic> messages = [];
+  bool isLoading = true;
+  bool hasError = false;
 
   void onItemTapped(int index) {
     setState(() {
@@ -36,7 +44,57 @@ class _ChatState extends State<Chat> {
       });
     }
   }
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
 
+  Future<void> _initializeData() async {
+    await _loadUserCredentials();
+    await fetchMessages();
+  }
+  Future<void> fetchMessages() async {
+    try {
+      Dio dio = Dio();
+
+      final response = await dio.get(
+        'https://admin.uthix.com/api/get-messages',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessLoginToken', // Replace with actual token
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      log("Response Body: ${response.data}");
+
+      if (response.statusCode == 200) {
+        setState(() {
+          messages = response.data['messages'];
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load messages');
+      }
+    } catch (e) {
+      log("Error fetching messages: $e");
+      setState(() {
+        hasError = true;
+        isLoading = false;
+      });
+    }
+  }
+  Future<void> _loadUserCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token'); // Retrieve token
+    log("Retrieved Token: $token"); // Log token for verification
+
+    setState(() {
+      accessLoginToken = token;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -68,96 +126,153 @@ class _ChatState extends State<Chat> {
           body: Stack(
             clipBehavior: Clip.none,
             children: [
-              Padding(
-                padding: EdgeInsets.only(bottom: 70.h, top: 40.h),
-                child: ListView.builder(
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PersonalChat()),
-                        );
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 10.h, horizontal: 20.w),
-                        child: Row(
-                          children: [
-                            ClipOval(
-                              child: Image.asset(
-                                "assets/login/profile.jpeg",
-                                width: 50.w,
-                                height: 50.h,
-                                fit: BoxFit.cover,
+              Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Expanded(
+                    // <-- Added to take remaining space
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      physics: BouncingScrollPhysics(), // Adds smooth scrolling
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        final message = messages[index];
+                        final senderName =
+                            message['receiver']?['name'] ?? "Unknown";
+                        final messageText = message['message'] ?? "";
+                        final isRead = message['is_read'] == 1;
+                        final createdAt = message['created_at'] ?? "";
+                        final formattedDate = createdAt.contains('T')
+                            ? createdAt.split('T')[0]
+                            : createdAt;
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PersonalChat(
+                                    conversationId: message['receiver']['id']),
                               ),
-                            ),
-                            SizedBox(width: 10.w),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text("Name",
-                                          style: TextStyle(
-                                              fontSize: 14.sp,
-                                              fontWeight: FontWeight.w500)),
-                                      const Spacer(),
-                                      Text("Date",
-                                          style:TextStyle(
-                                              fontSize: 14.sp,
-                                              fontWeight: FontWeight.w500)),
-                                    ],
-                                  ),
-                                  SizedBox(height: 5.h),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          "Lorem ipsum dolor sit amet",
-                                          style: TextStyle(
-                                            fontSize: 12.sp,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 60,
+                                  height: 60,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(1.0),
+                                    child: ClipOval(
+                                      child: Image.asset(
+                                        "assets/login/profile.jpeg",
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                            Icon(Icons.person,
+                                                size: 50,
+                                                color: Colors.grey),
                                       ),
-                                      Container(
-                                        height: 20.h,
-                                        width: 20.w,
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color:
-                                              Color.fromRGBO(51, 152, 246, 1),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            "1",
-                                            style: TextStyle(
-                                              fontSize: 10.sp,
-                                              fontWeight: FontWeight.w400,
-                                              color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              senderName,
+                                              style: GoogleFonts.urbanist(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.black,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
                                             ),
                                           ),
-                                        ),
+                                          Text(
+                                            formattedDate,
+                                            style: GoogleFonts.urbanist(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.black54,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              messageText,
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                              style: GoogleFonts.urbanist(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                          ),
+                                          if (!isRead)
+                                            Container(
+                                              height: 22,
+                                              width: 22,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Color.fromRGBO(
+                                                    51, 152, 246, 1),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  "1",
+                                                  style: GoogleFonts.urbanist(
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              Positioned(
+                bottom: 15,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Navbar(
+                    onItemTapped: onItemTapped,
+                    selectedIndex: selectedIndex,
+                  ),
                 ),
               ),
               Positioned(
-                bottom: 100.h,
-                right: 30.w,
+                bottom: 100,
+                right: 30,
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -166,34 +281,35 @@ class _ChatState extends State<Chat> {
                     );
                   },
                   child: Container(
-                    height: 60.h,
-                    width: 60.w,
+                    height: 64,
+                    width: 64,
                     decoration: BoxDecoration(
-                      color: const Color.fromRGBO(43, 92, 116, 1),
-                      shape: BoxShape.circle,
+                      color: Color.fromRGBO(43, 92, 116, 1),
+                      borderRadius: BorderRadius.circular(32),
                       boxShadow: [
                         BoxShadow(
-                            color: Colors.black.withOpacity(0.06),
-                            blurRadius: 8),
+                          color: Colors.black.withOpacity(0.06),
+                          offset: const Offset(0, 4),
+                          blurRadius: 8,
+                        ),
                         BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
-                            blurRadius: 4),
+                          color: Colors.black.withOpacity(0.04),
+                          offset: const Offset(0, 0),
+                          blurRadius: 4,
+                        ),
                       ],
                     ),
-                    child: Center(
-                      child: Icon(Icons.chat_bubble,
-                          size: 25.sp, color: Colors.white),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Icon(Icons.chat_bubble, size: 30, color: Colors.white),
+                        Center(
+                          child: Icon(Icons.add,
+                              size: 20, color: Color.fromRGBO(43, 92, 116, 1)),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ),
-              Positioned(
-                bottom: 15.h,
-                left: 0,
-                right: 0,
-                child: Center(
-                  child: Navbar(
-                      onItemTapped: onItemTapped, selectedIndex: selectedIndex),
                 ),
               ),
             ],

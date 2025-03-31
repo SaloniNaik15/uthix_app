@@ -85,7 +85,7 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80.h),
+        preferredSize: Size.fromHeight(70),
         child: Stack(
           children: [
             AppBar(
@@ -116,7 +116,7 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(10.w),
+          padding: EdgeInsets.all(10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -151,7 +151,7 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
                   hintStyle: TextStyle(fontSize: 14.sp),
                   fillColor: const Color(0xFFF6F6F6),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.r),
+                    borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide(color: const Color(0xFFD2D2D2), width: 1.w),
                   ),
                 ),
@@ -169,8 +169,8 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
                   fillColor: const Color(0xFFF6F6F6),
                   hintStyle: TextStyle(fontSize: 14.sp),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.r),
-                    borderSide: BorderSide(color: const Color(0xFFD2D2D2), width: 1.w),
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(color: const Color(0xFFD2D2D2), width: 1),
                   ),
                 ),
                 textAlign: TextAlign.left,
@@ -181,10 +181,10 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
                 alignment: Alignment.center,
                 child: Text("We will answer your query asap.", style: TextStyle(fontSize: 14.sp)),
               ),
-              SizedBox(height: 70.h),
+              SizedBox(height: 60.h),
               Center(
                 child: Padding(
-                  padding: EdgeInsets.only(bottom: 10.h),
+                  padding: EdgeInsets.only(bottom: 10),
                   child: SizedBox(
                     height: 50.h,
                     width: 100.w,
@@ -192,7 +192,7 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
                       style: FilledButton.styleFrom(
                         backgroundColor: const Color(0xFF605F5F),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.r),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       onPressed: isLoading ? null : submitQuery,

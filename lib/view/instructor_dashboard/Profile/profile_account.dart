@@ -87,7 +87,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, size: 25.sp),
+          icon: Icon(Icons.arrow_back_ios, size: 20),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -103,7 +103,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
             child: Stack(
               children: [
                 Padding(
-                  padding: EdgeInsets.only(left: 30.w),
+                  padding: EdgeInsets.only(left: 30),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -111,17 +111,17 @@ class _ProfileAccountState extends State<ProfileAccount> {
                       Text(
                         "$instructorName",
                         style: TextStyle(
-                          fontSize: 20.sp,
+                          fontSize: 20,
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
                         ),
                       ),
                       SizedBox(
-                        width: 220.w,
+                        width: 220,
                         child: Text(
                           "Congratulations! You are member now",
                           style: TextStyle(
-                            fontSize: 14.sp,
+                            fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: Colors.black,
                           ),
@@ -132,33 +132,33 @@ class _ProfileAccountState extends State<ProfileAccount> {
                 ),
                 Positioned(
                   top: 0,
-                  left: 260.w,
+                  left: 280,
                   child: Transform.rotate(
                     angle: -1.12 * (3.14159 / 180),
                     child: Image.asset(
                       'assets/instructor/premium.png',
-                      width: 128.w,
-                      height: 130.h,
+                      width: 128,
+                      height: 130,
                     ),
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 40.h),
+          SizedBox(height: 35),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.w),
+            padding: EdgeInsets.symmetric(horizontal: 10),
             child: Container(
-              height: 370.h,
+              height: 370,
               width: MediaQuery.sizeOf(context).width,
               decoration: BoxDecoration(
                 color: Color(0xFFFCFCFC),
                 border: Border.all(color: Color(0xFFD9D9D9)),
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: ListView.separated(
                 physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.only(top: 10.h),
+                padding: EdgeInsets.only(top: 5, bottom: 5),
                 itemCount: menuItems.length,
                 separatorBuilder: (_, __) =>
                     Divider(thickness: 1, color: Color(0xFFD2D2D2)),
@@ -200,18 +200,18 @@ class _ProfileAccountState extends State<ProfileAccount> {
                     },
                     child: Padding(
                       padding: EdgeInsets.symmetric(
-                          horizontal: 30.w, vertical: 10.h),
+                          horizontal: 20, vertical: 10),
                       child: Row(
                         children: [
-                          Image.asset(item["icon"]!, width: 24.w, height: 24.h),
-                          SizedBox(width: 15.w),
+                          Image.asset(item["icon"]!, width: 24, height: 24),
+                          SizedBox(width: 15),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 item["title"]!,
                                 style: TextStyle(
-                                    fontSize: 14.sp,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.black),
                               ),
@@ -219,7 +219,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
                                 Text(
                                   item["subtitle"]!,
                                   style: TextStyle(
-                                      fontSize: 14.sp,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       color: Colors.black),
                                 ),
@@ -233,11 +233,11 @@ class _ProfileAccountState extends State<ProfileAccount> {
               ),
             ),
           ),
-          SizedBox(height: 30.h),
+          SizedBox(height: 30),
           Padding(
             padding: const EdgeInsets.all(10),
             child: SizedBox(
-              height: 50.h,
+              height: 50,
               width: MediaQuery.sizeOf(context).width,
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
@@ -253,7 +253,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
                   "Log out",
                   style: TextStyle(
                       color: Colors.red,
-                      fontSize: 14.sp,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold),
                 ),
               ),

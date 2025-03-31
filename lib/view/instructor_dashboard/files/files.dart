@@ -80,14 +80,16 @@ class _FilesState extends State<Files> {
         title: Text(
           "Files",
           style: TextStyle(
-            fontSize: 18.sp,
+            fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 25),
-          onPressed: () {},
+          icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 20.sp),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         actions: [
           IconButton(
@@ -111,7 +113,7 @@ class _FilesState extends State<Files> {
           Column(
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.w),
+                padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -119,7 +121,7 @@ class _FilesState extends State<Files> {
                     Text(
                       "The class recordings and files uploaded by you will appear here",
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 12.sp,
                         fontWeight: FontWeight.w400,
                         color: const Color.fromRGBO(96, 95, 95, 1),
                       ),
@@ -142,7 +144,7 @@ class _FilesState extends State<Files> {
                             Text(
                               "Selected Class",
                               style: TextStyle(
-                                fontSize: 14.sp,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: const Color.fromRGBO(96, 95, 95, 1),
                               ),
@@ -156,20 +158,24 @@ class _FilesState extends State<Files> {
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: List.generate(
                           sortOptions.length,
-                          (index) => GestureDetector(
+                          (index) => Padding(
+                            padding: EdgeInsets.only(
+                                right:
+                                index < sortOptions.length - 1 ? 10 : 0),
+                            child :GestureDetector(
                             onTap: () {
                               setState(() {
                                 selectedIndex = index;
                               });
                             },
                             child: Container(
-                              height: 40.h,
+                              height: 45.h,
                               width: 100.w,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(38.r),
+                                borderRadius: BorderRadius.circular(38),
                                 color: selectedIndex == index
                                     ? Color.fromRGBO(43, 92, 116, 1)
                                     : Colors.transparent,
@@ -194,21 +200,22 @@ class _FilesState extends State<Files> {
                         ),
                       ),
                     ),
+                    )
                   ],
                 ),
               ),
               SizedBox(height: 10.h),
               Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      bottom: 70.h), // Prevents overlap with navbar
+                // child: Padding(
+                //   padding: EdgeInsets.only(
+                //       bottom: 70.h), // Prevents overlap with navbar
                   child: ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 30.w),
+                    padding: EdgeInsets.symmetric(horizontal: 10),
                     itemCount: files.length,
                     itemBuilder: (context, index) {
                       final file = files[index];
                       return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.h),
+                        padding: EdgeInsets.symmetric(vertical: 8),
                         child: GestureDetector(
                           onTap: () {
                             if (file["title"] == "Recordings") {
@@ -229,7 +236,7 @@ class _FilesState extends State<Files> {
                                   fit: BoxFit.cover,
                                 ),
                               ),
-                              SizedBox(width: 30.w),
+                              SizedBox(width: 30),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,7 +244,7 @@ class _FilesState extends State<Files> {
                                     Text(
                                       file["title"]!,
                                       style: TextStyle(
-                                        fontSize: 14.sp,
+                                        fontSize: 16.sp,
                                         fontWeight: FontWeight.w500,
                                         color: const Color.fromRGBO(0, 0, 0, 1),
                                       ),
@@ -260,12 +267,12 @@ class _FilesState extends State<Files> {
                     },
                   ),
                 ),
-              ),
+              // ),
             ],
           ),
           // Fixed Bottom Navigation Bar inside Stack
           Positioned(
-            bottom: 15.h,
+            bottom: 15,
             left: 0,
             right: 0,
             child: Center(

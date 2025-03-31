@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PersonalChat extends StatefulWidget {
-  const PersonalChat({Key? key}) : super(key: key);
+  const PersonalChat({Key? key, required conversationId}) : super(key: key);
 
   @override
   State<PersonalChat> createState() => _PersonalChatState();
