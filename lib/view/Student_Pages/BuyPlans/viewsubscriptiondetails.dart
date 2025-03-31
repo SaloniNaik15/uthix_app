@@ -29,7 +29,7 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(10.0),
-              decoration: BoxDecoration(color: const Color(0xFFF1EBEB)),
+              decoration: BoxDecoration(color: const Color(0xFFF6F6F6)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
