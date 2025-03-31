@@ -1,5 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer';
 
 class StudNewchart extends StatefulWidget {
   const StudNewchart({super.key});
@@ -11,34 +14,67 @@ class StudNewchart extends StatefulWidget {
 class _NewChatState extends State<StudNewchart> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-
-  List<String> allStudContacts = [
-    "Alice",
-    "Bob",
-    "Charlie",
-    "David",
-    "Eve",
-    "Frank",
-    "Grace"
-  ];
+  String? accessLoginToken;
+  List<String> allStudContacts = [];
   List<String> filteredContacts = [];
+  final Dio _dio = Dio();
+  final String _apiUrl = "https://admin.uthix.com/api/get-all-user";
 
   @override
   void initState() {
     super.initState();
-    filteredContacts = List.from(allStudContacts);
+    _initializeData();
+    _controller.addListener(_onSearchChanged);
   }
 
-  void _filterContacts(String query) {
+  Future<void> _initializeData() async {
+    await _loadUserCredentials();
+    await _fetchContacts();
+  }
+
+  void _onSearchChanged() {
+    _fetchContacts(_controller.text); // Fetch contacts based on input
+  }
+
+  Future<void> _loadUserCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token'); // Retrieve token
+    log("Retrieved Token: $token"); // Log token for verification
+
     setState(() {
-      filteredContacts = allStudContacts
-          .where((name) => name.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      accessLoginToken = token;
     });
+  }
+
+  Future<void> _fetchContacts([String query = ""]) async {
+    try {
+      String searchUrl = _apiUrl;
+      if (query.isNotEmpty) {
+        searchUrl = "$_apiUrl?name=$query"; // Append search query dynamically
+      }
+
+      Response response = await _dio.get(
+        searchUrl,
+        options:
+            Options(headers: {"Authorization": "Bearer $accessLoginToken"}),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> users = response.data["users"];
+        setState(() {
+          allStudContacts =
+              users.map((user) => user["name"].toString()).toList();
+          filteredContacts = List.from(allStudContacts);
+        });
+      }
+    } catch (e) {
+      print("Error fetching contacts: $e");
+    }
   }
 
   @override
   void dispose() {
+    _controller.removeListener(_onSearchChanged);
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -113,7 +149,6 @@ class _NewChatState extends State<StudNewchart> {
             child: TextField(
               controller: _controller,
               focusNode: _focusNode,
-              onChanged: _filterContacts,
               decoration: InputDecoration(
                 hintText: "Enter recipient",
                 border: const UnderlineInputBorder(
@@ -179,48 +214,6 @@ class _NewChatState extends State<StudNewchart> {
                             color: const Color.fromRGBO(0, 0, 0, 1),
                           ),
                         ),
-                        const Spacer(),
-                        Text(
-                          "Date",
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: const Color.fromRGBO(0, 0, 0, 1),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            "Lorem ipsum dolor sit amet",
-                            style: GoogleFonts.urbanist(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: const Color.fromRGBO(0, 0, 0, 1),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          height: 22,
-                          width: 22,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color.fromRGBO(51, 152, 246, 1),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "1",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ],
@@ -246,28 +239,6 @@ class _NewChatState extends State<StudNewchart> {
   }
 
   Widget _buildIcon(IconData icon, VoidCallback onTap) {
-    return Container(
-      height: 40,
-      width: 40,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            offset: const Offset(0, 4),
-            blurRadius: 8,
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            offset: const Offset(0, 0),
-            blurRadius: 4,
-          ),
-        ],
-      ),
-      child: Center(
-        child: IconButton(icon: Icon(icon, size: 25), onPressed: onTap),
-      ),
-    );
+    return IconButton(icon: Icon(icon, size: 25), onPressed: onTap);
   }
 }
