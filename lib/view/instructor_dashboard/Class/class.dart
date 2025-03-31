@@ -7,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart'; // For opening attachment URLs
 // Remove or adjust these imports if they're not in your project:
+import '../submission/submission.dart';
+import '../submission/view_assignmnets.dart';
 import 'live_classes.dart';
 import 'new_announcement.dart';
 
@@ -270,7 +272,7 @@ class _InstructorClassState extends State<InstructorClass> {
                             Text(
                               "Announce something to your class",
                               style: TextStyle(
-                                fontSize: 14.sp,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: const Color.fromRGBO(142, 140, 140, 1),
                               ),
@@ -305,11 +307,10 @@ class _InstructorClassState extends State<InstructorClass> {
                           final instructorName = mentorName;
                           final titleText = announcement["title"] ?? "No Title";
                           final attachments = announcement["attachments"] as List<dynamic>;
+                          final announcementId = announcement["id"].toString();
 
                           return GestureDetector(
-                            onTap: () {
-                              // Navigate to detailed view if required.
-                            },
+                            onTap: () {},
                             child: Container(
                               width: 400.h,
                               margin: const EdgeInsets.symmetric(
@@ -346,6 +347,31 @@ class _InstructorClassState extends State<InstructorClass> {
                                             fontWeight: FontWeight.w500,
                                             color: Colors.black,
                                           ),
+                                        ),
+                                        Spacer(),
+                                        PopupMenuButton<String>(
+                                          color: Colors.white,
+                                          onSelected: (value) {
+                                            if (value == 'view_submission') {
+                                              Navigator.push(
+                                                context,
+                                                  MaterialPageRoute(
+                                                  builder: (context) => ViewAssignmnets(
+                                                announcementId: announcementId,
+                                              ),
+                                              ),
+                                              );
+                                            }
+                                          },
+                                          itemBuilder: (BuildContext context) {
+                                            return [
+                                              PopupMenuItem<String>(
+                                                value: 'view_submission',
+                                                child: Text("View Submission"),
+                                              ),
+                                            ];
+                                          },
+                                          icon: const Icon(Icons.more_vert),
                                         ),
                                       ],
                                     ),

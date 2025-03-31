@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Newclass extends StatefulWidget {
-  final String classroomId; // Receive the classroom ID dynamically
+  final String classroomId;
 
   const Newclass({Key? key, required this.classroomId}) : super(key: key);
 
@@ -69,7 +69,7 @@ class _NewclassState extends State<Newclass> {
 
     debugPrint("Request Data: ${jsonEncode(requestData)}");
 
-    // Build the endpoint using the classroomId.
+
     final String endpoint =
         "https://admin.uthix.com/api/class-chapter/${widget.classroomId}";
 
