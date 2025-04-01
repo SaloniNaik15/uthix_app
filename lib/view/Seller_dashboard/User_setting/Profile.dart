@@ -86,11 +86,6 @@ class _ManageProfileState extends State<Profile> {
   }
 
   Future<void> updateProfile(String field, String value) async {
-    if (profileData == null) {
-      log("❌ Cannot update profile: Profile data is missing");
-      return;
-    }
-
     log("🛠️ Sending Update Request...");
 
     final Map<String, dynamic> requestData = {

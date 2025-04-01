@@ -34,10 +34,7 @@ class _Forgot1State extends State<Forgot1> {
       if (response.statusCode == 200) {
         // Show a success SnackBar and then navigate after it is closed
         final snackBar = SnackBar(content: Text("Code sent successfully"));
-        ScaffoldMessenger.of(context)
-            .showSnackBar(snackBar)
-            .closed
-            .then((_) {
+        ScaffoldMessenger.of(context).showSnackBar(snackBar).closed.then((_) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const Forgot2()),
@@ -48,7 +45,7 @@ class _Forgot1State extends State<Forgot1> {
           SnackBar(content: Text("Error: ${response.statusMessage}")),
         );
       }
-    } on DioError catch (dioError) {
+    } on DioException catch (dioError) {
       String errorMessage = "An error occurred";
       if (dioError.response != null) {
         errorMessage = "Error: ${dioError.response?.statusMessage}";
@@ -102,7 +99,7 @@ class _Forgot1State extends State<Forgot1> {
                       Image.asset(
                         "assets/registration/book.png",
                         width: 90.w,
-                        height:114.h,
+                        height: 114.h,
                       ),
                       SizedBox(height: 50.h),
                       Text(
