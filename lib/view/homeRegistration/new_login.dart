@@ -31,8 +31,10 @@ class _NewLoginState extends State<NewLogin> {
   final TextEditingController _emailIdController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool ispassword = true;
-
-  Future<void> saveUserSession(String token, String role) async {
+  Future<void> saveUserSession(
+    String token,
+    String role,
+  ) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('auth_token', token);
     await prefs.setString('user_role', role);
@@ -85,9 +87,9 @@ class _NewLoginState extends State<NewLogin> {
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         log("Stored Token: ${prefs.getString('auth_token')}, Role: ${prefs.getString('user_role')}");
+        
 
         Widget nextScreen;
-
         if (role == 'seller') {
           nextScreen = SellerDashboard();
         } else if (role == 'instructor') {
@@ -110,9 +112,7 @@ class _NewLoginState extends State<NewLogin> {
           ),
         );
       }
-
     } on DioError catch (dioError) {
-      // 👇 Handle specific API failure
       if (dioError.response != null) {
         log("Dio Error Response: ${dioError.response?.data}");
         final data = dioError.response?.data;
@@ -134,7 +134,6 @@ class _NewLoginState extends State<NewLogin> {
           );
         }
       } else {
-        // 👇 Network error / timeout
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -145,13 +144,12 @@ class _NewLoginState extends State<NewLogin> {
         );
       }
     } catch (e) {
-      // 👇 Fallback for any other unexpected errors
       log("Unexpected Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             "An unexpected error occurred. Please try again.",
-         style: GoogleFonts.urbanist(),
+            style: GoogleFonts.urbanist(),
           ),
         ),
       );
@@ -201,7 +199,7 @@ class _NewLoginState extends State<NewLogin> {
                             Image.asset(
                               "assets/registration/book.png",
                               width: 90.w,
-                              height:114.h,
+                              height: 114.h,
                               fit: BoxFit.cover,
                             ),
                             SizedBox(height: 20.h),
@@ -222,100 +220,99 @@ class _NewLoginState extends State<NewLogin> {
                                 color: Colors.black,
                               ),
                             ),
-                              SizedBox(height: 20.h),
-                              _buildTextField(
-                                  controller: _emailIdController,
-                                  hint: "Enter your Email"),
-                              SizedBox(height: 20.h),
-                              _buildPasswordField(),
-                              SizedBox(height: 20.h),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => Forgot1(),
-                                    ),
-                                  );
-                                },
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(right: 10.w),
-                                    child: Text(
-                                      "Forgot Password",
-                                      style: GoogleFonts.urbanist(
-                                        fontSize: 10.sp,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.blue,
-                                      ),
-                                    ),
+                            SizedBox(height: 20.h),
+                            _buildTextField(
+                                controller: _emailIdController,
+                                hint: "Enter your Email"),
+                            SizedBox(height: 20.h),
+                            _buildPasswordField(),
+                            SizedBox(height: 20.h),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Forgot1(),
                                   ),
-                                ),
-                              ),
-                              SizedBox(height: 25.h),
-                              GestureDetector(
-                                onTap: _login,
-                                child: Container(
-                                  height: 45.h,
-                                  width: MediaQuery.of(context).size.width / 1.5,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(25.r),
-                                    color: Color.fromRGBO(27, 97, 122, 1),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      "Login",
-                                      style: GoogleFonts.urbanist(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 45.h),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => Registration(),
-                                    ),
-                                  );
-                                },
-                                child: Text.rich(
-                                  TextSpan(
-                                    text: "Already have an account? ",
+                                );
+                              },
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Padding(
+                                  padding: EdgeInsets.only(right: 10.w),
+                                  child: Text(
+                                    "Forgot Password",
                                     style: GoogleFonts.urbanist(
-                                      fontSize: 12.sp,
+                                      fontSize: 10.sp,
                                       fontWeight: FontWeight.w400,
-                                      color: Colors.black,
+                                      color: Colors.blue,
                                     ),
-                                    children: [
-                                      TextSpan(
-                                        text: "Register",
-                                        style: GoogleFonts.urbanist(
-                                          fontSize: 12.sp,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color.fromRGBO(27, 97, 122, 1),
-                                          decoration: TextDecoration.underline,
-                                          decorationColor:
-                                              Color.fromRGBO(27, 97, 122, 1),
-                                        ),
-                                      ),
-                                    ],
                                   ),
-                                  textAlign: TextAlign.center,
                                 ),
                               ),
-                              SizedBox(height: 55.h),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 25.h),
+                            GestureDetector(
+                              onTap: _login,
+                              child: Container(
+                                height: 45.h,
+                                width: MediaQuery.of(context).size.width / 1.5,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(25.r),
+                                  color: Color.fromRGBO(27, 97, 122, 1),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Login",
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 45.h),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Registration(),
+                                  ),
+                                );
+                              },
+                              child: Text.rich(
+                                TextSpan(
+                                  text: "Already have an account? ",
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 12.sp,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: "Register",
+                                      style: GoogleFonts.urbanist(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color.fromRGBO(27, 97, 122, 1),
+                                        decoration: TextDecoration.underline,
+                                        decorationColor:
+                                            Color.fromRGBO(27, 97, 122, 1),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            SizedBox(height: 55.h),
+                          ],
                         ),
                       ),
-
+                    ),
                   ],
                 ),
               ),
@@ -340,16 +337,13 @@ class _NewLoginState extends State<NewLogin> {
         child: TextField(
           controller: _passwordController,
           obscureText: ispassword,
-
           style:
               GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: "Enter your Password",
             hintStyle:
-
                 GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
-
             suffixIcon: IconButton(
               icon: Icon(ispassword
                   ? Icons.visibility_off_outlined
@@ -389,9 +383,7 @@ Widget _buildTextField({
           border: InputBorder.none,
           hintText: hint,
           hintStyle:
-
               GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
-
         ),
       ),
     ),
