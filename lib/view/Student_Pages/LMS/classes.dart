@@ -165,7 +165,6 @@ class _ClassesState extends State<Classes> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
-
           Container(
             margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
             height: 42,
