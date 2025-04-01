@@ -19,17 +19,13 @@ class ClassData extends StatefulWidget {
 
 class _ClassDataState extends State<ClassData> {
   List<dynamic> classes = [];
-  List<Map<String, dynamic>> subjects = [];
   bool isLoading = true;
   String? token;
 
-  // Cache keys for classes and subjects.
+  // Cache key for classes.
   final String classesCacheKey = "cached_classes";
-  final String subjectsCacheKey = "cached_subjects";
 
-  final String apiUrl = "https://admin.uthix.com/api/classroom";
-  final String subjectsApiUrl =
-      "https://admin.uthix.com/api/instructor-get-subject";
+  final String apiUrl = "https://admin.uthix.com/api/instructor-classroom";
 
   @override
   void initState() {
@@ -45,15 +41,12 @@ class _ClassDataState extends State<ClassData> {
     });
     debugPrint("Token loaded: $token");
 
-    // Try to load cached classes and subjects first.
+    // Try to load cached classes first.
     _loadCachedData();
 
     if (token != null) {
-      // Fetch both classes and subjects concurrently.
-      await Future.wait([
-        fetchClasses(),
-        _fetchSubjects(),
-      ]);
+      // Fetch classes.
+      await fetchClasses();
     } else {
       log("No token found.");
       setState(() {
@@ -62,12 +55,10 @@ class _ClassDataState extends State<ClassData> {
     }
   }
 
-  // Load cached classes and subjects from SharedPreferences.
+  // Load cached classes from SharedPreferences.
   Future<void> _loadCachedData() async {
     final prefs = await SharedPreferences.getInstance();
     final cachedClasses = prefs.getString(classesCacheKey);
-    final cachedSubjects = prefs.getString(subjectsCacheKey);
-
     if (cachedClasses != null) {
       try {
         final List<dynamic> decodedClasses = jsonDecode(cachedClasses);
@@ -77,17 +68,6 @@ class _ClassDataState extends State<ClassData> {
         });
       } catch (e) {
         log("Error decoding cached classes: $e");
-      }
-    }
-
-    if (cachedSubjects != null) {
-      try {
-        final List<dynamic> decodedSubjects = jsonDecode(cachedSubjects);
-        setState(() {
-          subjects = List<Map<String, dynamic>>.from(decodedSubjects);
-        });
-      } catch (e) {
-        log("Error decoding cached subjects: $e");
       }
     }
   }
@@ -104,66 +84,34 @@ class _ClassDataState extends State<ClassData> {
           },
         ),
       );
+      // The API returns a JSON with "status" and "classrooms".
       if (response.statusCode == 200 && response.data["status"] == true) {
         setState(() {
-          classes = response.data["data"];
-          // Do not set isLoading false here; wait for subjects.
+          classes = response.data["classrooms"];
+          isLoading = false;
         });
         // Cache the classes data.
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(
-            classesCacheKey, jsonEncode(response.data["data"]));
+        await prefs.setString(classesCacheKey, jsonEncode(response.data["classrooms"]));
       } else {
         log("Error fetching classes: ${response.data["message"]}");
-      }
-    } catch (e) {
-      log("Error fetching classes: $e");
-    }
-  }
-
-  // Fetch subjects so we can map subject ids to names.
-  Future<void> _fetchSubjects() async {
-    try {
-      Response response = await Dio().get(
-        subjectsApiUrl,
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Content-Type": "application/json",
-          },
-        ),
-      );
-      if (response.statusCode == 200 && response.data["subject"] != null) {
-        setState(() {
-          subjects = List<Map<String, dynamic>>.from(response.data["subject"]);
-          isLoading = false; // Both fetched; loading complete.
-        });
-        // Cache the subjects data.
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(
-            subjectsCacheKey, jsonEncode(response.data["subject"]));
-      } else {
-        log("Error fetching subjects: ${response.data["message"]}");
         setState(() {
           isLoading = false;
         });
       }
     } catch (e) {
-      log("Error fetching subject: $e");
+      log("Error fetching classes: $e");
       setState(() {
         isLoading = false;
       });
     }
   }
 
-  // Helper function to get the subject name from the subject id.
-  String _getSubjectName(dynamic subjectId) {
+  // Helper function to get the subject name from a classroom item.
+  String _getSubjectName(dynamic classroomItem) {
     try {
-      final subject = subjects.firstWhere(
-        (subj) => subj["id"] == subjectId,
-        orElse: () => {},
-      );
-      return subject["name"] ?? "N/A";
+      final subject = classroomItem["subject"];
+      return subject != null ? subject["name"] ?? "N/A" : "N/A";
     } catch (e) {
       return "N/A";
     }
@@ -204,24 +152,6 @@ class _ClassDataState extends State<ClassData> {
                     color: Colors.white,
                   ),
                 ),
-                const Spacer(),
-                Container(
-                  width: 45,
-                  height: 45,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: ClipOval(
-                      child: Image.asset(
-                        "assets/login/profile.jpeg",
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -230,274 +160,161 @@ class _ClassDataState extends State<ClassData> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : classes.isEmpty
-              ? Center(
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              "assets/instructor/UnableToLoadData.png",
+              width: 200,
+              height: 200,
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "You don't have any classes. Create a new class.",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      )
+          : ListView.builder(
+        itemCount: classes.length,
+        itemBuilder: (context, index) {
+          final classItem = classes[index];
+          // Extract the classroom id from the top-level "id"
+          final classroomId = classItem["id"].toString();
+          // Get class name from the nested "classroom" object.
+          final className = classItem["classroom"] != null
+              ? classItem["classroom"]["class_name"]
+              : "Unknown Class";
+          // Get subject name using the helper function.
+          final subjectName = _getSubjectName(classItem);
+          return Padding(
+            padding: const EdgeInsets.only(top: 15, left: 20, right: 20, bottom: 15),
+            child: GestureDetector(
+              onTap: () {
+                // Navigation if needed.
+              },
+              child: Container(
+                width: 290,
+                height: 150,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color.fromRGBO(217, 217, 217, 1),
+                  ),
+                  color: const Color.fromRGBO(246, 246, 246, 1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset(
-                        "assets/instructor/UnableToLoadData.png",
-                        width: 200,
-                        height: 200,
+                      // Class name row.
+                      Text(
+                        className,
+                        style: GoogleFonts.urbanist(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      // Subject information.
+                      Text(
+                        "Subject: $subjectName",
+                        style: GoogleFonts.urbanist(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       const SizedBox(height: 20),
-                      Text(
-                        "You don't have any classes. Create a new class.",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      // Row of two buttons: Add Chapter and View All Chapters.
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              // Navigate to Add Chapter page with the specific classroom ID.
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Newclass(
+                                    classroomId: classroomId,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 39,
+                              width: 140,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: const Color.fromRGBO(43, 92, 116, 1),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Add Chapter",
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color.fromRGBO(43, 92, 116, 1),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              // Navigate to MyClasses page with the specific classroom ID.
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MyClasses(
+                                    classroomId: classroomId,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              height: 39,
+                              width: 140,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: const Color.fromRGBO(43, 92, 116, 1),
+                                  width: 1,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "View All Chapters",
+                                  style: GoogleFonts.urbanist(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                    color: const Color.fromRGBO(43, 92, 116, 1),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                )
-              : ListView.builder(
-                  itemCount: classes.length,
-                  itemBuilder: (context, index) {
-                    final classItem = classes[index];
-                    final classroomId = classItem['id'].toString();
-                    return Padding(
-                      padding: const EdgeInsets.only(
-                          top: 15, left: 20, right: 20, bottom: 15),
-                      child: GestureDetector(
-                        onTap: () {
-                          // Navigate to Newclass page if needed.
-                        },
-                        child: Container(
-                          width: 290,
-                          height: 170,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: const Color.fromRGBO(217, 217, 217, 1),
-                            ),
-                            color: const Color.fromRGBO(246, 246, 246, 1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Class name and section row.
-                                Row(
-                                  children: [
-                                    Text(
-                                      classItem['class_name'] ??
-                                          "Unknown Class",
-                                      style: GoogleFonts.urbanist(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      classItem['section'] ?? "No section",
-                                      style: GoogleFonts.urbanist(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 5),
-                                // Subject information.
-                                Text(
-                                  "Subject: ${_getSubjectName(classItem['subject_id'])}",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 5),
-                                // Participant avatars row.
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 80,
-                                      height: 23,
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        children: [
-                                          Positioned(
-                                            left: 0,
-                                            child: Container(
-                                              width: 23,
-                                              height: 23,
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.black,
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(1.0),
-                                                child: ClipOval(
-                                                  child: Image.asset(
-                                                    "assets/login/profile.jpeg",
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            left: 15,
-                                            child: Container(
-                                              width: 23,
-                                              height: 23,
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.black,
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(1.0),
-                                                child: ClipOval(
-                                                  child: Image.asset(
-                                                    "assets/login/profile.jpeg",
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            left: 30,
-                                            child: Container(
-                                              width: 23,
-                                              height: 23,
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.black,
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(1.0),
-                                                child: ClipOval(
-                                                  child: Image.asset(
-                                                    "assets/login/profile.jpeg",
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            left: 45,
-                                            child: Container(
-                                              width: 23,
-                                              height: 23,
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.black,
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(1.0),
-                                                child: ClipOval(
-                                                  child: Image.asset(
-                                                    "assets/login/profile.jpeg",
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                // Row of two buttons: Add Chapter and View All Chapters.
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        // Navigate to Add Chapter page with the specific classroom ID.
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => Newclass(
-                                              classroomId: classroomId,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        height: 39,
-                                        width: 140,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          border: Border.all(
-                                            color: const Color.fromRGBO(
-                                                43, 92, 116, 1),
-                                            width: 1,
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            "Add Chapter",
-                                            style: GoogleFonts.urbanist(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              color: const Color.fromRGBO(
-                                                  43, 92, 116, 1),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        // Navigate to MyClasses page with the specific classroom ID.
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => MyClasses(
-                                              classroomId: classroomId,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        height: 39,
-                                        width: 140,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          border: Border.all(
-                                            color: const Color.fromRGBO(
-                                                43, 92, 116, 1),
-                                            width: 1,
-                                          ),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            "View All Chapters",
-                                            style: GoogleFonts.urbanist(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              color: const Color.fromRGBO(
-                                                  43, 92, 116, 1),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  },
                 ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Newclass extends StatefulWidget {
-  final String classroomId; // Receive the classroom ID dynamically
+  final String classroomId;
 
   const Newclass({Key? key, required this.classroomId}) : super(key: key);
 
@@ -47,9 +47,7 @@ class _NewclassState extends State<Newclass> {
     }
   }
 
-  // Create a new class chapter using the access token.
-  // The API expects a POST to "https://admin.uthix.com/api/class-chapter/{classroomId}"
-  // with a JSON body containing title, date, time, timezone, and description.
+
   Future<void> _createClassroom() async {
     if (titleController.text.trim().isEmpty ||
         _selectdate == null ||
@@ -71,7 +69,7 @@ class _NewclassState extends State<Newclass> {
 
     debugPrint("Request Data: ${jsonEncode(requestData)}");
 
-    // Build the endpoint using the classroomId.
+
     final String endpoint =
         "https://admin.uthix.com/api/class-chapter/${widget.classroomId}";
 

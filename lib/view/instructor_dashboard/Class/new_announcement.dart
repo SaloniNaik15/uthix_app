@@ -2,12 +2,15 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class NewAnnouncement extends StatefulWidget {
-  const NewAnnouncement({Key? key}) : super(key: key);
+  final String classId;
+
+  const NewAnnouncement({Key? key, required this.classId}) : super(key: key);
 
   @override
   State<NewAnnouncement> createState() => _NewAnnouncementState();
@@ -16,16 +19,12 @@ class NewAnnouncement extends StatefulWidget {
 class _NewAnnouncementState extends State<NewAnnouncement> {
   final TextEditingController _announceController = TextEditingController();
 
-  // Ensure the endpoint URL matches your backend. Check for typos if needed.
-  final String apiUrl = "https://admin.uthix.com/api/announcement";
-  String? token; // Token will be loaded from SharedPreferences
+  // Base API URL; we'll append the classId and '/announcements'
+  final String baseUrl = "https://admin.uthix.com/api/chapters/";
 
-  File? _selectedFile;
-
-  final String instructorId = "2";
-  final String classroomId = "1";
+  String? token;
+  List<File> _selectedFiles = [];
   DateTime? _dueDate;
-
   final Dio _dio = Dio();
 
   @override
@@ -34,7 +33,6 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
     _loadToken();
   }
 
-  /// Loads the access token from SharedPreferences using the key "auth_token".
   Future<void> _loadToken() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -45,25 +43,29 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
     }
   }
 
-  /// Picks a single file from the device.
+  /// Allows the user to pick multiple files for attachment.
   Future<void> _pickAttachment() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
-        allowMultiple: true, // For multiple files, if needed
+        allowMultiple: true,
       );
       if (result != null && result.files.isNotEmpty) {
         setState(() {
-          _selectedFile = File(result.files.single.path!);
+          _selectedFiles = result.paths
+              .whereType<String>()
+              .map((path) => File(path))
+              .toList();
         });
       }
     } catch (e) {
-      debugPrint("Error picking file: $e");
+      debugPrint("Error picking files: $e");
     }
   }
 
-  /// Sends the announcement and selected file(s) to the server.
+  /// Posts the announcement (with multiple attachments) to the specific chapter endpoint.
   Future<void> _postAnnouncement() async {
     final announcementText = _announceController.text.trim();
+
     if (announcementText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Announcement text cannot be empty.")),
@@ -78,29 +80,40 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
       return;
     }
 
-    // Prepare multipart form data
-    FormData formData = FormData.fromMap({
-      "instructor_id": instructorId,
-      "classroom_id": classroomId,
+    // Construct the endpoint URL using the provided classId.
+    final String postUrl = "${baseUrl}${widget.classId}/announcements";
+
+    // Format the due date as dd-MM-yy if one is selected.
+    String? formattedDueDate;
+    if (_dueDate != null) {
+      formattedDueDate = DateFormat("dd-MM-yy").format(_dueDate!);
+    }
+
+    // Prepare form data.
+    final Map<String, dynamic> formMap = {
       "title": announcementText,
-      // If your API expects a due date, include it here
-      "due_date": _dueDate != null ? _dueDate!.toIso8601String() : null,
-      // Send file attachment if one was picked. Adjust key name if required.
-      if (_selectedFile != null)
-        "attachments[]": await MultipartFile.fromFile(
-          _selectedFile!.path,
-          filename: _selectedFile!.path.split('/').last,
-        ),
-    });
+      "due_date": formattedDueDate,
+    };
+
+    // If files are selected, add them to attachments[] as a list.
+    if (_selectedFiles.isNotEmpty) {
+      formMap["attachments[]"] = await Future.wait(
+        _selectedFiles.map((file) async => await MultipartFile.fromFile(
+          file.path,
+          filename: file.path.split('/').last,
+        )),
+      );
+    }
+
+    FormData formData = FormData.fromMap(formMap);
 
     try {
       final response = await _dio.post(
-        apiUrl,
+        postUrl,
         data: formData,
         options: Options(
           headers: {
             "Authorization": "Bearer $token",
-            "Content-Type": "multipart/form-data",
           },
         ),
       );
@@ -108,14 +121,13 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
       debugPrint("Response status: ${response.statusCode}");
       debugPrint("Response data: ${response.data}");
 
-      // Check if the response JSON indicates success
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data;
         if (data["status"] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(data["message"] ?? "Posted successfully!")),
           );
-          // Optionally, you can also navigate back or update your UI here.
+          Navigator.pop(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(data["message"] ?? "Failed to post.")),
@@ -134,7 +146,7 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
     }
   }
 
-  /// Optional: pick a due date from a date picker.
+  /// Opens a date picker to select an optional due date.
   Future<void> _pickDueDate() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -152,89 +164,77 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.white, // Entire background white.
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_outlined,
+            color: Colors.black,
+            size: 25.sp,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: const Text("New Announcement"),
+        elevation: 1,
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.all(20.0.w),
           child: Column(
             children: [
-              // Top navigation and Post button
+              // "Post" button row.
               Row(
                 children: [
-                  Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
-                          offset: const Offset(0, 4),
-                          blurRadius: 8,
-                        ),
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
-                          offset: const Offset(0, 0),
-                          blurRadius: 4,
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_back, size: 25),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ),
-                  ),
                   const Spacer(),
                   GestureDetector(
                     onTap: _postAnnouncement,
                     child: Container(
-                      height: 50,
-                      width: 130,
+                      height: 40.h,
+                      width: 80.w,
                       decoration: const BoxDecoration(
                         color: Color.fromRGBO(43, 92, 116, 1),
                       ),
                       child: Center(
                         child: Text(
                           "Post",
-                          style: GoogleFonts.urbanist(
-                            fontSize: 20,
+                          style: TextStyle(
+                            fontSize: 18,
                             fontWeight: FontWeight.w400,
                             color: Color.fromRGBO(255, 255, 255, 1),
                           ),
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
-              const SizedBox(height: 80),
+              SizedBox(height: 20.h),
               const Divider(
                 thickness: 1,
                 color: Color.fromRGBO(217, 217, 217, 1),
               ),
-              // Announcement TextField
+              // Announcement text input.
               Row(
                 children: [
                   const Icon(Icons.menu, color: Color.fromRGBO(43, 92, 116, 1)),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10.w),
                   Expanded(
                     child: TextField(
                       controller: _announceController,
                       style: GoogleFonts.urbanist(
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
                         color: Colors.black,
                       ),
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: "Announce something to your class",
-                        hintStyle: GoogleFonts.urbanist(
-                          fontSize: 16,
+                        hintStyle: TextStyle(
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey,
                         ),
@@ -247,45 +247,72 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
                 thickness: 1,
                 color: Color.fromRGBO(217, 217, 217, 1),
               ),
-              // Add Attachment
+              // Add attachment.
               GestureDetector(
                 onTap: _pickAttachment,
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.link,
-                        color: Color.fromRGBO(43, 92, 116, 1)),
-                    const SizedBox(width: 10),
-                    Text(
-                      _selectedFile == null
-                          ? "Add Attachment"
-                          : "Attachment: ${_selectedFile!.path.split('/').last}",
-                      style: GoogleFonts.urbanist(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400,
-                        color: Colors.grey,
-                      ),
+                    Row(
+                      children: [
+                        const Icon(Icons.link, color: Color.fromRGBO(43, 92, 116, 1)),
+                        SizedBox(width: 10.w),
+                        Text(
+                          "Add Attachment",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
                     ),
+                    SizedBox(height: 8.h),
+                    if (_selectedFiles.isNotEmpty)
+                      Container(
+                        // Set a maximum height; adjust as needed.
+                        constraints: BoxConstraints(maxHeight: 300.h),
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: _selectedFiles.length,
+                          separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                          itemBuilder: (context, index) {
+                            final file = _selectedFiles[index];
+                            return Padding(
+                              padding: EdgeInsets.only(left: 40.w),
+                              child: Text(
+                                file.path.split('/').last,
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                   ],
                 ),
               ),
-              const Divider(
+              Divider(
                 thickness: 1,
                 color: Color.fromRGBO(217, 217, 217, 1),
               ),
-              // Due Date Picker
+              // Due date picker.
               GestureDetector(
                 onTap: _pickDueDate,
                 child: Row(
                   children: [
-                    const Icon(Icons.alarm,
-                        color: Color.fromRGBO(43, 92, 116, 1)),
-                    const SizedBox(width: 10),
+                    const Icon(Icons.alarm, color: Color.fromRGBO(43, 92, 116, 1)),
+                    SizedBox(width: 10.w),
                     Text(
                       _dueDate == null
                           ? "Due Date"
-                          : "Due Date: ${_dueDate!.toLocal()}".split(' ')[0],
-                      style: GoogleFonts.urbanist(
-                        fontSize: 16,
+                          : "Due Date: ${DateFormat("dd-MM-yy").format(_dueDate!)}",
+                      style: TextStyle(
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w400,
                         color: Colors.grey,
                       ),
@@ -297,7 +324,6 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
                 thickness: 1,
                 color: Color.fromRGBO(217, 217, 217, 1),
               ),
-              const SizedBox(height: 20),
             ],
           ),
         ),

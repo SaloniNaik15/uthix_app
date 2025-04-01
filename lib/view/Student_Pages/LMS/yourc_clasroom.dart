@@ -171,8 +171,8 @@ class _YourClasroomState extends State<YourClasroom> {
             ),
             title: Text(
               "Your Classroom",
-              style: GoogleFonts.urbanist(
-                fontSize: 20.sp,
+              style: TextStyle(
+                fontSize: 18.sp,
                 fontWeight: FontWeight.w600,
                 color: Color.fromRGBO(96, 95, 95, 1),
               ),
@@ -265,7 +265,7 @@ class _YourClasroomState extends State<YourClasroom> {
                                     Text(
                                       "Teacher Name : ${classData["instructor"] ?? "N/A"}",
                                       style: GoogleFonts.urbanist(
-                                        fontSize: 13.sp,
+                                        fontSize: 14.sp,
                                         fontWeight: FontWeight.w500,
                                         color: Colors.grey[700],
                                       ),
