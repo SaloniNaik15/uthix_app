@@ -43,10 +43,7 @@ class _Forgot2State extends State<Forgot2> {
     final digit3 = _digit3Controller.text.trim();
     final digit4 = _digit4Controller.text.trim();
 
-    if (digit1.isEmpty ||
-        digit2.isEmpty ||
-        digit3.isEmpty ||
-        digit4.isEmpty) {
+    if (digit1.isEmpty || digit2.isEmpty || digit3.isEmpty || digit4.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please enter the complete code")),
       );
@@ -61,16 +58,11 @@ class _Forgot2State extends State<Forgot2> {
       final response = await dio.post(apiUrl, data: {"code": code});
 
       if (response.statusCode == 200) {
-
         final isValid = response.data["valid"] ?? true;
         if (isValid) {
           // Code is correct: show success message and navigate
-          final snackBar =
-          SnackBar(content: Text("Code sent successfully"));
-          ScaffoldMessenger.of(context)
-              .showSnackBar(snackBar)
-              .closed
-              .then((_) {
+          final snackBar = SnackBar(content: Text("Code sent successfully"));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar).closed.then((_) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const Forgot3()),
@@ -87,7 +79,7 @@ class _Forgot2State extends State<Forgot2> {
           const SnackBar(content: Text("Code is incorrect")),
         );
       }
-    } on DioError catch (dioError) {
+    } on DioException catch (dioError) {
       String errorMessage = "An error occurred";
       if (dioError.response != null) {
         errorMessage = "Error: ${dioError.response?.statusMessage}";
@@ -191,7 +183,7 @@ class _Forgot2State extends State<Forgot2> {
                       Image.asset(
                         "assets/registration/book.png",
                         width: 90.w,
-                        height:114.h,
+                        height: 114.h,
                       ),
                       SizedBox(height: 50.h),
                       Text(

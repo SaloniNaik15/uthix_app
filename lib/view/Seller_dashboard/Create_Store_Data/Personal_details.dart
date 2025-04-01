@@ -244,9 +244,9 @@ class _PersonalDetailsState extends State<PersonalDetails> {
             lastDate: DateTime.now(),
           );
 
-          if (pickedDate != null && mounted) {
+          if (mounted) {
             setState(() {
-              controller.text = DateFormat("dd/MM/yyyy").format(pickedDate);
+              controller.text = DateFormat("dd/MM/yyyy").format(pickedDate!);
             });
           }
         },
