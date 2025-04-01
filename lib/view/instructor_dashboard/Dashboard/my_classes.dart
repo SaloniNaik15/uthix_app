@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/instructor_dashboard/Class/class.dart';
-import '../submission/submission.dart';
+
 
 class MyClasses extends StatefulWidget {
   final String classroomId;
@@ -175,7 +175,7 @@ class _MyClassesState extends State<MyClasses> {
                                 child: TextField(
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
-                                  style: GoogleFonts.urbanist(
+                                  style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w400,
                                     color: const Color.fromRGBO(96, 95, 95, 1),
@@ -183,7 +183,7 @@ class _MyClassesState extends State<MyClasses> {
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
                                     hintText: "eg., xyz@gmail.com",
-                                    hintStyle: GoogleFonts.urbanist(
+                                    hintStyle: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
                                       color:
@@ -354,7 +354,7 @@ class _MyClassesState extends State<MyClasses> {
                   ),
                 ),
                 const SizedBox(width: 15),
-                const Text(
+                 Text(
                   "All Chapters",
                   style: TextStyle(
                     fontSize: 20,
@@ -383,7 +383,7 @@ class _MyClassesState extends State<MyClasses> {
             Text(
               "You don't have any chapter for this class.",
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -397,7 +397,7 @@ class _MyClassesState extends State<MyClasses> {
           final classId = classItem['id'].toString();
           return Padding(
             padding: const EdgeInsets.only(
-                top: 15, left: 20, right: 20, bottom: 15),
+                top: 15, left: 10, right: 10, bottom: 15),
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -431,7 +431,7 @@ class _MyClassesState extends State<MyClasses> {
                             Text(
                               "Chapter: ",
                               style: TextStyle(
-                                fontSize: 14.sp,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -442,7 +442,7 @@ class _MyClassesState extends State<MyClasses> {
                               child: Text(
                                 classItem['title'] ?? "No title",
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                 ),
                                 maxLines: 2,

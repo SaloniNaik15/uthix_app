@@ -12,7 +12,7 @@ import 'package:uthix_app/view/instructor_dashboard/Chat/chat.dart';
 import 'package:uthix_app/view/instructor_dashboard/Profile/profile_account.dart';
 import 'package:uthix_app/view/instructor_dashboard/calender/calender.dart';
 import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
-import 'package:uthix_app/view/instructor_dashboard/submission/submission.dart';
+
 import '../Profile/detail_profile.dart';
 import 'ClassData.dart';
 
@@ -242,7 +242,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
               Text(
                 "Create New Class and Invite Participants",
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Colors.black,
                 ),
@@ -267,7 +267,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                       child: Text(
                         "Create",
                         style: TextStyle(
-                          fontSize: 14.sp,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
                         ),
@@ -292,7 +292,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         Text(
           "Class",
           style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 14,
               fontWeight: FontWeight.w700,
               color: Colors.black54),
         ),
@@ -314,7 +314,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                 value: classroom["id"],
                 child: Text(
                   classroom["class_name"],
-                  style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                  style: TextStyle(fontSize: 12, color: Colors.black87),
                 ),
               );
             }).toList(),
@@ -323,7 +323,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             decoration: const InputDecoration(border: InputBorder.none),
             hint: Text(
               "Select Class",
-              style: TextStyle(fontSize: 12.sp, color: Colors.black45),
+              style: TextStyle(fontSize: 12, color: Colors.black45),
             ),
             onChanged: (int? val) {
               setState(() {
@@ -345,7 +345,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w700, color: Colors.black54),
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.black54),
         ),
         const SizedBox(height: 5),
         Container(
@@ -359,11 +359,11 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
             value: selectedValue,
             isExpanded: true,
             dropdownColor: Colors.white,
-            hint: Text("Select Subject", style: TextStyle(fontSize: 12.sp, color: Colors.black45)),
+            hint: Text("Select Subject", style: TextStyle(fontSize: 12, color: Colors.black45)),
             items: items.map((subject) {
               return DropdownMenuItem<int>(
                 value: subject["id"],
-                child: Text(subject["name"], style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
+                child: Text(subject["name"], style: TextStyle(fontSize: 12, color: Colors.black87)),
               );
             }).toList(),
             onChanged: (value) {
@@ -395,7 +395,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
               Text(
                 "Hi $instructorName",
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 18,
                   fontWeight: FontWeight.w500,
                   color: const Color.fromRGBO(96, 95, 95, 1),
                 ),
@@ -496,7 +496,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
                     Text(
                       item["title"]!,
                       style: TextStyle(
-                        fontSize: 13.sp,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                         color: const Color.fromRGBO(96, 95, 95, 1),
                       ),
@@ -541,7 +541,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
           title: Text(
             "Instructor Dashboard",
             style: TextStyle(
-              fontSize: 18.sp,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: const Color.fromRGBO(95, 95, 95, 1),
             ),

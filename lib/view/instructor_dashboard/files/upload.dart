@@ -28,7 +28,7 @@ class _UploadState extends State<Upload> {
         title: Text(
           "Upload Files",
           style: TextStyle(
-            fontSize: 18.sp,
+            fontSize: 20,
             fontWeight: FontWeight.w600,
             color: const Color.fromRGBO(96, 95, 95, 1),
           ),
@@ -40,7 +40,7 @@ class _UploadState extends State<Upload> {
         children: [
           SizedBox(height: 40.h),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 50.w),
+            padding: EdgeInsets.symmetric(horizontal: 40.w),
             child: Column(
               children: [
                 // First row of options
@@ -84,7 +84,7 @@ class _UploadState extends State<Upload> {
                 Text(
                   "The files uploaded by you will be accessible by all the participants of the class",
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 16,
                     fontWeight: FontWeight.w500,
                     color: const Color.fromRGBO(96, 95, 95, 1),
                   ),
@@ -118,7 +118,7 @@ class _UploadState extends State<Upload> {
         Text(
           title,
           style: TextStyle(
-            fontSize: 14.sp,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Colors.black,
           ),

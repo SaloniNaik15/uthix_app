@@ -25,7 +25,7 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
   final FocusNode _focusNode = FocusNode();
 
   // Assume the current user id is 2; update this as needed.
-  final int currentUserId = 0;
+  int currentUserId = 0; // Initially set to 0 but updated later
 
   @override
   void initState() {
@@ -33,31 +33,34 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
     _initializeData();
   }
 
-  // Initialize credentials, load sent IDs, then fetch conversation.
   Future<void> _initializeData() async {
     await _loadUserCredentials();
     await _loadSentMessageIds();
     await fetchConversation();
   }
 
-  // Load the token from SharedPreferences.
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
+    int? userId = prefs.getInt('user_id');
+
     log("Retrieved Token: $token");
+    log("Retrieved User ID: $userId");
+
     setState(() {
       accessLoginToken = token;
+      if (userId != null) {
+        currentUserId = userId; // ✅ Update with actual user ID
+      }
     });
   }
 
-  // Save _sentMessageIds as a JSON string.
   Future<void> _saveSentMessageIds() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('sentMessageIds', jsonEncode(_sentMessageIds));
     log("Saved sent message ids: $_sentMessageIds");
   }
 
-  // Load _sentMessageIds from SharedPreferences.
   Future<void> _loadSentMessageIds() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? jsonIds = prefs.getString('sentMessageIds');
@@ -91,12 +94,11 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
         setState(() {
           _messages = messagesJson.map((json) {
             ChatMessage msg = ChatMessage.fromJson(json);
-            bool senderFlag = _sentMessageIds.contains(msg.id) ||
-                (msg.senderId == currentUserId);
+            bool senderFlag =
+                (msg.senderId == currentUserId); // ✅ Correct sender check
             return msg.copyWith(isSender: senderFlag);
           }).toList();
 
-          // Sort messages by createdAt timestamp
           _messages.sort((a, b) => DateTime.parse(a.createdAt)
               .compareTo(DateTime.parse(b.createdAt)));
 
@@ -114,7 +116,6 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
     }
   }
 
-  // Send a message via POST to the API.
   Future<void> sendMessageToApi(String text) async {
     final url = 'https://admin.uthix.com/api/send-message';
     try {
@@ -125,7 +126,7 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          'sender_id': currentUserId,
+          'sender_id': currentUserId, // ✅ Correct sender ID
           'receiver_id': widget.conversationId.toString(),
           'message': text,
           'type': 'text',
@@ -135,18 +136,18 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final messageData = data['data'];
-        // Create a new message. Force the sender id to be currentUserId and isSender true.
+
         ChatMessage newMessage = ChatMessage(
           id: messageData['id'],
-          senderId: currentUserId, // Force current user's id
+          senderId: currentUserId,
           receiverId: int.parse(messageData['receiver_id'].toString()),
           message: messageData['message'],
           isRead: messageData['is_read'] ? 1 : 0,
           createdAt: messageData['created_at'],
-          receiverName: '', // Update if needed
+          receiverName: '',
           isSender: true,
         );
-        // Add the new message's id to _sentMessageIds and persist it.
+
         _sentMessageIds.add(newMessage.id);
         log("Sent message id added: ${newMessage.id} | _sentMessageIds: $_sentMessageIds");
         await _saveSentMessageIds();
@@ -159,11 +160,9 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
       }
     } catch (e) {
       log("Error sending message: $e");
-      // Optionally, show an error notification.
     }
   }
 
-  // Called when the send button is pressed.
   void _sendMessage() async {
     final String text = _messageController.text.trim();
     if (text.isNotEmpty) {
@@ -445,13 +444,14 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isSender = message.isSender;
+
     return Align(
       alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
       child: Row(
         mainAxisAlignment:
             isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          if (!isSender)
+          if (!isSender) // Show profile image only for received messages
             ClipOval(
               child: Image.asset(
                 'assets/login/profile.jpeg',
@@ -470,11 +470,14 @@ class MessageBubble extends StatelessWidget {
                 children: [
                   if (!isSender)
                     Text(
-                      'Ravi Pradhan',
+                      message.receiverName.isNotEmpty
+                          ? message.receiverName
+                          : "Unknown",
                       style: GoogleFonts.urbanist(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
                     ),
                   if (!isSender) const SizedBox(width: 5),
                   Text(
@@ -489,9 +492,10 @@ class MessageBubble extends StatelessWidget {
                     Text(
                       'You',
                       style: GoogleFonts.urbanist(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
                     ),
                 ],
               ),
@@ -509,8 +513,9 @@ class MessageBubble extends StatelessWidget {
                 child: Text(
                   message.message,
                   style: GoogleFonts.urbanist(
-                      fontSize: 16,
-                      color: isSender ? Colors.black : Colors.white),
+                    fontSize: 16,
+                    color: isSender ? Colors.black : Colors.white,
+                  ),
                 ),
               ),
             ],

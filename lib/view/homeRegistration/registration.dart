@@ -58,26 +58,27 @@ class _RegistrationState extends State<Registration> {
                           SizedBox(height: 50.h),
                           Text(
                             "Welcome to UTHIX",
-                            style: GoogleFonts.urbanist(
-                              fontSize: 28.sp,
-                              fontWeight: FontWeight.w500,
+                            style:TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
                           ),
-                          SizedBox(height: 14.h),
+                          SizedBox(height: 10.h),
                           Text(
                             "Are you a new User?",
-                            style: GoogleFonts.urbanist(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                               color: Color.fromRGBO(96, 95, 95, 1),
                             ),
                           ),
+                          SizedBox(height: 5.h),
                           Text(
-                            "Create an Account",
-                            style: GoogleFonts.urbanist(
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.w500,
+                            "Be part of something great. Register Now",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                               color: Colors.black,
                             ),
                           ),
@@ -86,15 +87,15 @@ class _RegistrationState extends State<Registration> {
                             width: 225.w,
                             child: Text(
                               "You are just a few minutes away to access seamless online learning",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w400,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
                                 color: Color.fromRGBO(96, 95, 95, 1),
                               ),
                               textAlign: TextAlign.center,
                             ),
                           ),
-                          SizedBox(height: 25.h),
+                          SizedBox(height: 30.h),
 
                           // Continue with Mail ID Button
                           buildButton(
@@ -107,12 +108,12 @@ class _RegistrationState extends State<Registration> {
                             iconPath: "assets/registration/gmail.png",
                             text: "Continue with Mail Id",
                           ),
-                          SizedBox(height: 70.h),
+                          SizedBox(height: 40.h),
                           Row(
                             children: [
                               Expanded(
                                 child: Divider(
-                                  thickness: 1,
+                                  thickness: 2,
                                   color: Colors.grey,
                                 ),
                               ),
@@ -120,26 +121,27 @@ class _RegistrationState extends State<Registration> {
                                 padding: EdgeInsets.symmetric(horizontal: 8.0),
                                 child: Text(
                                   "or",
-                                  style: TextStyle(fontSize: 20.sp),
+                                  style: TextStyle(fontSize: 20),
                                 ),
                               ),
                               Expanded(
                                 child: Divider(
-                                  thickness: 1,
+                                  thickness: 2,
                                   color: Colors.grey,
                                 ),
                               ),
                             ],
                           ),
+                          SizedBox(height: 40.h),
                           Text(
                             "Already have an account?",
-                            style: GoogleFonts.urbanist(
-                              fontSize: 14.sp,
+                            style:TextStyle(
+                              fontSize: 14,
                               fontWeight: FontWeight.w400,
                               color: Color.fromRGBO(96, 95, 95, 1),
                             ),
                           ),
-                          SizedBox(height: 2.h),
+                          SizedBox(height: 10.h),
 
                           // Login Button
                           GestureDetector(
@@ -161,8 +163,8 @@ class _RegistrationState extends State<Registration> {
                               child: Center(
                                 child: Text(
                                   "Login",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 20.sp,
+                                  style: TextStyle(
+                                    fontSize: 20,
                                     fontWeight: FontWeight.w400,
                                     color: Colors.white,
                                   ),
@@ -170,7 +172,7 @@ class _RegistrationState extends State<Registration> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 5.h),
+                          SizedBox(height: 10.h),
                           Text(
                             "By logging in you are agreeing to our Terms and Conditions and Privacy Policy",
                             textAlign: TextAlign.center,
@@ -228,8 +230,8 @@ class _RegistrationState extends State<Registration> {
                 SizedBox(width: 10.w),
                 Text(
                   text,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 16.sp,
+                  style: TextStyle(
+                    fontSize: 16,
                     fontWeight: FontWeight.w400,
                     color: Color.fromRGBO(175, 175, 175, 1),
                   ),
@@ -258,12 +260,12 @@ Widget _buildTextField(
       child: TextField(
         controller: controller,
         keyboardType: TextInputType.emailAddress,
-        style: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+        style:TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hint,
           hintStyle:
-              GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+          TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
         ),
       ),
     ),

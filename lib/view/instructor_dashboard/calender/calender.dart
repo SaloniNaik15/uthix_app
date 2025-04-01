@@ -39,7 +39,7 @@ class _CalenderState extends State<Calender> {
           title: Text(
             "Calendar",
             style: GoogleFonts.urbanist(
-              fontSize: 18.sp,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -53,7 +53,7 @@ class _CalenderState extends State<Calender> {
           ),
           actions: [
             Padding(
-              padding: const EdgeInsets.only(right: 15),
+              padding: const EdgeInsets.only(right: 10),
               child: CircleAvatar(
                 radius: 22,
                 backgroundColor: Colors.white,
@@ -80,11 +80,11 @@ class _CalenderState extends State<Calender> {
             height: 25,
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 15),
+            padding: const EdgeInsets.only(left: 10),
             child: Text(
               "Schedule a class and update Student’s Calendar",
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: Color.fromRGBO(96, 95, 95, 1),
               ),
@@ -224,7 +224,7 @@ class _CalenderState extends State<Calender> {
       child: Container(
         height: 82,
         alignment: Alignment.topRight,
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: isInMonth
               ? Color.fromRGBO(255, 255, 255, 1)
@@ -234,7 +234,7 @@ class _CalenderState extends State<Calender> {
         child: Text(
           day.toString(),
           style: TextStyle(
-            fontSize: 12.sp,
+            fontSize: 12,
             fontWeight: FontWeight.bold,
             color: isInMonth ? Colors.black : Colors.grey.shade400,
           ),

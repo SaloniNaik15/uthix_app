@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'new_login.dart';
 
 class Mailidpage extends StatefulWidget {
@@ -47,7 +48,8 @@ class _MailidpageState extends State<Mailidpage> {
     };
 
     try {
-      final response = await dio.post(url,
+      final response = await dio.post(
+        url,
         data: jsonEncode(body),
         options: Options(headers: {
           "Content-Type": "application/json",
@@ -58,9 +60,25 @@ class _MailidpageState extends State<Mailidpage> {
       log("Response Body: ${response.data}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.data;
+
+        // Extract user ID safely
+        int? userId = data['user'] != null && data['user'].containsKey('id')
+            ? data['user']['id']
+            : null;
+
+        if (userId != null) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setInt('user_id', userId);
+          log("Saloniiiiii Stored Id: ${prefs.getInt('user_id')}");
+        } else {
+          log("Warning: User ID is missing from API response");
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Registration Successful!")),
         );
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => NewLogin()),
@@ -68,17 +86,22 @@ class _MailidpageState extends State<Mailidpage> {
       } else {
         log("Error: ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registration Failed: ${response.data}")),
+          SnackBar(
+              content:
+                  Text("Registration Failed: ${response.data['message']}")),
         );
       }
     } on DioException catch (e) {
       log("Dio Error: $e");
       log("Full error response: ${e.response?.data}");
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Registration Failed: ${e.response?.data}")),
+        SnackBar(
+            content: Text(
+                "Registration Failed: ${e.response?.data['message'] ?? 'Something went wrong'}")),
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,7 +172,8 @@ class _MailidpageState extends State<Mailidpage> {
                               setState(() => isconfirm = !isconfirm),
                         ),
                         const SizedBox(height: 20),
-                        _buildReadOnlyField(label: "Selected Role", value: _selectedRole ?? ""),
+                        _buildReadOnlyField(
+                            label: "Selected Role", value: _selectedRole ?? ""),
                       ],
                     ),
                   ),
@@ -225,6 +249,7 @@ class _MailidpageState extends State<Mailidpage> {
       ),
     );
   }
+
   Widget _buildReadOnlyField({required String label, required String value}) {
     return Container(
       height: 50,
