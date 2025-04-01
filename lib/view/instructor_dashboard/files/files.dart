@@ -121,7 +121,7 @@ class _FilesState extends State<Files> {
                     Text(
                       "The class recordings and files uploaded by you will appear here",
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: const Color.fromRGBO(96, 95, 95, 1),
                       ),
@@ -186,7 +186,7 @@ class _FilesState extends State<Files> {
                                 child: Text(
                                   sortOptions[index],
                                   style:TextStyle(
-                                    fontSize: 14.sp,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w700,
                                     color: selectedIndex == index
                                         ? Colors.white
@@ -244,7 +244,7 @@ class _FilesState extends State<Files> {
                                     Text(
                                       file["title"]!,
                                       style: TextStyle(
-                                        fontSize: 16.sp,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w500,
                                         color: const Color.fromRGBO(0, 0, 0, 1),
                                       ),
@@ -252,7 +252,7 @@ class _FilesState extends State<Files> {
                                     Text(
                                       file["description"]!,
                                       style:TextStyle(
-                                        fontSize: 14.sp,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400,
                                         color: const Color.fromRGBO(0, 0, 0, 1),
                                       ),

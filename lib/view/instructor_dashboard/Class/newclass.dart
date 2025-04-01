@@ -190,7 +190,7 @@ class _NewclassState extends State<Newclass> {
           const SizedBox(width: 12),
           Text(
             title,
-            style: GoogleFonts.urbanist(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
               color: Colors.black,
@@ -200,7 +200,7 @@ class _NewclassState extends State<Newclass> {
           if (value.isNotEmpty)
             Text(
               value,
-              style: GoogleFonts.urbanist(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Colors.blue,
@@ -221,7 +221,7 @@ class _NewclassState extends State<Newclass> {
             const SizedBox(width: 12),
             Text(
               "Add Description",
-              style: GoogleFonts.urbanist(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: Colors.black,
@@ -235,7 +235,7 @@ class _NewclassState extends State<Newclass> {
           maxLines: 3,
           decoration: InputDecoration(
             hintText: "Enter class description...",
-            hintStyle: GoogleFonts.urbanist(
+            hintStyle: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w400,
               color: Colors.grey,
@@ -255,7 +255,7 @@ class _NewclassState extends State<Newclass> {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -267,7 +267,7 @@ class _NewclassState extends State<Newclass> {
               const SizedBox(height: 16),
               Text(
                 "Add new Chapter to class",
-                style: GoogleFonts.urbanist(
+                style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
@@ -278,7 +278,7 @@ class _NewclassState extends State<Newclass> {
                 controller: titleController,
                 decoration: InputDecoration(
                   hintText: "Add Title",
-                  hintStyle: GoogleFonts.urbanist(
+                  hintStyle: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
                     color: Colors.grey,
@@ -329,7 +329,7 @@ class _NewclassState extends State<Newclass> {
                     Expanded(
                       child: Text(
                         "Send Class Reminder to everyone in the Class",
-                        style: GoogleFonts.urbanist(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w400,
                           color: const Color(0xFF605F5F),
@@ -354,7 +354,7 @@ class _NewclassState extends State<Newclass> {
                     child: Center(
                       child: Text(
                         "SAVE",
-                        style: GoogleFonts.urbanist(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,

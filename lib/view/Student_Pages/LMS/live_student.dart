@@ -6,8 +6,6 @@ import 'package:provider/provider.dart';
 
 import 'package:uthix_app/view/Student_Pages/LMS/query_student.dart';
 import 'package:uthix_app/view/instructor_dashboard/Class/announcement.dart';
-import 'package:uthix_app/view/instructor_dashboard/submission/submission.dart';
-
 class LiveStudent extends StatefulWidget {
   const LiveStudent({super.key});
 
