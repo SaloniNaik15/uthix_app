@@ -438,8 +438,9 @@ class _InstructorClassState extends State<InstructorClass> {
                                                                 "${attachments.length} attachment(s) available",
                                                                 style:
                                                                     TextStyle(
-                                                                  fontSize:
-                                                                      12,
+
+                                                                  fontSize: 12,
+
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .w400,
@@ -511,7 +512,10 @@ class ClassCard extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(left: 25, top: 20, right: 25,bottom: 20),
+
+        padding:
+            const EdgeInsets.only(left: 25, top: 20, right: 25, bottom: 20),
+
         child: Column(
           children: [
             Row(
@@ -528,7 +532,8 @@ class ClassCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                 Spacer(),
+
+                Spacer(),
                 Text(
                   "Mentor : $mentor",
                   style: TextStyle(

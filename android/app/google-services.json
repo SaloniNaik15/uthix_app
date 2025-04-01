@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "171927809947",
+    "project_id": "uthix-2ec6c",
+    "storage_bucket": "uthix-2ec6c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:171927809947:android:3025174fb9c89e85b07b3e",
+        "android_client_info": {
+          "package_name": "com.example.uthix_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA35Hsst24oCMNVWC-ArfAuNdK7rsbs7zU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

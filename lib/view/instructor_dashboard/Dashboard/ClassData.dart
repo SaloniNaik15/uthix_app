@@ -92,7 +92,8 @@ class _ClassDataState extends State<ClassData> {
         });
         // Cache the classes data.
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(classesCacheKey, jsonEncode(response.data["classrooms"]));
+        await prefs.setString(
+            classesCacheKey, jsonEncode(response.data["classrooms"]));
       } else {
         log("Error fetching classes: ${response.data["message"]}");
         setState(() {
@@ -160,6 +161,7 @@ class _ClassDataState extends State<ClassData> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : classes.isEmpty
+
           ? Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -210,9 +212,20 @@ class _ClassDataState extends State<ClassData> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(10),
+
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+
+                      Image.asset(
+                        "assets/instructor/UnableToLoadData.png",
+                        width: 200,
+                        height: 200,
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "You don't have any classes. Create a new class.",
+
                       // Class name row.
                       Text(
                         className,
@@ -227,94 +240,155 @@ class _ClassDataState extends State<ClassData> {
                         "Subject: $subjectName",
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      // Row of two buttons: Add Chapter and View All Chapters.
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              // Navigate to Add Chapter page with the specific classroom ID.
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Newclass(
-                                    classroomId: classroomId,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              height: 39,
-                              width: 140,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: const Color.fromRGBO(43, 92, 116, 1),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Add Chapter",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: const Color.fromRGBO(43, 92, 116, 1),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              // Navigate to MyClasses page with the specific classroom ID.
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MyClasses(
-                                    classroomId: classroomId,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Container(
-                              height: 39,
-                              width: 140,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: const Color.fromRGBO(43, 92, 116, 1),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "View All Chapters",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: const Color.fromRGBO(43, 92, 116, 1),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
+                )
+              : ListView.builder(
+                  itemCount: classes.length,
+                  itemBuilder: (context, index) {
+                    final classItem = classes[index];
+                    // Extract the classroom id from the top-level "id"
+                    final classroomId = classItem["id"].toString();
+                    // Get class name from the nested "classroom" object.
+                    final className = classItem["classroom"] != null
+                        ? classItem["classroom"]["class_name"]
+                        : "Unknown Class";
+                    // Get subject name using the helper function.
+                    final subjectName = _getSubjectName(classItem);
+                    return Padding(
+                      padding: const EdgeInsets.only(
+                          top: 15, left: 10, right: 10, bottom: 15),
+                      child: GestureDetector(
+                        onTap: () {
+                          // Navigation if needed.
+                        },
+                        child: Container(
+                          width: 290,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: const Color.fromRGBO(217, 217, 217, 1),
+                            ),
+                            color: const Color.fromRGBO(246, 246, 246, 1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Class name row.
+                                Text(
+                                  className,
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                // Subject information.
+                                Text(
+                                  "Subject: $subjectName",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                // Row of two buttons: Add Chapter and View All Chapters.
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        // Navigate to Add Chapter page with the specific classroom ID.
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => Newclass(
+                                              classroomId: classroomId,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 39,
+                                        width: 140,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: const Color.fromRGBO(
+                                                43, 92, 116, 1),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            "Add Chapter",
+                                            style: GoogleFonts.urbanist(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: const Color.fromRGBO(
+                                                  43, 92, 116, 1),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        // Navigate to MyClasses page with the specific classroom ID.
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => MyClasses(
+                                              classroomId: classroomId,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 39,
+                                        width: 140,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: const Color.fromRGBO(
+                                                43, 92, 116, 1),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            "View All Chapters",
+                                            style: GoogleFonts.urbanist(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: const Color.fromRGBO(
+                                                  43, 92, 116, 1),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              ),
-            ),
-          );
-        },
-      ),
     );
   }
 }

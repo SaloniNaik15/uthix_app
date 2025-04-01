@@ -21,7 +21,6 @@ class _StudentProfileState extends State<StudentProfile> {
   String? accessLoginToken;
   String? userName;
   String? networkImageUrl;
-  Map<String, dynamic>? selectedClass;
   List<Map<String, dynamic>> _classOptions = [];
   String? _selectedClass;
 
@@ -69,23 +68,11 @@ class _StudentProfileState extends State<StudentProfile> {
           await dio.get('https://admin.uthix.com/api/all-classroom');
 
       if (response.statusCode == 200 && response.data["status"] == true) {
-        List<Map<String, dynamic>> loadedClasses =
-            List<Map<String, dynamic>>.from(
-          response.data["classrooms"].map((classroom) => {
-                "id": classroom["id"].toString(),
-                "name": classroom["class_name"]
-              }),
-        );
-
-        // Match the ID from _classController to select the correct class map
-        Map<String, dynamic>? foundClass = loadedClasses.firstWhere(
-          (item) => item["id"].toString() == _classController.text,
-          orElse: () => {},
-        );
-
         setState(() {
-          classOptions = loadedClasses;
-          selectedClass = foundClass.isNotEmpty ? foundClass : null;
+          classOptions = List<Map<String, dynamic>>.from(
+            response.data["classrooms"].map((classroom) =>
+                {"id": classroom["id"], "name": classroom["class_name"]}),
+          );
           isLoading = false;
         });
       }
@@ -180,7 +167,7 @@ class _StudentProfileState extends State<StudentProfile> {
         "phone": phone,
         "dob": dob,
         "gender": gender,
-        "classroom_id": userClass,
+        "class": userClass,
         "stream": stream,
         if (_profileImage != null)
           "image": await MultipartFile.fromFile(
@@ -251,39 +238,29 @@ class _StudentProfileState extends State<StudentProfile> {
       );
 
       if (response.statusCode == 200 && response.data["status"] == true) {
-        final data = response.data["data"];
+        final profileData = response.data["data"][0];
+        final user = profileData["user"];
 
-        if (data != null && data is List && data.isNotEmpty) {
-          final profileData = data[0];
-          final user = profileData["user"];
+        setState(() {
+          _phoneController.text = user["phone"]?.toString() ?? "";
+          _dobController.text = user["dob"] ?? "";
+          _genderValue = user["gender"];
+          _classController.text = profileData["class"] ?? "";
+          _streamController.text = profileData["stream"] ?? "";
 
-          setState(() {
-            _phoneController.text = user?["phone"]?.toString() ?? "";
-            _dobController.text = user?["dob"] ?? "";
-            _genderValue = user?["gender"];
-            String? classroomId = profileData["classroom_id"]?.toString();
-            if (classroomId != null) {
-              _classController.text = classroomId;
-            }
-            _streamController.text = profileData["stream"] ?? "";
-
-            if (user?["image"] != null && user!["image"].toString().isNotEmpty) {
-              networkImageUrl =
-              "https://admin.uthix.com/storage/images/student/${user?["image"]}";
-            } else {
-              networkImageUrl = null;
-            }
-          });
-
-          if (networkImageUrl != null) {
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setString("student_profile_image_url", networkImageUrl!);
+          if (user["image"] != null && user["image"].toString().isNotEmpty) {
+            networkImageUrl =
+                "https://admin.uthix.com/storage/images/student/${user["image"]}";
+          } else {
+            networkImageUrl = null;
           }
-
-          log("✅ Profile fields loaded successfully.");
-        } else {
-          log("❌ Profile data is null or empty.");
+        });
+        if (networkImageUrl != null) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString("student_profile_image_url", networkImageUrl!);
         }
+
+        log("✅ Profile fields loaded successfully.");
       } else {
         log("❌ Failed to load profile: ${response.statusCode}");
       }
@@ -463,32 +440,29 @@ class _StudentProfileState extends State<StudentProfile> {
             decoration: BoxDecoration(
               color: const Color(0xFFF6F6F6),
               borderRadius: BorderRadius.circular(40),
-              border: Border.all(color: const Color(0xFFD2D2D2)),
+              border: Border.all(color: Color(0xFFD2D2D2)),
             ),
             child: isLoading
-                ? const Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                : DropdownButtonFormField<Map<String, dynamic>>(
-                    value: selectedClass,
+                ? const Center(child: CircularProgressIndicator())
+                : DropdownButtonFormField<String>(
+                    value: _classController.text.isNotEmpty
+                        ? _classController.text
+                        : null,
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(horizontal: 12),
                     ),
                     hint: const Text("Select Class"),
                     dropdownColor: Colors.white,
-                    items: classOptions.map((classItem) {
-                      return DropdownMenuItem<Map<String, dynamic>>(
-                        value: classItem,
-                        child: Text(classItem["name"]),
-                      );
-                    }).toList(),
+                    items: classOptions
+                        .map((classItem) => DropdownMenuItem(
+                              value: classItem["id"].toString(),
+                              child: Text(classItem["name"]),
+                            ))
+                        .toList(),
                     onChanged: (val) {
-                      print("Selected Class: ${val?["name"]}");
                       setState(() {
-                        selectedClass = val;
-                        _classController.text = val!["id"].toString();
+                        _classController.text = val!;
                       });
                     },
                   ),
