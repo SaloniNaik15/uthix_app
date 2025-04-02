@@ -127,8 +127,8 @@ class _GradeState extends State<Grade> {
       children: [
         // Criterion label.
         Container(
-          height: 35.h,
-          width: 76.w,
+          height: 35,
+          width: 76,
           alignment: Alignment.centerLeft,
           child: Text(
             criteria,
@@ -139,11 +139,11 @@ class _GradeState extends State<Grade> {
             ),
           ),
         ),
-        SizedBox(width: 8.w),
+        SizedBox(width: 5),
         // Grade options.
         for (var rating in ratings)
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4.w),
+            padding: EdgeInsets.symmetric(horizontal: 4),
             child: GestureDetector(
               onTap: () {
                 setState(() {
@@ -157,13 +157,13 @@ class _GradeState extends State<Grade> {
 
 
               child: Container(
-                height: 34.h,
-                width: 87.w,
+                height: 34,
+                width: 87,
                 decoration: BoxDecoration(
                   color: selectedGrades[criteria] == rating
                       ? const Color.fromRGBO(43, 92, 116, 1)
                       : const Color.fromRGBO(246, 246, 246, 1),
-                  borderRadius: BorderRadius.circular(4.r),
+                  borderRadius: BorderRadius.circular(4),
                   border: Border.all(
                     color: const Color.fromRGBO(175, 175, 175, 1),
                   ),
@@ -206,8 +206,6 @@ class _GradeState extends State<Grade> {
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
           child: Container(
             width: MediaQuery.of(context).size.width * 1.2,
             padding: EdgeInsets.only(left: 15.w, right: 15.w, top: 40.h),
@@ -231,21 +229,21 @@ class _GradeState extends State<Grade> {
                     color: const Color.fromRGBO(96, 95, 95, 1),
                   ),
                 ),
-                SizedBox(height: 10.h),
+                10.verticalSpace,
                 gradeRow("Course Engagement", ["Excellent", "Well Done", "Basic"]),
-                SizedBox(height: 10.h),
+                10.verticalSpace,
                 gradeRow("Class Attendance", ["Excellent", "Well Done", "Basic"]),
-                SizedBox(height: 10.h),
+                10.verticalSpace,
                 gradeRow("Problem Solving", ["Excellent", "Well Done", "Basic"]),
-                SizedBox(height: 10.h),
+                10.verticalSpace,
                 gradeRow("Quick Thinking", ["Excellent", "Well Done", "Basic"]),
-                SizedBox(height: 10.h),
+                10.verticalSpace,
                 gradeRow("Course Knowledge", ["Excellent", "Well Done", "Basic"]),
-                SizedBox(height: 10.h),
+                10.verticalSpace,
                 gradeRow("Detailed Work", ["Excellent", "Well Done", "Basic"]),
-                SizedBox(height: 10.h),
+                10.verticalSpace,
                 gradeRow("Presentation Skills", ["Excellent", "Well Done", "Basic"]),
-                SizedBox(height: 30.h),
+                30.verticalSpace,
                 Divider(
                   thickness: 2.h,
                   color: const Color.fromRGBO(217, 217, 217, 1),
@@ -314,7 +312,6 @@ class _GradeState extends State<Grade> {
             ),
           ),
         ),
-      ),
     );
   }
 }

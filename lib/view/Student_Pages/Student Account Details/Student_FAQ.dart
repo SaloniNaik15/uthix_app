@@ -105,14 +105,14 @@ class _StudentFaqState extends State<StudentFaq> {
           ? const Center(child: Text("No FAQs available."))
           : SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10.w),
+          padding: EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 "Frequently Asked Questions",
                 style: TextStyle(
-                  fontSize: 18.sp,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -122,7 +122,7 @@ class _StudentFaqState extends State<StudentFaq> {
                   color: const Color(0xFFF4F4F4),
                   borderRadius: BorderRadius.circular(5.r),
                   border: Border.all(
-                      color: const Color(0xFFD9D9D9), width: 1.w),
+                      color: const Color(0xFFD9D9D9), width: 1),
                 ),
                 child: Column(
                   children: List.generate(_faqList.length, (index) {
@@ -134,7 +134,7 @@ class _StudentFaqState extends State<StudentFaq> {
                           question: item["question"],
                           answer: item["answer"],
                         ),
-                        Divider(height: 1.h),
+                        Divider(height: 1),
                       ],
                     );
                   }),
@@ -158,7 +158,7 @@ class _StudentFaqState extends State<StudentFaq> {
           title: Text(
             question,
             style: TextStyle(
-              fontSize: 14.sp,
+              fontSize: 14,
               color: Colors.black,
               fontWeight: FontWeight.w600,
             ),
@@ -167,7 +167,7 @@ class _StudentFaqState extends State<StudentFaq> {
             _expandedStates[index]
                 ? Icons.keyboard_arrow_up_outlined
                 : Icons.keyboard_arrow_down_outlined,
-            size: 25.sp,
+            size: 25,
             color: Colors.black,
           ),
           onTap: () {
@@ -178,11 +178,11 @@ class _StudentFaqState extends State<StudentFaq> {
         ),
         if (_expandedStates[index])
           Padding(
-            padding: EdgeInsets.all(10.w),
+            padding: EdgeInsets.all(10),
             child: Text(
               answer,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 14,
                 color: Colors.black,
               ),
             ),

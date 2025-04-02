@@ -93,18 +93,18 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Column(
             children: [
-              SizedBox(height: 10.h),
+              SizedBox(height: 10),
               Text(
                 "Manage your Account",
                 style: TextStyle(
-                  fontSize: 18.sp,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(height: 10.h),
               // Profile Image
               CircleAvatar(
-                radius: 50.r,
+                radius: 50,
                 backgroundImage: AssetImage(
                   "assets/Seller_dashboard_images/ManageStoreBackground.png",
                 ),
@@ -114,22 +114,13 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
               Text(
                 profile != null ? profile!["name"] ?? "null" : "Loading...",
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF2B5C74),
                 ),
               ),
               // Optionally, you can show more details from the profile if available.
-              Text(
-                profile != null
-                    ? "Class X B\nDelhi Public School, New Delhi\n+91 ${profile!["phone"] ?? "null"}"
-                    : "Loading...",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
+
               SizedBox(height: 20.h),
 
               // Profile fields
@@ -139,8 +130,8 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
               _buildProfileField(
                   Icons.phone, profile != null ? profile!["phone"]?.toString() ?? "null" : "Loading..."),
               // The sample API does not provide location or school. So we display "null".
-              _buildProfileField(Icons.location_on, "null"),
               _buildProfileField(Icons.school, "null"),
+              _buildProfileField(Icons.menu_book_sharp, "null"),
 
               SizedBox(height: 30.h),
 
@@ -179,7 +170,7 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
 
   Widget _buildProfileField(IconData icon, String text) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.only(bottom: 12),
       child: TextField(
         decoration: InputDecoration(
           filled: true,
@@ -187,27 +178,27 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
           prefixIcon: Icon(
             icon,
             color: Colors.grey,
-            size: 20.sp,
+            size: 20,
           ),
           hintText: text,
           hintStyle: TextStyle(
             color: const Color(0xFF605F5F),
             fontWeight: FontWeight.w500,
-            fontSize: 14.sp,
+            fontSize: 14,
           ),
           enabled: false,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30.r),
+            borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide(
               color: const Color(0xFFD2D2D2),
-              width: 2.w,
+              width: 2,
             ),
           ),
           disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30.r),
+            borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide(
               color: const Color(0xFFD2D2D2),
-              width: 1.w,
+              width: 1,
             ),
           ),
         ),
