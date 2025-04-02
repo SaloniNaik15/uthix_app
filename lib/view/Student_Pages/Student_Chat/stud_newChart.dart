@@ -4,19 +4,20 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer';
 
+import 'package:uthix_app/view/Student_Pages/Student_Chat/stud_personalChat.dart';
+
 class StudNewchart extends StatefulWidget {
   const StudNewchart({super.key});
 
   @override
-  State<StudNewchart> createState() => _NewChatState();
+  State<StudNewchart> createState() => _StudNewchartState();
 }
 
-class _NewChatState extends State<StudNewchart> {
+class _StudNewchartState extends State<StudNewchart> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   String? accessLoginToken;
-  List<String> allStudContacts = [];
-  List<String> filteredContacts = [];
+
   final Dio _dio = Dio();
   final String _apiUrl = "https://admin.uthix.com/api/get-all-user";
 
@@ -46,11 +47,14 @@ class _NewChatState extends State<StudNewchart> {
     });
   }
 
+  List<Map<String, dynamic>> allStudContacts = []; // Store full user data
+  List<Map<String, dynamic>> filteredContacts = [];
+
   Future<void> _fetchContacts([String query = ""]) async {
     try {
       String searchUrl = _apiUrl;
       if (query.isNotEmpty) {
-        searchUrl = "$_apiUrl?name=$query"; // Append search query dynamically
+        searchUrl = "$_apiUrl?name=$query";
       }
 
       Response response = await _dio.get(
@@ -62,8 +66,13 @@ class _NewChatState extends State<StudNewchart> {
       if (response.statusCode == 200) {
         List<dynamic> users = response.data["users"];
         setState(() {
-          allStudContacts =
-              users.map((user) => user["name"].toString()).toList();
+          allStudContacts = users
+              .map((user) => {
+                    "id": user["id"], // ✅ Store user ID
+                    "name": user["name"]
+                  })
+              .toList();
+
           filteredContacts = List.from(allStudContacts);
         });
       }
@@ -184,56 +193,60 @@ class _NewChatState extends State<StudNewchart> {
     );
   }
 
-  Widget _buildSuggestionItem(String name) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              SizedBox(
-                width: 50,
-                height: 50,
-                child: ClipOval(
-                  child: Image.asset("assets/login/profile.jpeg",
-                      fit: BoxFit.cover),
+  Widget _buildSuggestionItem(Map<String, dynamic> user) {
+    return InkWell(
+      onTap: () {
+        int conversationId = user["id"]; // ✅ Pass as conversationId
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                StudPersonalchat(conversationId: conversationId),
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: ClipOval(
+                    child: Image.asset("assets/login/profile.jpeg",
+                        fit: BoxFit.cover),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          name,
-                          style: GoogleFonts.urbanist(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: const Color.fromRGBO(0, 0, 0, 1),
-                          ),
-                        ),
-                      ],
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    user["name"],
+                    style: GoogleFonts.urbanist(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: const Color.fromRGBO(0, 0, 0, 1),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          const Row(
-            children: [
-              SizedBox(width: 60),
-              Expanded(
-                child: Divider(
-                  thickness: 2,
-                  color: Color.fromRGBO(246, 246, 245, 1),
+              ],
+            ),
+            const SizedBox(height: 10),
+            const Row(
+              children: [
+                SizedBox(width: 60),
+                Expanded(
+                  child: Divider(
+                    thickness: 2,
+                    color: Color.fromRGBO(246, 246, 245, 1),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

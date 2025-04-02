@@ -94,11 +94,11 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
         setState(() {
           _messages = messagesJson.map((json) {
             ChatMessage msg = ChatMessage.fromJson(json);
-            bool senderFlag =
-                (msg.senderId == currentUserId); // ✅ Correct sender check
+            bool senderFlag = (msg.senderId == currentUserId);
             return msg.copyWith(isSender: senderFlag);
           }).toList();
 
+          // ✅ Sort messages in ASCENDING order (oldest → newest)
           _messages.sort((a, b) => DateTime.parse(a.createdAt)
               .compareTo(DateTime.parse(b.createdAt)));
 
@@ -258,7 +258,7 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
                 : hasError
                     ? const Center(child: Text("Failed to load conversation"))
                     : ListView.builder(
-                        reverse: true, // Latest messages at bottom
+                        reverse: false, // Latest messages at bottom
                         itemCount: _messages.length,
                         itemBuilder: (context, index) {
                           return MessageBubble(message: _messages[index]);
