@@ -35,11 +35,11 @@ class _InstructorSettingsState extends State<InstructorSettings> {
         children: [
           // Title "Settings"
           Padding(
-            padding: EdgeInsets.all(16.w),
+            padding: EdgeInsets.all(10),
             child: Text(
               "Settings",
               style: TextStyle(
-                fontSize: 18.sp,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -51,19 +51,19 @@ class _InstructorSettingsState extends State<InstructorSettings> {
           ),
           // First Checkbox ListTile
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            padding: EdgeInsets.symmetric(horizontal: 10),
             child: CheckboxListTile(
               title: Text(
                 "Notifications",
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               subtitle: Text(
                 "This will not affect any order updates",
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 14,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -83,19 +83,19 @@ class _InstructorSettingsState extends State<InstructorSettings> {
           ),
           // Second Checkbox ListTile
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            padding: EdgeInsets.symmetric(horizontal: 10),
             child: CheckboxListTile(
               title: Text(
                 "Optimized Experience",
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               subtitle: Text(
                 "For optimized connection quality",
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 14,
                   fontWeight: FontWeight.w400,
                 ),
               ),

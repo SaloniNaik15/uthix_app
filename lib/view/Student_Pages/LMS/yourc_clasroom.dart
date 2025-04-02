@@ -35,9 +35,56 @@ class _YourClasroomState extends State<YourClasroom> {
 
   Future<void> _initializeData() async {
     await _loadUserCredentials();
-    await fetchAndLogClassroomData();
+    if (accessLoginToken != null) {
+      await fetchClassroomData();
+    }
   }
+  Future<void> fetchClassroomData() async {
+    try {
+      setState(() {
+        isLoading = true;
+        hasError = false;
+      });
 
+      final response = await dio.get(
+        'https://admin.uthix.com/api/student-classroom', // 🔁 Replace with your actual endpoint
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessLoginToken',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data['status'] == true) {
+        List<dynamic> rawData = response.data['data'];
+
+        // Dummy mapping (you should replace this with actual instructor/subject/classroom data retrieval)
+        List<Map<String, dynamic>> fetchedClasses = rawData.map<Map<String, dynamic>>((item) {
+          return {
+            "classroomId": item['classroom_id'],
+            "className": "Classroom ${item['classroom_id']}", // Replace with real data if available
+            "instructor": "Instructor ${item['instructor_id']}", // Replace with real instructor name if available
+          };
+        }).toList();
+
+        setState(() {
+          classList = fetchedClasses;
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          hasError = true;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      log("Error fetching classroom data: $e");
+      setState(() {
+        hasError = true;
+        isLoading = false;
+      });
+    }
+  }
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
@@ -46,94 +93,9 @@ class _YourClasroomState extends State<YourClasroom> {
     setState(() {
       accessLoginToken = token;
     });
-    await createStudent();
   }
 
-  Future<int?> createStudent() async {
-    if (accessLoginToken == null || accessLoginToken!.isEmpty) return null;
 
-    try {
-      final response = await dio.post(
-        "https://admin.uthix.com/api/student",
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $accessLoginToken',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-        ),
-      );
-
-      log("Create Student API Response: \${response.data}");
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        var data = response.data;
-        if (data["data"]?["user_id"] != null) {
-          int newStudentId = data["data"]["user_id"];
-          log("✅ New student created with user_id: \$newStudentId");
-          return newStudentId;
-        }
-      }
-    } catch (e) {
-      log("❌ Failed to create student: \$e");
-    }
-    return null;
-  }
-
-  Future<void> fetchAndLogClassroomData() async {
-    const url = 'https://admin.uthix.com/api/student-classroom';
-    try {
-      final response = await dio.get(
-        url,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $accessLoginToken',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-        ),
-      );
-      log("STUDENT-Response Body:\n\${response.data}\n");
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> jsonData = response.data;
-
-        if (jsonData["status"] == true && jsonData["students"] != null) {
-          List<dynamic> students = jsonData["students"];
-          List<Map<String, dynamic>> classrooms = [];
-
-          for (var student in students) {
-            final classroom = student["classroom"] ?? {};
-            final instructor = classroom["instructor"]?["user"] ?? {};
-
-            if (classroom.isNotEmpty && classroom["id"] != null) {
-              classrooms.add({
-                "classroomId": classroom["id"],
-                "className": classroom["class_name"] ?? "Class",
-                "section": classroom["section"] ?? "Section",
-                "instructor": instructor["name"] ?? "Unknown",
-              });
-            }
-          }
-
-          setState(() {
-            classList = classrooms;
-            isLoading = false;
-          });
-        } else {
-          setState(() {
-            classList = [];
-            isLoading = false;
-          });
-        }
-      }
-    } catch (e) {
-      log("❌ Error fetching classrooms: \$e");
-      setState(() {
-        hasError = true;
-        isLoading = false;
-      });
-    }
-  }
 
   void onItemTapped(int index) {
     setState(() {
@@ -215,6 +177,8 @@ class _YourClasroomState extends State<YourClasroom> {
                 Expanded(
                   child: isLoading
                       ? Center(child: CircularProgressIndicator())
+                      : hasError
+                      ? Center(child: Text("Failed to load classrooms"))
                       : classList.isEmpty
                       ? Center(child: Text("No classrooms assigned yet"))
                       : ListView.builder(

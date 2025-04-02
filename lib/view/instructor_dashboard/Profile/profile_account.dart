@@ -103,7 +103,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
             child: Stack(
               children: [
                 Padding(
-                  padding: EdgeInsets.only(left: 30),
+                  padding: EdgeInsets.only(left: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -117,11 +117,11 @@ class _ProfileAccountState extends State<ProfileAccount> {
                         ),
                       ),
                       SizedBox(
-                        width: 220,
+                        width: 250,
                         child: Text(
-                          "Congratulations! You are member now",
+                          "Congratulations! You are member now.",
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             fontWeight: FontWeight.w500,
                             color: Colors.black,
                           ),
@@ -130,6 +130,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
                     ],
                   ),
                 ),
+                Spacer(),
                 Positioned(
                   top: 0,
                   left: 280,
@@ -158,7 +159,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
               ),
               child: ListView.separated(
                 physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.only(top: 5, bottom: 5),
+                padding: EdgeInsets.only(top: 15, bottom: 15),
                 itemCount: menuItems.length,
                 separatorBuilder: (_, __) =>
                     Divider(thickness: 1, color: Color(0xFFD2D2D2)),
@@ -211,7 +212,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
                               Text(
                                 item["title"]!,
                                 style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.black),
                               ),

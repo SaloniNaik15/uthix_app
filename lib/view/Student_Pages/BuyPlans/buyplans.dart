@@ -124,7 +124,7 @@ class _BuyPlansState extends State<BuyPlans> {
 
   Widget _buildbenefits(String imagePath, String text) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 7.5.h),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -135,7 +135,7 @@ class _BuyPlansState extends State<BuyPlans> {
           Expanded(
             child: Text(text,
                 style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 10.sp,
                     fontFamily: "Urbanist",
                     fontWeight: FontWeight.w400,
                     color: Colors.black)),
@@ -239,7 +239,7 @@ class _BuyPlansState extends State<BuyPlans> {
         title: Text(
           "Choose Your Plan",
           style: TextStyle(
-              fontSize: 20.sp,
+              fontSize: 18.sp,
               fontWeight: FontWeight.w500,
               color: Colors.grey[700]),
         ),
@@ -250,7 +250,7 @@ class _BuyPlansState extends State<BuyPlans> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              height: 10.h,
+              height: 5.h,
             ),
             // Hardcoded Texts Above ListView
             ...features

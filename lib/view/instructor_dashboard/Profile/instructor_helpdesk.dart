@@ -120,7 +120,7 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Help Desk", style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+              Text("Help Desk", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -137,18 +137,18 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
               SizedBox(height: 10.h),
               const Divider(height: 1),
               SizedBox(height: 20.h),
-              Text("Raise a Query", style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold)),
+              Text("Raise a Query", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
               SizedBox(height: 20.h),
               const Divider(height: 1),
               SizedBox(height: 20.h),
-              Text("Subject", style: TextStyle(fontSize: 14.sp)),
+              Text("Subject", style: TextStyle(fontSize: 14)),
               SizedBox(height: 10.h),
               TextField(
                 controller: _subjectController,
                 decoration: InputDecoration(
                   hintText: "Start typing...",
                   filled: true,
-                  hintStyle: TextStyle(fontSize: 14.sp),
+                  hintStyle: TextStyle(fontSize: 14),
                   fillColor: const Color(0xFFF6F6F6),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -157,7 +157,7 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
                 ),
               ),
               SizedBox(height: 20.h),
-              Text("Description", style: TextStyle(fontSize: 14.sp)),
+              Text("Description", style: TextStyle(fontSize: 14)),
               SizedBox(height: 10.h),
               TextFormField(
                 controller: _descriptionController,
@@ -167,7 +167,7 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
                   hintText: 'Start Typing...',
                   filled: true,
                   fillColor: const Color(0xFFF6F6F6),
-                  hintStyle: TextStyle(fontSize: 14.sp),
+                  hintStyle: TextStyle(fontSize: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide(color: const Color(0xFFD2D2D2), width: 1),
@@ -179,7 +179,7 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
               SizedBox(height: 20.h),
               Container(
                 alignment: Alignment.center,
-                child: Text("We will answer your query asap.", style: TextStyle(fontSize: 14.sp)),
+                child: Text("We will answer your query asap.", style: TextStyle(fontSize: 14)),
               ),
               SizedBox(height: 60.h),
               Center(
@@ -201,7 +201,7 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
                           : Text(
                         "Send",
                         style: TextStyle(
-                          fontSize: 14.sp,
+                          fontSize: 14,
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
