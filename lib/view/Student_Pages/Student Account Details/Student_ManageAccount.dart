@@ -16,6 +16,7 @@ class StudentManageAccount extends StatefulWidget {
 
 class _StudentManageAccountState extends State<StudentManageAccount> {
   String? accessLoginToken;
+  String? profileImageUrl;
   // Holds the fetched profile data
   Map<String, dynamic>? profile;
 
@@ -43,30 +44,39 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
   Future<void> _fetchProfile() async {
     try {
       final dio = Dio();
-      // Replace with your actual API endpoint.
       final response = await dio.get(
-        "https://admin.uthix.com/api/profile",
+        "https://admin.uthix.com/api/student-profile",
         options: Options(
           headers: {"Authorization": "Bearer $accessLoginToken"},
         ),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && response.data["status"] == true) {
+        final profileData = response.data["data"];
+        final user = profileData["user"];
+        final classroom = profileData["classroom"];
+
+        String? imageFileName = user?["image"];
+        String? imageUrl = (imageFileName != null && imageFileName.isNotEmpty)
+            ? "https://admin.uthix.com/storage/images/student/${user["image"]}"
+            : null;
+
         setState(() {
-          profile = response.data;
+          profile = {
+            "name": user?["name"] ?? "N/A",
+            "phone": user?["phone"]?.toString() ?? "N/A",
+            "class": classroom?["class_name"] ?? "N/A",
+            "stream": profileData["stream"] ?? "N/A",
+          };
+          profileImageUrl = imageUrl;
         });
-        log("Profile fetched: ${response.data}");
+
+        log("✅ Student profile loaded: $profile");
       } else {
-        log("Failed to fetch profile: ${response.statusMessage}");
-        setState(() {
-          profile = null;
-        });
+        log("❌ Failed to fetch profile");
       }
     } catch (e) {
-      log("Error fetching profile: $e");
-      setState(() {
-        profile = null;
-      });
+      log("❌ Error fetching profile: $e");
     }
   }
 
@@ -105,9 +115,15 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
               // Profile Image
               CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage(
-                  "assets/Seller_dashboard_images/ManageStoreBackground.png",
-                ),
+                backgroundColor: Colors.grey[300],
+                backgroundImage: profileImageUrl != null
+                    ? NetworkImage(profileImageUrl!)
+                    : const AssetImage("assets/login/profile.jpeg") as ImageProvider,
+                onBackgroundImageError: (_, __) {
+                  setState(() {
+                    profileImageUrl = null;
+                  });
+                },
               ),
               SizedBox(height: 10.h),
               // Use the fetched profile name; if not yet available, show a placeholder.
@@ -125,13 +141,10 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
 
               // Profile fields
               // Here we use the fetched API data. For missing fields, "null" is shown.
-              _buildProfileField(
-                  Icons.person, profile != null ? profile!["name"] ?? "null" : "Loading..."),
-              _buildProfileField(
-                  Icons.phone, profile != null ? profile!["phone"]?.toString() ?? "null" : "Loading..."),
-              // The sample API does not provide location or school. So we display "null".
-              _buildProfileField(Icons.school, "null"),
-              _buildProfileField(Icons.menu_book_sharp, "null"),
+              _buildProfileField(Icons.person, profile?["name"] ?? "Loading..."),
+              _buildProfileField(Icons.phone, profile?["phone"] ?? "Loading..."),
+              _buildProfileField(Icons.school, profile?["class"] ?? "Loading..."),
+              _buildProfileField(Icons.menu_book_sharp, profile?["stream"] ?? "Loading..."),
 
               SizedBox(height: 30.h),
 
