@@ -18,9 +18,9 @@ dependencies:
   intl: ^0.20.2
   path_provider: ^2.1.5
   provider: ^6.1.2
-  shared_preferences: ^2.5.2
   table_calendar: ^3.2.0
   time: ^2.1.5
+
 #  razorpay_flutter: ^1.4.0
   cached_network_image: ^3.4.1
 
@@ -30,9 +30,12 @@ dependencies:
   flutter_screenutil: ^5.9.3
   carousel_slider: ^4.2.1
 
-  firebase_core: ^1.19.0
+  firebase_core: ^3.13.0
 
   url_launcher: ^6.3.1
+  shared_preferences: ^2.5.3
+  firebase_messaging: ^15.2.5
+  flutter_local_notifications: ^19.0.0
 
 
 dev_dependencies:

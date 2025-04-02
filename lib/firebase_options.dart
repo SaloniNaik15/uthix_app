@@ -59,4 +59,5 @@ class DefaultFirebaseOptions {
     projectId: 'uthix-2ec6c',
     storageBucket: 'uthix-2ec6c.firebasestorage.app',
   );
+
 }
