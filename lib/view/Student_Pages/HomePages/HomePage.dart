@@ -159,7 +159,7 @@ class _HomePagesState extends State<HomePages> {
                   Text(
                     userName ?? "...",
                     style: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Color.fromRGBO(96, 95, 95, 1),
                     ),
@@ -225,7 +225,7 @@ class _HomePagesState extends State<HomePages> {
             ),
           ),
           Positioned.fill(
-            top: 50.h,
+            top: 40.h,
             child: Align(
               alignment: Alignment.topCenter,
               child: Padding(
@@ -299,7 +299,7 @@ class _HomePagesState extends State<HomePages> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
-                              height: 117.6,
+                              height: 115,
                               child: Image.asset(
                                 dashBoard[index]["image"]!,
                                 fit: BoxFit.cover,

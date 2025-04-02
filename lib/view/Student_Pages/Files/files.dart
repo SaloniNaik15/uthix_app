@@ -59,10 +59,11 @@ class _StudFilesState extends State<StudFiles> {
       "title": "Images",
       "description": "8 GB, Modified by User on 05/01/2025",
     },
+
     {
-      "assetPath": "assets/files_icons/video.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
+      "assetPath": "assets/files_icons/image.png",
+      "title": "Images",
+      "description": "8 GB, Modified by User on 05/01/2025",
     },
     {
       "assetPath": "assets/files_icons/document_pdf.png",
@@ -79,51 +80,7 @@ class _StudFilesState extends State<StudFiles> {
       "title": "Documents",
       "description": "15 GB, Modified by Admin on 10/02/2025",
     },
-    {
-      "assetPath": "assets/files_icons/document_pdf.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/document_pdf.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/image.png",
-      "title": "Images",
-      "description": "8 GB, Modified by User on 05/01/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/video.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/document_pdf.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/document_pdf.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/image.png",
-      "title": "Images",
-      "description": "8 GB, Modified by User on 05/01/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/video.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
-    {
-      "assetPath": "assets/files_icons/document_pdf.png",
-      "title": "Documents",
-      "description": "15 GB, Modified by Admin on 10/02/2025",
-    },
+
   ];
 
   List<String> sortOptions = ["Newest", "Oldest", "A-Z"];
@@ -163,8 +120,8 @@ class _StudFilesState extends State<StudFiles> {
                     SizedBox(height: 10.h),
                     Text(
                       "The class recordings and files uploaded by you will appear here",
-                      style: GoogleFonts.urbanist(
-                        fontSize: 12.sp,
+                      style: TextStyle(
+                        fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: const Color.fromRGBO(96, 95, 95, 1),
                       ),
@@ -200,8 +157,8 @@ class _StudFilesState extends State<StudFiles> {
                                 child: Center(
                                   child: Text(
                                     sortOptions[index],
-                                    style: GoogleFonts.urbanist(
-                                      fontSize: 14.sp,
+                                    style:TextStyle(
+                                      fontSize: 14,
                                       fontWeight: FontWeight.w700,
                                       color: selectedIndex == index
                                           ? Colors.white
@@ -257,16 +214,16 @@ class _StudFilesState extends State<StudFiles> {
                                   children: [
                                     Text(
                                       file["title"]!,
-                                      style: GoogleFonts.urbanist(
-                                        fontSize: 16.sp,
+                                      style: TextStyle(
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w500,
                                         color: const Color.fromRGBO(0, 0, 0, 1),
                                       ),
                                     ),
                                     Text(
                                       file["description"]!,
-                                      style: GoogleFonts.urbanist(
-                                        fontSize: 14.sp,
+                                      style:TextStyle(
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400,
                                         color: const Color.fromRGBO(0, 0, 0, 1),
                                       ),

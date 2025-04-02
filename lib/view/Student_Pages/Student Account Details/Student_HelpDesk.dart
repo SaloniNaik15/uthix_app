@@ -34,7 +34,8 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
       final prefs = await SharedPreferences.getInstance();
       final authToken = prefs.getString('auth_token');
       Dio dio = Dio();
-      const String apiUrl = "https://admin.uthix.com/api/help-desks"; // 🔁 Replace this
+      const String apiUrl =
+          "https://admin.uthix.com/api/help-desks"; // 🔁 Replace this
 
       final response = await dio.post(
         apiUrl,
@@ -46,7 +47,6 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
           headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer $authToken",
-
           },
         ),
       );
@@ -95,7 +95,7 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
                 icon: Icon(
                   Icons.arrow_back_ios_outlined,
                   color: const Color(0xFF605F5F),
-                  size: 20.sp,
+                  size: 20,
                 ),
                 onPressed: () {
                   Navigator.pop(context);
@@ -103,8 +103,8 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
               ),
             ),
             Positioned(
-              top: 30.h,
-              right: -10.w,
+              top: 30,
+              right: -10,
               child: Image.asset(
                 'assets/icons/FrequentlyAsked Questions.png',
                 width: 70.w,
@@ -120,44 +120,51 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Help Desk", style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
+              Text("Help Desk",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    height: 50.h,
-                    width: 220.w,
-                    child: const Text("Please contact us and we will be happy to help you"),
-                  ),
+                  Text(
+                      "Please contact us \n"
+                      " we will be happy to help you",
+                      style: TextStyle(
+                        fontSize: 16,
+                      )),
+                  Spacer(),
                   Card(
-                    child: Image.asset('assets/icons/HelpDesk.png', width: 90.w, height: 90.h),
+                    child: Image.asset('assets/icons/HelpDesk.png',
+                        width: 90, height: 90),
                   ),
                 ],
               ),
               SizedBox(height: 10.h),
               const Divider(height: 1),
               SizedBox(height: 20.h),
-              Text("Raise a Query", style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold)),
+              Text("Raise a Query",
+                  style:
+                      TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
               SizedBox(height: 20.h),
               const Divider(height: 1),
               SizedBox(height: 20.h),
-              Text("Subject", style: TextStyle(fontSize: 14.sp)),
+              Text("Subject", style: TextStyle(fontSize: 14)),
               SizedBox(height: 10.h),
               TextField(
                 controller: _subjectController,
                 decoration: InputDecoration(
                   hintText: "Start typing...",
                   filled: true,
-                  hintStyle: TextStyle(fontSize: 14.sp),
+                  hintStyle: TextStyle(fontSize: 14),
                   fillColor: const Color(0xFFF6F6F6),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: const Color(0xFFD2D2D2), width: 1.w),
+                    borderSide:
+                        BorderSide(color: const Color(0xFFD2D2D2), width: 1),
                   ),
                 ),
               ),
               SizedBox(height: 20.h),
-              Text("Description", style: TextStyle(fontSize: 14.sp)),
+              Text("Description", style: TextStyle(fontSize: 14)),
               SizedBox(height: 10.h),
               TextFormField(
                 controller: _descriptionController,
@@ -170,7 +177,8 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
                   hintStyle: TextStyle(fontSize: 14.sp),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: const Color(0xFFD2D2D2), width: 1),
+                    borderSide:
+                        BorderSide(color: const Color(0xFFD2D2D2), width: 1),
                   ),
                 ),
                 textAlign: TextAlign.left,
@@ -179,7 +187,8 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
               SizedBox(height: 20.h),
               Container(
                 alignment: Alignment.center,
-                child: Text("We will answer your query asap.", style: TextStyle(fontSize: 14.sp)),
+                child: Text("We will answer your query asap.",
+                    style: TextStyle(fontSize: 14)),
               ),
               SizedBox(height: 60.h),
               Center(
@@ -197,15 +206,16 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
                       ),
                       onPressed: isLoading ? null : submitQuery,
                       child: isLoading
-                          ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                          ? const CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2)
                           : Text(
-                        "Send",
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                              "Send",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
                   ),
                 ),

@@ -53,7 +53,7 @@ class _StudentProfileState extends State<StudentProfile> {
       accessLoginToken = token;
     });
     await fetchClasses();
-    _fetchUserProfile();
+    // _fetchUserProfile();
     _fetchstudentProfile();
   }
 
@@ -94,32 +94,6 @@ class _StudentProfileState extends State<StudentProfile> {
       setState(() {
         _profileImage = File(pickedFile.path);
       });
-    }
-  }
-
-  Future<void> _fetchUserProfile() async {
-    try {
-      final dio = Dio();
-      final response = await dio.get(
-        "https://admin.uthix.com/api/profile",
-        options: Options(
-          headers: {"Authorization": "Bearer $accessLoginToken"},
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        _populateFields(data);
-
-        // Cache the profile data
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString("cached_profile", jsonEncode(data));
-        log("Profile updated from API and cached.");
-      } else {
-        log("Failed to fetch user profile: ${response.statusMessage}");
-      }
-    } catch (e) {
-      log("Error fetching user profile: $e");
     }
   }
 
@@ -240,37 +214,26 @@ class _StudentProfileState extends State<StudentProfile> {
       );
 
       if (response.statusCode == 200 && response.data["status"] == true) {
-        final profileData = response.data["data"][0];
+        final profileData = response.data["data"]; // ✅ It's a map, not a list
         final user = profileData["user"];
+        final classroom = profileData["classroom"];
         final classroomIdFromApi = profileData["classroom_id"];
 
-        String classNameFromApi = "";
-        if (classroomIdFromApi != null) {
-          final matchedClass = classOptions.firstWhere(
-            (option) => option["id"] == classroomIdFromApi,
-            orElse: () => {"name": ""},
-          );
-          classNameFromApi = matchedClass["name"];
-        }
+        String classNameFromApi = classroom != null ? classroom["class_name"] ?? "" : "";
 
         setState(() {
+          _nameController.text = user["name"] ?? "";
+          _emailController.text = user["email"] ?? "";
           _phoneController.text = user["phone"]?.toString() ?? "";
           _dobController.text = user["dob"] ?? "";
           _genderValue = user["gender"];
           _streamController.text = profileData["stream"] ?? "";
-          selectedClassroomId = profileData["classroom_id"];
-
-          if (selectedClassroomId != null) {
-            final selectedClass = classOptions.firstWhere(
-              (option) => option["id"] == selectedClassroomId,
-              orElse: () => {"name": ""},
-            );
-            _classController.text = selectedClass["name"];
-          }
+          selectedClassroomId = classroomIdFromApi;
+          _classController.text = classNameFromApi;
 
           if (user["image"] != null && user["image"].toString().isNotEmpty) {
             networkImageUrl =
-                "https://admin.uthix.com/storage/images/student/${user["image"]}";
+            "https://admin.uthix.com/storage/images/student/${user["image"]}";
           } else {
             networkImageUrl = null;
           }
@@ -281,12 +244,12 @@ class _StudentProfileState extends State<StudentProfile> {
           prefs.setString("student_profile_image_url", networkImageUrl!);
         }
 
-        log("✅ Profile fields loaded successfully.");
+        log("✅ Student profile loaded successfully.");
       } else {
-        log("❌ Failed to load profile: ${response.statusCode}");
+        log("❌ Failed to load student profile: ${response.statusCode}");
       }
     } catch (e) {
-      log("❌ Error fetching profile: $e");
+      log("❌ Error fetching student profile: $e");
     }
   }
 

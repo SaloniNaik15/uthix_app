@@ -20,7 +20,7 @@ class _StudentWalletState extends State<StudentWallet> {
           icon: Icon(
             Icons.arrow_back_ios_outlined,
             color: const Color(0xFF605F5F),
-            size: 20.sp,
+            size: 20,
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -28,7 +28,7 @@ class _StudentWalletState extends State<StudentWallet> {
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(20.w),
+        padding: EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -43,16 +43,16 @@ class _StudentWalletState extends State<StudentWallet> {
                     Text(
                       "Wallet",
                       style: TextStyle(
-                        fontSize: 18.sp,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
                     ),
-                    SizedBox(height: 5.h),
+                    SizedBox(height: 5),
                     Text(
                       "Credit id added to your wallet\nwith every order",
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontSize: 14,
                         color: Colors.black87,
                       ),
                     ),
@@ -60,8 +60,8 @@ class _StudentWalletState extends State<StudentWallet> {
                 ),
                 // Wallet Balance Container
                 Container(
-                  width: 100.w,
-                  height: 100.w,
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
                     color: const Color(0xFF2B5C74),
                     shape: BoxShape.circle,
@@ -77,14 +77,14 @@ class _StudentWalletState extends State<StudentWallet> {
                     children: [
                       Icon(
                         Icons.account_balance_wallet,
-                        size: 25.sp,
+                        size: 25,
                         color: Colors.green,
                       ),
-                      SizedBox(height: 5.h),
+                      SizedBox(height: 5),
                       Text(
                         "₹299",
                         style: TextStyle(
-                          fontSize: 14.sp,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -92,14 +92,14 @@ class _StudentWalletState extends State<StudentWallet> {
                       Text(
                         "Wallet",
                         style: TextStyle(
-                          fontSize: 10.sp,
+                          fontSize: 10,
                           color: Colors.white,
                         ),
                       ),
                       Text(
                         "Balance",
                         style: TextStyle(
-                          fontSize: 10.sp,
+                          fontSize: 10,
                           color: Colors.white,
                         ),
                       ),
@@ -108,7 +108,7 @@ class _StudentWalletState extends State<StudentWallet> {
                 ),
               ],
             ),
-            SizedBox(height: 30.h),
+            SizedBox(height: 30),
             // Cashback & Wallet Usage Sections
             _buildWalletFeature(
               number: "1",
@@ -116,7 +116,7 @@ class _StudentWalletState extends State<StudentWallet> {
               description:
               "50% cashback will be credited to your wallet with every order",
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 20),
             _buildWalletFeature(
               number: "2",
               title: "Save more by using wallet cash",
@@ -139,8 +139,8 @@ class _StudentWalletState extends State<StudentWallet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 30.w,
-          height: 30.w,
+          width: 30,
+          height: 30,
           decoration: BoxDecoration(
             color: Colors.blue,
             shape: BoxShape.circle,
@@ -151,7 +151,7 @@ class _StudentWalletState extends State<StudentWallet> {
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
-                fontSize: 14.sp,
+                fontSize: 14,
               ),
             ),
           ),
@@ -164,7 +164,7 @@ class _StudentWalletState extends State<StudentWallet> {
               Text(
                 title,
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -172,7 +172,7 @@ class _StudentWalletState extends State<StudentWallet> {
               Text(
                 description,
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 14,
                 ),
               ),
             ],

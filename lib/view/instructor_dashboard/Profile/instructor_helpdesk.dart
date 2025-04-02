@@ -11,7 +11,6 @@ class InstructorHelpdesk extends StatefulWidget {
 }
 
 class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
-
   final TextEditingController _subjectController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   bool isLoading = false;
@@ -47,7 +46,6 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
           headers: {
             "Content-Type": "application/json",
             "Authorization": "Bearer $authToken",
-
           },
         ),
       );
@@ -80,6 +78,7 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
     _descriptionController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,7 +94,7 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
                 icon: Icon(
                   Icons.arrow_back_ios_outlined,
                   color: const Color(0xFF605F5F),
-                  size: 20.sp,
+                  size: 20,
                 ),
                 onPressed: () {
                   Navigator.pop(context);
@@ -103,8 +102,8 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
               ),
             ),
             Positioned(
-              top: 30.h,
-              right: -10.w,
+              top: 30,
+              right: -10,
               child: Image.asset(
                 'assets/icons/FrequentlyAsked Questions.png',
                 width: 70.w,
@@ -120,24 +119,29 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Help Desk", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text("Help Desk",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    height: 50.h,
-                    width: 220.w,
-                    child: const Text("Please contact us and we will be happy to help you"),
-                  ),
+                  Text(
+                      "Please contact us \n"
+                      " we will be happy to help you",
+                      style: TextStyle(
+                        fontSize: 16,
+                      )),
+                  Spacer(),
                   Card(
-                    child: Image.asset('assets/icons/HelpDesk.png', width: 90.w, height: 90.h),
+                    child: Image.asset('assets/icons/HelpDesk.png',
+                        width: 90, height: 90),
                   ),
                 ],
               ),
               SizedBox(height: 10.h),
               const Divider(height: 1),
               SizedBox(height: 20.h),
-              Text("Raise a Query", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+              Text("Raise a Query",
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
               SizedBox(height: 20.h),
               const Divider(height: 1),
               SizedBox(height: 20.h),
@@ -152,7 +156,8 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
                   fillColor: const Color(0xFFF6F6F6),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: const Color(0xFFD2D2D2), width: 1.w),
+                    borderSide:
+                        BorderSide(color: const Color(0xFFD2D2D2), width: 1.w),
                   ),
                 ),
               ),
@@ -170,7 +175,8 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
                   hintStyle: TextStyle(fontSize: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: const Color(0xFFD2D2D2), width: 1),
+                    borderSide:
+                        BorderSide(color: const Color(0xFFD2D2D2), width: 1),
                   ),
                 ),
                 textAlign: TextAlign.left,
@@ -179,7 +185,8 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
               SizedBox(height: 20.h),
               Container(
                 alignment: Alignment.center,
-                child: Text("We will answer your query asap.", style: TextStyle(fontSize: 14)),
+                child: Text("We will answer your query asap.",
+                    style: TextStyle(fontSize: 14)),
               ),
               SizedBox(height: 60.h),
               Center(
@@ -197,15 +204,16 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
                       ),
                       onPressed: isLoading ? null : submitQuery,
                       child: isLoading
-                          ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                          ? const CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2)
                           : Text(
-                        "Send",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                              "Send",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ),
                   ),
                 ),
