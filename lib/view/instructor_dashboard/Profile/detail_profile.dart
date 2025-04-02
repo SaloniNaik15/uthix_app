@@ -111,53 +111,66 @@ class _DetailProfileState extends State<DetailProfile> {
           },
         ),
       );
+
       if (response.statusCode == 200 && response.data['status'] == true) {
-        final user = response.data['data'][0];
-        final userInfo = user['user'];
+        final userProfile = response.data['data'][0];
+        final userInfo = userProfile['user'];
+
+        int userId = userInfo['id'] ?? 0; // ✅ Ensure non-null user ID
 
         setState(() {
           controllers['name']?.text = userInfo['name'] ?? '';
           controllers['phone']?.text = userInfo['phone']?.toString() ?? '';
           controllers['email']?.text = userInfo['email'] ?? '';
           controllers['gender']?.text = userInfo['gender'] ?? '';
-          controllers['bio']?.text = user['bio'] ?? '';
-          controllers['qualification']?.text = user['qualification'] ?? '';
-          controllers['experience']?.text = user['experience']?.toString() ?? '';
-          controllers['specialization']?.text = user['specialization'] ?? '';
+          controllers['bio']?.text = userProfile['bio'] ?? '';
+          controllers['qualification']?.text =
+              userProfile['qualification'] ?? '';
+          controllers['experience']?.text =
+              userProfile['experience']?.toString() ?? '';
+          controllers['specialization']?.text =
+              userProfile['specialization'] ?? '';
+
           final profileImageName =
-              user["profile_image"] ?? userInfo["image"]; // fallback
+              userProfile["profile_image"] ?? userInfo["image"];
           if (profileImageName != null &&
-              profileImageName.toString().toLowerCase() != "null" &&
-              profileImageName.toString().isNotEmpty) {
-            setState(() {
-              profileImageUrl =
-                  "https://admin.uthix.com/storage/images/instructor/${userInfo["image"]}";
-              log("Profile Image URL: $profileImageUrl");
-            });
-          }else {
-            setState(() {
-              profileImageUrl = null; // fallback to default image
-            });
+              profileImageName.toString().toLowerCase() != "null") {
+            profileImageUrl =
+                "https://admin.uthix.com/storage/images/instructor/$profileImageName";
+            log("✅ Profile Image URL: $profileImageUrl");
+          } else {
+            profileImageUrl = null;
           }
         });
+
         final prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('user_id', userId); // ✅ Store non-null user ID
         await prefs.setString('instructor_name', userInfo['name'] ?? '');
-        await prefs.setString('instructor_phone', userInfo['phone']?.toString() ?? '');
+        await prefs.setString(
+            'instructor_phone', userInfo['phone']?.toString() ?? '');
         await prefs.setString('instructor_email', userInfo['email'] ?? '');
-        await prefs.setString('instructor_specialization', user['specialization'] ?? '');
-        await prefs.setString('instructor_experience', user['experience']?.toString() ?? '');
-        final imageName = user["profile_image"] ?? userInfo["image"];
+        await prefs.setString(
+            'instructor_specialization', userProfile['specialization'] ?? '');
+        await prefs.setString('instructor_experience',
+            userProfile['experience']?.toString() ?? '');
+
+        final imageName = userProfile["profile_image"] ?? userInfo["image"];
         if (imageName != null && imageName.toString().toLowerCase() != "null") {
           await prefs.setString('instructor_image_url',
               "https://admin.uthix.com/storage/images/instructor/$imageName");
         } else {
           await prefs.remove('instructor_image_url');
         }
+
+        // ✅ Log user_id AFTER storing it in SharedPreferences
+        log("✅ Instructor Profile Stored Successfully.");
+        log("🔍 Stored Instructor User ID: ${prefs.getInt('user_id')}");
+      } else {
+        log("❌ Failed to load instructor profile: ${response.statusCode}");
       }
     } catch (e) {
-      debugPrint("Error fetching profile: $e");
+      log("❌ Error fetching instructor profile: $e");
     }
-
   }
 
   Future<void> updateProfile() async {
@@ -225,7 +238,9 @@ class _DetailProfileState extends State<DetailProfile> {
         });
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => InstructorDashboard()), // 👈 Your Dashboard screen
+          MaterialPageRoute(
+              builder: (context) =>
+                  InstructorDashboard()), // 👈 Your Dashboard screen
         );
       } else {
         debugPrint("❌ Failed to update: ${response.data}");

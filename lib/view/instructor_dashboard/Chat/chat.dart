@@ -1,18 +1,19 @@
-import 'dart:developer';
+// ignore_for_file: deprecated_member_use
 
+import 'dart:convert';
+import 'dart:developer';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uthix_app/UpcomingPage.dart';
+import 'package:uthix_app/modal/nav_itemStudent.dart';
 import 'package:uthix_app/modal/nav_items.dart';
 import 'package:uthix_app/modal/navbarWidgetInstructor.dart';
+import 'package:uthix_app/modal/navbarWidgetStudent.dart';
 import 'package:uthix_app/view/instructor_dashboard/Chat/new_chat.dart';
 import 'package:uthix_app/view/instructor_dashboard/Chat/personal_chat.dart';
-import 'package:uthix_app/view/instructor_dashboard/Dashboard/instructor_dashboard.dart';
-import 'package:uthix_app/view/instructor_dashboard/Profile/profile_account.dart';
-import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
 
 class Chat extends StatefulWidget {
   const Chat({super.key});
@@ -27,6 +28,87 @@ class _ChatState extends State<Chat> {
   List<dynamic> messages = [];
   bool isLoading = true;
   bool hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    await _loadUserCredentials();
+    await fetchMessages();
+  }
+
+  int currentUserId = 0;
+
+  Future<void> _loadUserCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String? token = prefs.getString('auth_token'); // Retrieve token
+    int? userId = prefs.getInt('user_id'); // Retrieve user_id
+
+    log("🔹 Retrieved Token: $token");
+    log("🔹 Retrieved User ID: $userId");
+
+    setState(() {
+      accessLoginToken = token;
+      currentUserId = userId ?? 0; // ✅ Ensure non-null user ID
+    });
+  }
+
+  Future<void> fetchMessages() async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://admin.uthix.com/api/get-messages'),
+        headers: {
+          'Authorization': 'Bearer $accessLoginToken',
+          'Content-Type': 'application/json',
+        },
+      );
+      log("Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        List<dynamic> rawMessages = data['messages'];
+
+        // Group messages by the other participant (sender OR receiver)
+        Map<int, dynamic> groupedMessages = {};
+
+        for (var message in rawMessages) {
+          int senderId = message['sender']['id'];
+          int receiverId = message['receiver']['id'];
+
+          // Determine the other participant (who you're chatting with)
+          int otherUserId = senderId == currentUserId ? receiverId : senderId;
+
+          // Get the existing message for the user
+          var existingMessage = groupedMessages[otherUserId];
+
+          // If there's no existing message or this one is newer, update it
+          if (existingMessage == null ||
+              DateTime.parse(message['created_at'])
+                  .isAfter(DateTime.parse(existingMessage['created_at']))) {
+            groupedMessages[otherUserId] = message;
+          }
+        }
+
+        setState(() {
+          messages = groupedMessages.values
+              .toList(); // Ensure latest messages are displayed first
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load messages');
+      }
+    } catch (e) {
+      log("Error fetching messages: $e");
+      setState(() {
+        hasError = true;
+        isLoading = false;
+      });
+    }
+  }
 
   void onItemTapped(int index) {
     setState(() {
@@ -44,64 +126,12 @@ class _ChatState extends State<Chat> {
       });
     }
   }
-  @override
-  void initState() {
-    super.initState();
-    _initializeData();
-  }
 
-  Future<void> _initializeData() async {
-    await _loadUserCredentials();
-    await fetchMessages();
-  }
-  Future<void> fetchMessages() async {
-    try {
-      Dio dio = Dio();
-
-      final response = await dio.get(
-        'https://admin.uthix.com/api/get-messages',
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $accessLoginToken', // Replace with actual token
-            'Content-Type': 'application/json',
-          },
-        ),
-      );
-
-      log("Response Body: ${response.data}");
-
-      if (response.statusCode == 200) {
-        setState(() {
-          messages = response.data['messages'];
-          isLoading = false;
-        });
-      } else {
-        throw Exception('Failed to load messages');
-      }
-    } catch (e) {
-      log("Error fetching messages: $e");
-      setState(() {
-        hasError = true;
-        isLoading = false;
-      });
-    }
-  }
-  Future<void> _loadUserCredentials() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token'); // Retrieve token
-    log("Retrieved Token: $token"); // Log token for verification
-
-    setState(() {
-      accessLoginToken = token;
-    });
-  }
   @override
   Widget build(BuildContext context) {
     return Stack(
-      clipBehavior: Clip.none,
       children: [
         Scaffold(
-          backgroundColor: Colors.white,
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(80.h),
             child: AppBar(
@@ -116,7 +146,7 @@ class _ChatState extends State<Chat> {
               title: Text(
                 "Chat",
                 style: GoogleFonts.urbanist(
-                  fontSize: 18.sp,
+                  fontSize: 20.sp,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -133,14 +163,20 @@ class _ChatState extends State<Chat> {
                     // <-- Added to take remaining space
                     child: ListView.builder(
                       padding: EdgeInsets.zero,
-                      physics: BouncingScrollPhysics(), // Adds smooth scrolling
+                      physics: BouncingScrollPhysics(),
                       itemCount: messages.length,
                       itemBuilder: (context, index) {
                         final message = messages[index];
-                        final senderName =
-                            message['receiver']?['name'] ?? "Unknown";
-                        final messageText = message['message'] ?? "";
-                        final isRead = message['is_read'] == 1;
+                        final senderId = message['sender']['id'];
+                        final receiverId = message['receiver']['id'];
+
+                        // Determine the chat partner (not the current user)
+                        final otherUser = senderId == currentUserId
+                            ? message['receiver']
+                            : message['sender'];
+                        final otherUserName = otherUser['name'] ?? "Unknown";
+                        final messageText = message['message'] ??
+                            "No message"; // Fallback if message is empty
                         final createdAt = message['created_at'] ?? "";
                         final formattedDate = createdAt.contains('T')
                             ? createdAt.split('T')[0]
@@ -151,8 +187,8 @@ class _ChatState extends State<Chat> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => PersonalChat(
-                                    conversationId: message['receiver']['id']),
+                                builder: (context) => Personalchat(
+                                    conversationId: otherUser['id']),
                               ),
                             );
                           },
@@ -172,9 +208,9 @@ class _ChatState extends State<Chat> {
                                         fit: BoxFit.cover,
                                         errorBuilder:
                                             (context, error, stackTrace) =>
-                                            Icon(Icons.person,
-                                                size: 50,
-                                                color: Colors.grey),
+                                                Icon(Icons.person,
+                                                    size: 50,
+                                                    color: Colors.grey),
                                       ),
                                     ),
                                   ),
@@ -183,14 +219,14 @@ class _ChatState extends State<Chat> {
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Row(
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              senderName,
+                                              otherUserName, // Show the actual chat partner's name
                                               style: GoogleFonts.urbanist(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w500,
@@ -225,26 +261,6 @@ class _ChatState extends State<Chat> {
                                               ),
                                             ),
                                           ),
-                                          if (!isRead)
-                                            Container(
-                                              height: 22,
-                                              width: 22,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Color.fromRGBO(
-                                                    51, 152, 246, 1),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  "1",
-                                                  style: GoogleFonts.urbanist(
-                                                    fontSize: 11,
-                                                    fontWeight: FontWeight.w400,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
                                         ],
                                       ),
                                     ],
@@ -315,33 +331,29 @@ class _ChatState extends State<Chat> {
             ],
           ),
         ),
-
-        // Gradient Container Positioned Half in AppBar and Half in Body
         Positioned(
-          top:
-              74.h, // Adjust this value to control how much is above the AppBar
-          left: MediaQuery.of(context).size.width / 2 -
-              50.w, // Centering the circle
+          top: 100,
+          left: (MediaQuery.of(context).size.width - 80) / 2,
           child: Container(
-            width: 80.w,
-            height: 80.h,
+            width: 80,
+            height: 80,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
-                colors: [Colors.white, Colors.blue],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Color.fromRGBO(255, 255, 255, 1),
+                  Color.fromRGBO(51, 152, 246, 0.75),
+                ],
               ),
             ),
-            child: CircleAvatar(
-              radius: 50.r,
-              backgroundColor: Colors.transparent,
-              child: CircleAvatar(
-                radius: 45.r,
-                backgroundColor: Colors.white,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(45.r),
-                  child: Image.asset("assets/icons/profile.png"),
+            child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
                 ),
               ),
             ),

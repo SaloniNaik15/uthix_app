@@ -62,19 +62,6 @@ class _MailidpageState extends State<Mailidpage> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data;
 
-        // Extract user ID safely
-        int? userId = data['user'] != null && data['user'].containsKey('id')
-            ? data['user']['id']
-            : null;
-
-        if (userId != null) {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setInt('user_id', userId);
-          log("Saloniiiiii Stored Id: ${prefs.getInt('user_id')}");
-        } else {
-          log("Warning: User ID is missing from API response");
-        }
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Registration Successful!")),
         );

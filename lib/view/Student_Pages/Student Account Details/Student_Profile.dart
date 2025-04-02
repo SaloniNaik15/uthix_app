@@ -238,14 +238,17 @@ class _StudentProfileState extends State<StudentProfile> {
       );
 
       if (response.statusCode == 200 && response.data["status"] == true) {
-        final profileData = response.data["data"][0];
+        final profileData = response.data["data"];
         final user = profileData["user"];
+
+        // ✅ Extract user_id
+        int userId = user["id"];
 
         setState(() {
           _phoneController.text = user["phone"]?.toString() ?? "";
           _dobController.text = user["dob"] ?? "";
           _genderValue = user["gender"];
-          _classController.text = profileData["class"] ?? "";
+          _classController.text = profileData["classroom_id"]?.toString() ?? "";
           _streamController.text = profileData["stream"] ?? "";
 
           if (user["image"] != null && user["image"].toString().isNotEmpty) {
@@ -255,9 +258,17 @@ class _StudentProfileState extends State<StudentProfile> {
             networkImageUrl = null;
           }
         });
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+
+        // ✅ Store user_id in SharedPreferences
+        await prefs.setInt("user_id", userId);
+        log("✅CHAT FOR_STUDENT: Stored User ID: $userId");
+
+        // ✅ Store profile image URL if available
         if (networkImageUrl != null) {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setString("student_profile_image_url", networkImageUrl!);
+          await prefs.setString("student_profile_image_url", networkImageUrl!);
+          log("✅ Stored Profile Image URL: $networkImageUrl");
         }
 
         log("✅ Profile fields loaded successfully.");

@@ -39,13 +39,20 @@ class _StudChatState extends State<StudChat> {
     await fetchMessages();
   }
 
+  int currentUserId = 0;
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token'); // Retrieve token
-    log("Retrieved Token: $token"); // Log token for verification
+    int? userId = prefs.getInt('user_id');
+
+    log("Retrieved Token: $token");
+    log("CHAT-STUDENT Retrieved User ID: $userId");
 
     setState(() {
       accessLoginToken = token;
+      if (userId != null) {
+        currentUserId = userId; // ✅ Update with actual user ID
+      }
     });
   }
 
@@ -64,16 +71,30 @@ class _StudChatState extends State<StudChat> {
         final data = jsonDecode(response.body);
         List<dynamic> rawMessages = data['messages'];
 
-        // Group messages by senderId, keeping only the latest message per sender
+        // Group messages by the other participant (sender OR receiver)
         Map<int, dynamic> groupedMessages = {};
 
         for (var message in rawMessages) {
-          int senderId = message['receiver']['id'];
-          groupedMessages[senderId] = message; // This keeps the latest message
+          int senderId = message['sender']['id'];
+          int receiverId = message['receiver']['id'];
+
+          // Determine the other participant (who you're chatting with)
+          int otherUserId = senderId == currentUserId ? receiverId : senderId;
+
+          // Get the existing message for the user
+          var existingMessage = groupedMessages[otherUserId];
+
+          // If there's no existing message or this one is newer, update it
+          if (existingMessage == null ||
+              DateTime.parse(message['created_at'])
+                  .isAfter(DateTime.parse(existingMessage['created_at']))) {
+            groupedMessages[otherUserId] = message;
+          }
         }
 
         setState(() {
-          messages = groupedMessages.values.toList();
+          messages = groupedMessages.values
+              .toList(); // Ensure latest messages are displayed first
           isLoading = false;
         });
       } else {
@@ -141,14 +162,20 @@ class _StudChatState extends State<StudChat> {
                     // <-- Added to take remaining space
                     child: ListView.builder(
                       padding: EdgeInsets.zero,
-                      physics: BouncingScrollPhysics(), // Adds smooth scrolling
+                      physics: BouncingScrollPhysics(),
                       itemCount: messages.length,
                       itemBuilder: (context, index) {
                         final message = messages[index];
-                        final senderName =
-                            message['receiver']?['name'] ?? "Unknown";
-                        final messageText = message['message'] ?? "";
-                        final isRead = message['is_read'] == 1;
+                        final senderId = message['sender']['id'];
+                        final receiverId = message['receiver']['id'];
+
+                        // Determine the chat partner (not the current user)
+                        final otherUser = senderId == currentUserId
+                            ? message['receiver']
+                            : message['sender'];
+                        final otherUserName = otherUser['name'] ?? "Unknown";
+                        final messageText = message['message'] ??
+                            "No message"; // Fallback if message is empty
                         final createdAt = message['created_at'] ?? "";
                         final formattedDate = createdAt.contains('T')
                             ? createdAt.split('T')[0]
@@ -160,7 +187,7 @@ class _StudChatState extends State<StudChat> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => StudPersonalchat(
-                                    conversationId: message['receiver']['id']),
+                                    conversationId: otherUser['id']),
                               ),
                             );
                           },
@@ -198,7 +225,7 @@ class _StudChatState extends State<StudChat> {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              senderName,
+                                              otherUserName, // Show the actual chat partner's name
                                               style: GoogleFonts.urbanist(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w500,
@@ -233,26 +260,6 @@ class _StudChatState extends State<StudChat> {
                                               ),
                                             ),
                                           ),
-                                          if (!isRead)
-                                            Container(
-                                              height: 22,
-                                              width: 22,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Color.fromRGBO(
-                                                    51, 152, 246, 1),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  "1",
-                                                  style: GoogleFonts.urbanist(
-                                                    fontSize: 11,
-                                                    fontWeight: FontWeight.w400,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
                                         ],
                                       ),
                                     ],

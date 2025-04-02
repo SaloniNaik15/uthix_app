@@ -40,121 +40,119 @@ class _NewLoginState extends State<NewLogin> {
     await prefs.setString('user_role', role);
   }
 
-  void _login() async {
-    String email = _emailIdController.text.trim().toLowerCase();
-    String password = _passwordController.text.trim();
+ 
 
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Please enter email and password",
-            style: GoogleFonts.urbanist(),
-          ),
+void _login() async {
+  String email = _emailIdController.text.trim().toLowerCase();
+  String password = _passwordController.text.trim();
+
+  if (email.isEmpty || password.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "Please enter email and password",
+          style: GoogleFonts.urbanist(),
         ),
+      ),
+    );
+    return;
+  }
+
+  try {
+    final Dio dio = Dio();
+
+    final response = await dio.post(
+      'https://admin.uthix.com/api/login',
+      options: Options(headers: {"Content-Type": "application/json"}),
+      data: {"email": email, "password": password},
+    );
+
+    log("API Response: ${response.data}");
+
+    final data = response.data;
+    if (response.statusCode == 403 &&
+        data['status']?.toLowerCase() == 'pending') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => panding()),
       );
       return;
     }
 
-    try {
-      final Dio dio = Dio();
+    if (response.statusCode == 200 &&
+        data['status']?.toLowerCase() == 'approved' &&
+        data.containsKey('access_token')) {
+      String token = data['access_token'];
+      String role = data['role'] ?? 'student';
 
-      final response = await dio.post(
-        'https://admin.uthix.com/api/login',
-        options: Options(headers: {"Content-Type": "application/json"}),
-        data: {"email": email, "password": password},
+      await saveUserSession(token, role);
+
+      Widget nextScreen;
+      if (role == 'seller') {
+        nextScreen = SellerDashboard();
+      } else if (role == 'instructor') {
+        nextScreen = DetailProfile();
+      } else {
+        nextScreen = StudentProfile();
+      }
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => nextScreen),
       );
-
-      log("API Response: ${response.data}");
-
-      final data = response.data;
-      if (response.statusCode == 403 &&
-          data['status']?.toLowerCase() == 'pending') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => panding()),
-        );
-        return;
-      }
-
-      if (response.statusCode == 200 &&
-          data['status']?.toLowerCase() == 'approved' &&
-          data.containsKey('access_token')) {
-        String token = data['access_token'];
-        String role = data['role'] ?? 'student';
-
-        await saveUserSession(token, role);
-
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        log("Stored Token: ${prefs.getString('auth_token')}, Role: ${prefs.getString('user_role')}");
-        
-
-        Widget nextScreen;
-        if (role == 'seller') {
-          nextScreen = SellerDashboard();
-        } else if (role == 'instructor') {
-          nextScreen = DetailProfile();
-        } else {
-          nextScreen = StudentProfile();
-        }
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => nextScreen),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              data['message'] ?? "Invalid email or password",
-              style: GoogleFonts.urbanist(),
-            ),
-          ),
-        );
-      }
-    } on DioError catch (dioError) {
-      if (dioError.response != null) {
-        log("Dio Error Response: ${dioError.response?.data}");
-        final data = dioError.response?.data;
-
-        if (dioError.response?.statusCode == 403 &&
-            data?['status']?.toLowerCase() == 'pending') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => panding()),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                data?['message'] ?? "Invalid email or password",
-                style: GoogleFonts.urbanist(),
-              ),
-            ),
-          );
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Network error. Please check your connection.",
-              style: GoogleFonts.urbanist(),
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      log("Unexpected Error: $e");
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            "An unexpected error occurred. Please try again.",
+            data['message'] ?? "Invalid email or password",
             style: GoogleFonts.urbanist(),
           ),
         ),
       );
     }
+  } on DioError catch (dioError) {
+    if (dioError.response != null) {
+      log("Dio Error Response: ${dioError.response?.data}");
+      final data = dioError.response?.data;
+
+      if (dioError.response?.statusCode == 403 &&
+          data?['status']?.toLowerCase() == 'pending') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => panding()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              data?['message'] ?? "Invalid email or password",
+              style: GoogleFonts.urbanist(),
+            ),
+          ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Network error. Please check your connection.",
+            style: GoogleFonts.urbanist(),
+          ),
+        ),
+      );
+    }
+  } catch (e) {
+    log("Unexpected Error: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "An unexpected error occurred. Please try again.",
+          style: GoogleFonts.urbanist(),
+        ),
+      ),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
