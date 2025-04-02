@@ -31,128 +31,131 @@ class _NewLoginState extends State<NewLogin> {
   final TextEditingController _emailIdController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool ispassword = true;
-  Future<void> saveUserSession(
-    String token,
-    String role,
-  ) async {
+
+  Future<void> saveUserSession(String token, String role) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('auth_token', token);
     await prefs.setString('user_role', role);
   }
 
- 
+  void _login() async {
+    String email = _emailIdController.text.trim().toLowerCase();
+    String password = _passwordController.text.trim();
 
-void _login() async {
-  String email = _emailIdController.text.trim().toLowerCase();
-  String password = _passwordController.text.trim();
-
-  if (email.isEmpty || password.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          "Please enter email and password",
-          style: GoogleFonts.urbanist(),
-        ),
-      ),
-    );
-    return;
-  }
-
-  try {
-    final Dio dio = Dio();
-
-    final response = await dio.post(
-      'https://admin.uthix.com/api/login',
-      options: Options(headers: {"Content-Type": "application/json"}),
-      data: {"email": email, "password": password},
-    );
-
-    log("API Response: ${response.data}");
-
-    final data = response.data;
-    if (response.statusCode == 403 &&
-        data['status']?.toLowerCase() == 'pending') {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => panding()),
-      );
-      return;
-    }
-
-    if (response.statusCode == 200 &&
-        data['status']?.toLowerCase() == 'approved' &&
-        data.containsKey('access_token')) {
-      String token = data['access_token'];
-      String role = data['role'] ?? 'student';
-
-      await saveUserSession(token, role);
-
-      Widget nextScreen;
-      if (role == 'seller') {
-        nextScreen = SellerDashboard();
-      } else if (role == 'instructor') {
-        nextScreen = DetailProfile();
-      } else {
-        nextScreen = StudentProfile();
-      }
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => nextScreen),
-      );
-    } else {
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            data['message'] ?? "Invalid email or password",
+            "Please enter email and password",
             style: GoogleFonts.urbanist(),
           ),
         ),
       );
+      return;
     }
-  } on DioError catch (dioError) {
-    if (dioError.response != null) {
-      log("Dio Error Response: ${dioError.response?.data}");
-      final data = dioError.response?.data;
 
-      if (dioError.response?.statusCode == 403 &&
-          data?['status']?.toLowerCase() == 'pending') {
+    try {
+      final Dio dio = Dio();
+
+      final response = await dio.post(
+        'https://admin.uthix.com/api/login',
+        options: Options(headers: {"Content-Type": "application/json"}),
+        data: {"email": email, "password": password},
+      );
+
+      log("API Response: ${response.data}");
+
+      final data = response.data;
+      if (response.statusCode == 403 &&
+          data['status']?.toLowerCase() == 'pending') {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => panding()),
+        );
+        return;
+      }
+
+      if (response.statusCode == 200 &&
+          data['status']?.toLowerCase() == 'approved' &&
+          data.containsKey('access_token')) {
+        String token = data['access_token'];
+        String role = data['role'] ?? 'student';
+
+        await saveUserSession(token, role);
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        log("Stored Token: ${prefs.getString('auth_token')}, Role: ${prefs.getString('user_role')}");
+
+        Widget nextScreen;
+
+        if (role == 'seller') {
+          nextScreen = SellerDashboard();
+        } else if (role == 'instructor') {
+          nextScreen = DetailProfile();
+        } else {
+          nextScreen = StudentProfile();
+        }
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => nextScreen),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              data?['message'] ?? "Invalid email or password",
+              data['message'] ?? "Invalid email or password",
               style: GoogleFonts.urbanist(),
             ),
           ),
         );
       }
-    } else {
+    } on DioException catch (dioError) {
+      // 👇 Handle specific API failure
+      if (dioError.response != null) {
+        log("Dio Error Response: ${dioError.response?.data}");
+        final data = dioError.response?.data;
+
+        if (dioError.response?.statusCode == 403 &&
+            data?['status']?.toLowerCase() == 'pending') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => panding()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                data?['message'] ?? "Invalid email or password",
+                style: GoogleFonts.urbanist(),
+              ),
+            ),
+          );
+        }
+      } else {
+        // 👇 Network error / timeout
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Network error. Please check your connection.",
+              style: GoogleFonts.urbanist(),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      // 👇 Fallback for any other unexpected errors
+      log("Unexpected Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            "Network error. Please check your connection.",
+            "An unexpected error occurred. Please try again.",
             style: GoogleFonts.urbanist(),
           ),
         ),
       );
     }
-  } catch (e) {
-    log("Unexpected Error: $e");
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          "An unexpected error occurred. Please try again.",
-          style: GoogleFonts.urbanist(),
-        ),
-      ),
-    );
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -240,26 +243,32 @@ void _login() async {
                                   padding: EdgeInsets.only(right: 10.w),
                                   child: Text(
                                     "Forgot Password",
-                                    style: GoogleFonts.urbanist(
-                                      fontSize: 10.sp,
+                                    style: TextStyle(
+                                      fontSize: 12,
                                       fontWeight: FontWeight.w400,
                                       color: Colors.blue,
                                     ),
-
-                                  );
-                                },
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(right: 10.w),
-                                    child: Text(
-                                      "Forgot Password",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.blue,
-                                      ),
-
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 25.h),
+                            GestureDetector(
+                              onTap: _login,
+                              child: Container(
+                                height: 45.h,
+                                width: MediaQuery.of(context).size.width / 1.5,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(25.r),
+                                  color: Color.fromRGBO(27, 97, 122, 1),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Login",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
@@ -278,19 +287,16 @@ void _login() async {
                               child: Text.rich(
                                 TextSpan(
                                   text: "Already have an account? ",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 12.sp,
+                                  style: TextStyle(
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w400,
                                     color: Colors.black,
                                   ),
-
-
-                                  child: Center(
-                                    child: Text(
-                                      "Login",
-                                      style:TextStyle(
-                                        fontSize: 18,
-
+                                  children: [
+                                    TextSpan(
+                                      text: "Register",
+                                      style: TextStyle(
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400,
                                         color: Color.fromRGBO(27, 97, 122, 1),
                                         decoration: TextDecoration.underline,
@@ -302,47 +308,9 @@ void _login() async {
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-
-                       
-                              SizedBox(height: 45.h),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => Registration(),
-                                    ),
-                                  );
-                                },
-                                child: Text.rich(
-                                  TextSpan(
-                                    text: "Already have an account? ",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text: "Register",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color.fromRGBO(27, 97, 122, 1),
-                                          decoration: TextDecoration.underline,
-                                          decorationColor:
-                                              Color.fromRGBO(27, 97, 122, 1),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              SizedBox(height: 55.h),
-                            ],
-                          ),
-
+                            ),
+                            SizedBox(height: 55.h),
+                          ],
                         ),
                       ),
                     ),
@@ -370,15 +338,11 @@ void _login() async {
         child: TextField(
           controller: _passwordController,
           obscureText: ispassword,
-          style:
-          TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: "Enter your Password",
-            
-
-            TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-
+            hintStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
             suffixIcon: IconButton(
               icon: Icon(ispassword
                   ? Icons.visibility_off_outlined
@@ -417,10 +381,7 @@ Widget _buildTextField({
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hint,
-          hintStyle:
-
-          TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-
+          hintStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
         ),
       ),
     ),
