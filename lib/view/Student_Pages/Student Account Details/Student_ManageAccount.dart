@@ -16,6 +16,7 @@ class StudentManageAccount extends StatefulWidget {
 
 class _StudentManageAccountState extends State<StudentManageAccount> {
   String? accessLoginToken;
+  String? profileImageUrl;
   // Holds the fetched profile data
   Map<String, dynamic>? profile;
 
@@ -43,30 +44,39 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
   Future<void> _fetchProfile() async {
     try {
       final dio = Dio();
-      // Replace with your actual API endpoint.
       final response = await dio.get(
-        "https://admin.uthix.com/api/profile",
+        "https://admin.uthix.com/api/student-profile",
         options: Options(
           headers: {"Authorization": "Bearer $accessLoginToken"},
         ),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 && response.data["status"] == true) {
+        final profileData = response.data["data"];
+        final user = profileData["user"];
+        final classroom = profileData["classroom"];
+
+        String? imageFileName = user?["image"];
+        String? imageUrl = (imageFileName != null && imageFileName.isNotEmpty)
+            ? "https://admin.uthix.com/storage/images/student/${user["image"]}"
+            : null;
+
         setState(() {
-          profile = response.data;
+          profile = {
+            "name": user?["name"] ?? "N/A",
+            "phone": user?["phone"]?.toString() ?? "N/A",
+            "class": classroom?["class_name"] ?? "N/A",
+            "stream": profileData["stream"] ?? "N/A",
+          };
+          profileImageUrl = imageUrl;
         });
-        log("Profile fetched: ${response.data}");
+
+        log("✅ Student profile loaded: $profile");
       } else {
-        log("Failed to fetch profile: ${response.statusMessage}");
-        setState(() {
-          profile = null;
-        });
+        log("❌ Failed to fetch profile");
       }
     } catch (e) {
-      log("Error fetching profile: $e");
-      setState(() {
-        profile = null;
-      });
+      log("❌ Error fetching profile: $e");
     }
   }
 
@@ -93,54 +103,48 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Column(
             children: [
-              SizedBox(height: 10.h),
+              SizedBox(height: 10),
               Text(
                 "Manage your Account",
                 style: TextStyle(
-                  fontSize: 18.sp,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(height: 10.h),
               // Profile Image
               CircleAvatar(
-                radius: 50.r,
-                backgroundImage: AssetImage(
-                  "assets/Seller_dashboard_images/ManageStoreBackground.png",
-                ),
+                radius: 50,
+                backgroundColor: Colors.grey[300],
+                backgroundImage: profileImageUrl != null
+                    ? NetworkImage(profileImageUrl!)
+                    : const AssetImage("assets/login/profile.jpeg") as ImageProvider,
+                onBackgroundImageError: (_, __) {
+                  setState(() {
+                    profileImageUrl = null;
+                  });
+                },
               ),
               SizedBox(height: 10.h),
               // Use the fetched profile name; if not yet available, show a placeholder.
               Text(
                 profile != null ? profile!["name"] ?? "null" : "Loading...",
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF2B5C74),
                 ),
               ),
               // Optionally, you can show more details from the profile if available.
-              Text(
-                profile != null
-                    ? "Class X B\nDelhi Public School, New Delhi\n+91 ${profile!["phone"] ?? "null"}"
-                    : "Loading...",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
+
               SizedBox(height: 20.h),
 
               // Profile fields
               // Here we use the fetched API data. For missing fields, "null" is shown.
-              _buildProfileField(
-                  Icons.person, profile != null ? profile!["name"] ?? "null" : "Loading..."),
-              _buildProfileField(
-                  Icons.phone, profile != null ? profile!["phone"]?.toString() ?? "null" : "Loading..."),
-              // The sample API does not provide location or school. So we display "null".
-              _buildProfileField(Icons.location_on, "null"),
-              _buildProfileField(Icons.school, "null"),
+              _buildProfileField(Icons.person, profile?["name"] ?? "Loading..."),
+              _buildProfileField(Icons.phone, profile?["phone"] ?? "Loading..."),
+              _buildProfileField(Icons.school, profile?["class"] ?? "Loading..."),
+              _buildProfileField(Icons.menu_book_sharp, profile?["stream"] ?? "Loading..."),
 
               SizedBox(height: 30.h),
 
@@ -179,7 +183,7 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
 
   Widget _buildProfileField(IconData icon, String text) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.only(bottom: 12),
       child: TextField(
         decoration: InputDecoration(
           filled: true,
@@ -187,27 +191,27 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
           prefixIcon: Icon(
             icon,
             color: Colors.grey,
-            size: 20.sp,
+            size: 20,
           ),
           hintText: text,
           hintStyle: TextStyle(
             color: const Color(0xFF605F5F),
             fontWeight: FontWeight.w500,
-            fontSize: 14.sp,
+            fontSize: 14,
           ),
           enabled: false,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30.r),
+            borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide(
               color: const Color(0xFFD2D2D2),
-              width: 2.w,
+              width: 2,
             ),
           ),
           disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30.r),
+            borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide(
               color: const Color(0xFFD2D2D2),
-              width: 1.w,
+              width: 1,
             ),
           ),
         ),

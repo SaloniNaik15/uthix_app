@@ -16,7 +16,7 @@ class NavbarStudent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity, // 90% of screen width
+      width: MediaQuery.of(context).size.width * 0.9, // 90% of screen width
       height: 59.h, // Responsive height
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -48,7 +48,7 @@ class NavbarStudent extends StatelessWidget {
                 children: [
                   Icon(
                     navStudItems[index]["icon"],
-                    size: 20.sp, // Responsive icon size
+                    size: 20, // Responsive icon size
                     color: selectedIndex == index
                         ? Colors.blue
                         : const Color.fromRGBO(96, 95, 95, 1),
@@ -57,7 +57,7 @@ class NavbarStudent extends StatelessWidget {
                   Text(
                     navStudItems[index]["title"],
                     style: GoogleFonts.urbanist(
-                      fontSize: 10.sp, // Responsive font size
+                      fontSize: 12, // Responsive font size
                       fontWeight: FontWeight.w400,
                       color: selectedIndex == index
                           ? Colors.blue

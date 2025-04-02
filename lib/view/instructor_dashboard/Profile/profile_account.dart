@@ -97,7 +97,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 130.h,
+            height: 130,
             width: double.infinity,
             decoration: BoxDecoration(color: Color(0xFFF6F6F6)),
             child: Stack(
@@ -106,7 +106,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
                   padding: EdgeInsets.only(left: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Text(
                         "$instructorName",
@@ -116,16 +116,13 @@ class _ProfileAccountState extends State<ProfileAccount> {
                           color: Colors.black,
                         ),
                       ),
-                      SizedBox(
-                        width: 250,
-                        child: Text(
-                          "Congratulations! You are member now.",
+                        Text(
+                          "Congratulations! \nYou are member now.",
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             color: Colors.black,
                           ),
-                        ),
                       ),
                     ],
                   ),
@@ -146,11 +143,11 @@ class _ProfileAccountState extends State<ProfileAccount> {
               ],
             ),
           ),
-          SizedBox(height: 35),
+          30.verticalSpace,
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 10),
             child: Container(
-              height: 370,
+              height: 380,
               width: MediaQuery.sizeOf(context).width,
               decoration: BoxDecoration(
                 color: Color(0xFFFCFCFC),

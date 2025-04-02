@@ -47,7 +47,6 @@ class _NewclassState extends State<Newclass> {
     }
   }
 
-
   Future<void> _createClassroom() async {
     if (titleController.text.trim().isEmpty ||
         _selectdate == null ||
@@ -68,7 +67,6 @@ class _NewclassState extends State<Newclass> {
     };
 
     debugPrint("Request Data: ${jsonEncode(requestData)}");
-
 
     final String endpoint =
         "https://admin.uthix.com/api/class-chapter/${widget.classroomId}";
@@ -161,11 +159,9 @@ class _NewclassState extends State<Newclass> {
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
     );
-    if (pickdate != null) {
-      setState(() {
-        _selectdate = pickdate;
-      });
-    }
+    setState(() {
+      _selectdate = pickdate;
+    });
   }
 
   Future<void> _selectTimefunc() async {

@@ -99,9 +99,9 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
     if (_selectedFiles.isNotEmpty) {
       formMap["attachments[]"] = await Future.wait(
         _selectedFiles.map((file) async => await MultipartFile.fromFile(
-          file.path,
-          filename: file.path.split('/').last,
-        )),
+              file.path,
+              filename: file.path.split('/').last,
+            )),
       );
     }
 
@@ -260,7 +260,8 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.link, color: Color.fromRGBO(43, 92, 116, 1)),
+                        const Icon(Icons.link,
+                            color: Color.fromRGBO(43, 92, 116, 1)),
                         SizedBox(width: 10.w),
                         Text(
                           "Add Attachment",
@@ -281,7 +282,8 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
                           shrinkWrap: true,
                           physics: const AlwaysScrollableScrollPhysics(),
                           itemCount: _selectedFiles.length,
-                          separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                          separatorBuilder: (context, index) =>
+                              SizedBox(height: 16.h),
                           itemBuilder: (context, index) {
                             final file = _selectedFiles[index];
                             return Padding(
@@ -310,7 +312,8 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
                 onTap: _pickDueDate,
                 child: Row(
                   children: [
-                    const Icon(Icons.alarm, color: Color.fromRGBO(43, 92, 116, 1)),
+                    const Icon(Icons.alarm,
+                        color: Color.fromRGBO(43, 92, 116, 1)),
                     SizedBox(width: 10.w),
                     Text(
                       _dueDate == null

@@ -29,16 +29,16 @@ class _ProgressTrackingState extends State<ProgressTracking> {
         children: [
           Text(
             title,
-            style: GoogleFonts.urbanist(
-              fontSize: 14.sp,
+            style: TextStyle(
+              fontSize: 14,
               fontWeight: FontWeight.w600,
               color: const Color.fromRGBO(96, 95, 95, 1),
             ),
           ),
           Text(
             value,
-            style: GoogleFonts.urbanist(
-              fontSize: 16.sp,
+            style: TextStyle(
+              fontSize: 16,
               fontWeight: FontWeight.w600,
               color: const Color.fromRGBO(96, 95, 95, 1),
             ),
@@ -50,7 +50,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
 
   Widget buildCategoryContainer(String title) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 15.w),
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       decoration: BoxDecoration(
         color: Color.fromRGBO(246, 246, 246, 1),
         border: Border.all(color: Color.fromRGBO(217, 217, 217, 1)),
@@ -58,8 +58,8 @@ class _ProgressTrackingState extends State<ProgressTracking> {
       ),
       child: Text(
         title,
-        style: GoogleFonts.urbanist(
-          fontSize: 14.sp,
+        style: TextStyle(
+          fontSize: 14,
           fontWeight: FontWeight.w600,
           color: const Color.fromRGBO(96, 95, 95, 1),
         ),
@@ -71,16 +71,16 @@ class _ProgressTrackingState extends State<ProgressTracking> {
     return Row(
       children: [
         Container(
-          height: 15.h,
-          width: 15.w,
+          height: 15,
+          width: 15,
           decoration:
               BoxDecoration(shape: BoxShape.circle, color: Colors.green),
         ),
-        SizedBox(width: 3.w),
+        SizedBox(width: 3),
         Text(
           text,
           style: GoogleFonts.urbanist(
-            fontSize: 14.sp,
+            fontSize: 14,
             fontWeight: FontWeight.w600,
             color: const Color.fromRGBO(96, 95, 95, 1),
           ),
@@ -92,7 +92,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
   Widget buildBarChart() {
     return Expanded(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10.h),
+        padding: EdgeInsets.symmetric(horizontal: 10),
         child: BarChart(
           BarChartData(
             alignment: BarChartAlignment.center,
@@ -128,7 +128,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                             child: Text(
                               labels[value.toInt()],
                               style: GoogleFonts.urbanist(
-                                  fontSize: 6.sp, fontWeight: FontWeight.w700),
+                                  fontSize: 8, fontWeight: FontWeight.w700),
                             ),
                           );
                   },
@@ -171,7 +171,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
             color: Color.fromRGBO(217, 217, 217, 1),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 30.w),
+            padding: EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -209,7 +209,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
         Scaffold(
           backgroundColor: Colors.white,
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(80.h), // Custom AppBar height
+            preferredSize: Size.fromHeight(80), // Custom AppBar height
             child: AppBar(
               backgroundColor: const Color.fromRGBO(43, 92, 116, 1),
               elevation: 0, // Removes shadow
@@ -217,16 +217,16 @@ class _ProgressTrackingState extends State<ProgressTracking> {
               automaticallyImplyLeading: false, // Removes default back arrow
               flexibleSpace: Padding(
                 padding: EdgeInsets.only(
-                    top: 10.h,
-                    left: 10.w,
-                    right: 10.w), // Adjust for top alignment
+                    top: 10,
+                    left: 10,
+                    right: 10), // Adjust for top alignment
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
                       icon: Icon(
                         Icons.arrow_back_ios_outlined,
-                        size: 25.sp,
+                        size: 20,
                         color: Colors.white,
                       ),
                       onPressed: () {
@@ -238,14 +238,14 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                         child: Text(
                           "My Progress",
                           style: GoogleFonts.urbanist(
-                            fontSize: 20.sp,
+                            fontSize: 20,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(width: 48.w), // width matches IconButton width
+                    SizedBox(width: 48), // width matches IconButton width
                   ],
                 ),
               ),
@@ -262,32 +262,25 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                     ),
                     Text(
                       "Mahima Mandal",
-                      style: GoogleFonts.urbanist(
-                        fontSize: 16.sp,
+                      style: TextStyle(
+                        fontSize: 20,
                         fontWeight: FontWeight.w600,
                         color: const Color.fromRGBO(43, 92, 116, 1),
                       ),
                     ),
                     Text(
                       "Class X B",
-                      style: GoogleFonts.urbanist(
-                        fontSize: 14.sp,
+                      style: TextStyle(
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: const Color.fromRGBO(96, 95, 95, 1),
                       ),
                     ),
-                    Text(
-                      "Delhi Public School, New Delhi",
-                      style: GoogleFonts.urbanist(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: const Color.fromRGBO(96, 95, 95, 1),
-                      ),
-                    ),
+
                     Text(
                       "+91 XXXXX XXXXX",
-                      style: GoogleFonts.urbanist(
-                        fontSize: 14.sp,
+                      style: TextStyle(
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: const Color.fromRGBO(96, 95, 95, 1),
                       ),
@@ -307,7 +300,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                       ),
                     ),
                     SizedBox(
-                      height: 20.h,
+                      height: 20,
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 25),
@@ -316,7 +309,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                         child: Text(
                           "My Performance Chart",
                           style: GoogleFonts.urbanist(
-                            fontSize: 16.sp,
+                            fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: const Color.fromRGBO(96, 95, 95, 1),
                           ),
@@ -324,7 +317,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                       ),
                     ),
                     SizedBox(
-                      height: 20.h,
+                      height: 20,
                     ),
                     buildStatisticsContainer()
                   ],
@@ -334,11 +327,11 @@ class _ProgressTrackingState extends State<ProgressTracking> {
           ),
         ),
         Positioned(
-          top: 75.h,
-          left: (MediaQuery.of(context).size.width - 80) / 2.w,
+          top: 80,
+          left: (MediaQuery.of(context).size.width - 80) / 2,
           child: Container(
-            width: 80.w,
-            height: 80.h,
+            width: 80,
+            height: 80,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(

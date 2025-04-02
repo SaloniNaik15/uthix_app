@@ -1,158 +1,118 @@
-// ignore_for_file: deprecated_member_use
-
-import 'dart:convert';
 import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:uthix_app/view/Student_Pages/LMS/submission_student.dart';
+import 'package:uthix_app/view/Student_Pages/LMS/live_student.dart';
 
 class Classes extends StatefulWidget {
-  final int classroomId;
-  const Classes({super.key, required this.classroomId});
+  final int chapterId;
+  const Classes({Key? key, required this.chapterId}) : super(key: key);
 
   @override
   State<Classes> createState() => _ClassesState();
 }
 
 class _ClassesState extends State<Classes> {
-  String? accessLoginToken;
-  List<dynamic> classData = [];
-  List<dynamic> announcementsList = [];
+  String? token;
   bool isLoading = true;
-  int currentIndex = 0;
+
+  // Map to hold class/chapter details (derived from API's "chapter_title")
+  // We add "chapter_id" to pass later.
+  Map<String, String> classInfo = {
+    "subject": "",
+    "time": "",
+    "days": "",
+    "mentor": "",
+    "chapter": "",
+    "chapter_id": "",
+  };
+
+  // List to hold announcements; each announcement is a Map with keys:
+  // name, timestamp, comment, attachments (list), profile, announcement_id.
+  List<Map<String, dynamic>> announcementsList = [];
+  final Dio _dio = Dio();
+
   @override
   void initState() {
     super.initState();
-    _initializeData();
+    _loadTokenAndFetchData();
   }
 
-  Future<void> _initializeData() async {
-    await _loadUserCredentials();
-    await fetchData();
-    await fetchAnnouncements();
-  }
-
-  Future<void> _loadUserCredentials() async {
+  Future<void> _loadTokenAndFetchData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token'); // Retrieve token
-    log("Retrieved Token: $token"); // Log token for verification
+    token = prefs.getString('auth_token');
 
-    setState(() {
-      accessLoginToken = token;
-    });
-  }
-
-  final Dio dio = Dio(); // Initialize Dio instance
-
-  Future<void> fetchData() async {
-    const String url = 'https://admin.uthix.com/api/subject-classes/1';
-    String? token = accessLoginToken;
-
-    try {
-      final response = await dio.get(
-        url,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-        ),
-      );
-
-      log('SAloni Response Code: ${response.statusCode}');
-      log('Response Body: ${response.data}');
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = response.data;
-        setState(() {
-          classData = responseData["data"];
-          isLoading = false;
-        });
-      } else {
-        log("Error: Invalid response structure");
-        setState(() {
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      print("Error fetching class data: $e");
+    if (token != null) {
+      await fetchData();
+    } else {
+      log("Token not found!");
       setState(() {
         isLoading = false;
       });
     }
   }
 
-  Future<void> fetchAnnouncements() async {
-    const String url = 'https://admin.uthix.com/api/classroom/1/announcements';
-    String? token = accessLoginToken;
+  Future<void> fetchData() async {
+    final String url =
+        "https://admin.uthix.com/api/student/chapters/${widget.chapterId}/announcements";
 
     try {
-      final response = await dio.get(
+      final response = await _dio.get(
         url,
         options: Options(
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
           },
         ),
       );
+      log("Response Data: ${response.data}");
 
-      print('Response Code: ${response.statusCode}');
-      log('Response Body: ${response.data}');
+      if (response.data['status'] == true) {
+        final chapter = response.data['chapter_title'];
+        setState(() {
+          classInfo = {
+            "subject": chapter["title"] ?? "Unknown",
+            "time": chapter["time"] != null && chapter["timezone"] != null
+                ? "${chapter["time"]} ${chapter["timezone"]}"
+                : (chapter["time"] ?? ""),
+            "days": chapter["repeat_days"] ?? "",
+            "mentor": (response.data["announcements"] as List).isNotEmpty
+                ? (response.data["announcements"][0]["instructor_name"] ??
+                "No Mentor")
+                : "No Mentor",
+            "chapter": chapter["description"] ?? "",
+            "chapter_id": chapter["id"]?.toString() ?? "",
+          };
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = response.data;
-        if (responseData["status"] == true) {
-          List<dynamic> announcements = responseData["data"];
+          // Map each announcement including announcement_id.
+          announcementsList = (response.data["announcements"] as List)
+              .map((item) => {
+            "name": item["instructor_name"] ?? "",
+            "timestamp": item["created_at"] ?? "",
+            "comment": item["title"] ?? "",
+            "attachments": item["attachments"] ?? [],
+            "profile": item["instructor"]?["user"]?["image"] ?? "",
+            "announcement_id": item["announcement_id"]?.toString() ?? "",
+          })
+              .cast<Map<String, dynamic>>()
+              .toList();
 
-          if (mounted) {
-            setState(() {
-              announcementsList = announcements;
-              isLoading = false;
-            });
-          }
-        } else {
-          print("Error: Invalid response structure");
-          if (mounted) {
-            setState(() {
-              isLoading = false;
-            });
-          }
-        }
+          isLoading = false;
+        });
       } else {
-        print("Error: API request failed");
-        if (mounted) {
-          setState(() {
-            isLoading = false;
-          });
-        }
-      }
-    } catch (e) {
-      print("Error fetching announcements: $e");
-      if (mounted) {
+        log("API returned status false");
         setState(() {
           isLoading = false;
         });
       }
-    }
-  }
-
-  void showPreviousClass() {
-    if (currentIndex > 0) {
+    } catch (e) {
+      log("Error fetching data: $e");
       setState(() {
-        currentIndex--;
-      });
-    }
-  }
-
-  // Navigate to the next class
-  void showNextClass() {
-    if (currentIndex < classData.length - 1) {
-      setState(() {
-        currentIndex++;
+        isLoading = false;
       });
     }
   }
@@ -164,466 +124,350 @@ class _ClassesState extends State<Classes> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        actions: [
-
-          Container(
-            margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-            height: 42,
-            width: 42,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(19),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
-                  offset: const Offset(0, 4),
-                  blurRadius: 8,
-                ),
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  offset: const Offset(0, 0),
-                  blurRadius: 4,
-                ),
-              ],
-            ),
-            child: ClipOval(
-              child: Image.asset(
-                "assets/login/profile.jpeg",
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : classData.isEmpty
-                  ? const Center(child: Text("No classes available"))
-                  : Column(
-                      children: [
-                        const SizedBox(height: 40),
-                        ClassCard(
-                          subject: classData[currentIndex]["classroom"]
-                                  ["subject"]["name"] ??
-                              "Unknown",
-                          mentor: classData[currentIndex]["classroom"]
-                                  ["instructor"]["bio"] ??
-                              "No Mentor",
-                          schedule:
-                              "${classData[currentIndex]["time"]} | ${classData[currentIndex]["repeat_days"]}",
-                          coMentors: "N/A",
-                          chapter: classData[currentIndex]["title"] ??
-                              "No description",
-                          onPrevious: showPreviousClass,
-                          onNext: showNextClass,
-                          hasPrevious: currentIndex > 0,
-                          hasNext: currentIndex < classData.length - 1,
-                        ),
-                      ],
-                    ),
-
-          // Padding(
-          //   padding: const EdgeInsets.all(40),
-          //   child: SingleChildScrollView(
-          //     scrollDirection: Axis.vertical,
-          //     child: Column(
-          //       children: [
-          //         Row(
-          //           children: [
-          //             Column(
-          //               children: [
-          //                 Text(
-          //                   "Teacher",
-          //                   style: GoogleFonts.urbanist(
-          //                     fontSize: 14,
-          //                     fontWeight: FontWeight.w500,
-          //                     color: const Color.fromRGBO(0, 0, 0, 1),
-          //                   ),
-          //                 ),
-          //                 Container(
-          //                   width: 45,
-          //                   height: 45,
-          //                   decoration: BoxDecoration(
-          //                     shape: BoxShape.circle,
-          //                   ),
-          //                   child: ClipOval(
-          //                     child: Image.asset(
-          //                       "assets/login/profile.jpeg",
-          //                       fit: BoxFit.cover,
-          //                     ),
-          //                   ),
-          //                 ),
-          //                 Text(
-          //                   "Mahima",
-          //                   style: GoogleFonts.urbanist(
-          //                     fontSize: 14,
-          //                     fontWeight: FontWeight.w300,
-          //                     color: const Color.fromRGBO(96, 95, 95, 1),
-          //                   ),
-          //                 ),
-          //               ],
-          //             ),
-          //             const Spacer(),
-          //             Column(
-          //               children: [
-          //                 Text(
-          //                   "Participants",
-          //                   style: GoogleFonts.urbanist(
-          //                     fontSize: 14,
-          //                     fontWeight: FontWeight.w500,
-          //                     color: const Color.fromRGBO(0, 0, 0, 1),
-          //                   ),
-          //                 ),
-          //                 SizedBox(
-          //                   height: 40,
-          //                   width: 80,
-          //                   child: Stack(
-          //                     clipBehavior: Clip.none,
-          //                     children: List.generate(4, (index) {
-          //                       return Positioned(
-          //                         right: 15 * index.toDouble(),
-          //                         child: Container(
-          //                           width: 39,
-          //                           height: 39,
-          //                           decoration: BoxDecoration(
-          //                             shape: BoxShape.circle,
-          //                             color: Colors.black,
-          //                           ),
-          //                           child: Padding(
-          //                             padding: const EdgeInsets.all(1.0),
-          //                             child: ClipOval(
-          //                               child: Image.asset(
-          //                                 "assets/login/profile.jpeg",
-          //                                 fit: BoxFit.cover,
-          //                               ),
-          //                             ),
-          //                           ),
-          //                         ),
-          //                       );
-          //                     }),
-          //                   ),
-          //                 ),
-          //                 Text(
-          //                   "30 +",
-          //                   style: GoogleFonts.urbanist(
-          //                     fontSize: 18,
-          //                     fontWeight: FontWeight.w300,
-          //                     color: const Color.fromRGBO(96, 95, 95, 1),
-          //                   ),
-          //                 ),
-          //               ],
-          //             ),
-          //           ],
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
-
-          //First post.
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30),
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                itemCount: announcementsList.length,
-                itemBuilder: (context, index) {
-                  final announcement = announcementsList[index];
-
-                  return CommentCard(
-                    profileImage: "assets/login/profile.jpeg",
-                    //name: announcement["classroom"]["instructor"]["user"]["name"],
-                    name: "instructor",
-                    timestamp: announcement["created_at"],
-                    comment: announcement["title"],
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class ClassCard extends StatelessWidget {
-  final String subject;
-  final String mentor;
-  final String schedule;
-  final String coMentors;
-  final String chapter;
-  final VoidCallback onPrevious;
-  final VoidCallback onNext;
-  final bool hasPrevious;
-  final bool hasNext;
-
-  const ClassCard({
-    super.key,
-    required this.subject,
-    required this.mentor,
-    required this.schedule,
-    required this.coMentors,
-    required this.chapter,
-    required this.onPrevious,
-    required this.onNext,
-    required this.hasPrevious,
-    required this.hasNext,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 170,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: const Color.fromRGBO(43, 92, 116, 1),
-        borderRadius: BorderRadius.circular(7),
-        border: Border.all(
-          color: const Color.fromRGBO(11, 159, 167, 1),
-          width: 1,
+        leadingWidth: 60,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 25, top: 10, right: 25),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Text(
-                  subject,
+            // TOP BLUE CONTAINER for class/chapter info.
+            Container(
+              width: double.infinity,
+              color: const Color.fromRGBO(43, 92, 116, 1),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 12, vertical: 16),
+              child: Column(
+                children: [
+                  // Row with subject/time/days on the left and mentor info on the right.
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              classInfo["subject"] ?? "",
+                              style: GoogleFonts.urbanist(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "${classInfo["time"]}  MON THRU FRI",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Mentor info.
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            "Mentor : ${classInfo["mentor"]}",
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // Row with Join Class button.
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFD9D9D9),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LiveStudent(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "Join Class",
+                          style: GoogleFonts.urbanist(
+                            fontSize: 14,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Teal divider.
+                  Container(
+                    height: 1,
+                    color: const Color.fromRGBO(11, 159, 167, 1),
+                  ),
+                  const SizedBox(height: 10),
+                  // Chapter Label.
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "CHAPTER: ${classInfo["chapter"]}",
+                      style: GoogleFonts.urbanist(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            // Announcements List.
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: announcementsList.isEmpty
+                  ? Center(
+                child: Text(
+                  "No assignment for this chapter yet",
                   style: GoogleFonts.urbanist(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 ),
-                const Spacer(),
-                Text(
-                  "Mentor : $mentor",
-                  style: GoogleFonts.urbanist(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
+              )
+                  : Column(
+                children: announcementsList.map((announcement) {
+                  return _AnnouncementCard(
+                    name: announcement["name"] ?? "",
+                    timestamp: announcement["timestamp"] ?? "",
+                    comment: announcement["comment"] ?? "",
+                    attachments:
+                    announcement["attachments"] ?? [],
+                    profile: announcement["profile"] ?? "",
+                    announcementId:
+                    announcement["announcement_id"] ?? "",
+                    chapterId: classInfo["chapter_id"] ?? "",
+                  );
+                }).toList(),
+              ),
             ),
-            Row(
-              children: [
-                Text(
-                  schedule,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  "$coMentors Co-Mentors",
-                  style: GoogleFonts.urbanist(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios,
-                          size: 10, color: Colors.white),
-                      onPressed: hasPrevious
-                          ? onPrevious
-                          : null, // Disable if no previous class
-                    ),
-                    // const SizedBox(width: 2),
-                    _buildTabText("PREVIOUS"),
-                    const SizedBox(width: 25),
-                    _buildTabText("ONGOING"),
-                    const SizedBox(width: 25),
-                    _buildTabText("NEXT"),
-                    const SizedBox(width: 2),
-                    IconButton(
-                      icon: const Icon(Icons.arrow_forward_ios,
-                          size: 10, color: Colors.white),
-                      onPressed:
-                          hasNext ? onNext : null, // Disable if no next class
-                    ),
-                  ],
-                ),
-                Container(
-                  height: 1,
-                  width: 300,
-                  color: const Color.fromRGBO(11, 159, 167, 1),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  "CHAPTER: $chapter",
-                  style: GoogleFonts.urbanist(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
-
-  Widget _buildTabText(String text) {
-    return Text(
-      text,
-      style: GoogleFonts.urbanist(
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-        color: Colors.white,
-      ),
-    );
-  }
 }
 
-class CommentCard extends StatelessWidget {
-  final String profileImage;
+class _AnnouncementCard extends StatelessWidget {
   final String name;
   final String timestamp;
   final String comment;
+  final List attachments;
+  final String profile;
+  final String announcementId;
+  final String chapterId;
 
-  const CommentCard({
+  const _AnnouncementCard({
     Key? key,
-    required this.profileImage,
     required this.name,
     required this.timestamp,
     required this.comment,
+    required this.attachments,
+    required this.profile,
+    required this.announcementId,
+    required this.chapterId,
   }) : super(key: key);
+
+  Future<void> _openAttachment(String attachmentPath) async {
+    final String url = "https://admin.uthix.com/$attachmentPath";
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      debugPrint("Could not launch $url");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 10, bottom: 30),
-          child: Container(
-            width: 340,
-            decoration: BoxDecoration(
-              color: const Color.fromRGBO(246, 246, 246, 1),
-              borderRadius: BorderRadius.circular(7),
-              border: Border.all(
-                color: const Color.fromRGBO(217, 217, 217, 1),
-                width: 1,
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+    return Padding(
+      // Spacing between cards.
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: const Color.fromRGBO(246, 246, 246, 1),
+          borderRadius: BorderRadius.circular(7),
+          border: Border.all(
+            color: const Color.fromRGBO(217, 217, 217, 1),
+            width: 1,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top row with profile image, instructor name, timestamp, and menu.
+              Row(
                 children: [
-                  Row(
+                  // Show profile image if available; else display first letter.
+                  Container(
+                    width: 45,
+                    height: 45,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    child: ClipOval(
+                      child: profile.isNotEmpty
+                          ? Image.network(
+                        "https://admin.uthix.com/uploads/$profile",
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return _buildInitialAvatar(name);
+                        },
+                      )
+                          : _buildInitialAvatar(name),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  // Instructor name and timestamp.
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 45,
-                        height: 45,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            profileImage,
-                            fit: BoxFit.cover,
-                          ),
+                      Text(
+                        name,
+                        style: GoogleFonts.urbanist(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            name,
+                      Text(
+                        timestamp,
+                        style: GoogleFonts.urbanist(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: const Color.fromRGBO(96, 95, 95, 1),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  // PopupMenuButton with "Submit Assignment".
+                  PopupMenuButton<String>(
+                    color: Colors.white,
+                    onSelected: (value) {
+                      if (value == "submit_assignment") {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SubmissionStudent(
+                              announcementId: announcementId,
+                              chapterId: chapterId,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem<String>(
+                          value: "submit_assignment",
+                          child: Text(
+                            "Submit Assignment",
                             style: GoogleFonts.urbanist(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
-                              color: Colors.black,
                             ),
                           ),
-                          Text(
-                            timestamp,
-                            style: GoogleFonts.urbanist(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                              color: const Color.fromRGBO(96, 95, 95, 1),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      const Icon(Icons.more_vert),
-                    ],
+                        ),
+                      ];
+                    },
+                    icon: const Icon(Icons.more_vert),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    comment,
-                    style: GoogleFonts.urbanist(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    height: 1,
-                    color: const Color.fromRGBO(213, 213, 213, 1),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Add Comment",
-                    style: GoogleFonts.urbanist(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: const Color.fromRGBO(142, 140, 140, 1),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
                 ],
               ),
-            ),
-          ),
-        ),
-        Positioned(
-          left: 20,
-          bottom: 20,
-          child: Container(
-            width: 35,
-            height: 22,
-            decoration: BoxDecoration(
-              color: const Color.fromRGBO(246, 246, 246, 1),
-              borderRadius: BorderRadius.circular(9),
-              border: Border.all(
-                color: const Color.fromRGBO(217, 217, 217, 1),
-                width: 1,
+              const SizedBox(height: 10),
+              // Announcement title text.
+              Text(
+                comment,
+                style: GoogleFonts.urbanist(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black,
+                ),
               ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Image.asset("assets/instructor/emoticon-happy-outline.png"),
-                const Icon(Icons.add, size: 10),
-              ],
-            ),
+              const SizedBox(height: 10),
+              // Attachment row.
+              attachments.isNotEmpty
+                  ? GestureDetector(
+                onTap: () => _openAttachment(
+                    attachments[0]["attachment_file"]),
+                child: Row(
+                  children: [
+                    const Icon(Icons.attach_file,
+                        size: 14, color: Colors.blue),
+                    const SizedBox(width: 5),
+                    Text(
+                      "Open Attachment",
+                      style: GoogleFonts.urbanist(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+                  : Text(
+                "No Attachment",
+                style: GoogleFonts.urbanist(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
           ),
         ),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildInitialAvatar(String name) {
+    return CircleAvatar(
+      backgroundColor: Colors.grey.shade400,
+      child: Text(
+        name.isNotEmpty ? name[0].toUpperCase() : "",
+        style: GoogleFonts.urbanist(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 }

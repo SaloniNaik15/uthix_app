@@ -21,7 +21,7 @@ class _StudentProfileState extends State<StudentProfile> {
   String? accessLoginToken;
   String? userName;
   String? networkImageUrl;
-  Map<String, dynamic>? selectedClass;
+  int? selectedClassroomId;
   List<Map<String, dynamic>> _classOptions = [];
   String? _selectedClass;
 
@@ -53,7 +53,7 @@ class _StudentProfileState extends State<StudentProfile> {
       accessLoginToken = token;
     });
     await fetchClasses();
-    _fetchUserProfile();
+    // _fetchUserProfile();
     _fetchstudentProfile();
   }
 
@@ -69,23 +69,11 @@ class _StudentProfileState extends State<StudentProfile> {
           await dio.get('https://admin.uthix.com/api/all-classroom');
 
       if (response.statusCode == 200 && response.data["status"] == true) {
-        List<Map<String, dynamic>> loadedClasses =
-            List<Map<String, dynamic>>.from(
-          response.data["classrooms"].map((classroom) => {
-                "id": classroom["id"].toString(),
-                "name": classroom["class_name"]
-              }),
-        );
-
-        // Match the ID from _classController to select the correct class map
-        Map<String, dynamic>? foundClass = loadedClasses.firstWhere(
-          (item) => item["id"].toString() == _classController.text,
-          orElse: () => {},
-        );
-
         setState(() {
-          classOptions = loadedClasses;
-          selectedClass = foundClass.isNotEmpty ? foundClass : null;
+          classOptions = List<Map<String, dynamic>>.from(
+            response.data["classrooms"].map((classroom) =>
+                {"id": classroom["id"], "name": classroom["class_name"]}),
+          );
           isLoading = false;
         });
       }
@@ -106,32 +94,6 @@ class _StudentProfileState extends State<StudentProfile> {
       setState(() {
         _profileImage = File(pickedFile.path);
       });
-    }
-  }
-
-  Future<void> _fetchUserProfile() async {
-    try {
-      final dio = Dio();
-      final response = await dio.get(
-        "https://admin.uthix.com/api/profile",
-        options: Options(
-          headers: {"Authorization": "Bearer $accessLoginToken"},
-        ),
-      );
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        _populateFields(data);
-
-        // Cache the profile data
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString("cached_profile", jsonEncode(data));
-        log("Profile updated from API and cached.");
-      } else {
-        log("Failed to fetch user profile: ${response.statusMessage}");
-      }
-    } catch (e) {
-      log("Error fetching user profile: $e");
     }
   }
 
@@ -170,7 +132,7 @@ class _StudentProfileState extends State<StudentProfile> {
       );
       return;
     }
-
+    log("📘 Submitting classroom_id: $selectedClassroomId");
     try {
       final dio = Dio();
 
@@ -180,8 +142,9 @@ class _StudentProfileState extends State<StudentProfile> {
         "phone": phone,
         "dob": dob,
         "gender": gender,
-        "classroom_id": userClass,
+        "class": userClass,
         "stream": stream,
+        "classroom_id": selectedClassroomId,
         if (_profileImage != null)
           "image": await MultipartFile.fromFile(
             _profileImage!.path,
@@ -251,6 +214,7 @@ class _StudentProfileState extends State<StudentProfile> {
       );
 
       if (response.statusCode == 200 && response.data["status"] == true) {
+
         final profileData = response.data["data"];
         final user = profileData["user"];
 
@@ -267,10 +231,12 @@ class _StudentProfileState extends State<StudentProfile> {
           if (user["image"] != null && user["image"].toString().isNotEmpty) {
             networkImageUrl =
                 "https://admin.uthix.com/storage/images/student/${user["image"]}";
+
           } else {
             networkImageUrl = null;
           }
         });
+
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -285,11 +251,12 @@ class _StudentProfileState extends State<StudentProfile> {
         }
 
         log("✅ Profile fields loaded successfully.");
+
       } else {
-        log("❌ Failed to load profile: ${response.statusCode}");
+        log("❌ Failed to load student profile: ${response.statusCode}");
       }
     } catch (e) {
-      log("❌ Error fetching profile: $e");
+      log("❌ Error fetching student profile: $e");
     }
   }
 
@@ -464,32 +431,33 @@ class _StudentProfileState extends State<StudentProfile> {
             decoration: BoxDecoration(
               color: const Color(0xFFF6F6F6),
               borderRadius: BorderRadius.circular(40),
-              border: Border.all(color: const Color(0xFFD2D2D2)),
+              border: Border.all(color: Color(0xFFD2D2D2)),
             ),
             child: isLoading
-                ? const Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                : DropdownButtonFormField<Map<String, dynamic>>(
-                    value: selectedClass,
+                ? const Center(child: CircularProgressIndicator())
+                : DropdownButtonFormField<String>(
+                    value: selectedClassroomId?.toString(),
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(horizontal: 12),
                     ),
                     hint: const Text("Select Class"),
                     dropdownColor: Colors.white,
-                    items: classOptions.map((classItem) {
-                      return DropdownMenuItem<Map<String, dynamic>>(
-                        value: classItem,
-                        child: Text(classItem["name"]),
-                      );
-                    }).toList(),
+                    items: classOptions
+                        .map((classItem) => DropdownMenuItem(
+                              value: classItem["id"].toString(),
+                              child: Text(classItem["name"]),
+                            ))
+                        .toList(),
                     onChanged: (val) {
-                      print("Selected Class: ${val?["name"]}");
+                      final selected = classOptions.firstWhere(
+                        (classItem) => classItem["id"].toString() == val,
+                        orElse: () => {"id": null, "name": ""},
+                      );
+
                       setState(() {
-                        selectedClass = val;
-                        _classController.text = val!["id"].toString();
+                        selectedClassroomId = selected["id"];
+                        _classController.text = selected["name"];
                       });
                     },
                   ),

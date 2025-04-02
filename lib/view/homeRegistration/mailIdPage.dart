@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,7 +30,19 @@ class _MailidpageState extends State<Mailidpage> {
     super.initState();
     _selectedRole = widget.role;
   }
+  Future<String?> getFcmToken() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
 
+    NotificationSettings settings = await messaging.requestPermission();
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      final token = await messaging.getToken();
+      print("✅ FCM Token: $token");
+      return token;
+    } else {
+      print("❌ Notification permission not granted.");
+      return null;
+    }
+  }
   Future<void> _registerUser() async {
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -39,12 +52,14 @@ class _MailidpageState extends State<Mailidpage> {
     }
 
     final dio = Dio();
+    final fcmToken = await getFcmToken();
     final url = "https://admin.uthix.com/api/register";
     final body = {
       "name": _userNameController.text,
       "email": _emailIdController.text,
       "password": _passwordController.text,
       "role": _selectedRole,
+      'fcm_token': fcmToken,
     };
 
     try {

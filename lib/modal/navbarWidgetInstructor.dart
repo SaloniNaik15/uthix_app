@@ -48,7 +48,7 @@ class Navbar extends StatelessWidget {
                 children: [
                   Icon(
                     navItems[index]["icon"],
-                    size: 20.sp,
+                    size: 20,
                     color: selectedIndex == index
                         ? Colors.blue
                         : const Color.fromRGBO(96, 95, 95, 1),
@@ -57,7 +57,7 @@ class Navbar extends StatelessWidget {
                   Text(
                     navItems[index]["title"],
                     style: GoogleFonts.urbanist(
-                      fontSize: 10.sp,
+                      fontSize: 12,
                       fontWeight: FontWeight.w400,
                       color: selectedIndex == index
                           ? Colors.blue

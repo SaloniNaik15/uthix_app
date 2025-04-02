@@ -206,9 +206,9 @@ class _FilesState extends State<Files> {
               ),
               SizedBox(height: 10.h),
               Expanded(
-                // child: Padding(
-                //   padding: EdgeInsets.only(
-                //       bottom: 70.h), // Prevents overlap with navbar
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      bottom: 85), // Prevents overlap with navbar
                   child: ListView.builder(
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     itemCount: files.length,
@@ -267,7 +267,7 @@ class _FilesState extends State<Files> {
                     },
                   ),
                 ),
-              // ),
+              ),
             ],
           ),
           // Fixed Bottom Navigation Bar inside Stack

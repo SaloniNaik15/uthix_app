@@ -23,7 +23,7 @@ class _StudentSettingsState extends State<StudentSettings> {
           icon: Icon(
             Icons.arrow_back_ios_outlined,
             color: const Color(0xFF605F5F),
-            size: 20.sp,
+            size: 20,
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -39,7 +39,7 @@ class _StudentSettingsState extends State<StudentSettings> {
             child: Text(
               "Settings",
               style: TextStyle(
-                fontSize: 18.sp,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -47,19 +47,19 @@ class _StudentSettingsState extends State<StudentSettings> {
           Divider(thickness: 1, color: Colors.grey[300]),
           // First Checkbox ListTile
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            padding: EdgeInsets.symmetric(horizontal: 10),
             child: CheckboxListTile(
               title: Text(
                 "Notifications",
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               subtitle: Text(
                 "This will not affect any order updates",
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 14,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -75,19 +75,19 @@ class _StudentSettingsState extends State<StudentSettings> {
           Divider(thickness: 1, color: Colors.grey[300]),
           // Second Checkbox ListTile
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            padding: EdgeInsets.symmetric(horizontal: 10),
             child: CheckboxListTile(
               title: Text(
                 "Optimized Experience",
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               subtitle: Text(
                 "For optimized connection quality",
                 style: TextStyle(
-                  fontSize: 14.sp,
+                  fontSize: 14,
                   fontWeight: FontWeight.w400,
                 ),
               ),
