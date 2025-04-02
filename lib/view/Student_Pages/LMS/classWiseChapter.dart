@@ -2,19 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Dummy Chapter Detail Screen
-class ChapterDetailScreen extends StatelessWidget {
-  final int chapterId;
-  const ChapterDetailScreen({super.key, required this.chapterId});
+import 'classes.dart';
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Chapter ID: $chapterId")),
-      body: Center(child: Text("Details for Chapter ID: $chapterId")),
-    );
-  }
-}
 
 class Classwisechapter extends StatefulWidget {
   final int dataId;
@@ -83,7 +72,7 @@ class _ClasswisechapterState extends State<Classwisechapter> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ChapterDetailScreen(chapterId: chapterId),
+        builder: (context) => Classes(chapterId: chapterId),
       ),
     );
   }
@@ -146,12 +135,13 @@ class _ClasswisechapterState extends State<Classwisechapter> {
                   contentPadding: const EdgeInsets.symmetric(
                       vertical: 12, horizontal: 16),
                   title: Text(
-                    chapter['title'],
+                    'Chapter: ${chapter['title']}',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),
+
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(

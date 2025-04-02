@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -19,289 +20,231 @@ class _LiveStudentState extends State<LiveStudent> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70),
-        child: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: Container(
-            margin: const EdgeInsets.only(left: 10, top: 10, bottom: 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
-                  offset: const Offset(0, 4),
-                  blurRadius: 8,
-                ),
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  offset: const Offset(0, 0),
-                  blurRadius: 4,
-                ),
-              ],
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_outlined,
-                  size: 25, color: Colors.black),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 2,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_outlined,
+            size: 25,
+            color: Colors.black,
           ),
-          actions: [
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Teacher image (simulating a "live class" view)
             Container(
-              margin: const EdgeInsets.only(right: 10, top: 10, bottom: 10),
-              height: 42,
-              width: 42,
+              width: double.infinity,
+              height: 230,
+              margin: const EdgeInsets.only(top: 20),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(19),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    offset: const Offset(0, 4),
-                    blurRadius: 8,
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    offset: const Offset(0, 0),
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
-              child: ClipOval(
-                child: Image.asset(
-                  "assets/login/profile.jpeg",
+                borderRadius: BorderRadius.circular(7),
+                border: Border.all(
+                  color: const Color.fromRGBO(11, 159, 167, 1),
+                  width: 1,
+                ),
+                image: const DecorationImage(
+                  image: AssetImage("assets/teacher_sample.jpg"),
                   fit: BoxFit.cover,
                 ),
               ),
+              // You can place overlay icons or controls on the image if needed.
             ),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          Container(
-            height: 230,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(7),
-              border:
-                  Border.all(color: Color.fromRGBO(11, 159, 167, 1), width: 1),
-            ),
-            child: Image.asset(
-              "assets/instructor/liveclasses.png",
-              fit: BoxFit.cover,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 20, right: 10, top: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "SUBJECT: Mathematics",
-                  style: GoogleFonts.urbanist(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: const Color.fromRGBO(16, 95, 131, 1),
+            SizedBox(height: 20.h,),
+
+            // Example message bubble for user queries
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(
+                height: 150,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(246, 246, 246, 1),
+                  borderRadius: BorderRadius.circular(7),
+                  border: Border.all(
+                    color: const Color.fromRGBO(217, 217, 217, 1),
+                    width: 1,
                   ),
                 ),
-                Text(
-                  "CHAPTER: Alegbra  by Om Prakasah ",
-                  style: GoogleFonts.urbanist(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: const Color.fromRGBO(132, 132, 132, 1),
-                  ),
-                ),
-                Text(
-                  "YOU HAVE 3 CO-MENTORS TO HELP YOU",
-                  style: GoogleFonts.urbanist(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                    color: const Color.fromRGBO(132, 132, 132, 1),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Container(
-                  height: 150,
-                  width: 340,
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(246, 246, 246, 1),
-                    borderRadius: BorderRadius.circular(7),
-                    border: Border.all(
-                        color: Color.fromRGBO(217, 217, 217, 1), width: 1),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Row with user avatar + placeholder text
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 45,
-                              height: 45,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                              ),
-                              child: ClipOval(
-                                child: Image.asset(
-                                  "assets/login/profile.jpeg",
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
+                        Container(
+                          width: 45,
+                          height: 45,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              "assets/login/profile.jpeg",
+                              fit: BoxFit.cover,
                             ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: TextField(
-                                controller: _queryController,
-                                decoration: InputDecoration(
-                                  hintText: "You can type your queries here!",
-                                  border: InputBorder.none,
-                                  hintStyle: GoogleFonts.urbanist(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    color: const Color.fromRGBO(0, 0, 0, 1),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        Divider(
-                          thickness: 1,
-                          color: Color.fromRGBO(217, 217, 217, 1),
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: GestureDetector(
-                            onTap: () {},
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: const Color.fromRGBO(217, 217, 217, 1),
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                              child: Text(
-                                "Send",
-                                style: GoogleFonts.urbanist(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: const Color.fromRGBO(43, 92, 116, 1),
-                                ),
-                              ),
-                            ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          "You can type your queries here!",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                //Queries if and announcement by teacher if.
-                SizedBox(
-                  height: 250,
-                  child: ListView.builder(
-                    itemCount: 10,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => QueryStudent()));
-                        },
-                        child: Container(
-                          width: 340,
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 10),
-                          decoration: BoxDecoration(
-                            color: const Color.fromRGBO(246, 246, 246, 1),
-                            borderRadius: BorderRadius.circular(7),
-                            border: Border.all(
-                              color: const Color.fromRGBO(217, 217, 217, 1),
-                              width: 1,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    ClipOval(
-                                      child: Image.asset(
-                                        "assets/login/profile.jpeg",
-                                        width: 45,
-                                        height: 45,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      "Surayaiya Jagannath",
-                                      style: GoogleFonts.urbanist(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    const Icon(Icons.more_vert),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  "Submit",
-                                  //using provider text send by query,
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  "Add Attachment",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color:
-                                        const Color.fromRGBO(142, 140, 140, 1),
-                                  ),
-                                ),
-                                Container(
-                                  height: 1,
-                                  color: const Color.fromRGBO(213, 213, 213, 1),
-                                  margin:
-                                      const EdgeInsets.symmetric(vertical: 8),
-                                ),
-                                Text(
-                                  "Add Comment",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color:
-                                        const Color.fromRGBO(142, 140, 140, 1),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                    const Spacer(),
+                    const Divider(
+                      thickness: 1,
+                      color: Color.fromRGBO(217, 217, 217, 1),
+                    ),
+                    // "Send" button
+                    Container(
+                      height: 30,
+                      width: 80,
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(217, 217, 217, 1),
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text(
+                        "Send",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Color.fromRGBO(43, 92, 116, 1),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // Example chat/announcement messages
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                children: [
+                  _buildChatBubble(
+                    name: "Co Mentor",
+                    time: "Just Now | 12 Aug 2025",
+                    message: "New Assignment: Submit your report here",
+                  ),
+                  _buildChatBubble(
+                    name: "Your new query",
+                    time: "10:00 | 12 Aug 2025",
+                    message:
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et ?",
+                    isUser: true,
+                  ),
+                  _buildChatBubble(
+                    name: "Co Mentor",
+                    time: "1 hour ago | 12 Aug 2025",
+                    message: "New Assignment: Submit your homework",
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  // Helper for chat-like announcement bubbles
+  Widget _buildChatBubble({
+    required String name,
+    required String time,
+    required String message,
+    bool isUser = false,
+  }) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 15),
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(246, 246, 246, 1),
+        borderRadius: BorderRadius.circular(7),
+        border: Border.all(
+          color: const Color.fromRGBO(217, 217, 217, 1),
+          width: 1,
+        ),
+      ),
+      padding: const EdgeInsets.all(8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top row with avatar, name, time, and a 3-dot menu icon
+          Row(
+            children: [
+              ClipOval(
+                child: Image.asset(
+                  "assets/login/profile.jpeg",
+                  width: 45,
+                  height: 45,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text(
+                      time,
+                      style: const TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w300,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.more_vert),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Message content
+          Text(
+            message,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              color: Colors.black,
+            ),
+          ),
+          const SizedBox(height: 10),
+          // "Add Comment" text
+          const Text(
+            "Add Comment",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Color.fromRGBO(142, 140, 140, 1),
             ),
           ),
         ],

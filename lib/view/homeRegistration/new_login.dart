@@ -31,10 +31,8 @@ class _NewLoginState extends State<NewLogin> {
   final TextEditingController _emailIdController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool ispassword = true;
-  Future<void> saveUserSession(
-      String token,
-      String role,
-      ) async {
+
+  Future<void> saveUserSession(String token, String role) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('auth_token', token);
     await prefs.setString('user_role', role);
@@ -88,8 +86,8 @@ class _NewLoginState extends State<NewLogin> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         log("Stored Token: ${prefs.getString('auth_token')}, Role: ${prefs.getString('user_role')}");
 
-
         Widget nextScreen;
+
         if (role == 'seller') {
           nextScreen = SellerDashboard();
         } else if (role == 'instructor') {
@@ -112,7 +110,8 @@ class _NewLoginState extends State<NewLogin> {
           ),
         );
       }
-    } on DioError catch (dioError) {
+    } on DioException catch (dioError) {
+      // 👇 Handle specific API failure
       if (dioError.response != null) {
         log("Dio Error Response: ${dioError.response?.data}");
         final data = dioError.response?.data;
@@ -134,6 +133,7 @@ class _NewLoginState extends State<NewLogin> {
           );
         }
       } else {
+        // 👇 Network error / timeout
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -144,6 +144,7 @@ class _NewLoginState extends State<NewLogin> {
         );
       }
     } catch (e) {
+      // 👇 Fallback for any other unexpected errors
       log("Unexpected Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -205,17 +206,17 @@ class _NewLoginState extends State<NewLogin> {
                             SizedBox(height: 20.h),
                             Text(
                               "Welcome BACK!",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 22.sp,
+                              style: TextStyle(
+                                fontSize: 26,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,
                               ),
                             ),
-                            SizedBox(height: 10.h),
+                            SizedBox(height: 20.h),
                             Text(
                               "Login to your account",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 14.sp,
+                              style: TextStyle(
+                                fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,
                               ),
@@ -242,8 +243,8 @@ class _NewLoginState extends State<NewLogin> {
                                   padding: EdgeInsets.only(right: 10.w),
                                   child: Text(
                                     "Forgot Password",
-                                    style: GoogleFonts.urbanist(
-                                      fontSize: 10.sp,
+                                    style: TextStyle(
+                                      fontSize: 12,
                                       fontWeight: FontWeight.w400,
                                       color: Colors.blue,
                                     ),
@@ -264,8 +265,8 @@ class _NewLoginState extends State<NewLogin> {
                                 child: Center(
                                   child: Text(
                                     "Login",
-                                    style: GoogleFonts.urbanist(
-                                      fontSize: 16.sp,
+                                    style: TextStyle(
+                                      fontSize: 18,
                                       fontWeight: FontWeight.w400,
                                       color: Colors.white,
                                     ),
@@ -286,21 +287,21 @@ class _NewLoginState extends State<NewLogin> {
                               child: Text.rich(
                                 TextSpan(
                                   text: "Already have an account? ",
-                                  style: GoogleFonts.urbanist(
-                                    fontSize: 12.sp,
+                                  style: TextStyle(
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w400,
                                     color: Colors.black,
                                   ),
                                   children: [
                                     TextSpan(
                                       text: "Register",
-                                      style: GoogleFonts.urbanist(
-                                        fontSize: 12.sp,
+                                      style: TextStyle(
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w400,
                                         color: Color.fromRGBO(27, 97, 122, 1),
                                         decoration: TextDecoration.underline,
                                         decorationColor:
-                                        Color.fromRGBO(27, 97, 122, 1),
+                                            Color.fromRGBO(27, 97, 122, 1),
                                       ),
                                     ),
                                   ],
@@ -337,13 +338,11 @@ class _NewLoginState extends State<NewLogin> {
         child: TextField(
           controller: _passwordController,
           obscureText: ispassword,
-          style:
-          GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: "Enter your Password",
-            hintStyle:
-            GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+            hintStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
             suffixIcon: IconButton(
               icon: Icon(ispassword
                   ? Icons.visibility_off_outlined
@@ -378,12 +377,11 @@ Widget _buildTextField({
       child: TextField(
         controller: controller,
         keyboardType: TextInputType.emailAddress,
-        style: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hint,
-          hintStyle:
-          GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
+          hintStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
         ),
       ),
     ),
