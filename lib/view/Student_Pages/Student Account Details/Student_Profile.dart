@@ -21,6 +21,7 @@ class _StudentProfileState extends State<StudentProfile> {
   String? accessLoginToken;
   String? userName;
   String? networkImageUrl;
+  int? selectedClassroomId;
   List<Map<String, dynamic>> _classOptions = [];
   String? _selectedClass;
 
@@ -157,7 +158,7 @@ class _StudentProfileState extends State<StudentProfile> {
       );
       return;
     }
-
+    log("📘 Submitting classroom_id: $selectedClassroomId");
     try {
       final dio = Dio();
 
@@ -169,6 +170,7 @@ class _StudentProfileState extends State<StudentProfile> {
         "gender": gender,
         "class": userClass,
         "stream": stream,
+        "classroom_id": selectedClassroomId,
         if (_profileImage != null)
           "image": await MultipartFile.fromFile(
             _profileImage!.path,
@@ -240,13 +242,31 @@ class _StudentProfileState extends State<StudentProfile> {
       if (response.statusCode == 200 && response.data["status"] == true) {
         final profileData = response.data["data"][0];
         final user = profileData["user"];
+        final classroomIdFromApi = profileData["classroom_id"];
+
+        String classNameFromApi = "";
+        if (classroomIdFromApi != null) {
+          final matchedClass = classOptions.firstWhere(
+            (option) => option["id"] == classroomIdFromApi,
+            orElse: () => {"name": ""},
+          );
+          classNameFromApi = matchedClass["name"];
+        }
 
         setState(() {
           _phoneController.text = user["phone"]?.toString() ?? "";
           _dobController.text = user["dob"] ?? "";
           _genderValue = user["gender"];
-          _classController.text = profileData["class"] ?? "";
           _streamController.text = profileData["stream"] ?? "";
+          selectedClassroomId = profileData["classroom_id"];
+
+          if (selectedClassroomId != null) {
+            final selectedClass = classOptions.firstWhere(
+              (option) => option["id"] == selectedClassroomId,
+              orElse: () => {"name": ""},
+            );
+            _classController.text = selectedClass["name"];
+          }
 
           if (user["image"] != null && user["image"].toString().isNotEmpty) {
             networkImageUrl =
@@ -255,6 +275,7 @@ class _StudentProfileState extends State<StudentProfile> {
             networkImageUrl = null;
           }
         });
+
         if (networkImageUrl != null) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString("student_profile_image_url", networkImageUrl!);
@@ -445,9 +466,7 @@ class _StudentProfileState extends State<StudentProfile> {
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : DropdownButtonFormField<String>(
-                    value: _classController.text.isNotEmpty
-                        ? _classController.text
-                        : null,
+                    value: selectedClassroomId?.toString(),
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(horizontal: 12),
@@ -461,8 +480,14 @@ class _StudentProfileState extends State<StudentProfile> {
                             ))
                         .toList(),
                     onChanged: (val) {
+                      final selected = classOptions.firstWhere(
+                        (classItem) => classItem["id"].toString() == val,
+                        orElse: () => {"id": null, "name": ""},
+                      );
+
                       setState(() {
-                        _classController.text = val!;
+                        selectedClassroomId = selected["id"];
+                        _classController.text = selected["name"];
                       });
                     },
                   ),
