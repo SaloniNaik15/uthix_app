@@ -161,62 +161,10 @@ class _ClassDataState extends State<ClassData> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : classes.isEmpty
-
-          ? Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              "assets/instructor/UnableToLoadData.png",
-              width: 200,
-              height: 200,
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              "You don't have any classes. Create a new class.",
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      )
-          : ListView.builder(
-        itemCount: classes.length,
-        itemBuilder: (context, index) {
-          final classItem = classes[index];
-          // Extract the classroom id from the top-level "id"
-          final classroomId = classItem["id"].toString();
-          // Get class name from the nested "classroom" object.
-          final className = classItem["classroom"] != null
-              ? classItem["classroom"]["class_name"]
-              : "Unknown Class";
-          // Get subject name using the helper function.
-          final subjectName = _getSubjectName(classItem);
-          return Padding(
-            padding: const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 15),
-            child: GestureDetector(
-              onTap: () {
-                // Navigation if needed.
-              },
-              child: Container(
-                width: 290,
-                height: 150,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color.fromRGBO(217, 217, 217, 1),
-                  ),
-                  color: const Color.fromRGBO(246, 246, 246, 1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-
+              ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-
                       Image.asset(
                         "assets/instructor/UnableToLoadData.png",
                         width: 200,
@@ -225,19 +173,6 @@ class _ClassDataState extends State<ClassData> {
                       const SizedBox(height: 20),
                       const Text(
                         "You don't have any classes. Create a new class.",
-
-                      // Class name row.
-                      Text(
-                        className,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      // Subject information.
-                      Text(
-                        "Subject: $subjectName",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
@@ -260,7 +195,7 @@ class _ClassDataState extends State<ClassData> {
                     final subjectName = _getSubjectName(classItem);
                     return Padding(
                       padding: const EdgeInsets.only(
-                          top: 15, left: 10, right: 10, bottom: 15),
+                          top: 15, left: 20, right: 20, bottom: 15),
                       child: GestureDetector(
                         onTap: () {
                           // Navigation if needed.
@@ -283,7 +218,7 @@ class _ClassDataState extends State<ClassData> {
                                 // Class name row.
                                 Text(
                                   className,
-                                  style: TextStyle(
+                                  style: GoogleFonts.urbanist(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -292,7 +227,7 @@ class _ClassDataState extends State<ClassData> {
                                 // Subject information.
                                 Text(
                                   "Subject: $subjectName",
-                                  style: TextStyle(
+                                  style: GoogleFonts.urbanist(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                   ),

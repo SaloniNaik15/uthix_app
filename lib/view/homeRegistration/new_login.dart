@@ -32,9 +32,9 @@ class _NewLoginState extends State<NewLogin> {
   final TextEditingController _passwordController = TextEditingController();
   bool ispassword = true;
   Future<void> saveUserSession(
-    String token,
-    String role,
-  ) async {
+      String token,
+      String role,
+      ) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('auth_token', token);
     await prefs.setString('user_role', role);
@@ -87,7 +87,7 @@ class _NewLoginState extends State<NewLogin> {
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         log("Stored Token: ${prefs.getString('auth_token')}, Role: ${prefs.getString('user_role')}");
-        
+
 
         Widget nextScreen;
         if (role == 'seller') {
@@ -205,17 +205,17 @@ class _NewLoginState extends State<NewLogin> {
                             SizedBox(height: 20.h),
                             Text(
                               "Welcome BACK!",
-                              style: TextStyle(
-                                fontSize: 26,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 22.sp,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,
                               ),
                             ),
-                            SizedBox(height: 20.h),
+                            SizedBox(height: 10.h),
                             Text(
                               "Login to your account",
-                              style: TextStyle(
-                                fontSize: 16,
+                              style: GoogleFonts.urbanist(
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black,
                               ),
@@ -247,21 +247,27 @@ class _NewLoginState extends State<NewLogin> {
                                       fontWeight: FontWeight.w400,
                                       color: Colors.blue,
                                     ),
-
-                                  );
-                                },
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(right: 10.w),
-                                    child: Text(
-                                      "Forgot Password",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.blue,
-                                      ),
-
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 25.h),
+                            GestureDetector(
+                              onTap: _login,
+                              child: Container(
+                                height: 45.h,
+                                width: MediaQuery.of(context).size.width / 1.5,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(25.r),
+                                  color: Color.fromRGBO(27, 97, 122, 1),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    "Login",
+                                    style: GoogleFonts.urbanist(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w400,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
@@ -285,66 +291,25 @@ class _NewLoginState extends State<NewLogin> {
                                     fontWeight: FontWeight.w400,
                                     color: Colors.black,
                                   ),
-
-
-                                  child: Center(
-                                    child: Text(
-                                      "Login",
-                                      style:TextStyle(
-                                        fontSize: 18,
-
+                                  children: [
+                                    TextSpan(
+                                      text: "Register",
+                                      style: GoogleFonts.urbanist(
+                                        fontSize: 12.sp,
                                         fontWeight: FontWeight.w400,
                                         color: Color.fromRGBO(27, 97, 122, 1),
                                         decoration: TextDecoration.underline,
                                         decorationColor:
-                                            Color.fromRGBO(27, 97, 122, 1),
+                                        Color.fromRGBO(27, 97, 122, 1),
                                       ),
                                     ),
                                   ],
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-
-                       
-                              SizedBox(height: 45.h),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => Registration(),
-                                    ),
-                                  );
-                                },
-                                child: Text.rich(
-                                  TextSpan(
-                                    text: "Already have an account? ",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
-                                    ),
-                                    children: [
-                                      TextSpan(
-                                        text: "Register",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color.fromRGBO(27, 97, 122, 1),
-                                          decoration: TextDecoration.underline,
-                                          decorationColor:
-                                              Color.fromRGBO(27, 97, 122, 1),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                              SizedBox(height: 55.h),
-                            ],
-                          ),
-
+                            ),
+                            SizedBox(height: 55.h),
+                          ],
                         ),
                       ),
                     ),
@@ -373,14 +338,12 @@ class _NewLoginState extends State<NewLogin> {
           controller: _passwordController,
           obscureText: ispassword,
           style:
-          TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+          GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: "Enter your Password",
-            
-
-            TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-
+            hintStyle:
+            GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
             suffixIcon: IconButton(
               icon: Icon(ispassword
                   ? Icons.visibility_off_outlined
@@ -415,14 +378,12 @@ Widget _buildTextField({
       child: TextField(
         controller: controller,
         keyboardType: TextInputType.emailAddress,
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+        style: GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
         decoration: InputDecoration(
           border: InputBorder.none,
           hintText: hint,
           hintStyle:
-
-          TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-
+          GoogleFonts.urbanist(fontSize: 14, fontWeight: FontWeight.w400),
         ),
       ),
     ),

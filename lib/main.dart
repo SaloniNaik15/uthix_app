@@ -1,5 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uthix_app/push_notification_service.dart';
 
 import 'package:uthix_app/view/Student_Pages/Modern_Tools/modern_tools.dart';
 import 'package:uthix_app/view/homeRegistration/new_registerlogin.dart';
@@ -13,10 +17,26 @@ import 'package:uthix_app/view/homeRegistration/splashintroScreen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:uthix_app/view/homeRegistration/welcome_screen.dart';
-import 'package:uthix_app/view/instructor_dashboard/panding.dart'; // Import ScreenUti
+import 'package:uthix_app/view/instructor_dashboard/panding.dart';
 
-void main() {
+import 'firebase_options.dart'; // Import ScreenUti
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+    print("🔄 FCM Token Refreshed: $newToken");
+
+    // You can store it in shared preferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('fcm_token', newToken);
+
+  });
+
+  await PushNotificationService().initialize();
   runApp(
     const MainApp(),
   );
@@ -47,9 +67,8 @@ class MainApp extends StatelessWidget {
           //home: InstructorDashboard(),
           //home: ECommerce(),
         );
-
       },
-        child: Introscreen(),
+      child: Introscreen(),
     );
   }
 }
