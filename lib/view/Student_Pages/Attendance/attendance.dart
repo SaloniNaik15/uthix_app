@@ -1,6 +1,10 @@
+import 'dart:developer';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Attendance extends StatefulWidget {
   const Attendance({super.key});
@@ -10,13 +14,52 @@ class Attendance extends StatefulWidget {
 }
 
 class _AttendanceState extends State<Attendance> {
-  double percentage = 77; // Update this value dynamically as needed
+  double percentage = 77;
+  String? accessLoginToken;
+  String studentName = "";
+  String studentClass = "";
+  String studentPhone = "";// Update this value dynamically as needed
+  @override
+  void initState() {
+    super.initState();
+    _initializeProfileData();
+  }
+    Future<void> _initializeProfileData() async {
+      final prefs = await SharedPreferences.getInstance();
+      accessLoginToken = prefs.getString('auth_token');
 
+      try {
+        final dio = Dio();
+        final response = await dio.get(
+          "https://admin.uthix.com/api/student-profile",
+          options: Options(
+            headers: {"Authorization": "Bearer $accessLoginToken"},
+          ),
+        );
+
+        if (response.statusCode == 200 && response.data["status"] == true) {
+          final data = response.data["data"];
+          final user = data["user"];
+          final classroom = data["classroom"];
+
+          setState(() {
+            studentName = user["name"] ?? "";
+            studentClass = classroom?["class_name"] ?? "";
+            studentPhone = user["phone"].toString();
+          });
+
+          log("✅ Attendance Profile Data Loaded");
+        } else {
+          log("❌ Failed to load student profile");
+        }
+      } catch (e) {
+        log("❌ Error: $e");
+      }
+    }
   @override
   Widget build(BuildContext context) {
     double progressValue =
         percentage / 100; // Convert percentage to progress value (0 to 1)
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(43, 92, 116, 1),
@@ -26,7 +69,7 @@ class _AttendanceState extends State<Attendance> {
           padding: const EdgeInsets.only(left: 20),
           child: IconButton(
             icon:  Icon(Icons.arrow_back_ios_outlined,
-                size: 25.sp, color: Colors.white),
+                size: 25, color: Colors.white),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -37,16 +80,16 @@ class _AttendanceState extends State<Attendance> {
           children: [
             Text(
               "My Attendance",
-              style: GoogleFonts.urbanist(
-                fontSize: 20.sp,
+              style: TextStyle(
+                fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
             ),
             Text(
               "Total 9 classes attended out of 12",
-              style: GoogleFonts.urbanist(
-                fontSize: 14.sp,
+              style: TextStyle(
+                fontSize: 16,
                 fontWeight: FontWeight.w400,
                 color: Colors.white,
               ),
@@ -61,38 +104,30 @@ class _AttendanceState extends State<Attendance> {
           children: [
              SizedBox(height: 50.h),
             Text(
-              "Mahima Mandal",
-              style: GoogleFonts.urbanist(
-                fontSize: 16.sp,
+              studentName,
+              style: TextStyle(
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: const Color.fromRGBO(43, 92, 116, 1),
               ),
             ),
             Text(
-              "Class X B",
-              style: GoogleFonts.urbanist(
-                fontSize: 14.sp,
+              studentClass,
+              style: TextStyle(
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: const Color.fromRGBO(96, 95, 95, 1),
               ),
             ),
             Text(
-              "Delhi Public School, New Delhi",
-              style: GoogleFonts.urbanist(
-                fontSize: 14.sp,
+              studentPhone,
+              style: TextStyle(
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: const Color.fromRGBO(96, 95, 95, 1),
               ),
             ),
-            Text(
-              "+91 XXXXX XXXXX",
-              style: GoogleFonts.urbanist(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                color: const Color.fromRGBO(96, 95, 95, 1),
-              ),
-            ),
-             SizedBox(height: 50.h),
+             SizedBox(height: 50),
             Center(
               child: Stack(
                 alignment: Alignment.center,
@@ -102,7 +137,7 @@ class _AttendanceState extends State<Attendance> {
                     height: 203,
                     child: CircularProgressIndicator(
                       value: 1,
-                      strokeWidth: 10.w,
+                      strokeWidth: 10,
                       valueColor: AlwaysStoppedAnimation<Color>(
                         const Color.fromARGB(255, 237, 235, 235),
                       ),
@@ -114,7 +149,7 @@ class _AttendanceState extends State<Attendance> {
                     height: 160,
                     child: CircularProgressIndicator(
                       value: progressValue,
-                      strokeWidth: 7.w,
+                      strokeWidth: 7,
                       backgroundColor: Colors.transparent,
                       valueColor: const AlwaysStoppedAnimation<Color>(
                         Color.fromRGBO(43, 92, 116, 1),
@@ -125,7 +160,7 @@ class _AttendanceState extends State<Attendance> {
                   Text(
                     "$percentage%",
                     style: GoogleFonts.urbanist(
-                      fontSize: 32.sp,
+                      fontSize: 32,
                       fontWeight: FontWeight.w600,
                       color: Color.fromRGBO(96, 95, 95, 1),
                     ),
@@ -134,17 +169,17 @@ class _AttendanceState extends State<Attendance> {
               ),
             ),
              SizedBox(
-              height: 25.h,
+              height: 25,
             ),
             Text(
               "Need $percentage% to pass",
               style: GoogleFonts.urbanist(
-                fontSize: 14.sp,
+                fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: Color.fromRGBO(0, 0, 0, 1),
               ),
             ),
-             SizedBox(height: 90.h),
+             SizedBox(height: 80.h),
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 20),
               child: Row(
@@ -168,8 +203,8 @@ class _AttendanceState extends State<Attendance> {
   // Helper widget for info cards
   Widget buildInfoCard(String title, String value) {
     return Container(
-      height: 102.h,
-      width: 102.w,
+      height: 102,
+      width: 102,
       decoration: BoxDecoration(
         color: const Color.fromRGBO(246, 246, 246, 1),
         border: Border.all(color: const Color.fromRGBO(217, 217, 217, 1)),
@@ -180,16 +215,16 @@ class _AttendanceState extends State<Attendance> {
         children: [
           Text(
             title,
-            style: GoogleFonts.urbanist(
-              fontSize: 14.sp,
+            style: TextStyle(
+              fontSize: 14,
               fontWeight: FontWeight.w600,
               color: const Color.fromRGBO(96, 95, 95, 1),
             ),
           ),
           Text(
             value,
-            style: GoogleFonts.urbanist(
-              fontSize: 14.sp,
+            style: TextStyle(
+              fontSize: 14,
               fontWeight: FontWeight.w600,
               color: const Color.fromRGBO(96, 95, 95, 1),
             ),
