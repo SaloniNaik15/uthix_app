@@ -194,12 +194,12 @@ class _HomePagesState extends State<HomePages> {
                       profileImageUrl!,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Image.asset(
-                        "assets/login/profile.jpeg",
+                        "assets/login/profile.png",
                         fit: BoxFit.cover,
                       ),
                     )
                         : Image.asset(
-                      "assets/login/profile.jpeg",
+                      "assets/login/profile.png",
                       fit: BoxFit.cover,
                     ),
                   ),
