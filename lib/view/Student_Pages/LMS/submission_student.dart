@@ -9,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/live_student.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/submission_student.dart'; // For navigation if needed
 
-// SubmissionStudent page that receives announcementId and chapterId.
 class SubmissionStudent extends StatefulWidget {
   final String announcementId;
   final String chapterId;
@@ -57,7 +56,7 @@ class _SubmissionStudentState extends State<SubmissionStudent> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-            // Example assignment details container.
+
             Stack(
               clipBehavior: Clip.none,
               children: [
@@ -160,8 +159,6 @@ class _SubmissionStudentState extends State<SubmissionStudent> {
   }
 }
 
-// BottomSheet widget to handle file upload.
-
 class UploadBottomSheet extends StatefulWidget {
   final String announcementId;
   final String chapterId;
@@ -212,7 +209,7 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
       isUploading = true;
     });
     try {
-      String uploadUrl = "https://admin.uthix.com/api/student/assignments/upload";
+      String uploadUrl = "https://admin.uthix.com/api/announcements/${widget.announcementId}/assignments";
       FormData formData = FormData.fromMap({
         "announcement_id": widget.announcementId,
         "chapter_id": widget.chapterId,
@@ -282,7 +279,6 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
               ),
             ),
             SizedBox(height: 16),
-            // Display the selected file path or a message if none.
             _selectedFilePath != null
                 ? Text("Selected File: ${_selectedFilePath!}")
                 : Text("No file selected"),
