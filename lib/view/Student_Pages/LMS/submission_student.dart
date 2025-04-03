@@ -37,6 +37,7 @@ class _SubmissionStudentState extends State<SubmissionStudent> {
     setState(() {
       token = prefs.getString('auth_token');
     });
+    log("Loaded token: $token");
   }
 
   @override
@@ -56,7 +57,6 @@ class _SubmissionStudentState extends State<SubmissionStudent> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-
             Stack(
               clipBehavior: Clip.none,
               children: [
@@ -116,18 +116,19 @@ class _SubmissionStudentState extends State<SubmissionStudent> {
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
               child: GestureDetector(
                 onTap: () {
-                  // Show bottom sheet for file selection and upload.
+                  // Pass the parent's context to the bottom sheet.
                   showModalBottomSheet(
                     context: context,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                     ),
-                    builder: (BuildContext context) {
+                    builder: (BuildContext bottomSheetContext) {
                       return UploadBottomSheet(
                         announcementId: widget.announcementId,
                         chapterId: widget.chapterId,
                         token: token ?? "",
                         dio: _dio,
+                        parentContext: context,
                       );
                     },
                   );
@@ -164,6 +165,7 @@ class UploadBottomSheet extends StatefulWidget {
   final String chapterId;
   final String token;
   final Dio dio;
+  final BuildContext parentContext; // Parent's context for SnackBar
 
   const UploadBottomSheet({
     Key? key,
@@ -171,6 +173,7 @@ class UploadBottomSheet extends StatefulWidget {
     required this.chapterId,
     required this.token,
     required this.dio,
+    required this.parentContext,
   }) : super(key: key);
 
   @override
@@ -195,12 +198,13 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
       setState(() {
         _selectedFilePath = result.files.single.path;
       });
+      log("Selected file path: $_selectedFilePath");
     }
   }
 
   Future<void> _uploadAssignment() async {
     if (_selectedFilePath == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(widget.parentContext).showSnackBar(
         SnackBar(content: Text("Please choose a file to upload.")),
       );
       return;
@@ -230,20 +234,36 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
         ),
       );
       log("Upload Response: ${response.data}");
-      if (response.data["message"] != null &&
-          response.data["message"].toString().contains("successfully")) {
-        Navigator.pop(context); // Close bottom sheet.
-        ScaffoldMessenger.of(context).showSnackBar(
+
+      var responseData = response.data;
+      log("Parsed response: $responseData");
+
+      // Check success using the new JSON structure.
+      // Expected response:
+      // {
+      //    "message": "Assignment uploaded successfully!",
+      //    "assignment_upload": { ... }
+      // }
+      if (response.statusCode == 201 &&
+          responseData["assignment_upload"] != null &&
+          responseData["message"] != null &&
+          responseData["message"].toString().trim().toLowerCase().contains("successfully")) {
+        // Show the success SnackBar on the parent's context.
+        ScaffoldMessenger.of(widget.parentContext).showSnackBar(
           SnackBar(content: Text("File uploaded successfully")),
         );
+        // Close the bottom sheet.
+        Navigator.pop(context);
+        // Then, navigate back to the previous page.
+        Navigator.pop(widget.parentContext);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(widget.parentContext).showSnackBar(
           SnackBar(content: Text("File upload failed")),
         );
       }
     } catch (e) {
       log("Upload failed: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(widget.parentContext).showSnackBar(
         SnackBar(content: Text("File upload failed")),
       );
     } finally {
@@ -310,6 +330,3 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
     );
   }
 }
-
-
-
