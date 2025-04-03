@@ -15,8 +15,8 @@ class ProgressTracking extends StatefulWidget {
 class _ProgressTrackingState extends State<ProgressTracking> {
   Widget buildInfoContainer(String title, String value) {
     return Container(
-      height: 102.h,
-      width: 102.w,
+      height: 102,
+      width: 102,
       decoration: BoxDecoration(
         color: Color.fromRGBO(246, 246, 246, 1),
         border: Border.all(
@@ -156,7 +156,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
       ),
       child: Column(
         children: [
-          SizedBox(height: 20.h),
+          SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -164,7 +164,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
               buildCategoryContainer("Track Scores"),
             ],
           ),
-          SizedBox(height: 20.h),
+          SizedBox(height: 20),
           buildBarChart(),
           Divider(
             thickness: 1,

@@ -216,7 +216,7 @@ class _StudNewchartState extends State<StudNewchart> {
                   width: 50,
                   height: 50,
                   child: ClipOval(
-                    child: Image.asset("assets/login/profile.jpeg",
+                    child: Image.asset("assets/login/profile.png",
                         fit: BoxFit.cover),
                   ),
                 ),

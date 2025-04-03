@@ -458,7 +458,7 @@ class MessageBubble extends StatelessWidget {
           if (!isSender) // Show profile image only for received messages
             ClipOval(
               child: Image.asset(
-                'assets/login/profile.jpeg',
+                'assets/login/profile.png',
                 height: 40,
                 width: 40,
                 fit: BoxFit.cover,

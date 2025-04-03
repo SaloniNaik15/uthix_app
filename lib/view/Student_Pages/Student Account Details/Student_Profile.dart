@@ -213,29 +213,33 @@ class _StudentProfileState extends State<StudentProfile> {
       );
 
       if (response.statusCode == 200 && response.data["status"] == true) {
-
         final profileData = response.data["data"];
         final user = profileData["user"];
+        final classroom = profileData["classroom"];
+        final classroomIdFromApi = profileData["classroom_id"];
 
+        String classNameFromApi =
+            classroom != null ? classroom["class_name"] ?? "" : "";
         // ✅ Extract user_id
         int userId = user["id"];
 
         setState(() {
+          _nameController.text = user["name"] ?? "";
+          _emailController.text = user["email"] ?? "";
           _phoneController.text = user["phone"]?.toString() ?? "";
           _dobController.text = user["dob"] ?? "";
           _genderValue = user["gender"];
-          _classController.text = profileData["classroom_id"]?.toString() ?? "";
           _streamController.text = profileData["stream"] ?? "";
+          selectedClassroomId = classroomIdFromApi;
+          _classController.text = classNameFromApi;
 
           if (user["image"] != null && user["image"].toString().isNotEmpty) {
             networkImageUrl =
-                "https://admin.uthix.com/storage/images/student/${user["image"]}";
-
+            "https://admin.uthix.com/storage/images/student/${user["image"]}";
           } else {
             networkImageUrl = null;
           }
         });
-
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -250,7 +254,6 @@ class _StudentProfileState extends State<StudentProfile> {
         }
 
         log("✅ Profile fields loaded successfully.");
-
       } else {
         log("❌ Failed to load student profile: ${response.statusCode}");
       }
