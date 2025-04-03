@@ -97,16 +97,19 @@ class _ProfileAccountState extends State<ProfileAccount> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
+            color: Color(0xFFF6F6F6),
             height: 130,
-            width: double.infinity,
-            decoration: BoxDecoration(color: Color(0xFFF6F6F6)),
-            child: Stack(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Column(
+            width: MediaQuery.sizeOf(context).width,
+            child: Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween, // Space between text and image
+                crossAxisAlignment: CrossAxisAlignment.center, // Align items vertically in the center
+                children: [
+                  // Text Section (on the left)
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.center, // Center vertically
                     children: [
                       Text(
                         "$instructorName",
@@ -116,38 +119,34 @@ class _ProfileAccountState extends State<ProfileAccount> {
                           color: Colors.black,
                         ),
                       ),
-                        Text(
-                          "Congratulations! \nYou are member now.",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black,
-                          ),
+                      SizedBox(height: 8), // Add spacing between lines
+                      Text(
+                        "Congratulations! \nYou are a member now.",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
                       ),
                     ],
                   ),
-                ),
-                Spacer(),
-                Positioned(
-                  top: 0,
-                  left: 280,
-                  child: Transform.rotate(
-                    angle: -1.12 * (3.14159 / 180),
+                  // Image Section (on the right)
+                  Transform.rotate(
+                    angle: -1.12 * (3.14159 / 180), // Rotate image slightly
                     child: Image.asset(
                       'assets/instructor/premium.png',
                       width: 128,
                       height: 130,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           30.verticalSpace,
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 10),
             child: Container(
-              height: 380,
               width: MediaQuery.sizeOf(context).width,
               decoration: BoxDecoration(
                 color: Color(0xFFFCFCFC),
@@ -155,6 +154,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: ListView.separated(
+                shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 padding: EdgeInsets.only(top: 15, bottom: 15),
                 itemCount: menuItems.length,

@@ -13,6 +13,8 @@ import 'package:uthix_app/view/Student_Pages/Student%20Account%20Details/Order_T
 import 'package:uthix_app/view/Student_Pages/Student%20Account%20Details/Student_HelpDesk.dart';
 import 'package:uthix_app/view/Student_Pages/Student%20Account%20Details/Student_ManageAccount.dart';
 
+import '../Grade/chapter grades.dart';
+
 // Import all the pages
 
 class MyDrawer extends StatefulWidget {
@@ -173,7 +175,7 @@ class _MyDrawerState extends State<MyDrawer> {
         page = Attendance();
         break;
       case 8:
-        page = GradeStudent();
+        page = AllSubmissionsScreen();
         break;
       case 9:
         page = StudentManageAccount();

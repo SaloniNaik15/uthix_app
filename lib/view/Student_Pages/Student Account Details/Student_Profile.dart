@@ -53,7 +53,6 @@ class _StudentProfileState extends State<StudentProfile> {
       accessLoginToken = token;
     });
     await fetchClasses();
-    // _fetchUserProfile();
     _fetchstudentProfile();
   }
 
