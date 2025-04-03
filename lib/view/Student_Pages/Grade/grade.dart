@@ -5,8 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dio/dio.dart';
 import 'dart:developer';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class GradeStudent extends StatefulWidget {
-  const GradeStudent({super.key});
+  final int announcementId; // ✅ Add this line
+
+  const GradeStudent({super.key, required this.announcementId}); // ✅ Now it works
 
   @override
   State<GradeStudent> createState() => _GradeStudentState();
@@ -25,15 +29,24 @@ class _GradeStudentState extends State<GradeStudent> {
 
   Future<void> fetchGradeData() async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+
+      if (token == null || token.isEmpty) {
+        log("❌ Auth token not found");
+        return;
+      }
+
       dio.options.headers = {
-        'Authorization':
-            'Bearer 191|bRbcNCjEmuOvrRN6tyyErtclry4DGis4x37UydmB95b746a0', // Replace with actual token
+        'Authorization': 'Bearer $token',
         'Accept': 'application/json',
       };
 
-      Response response = await dio.get('https://admin.uthix.com/api/grade/10');
+      final response = await dio.get(
+        'https://admin.uthix.com/api/grade/${widget.announcementId}',
+      );
 
-      log("API Response: ${response.data}"); // Log the response
+      log("📦 API Response: ${response.data}");
 
       if (response.statusCode == 200 && response.data["status"] == true) {
         var gradeData = response.data["grade"];
@@ -46,10 +59,10 @@ class _GradeStudentState extends State<GradeStudent> {
           }
         });
       } else {
-        log("Failed to fetch grades");
+        log("⚠️ Failed to fetch grades");
       }
     } catch (e) {
-      log("Error fetching data: $e");
+      log("🔥 Error fetching data: $e");
     }
   }
 
@@ -63,21 +76,15 @@ class _GradeStudentState extends State<GradeStudent> {
           alignment: Alignment.centerLeft,
           child: Text(
             criteria,
-            style: GoogleFonts.urbanist(
-              fontSize: 14,
+            style: TextStyle(
+              fontSize: 12,
               fontWeight: FontWeight.w400,
               color: Colors.black,
             ),
           ),
         ),
         for (var rating in ratings)
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedGrades[criteria] = rating;
-              });
-            },
-            child: Container(
+             Container(
               height: 34,
               width: 90,
               decoration: BoxDecoration(
@@ -91,15 +98,16 @@ class _GradeStudentState extends State<GradeStudent> {
               child: Center(
                 child: Text(
                   rating,
-                  style: GoogleFonts.urbanist(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
-                    color: Colors.black,
+                    color: selectedGrades[criteria] == rating
+                        ? Colors.white // ✅ white text for selected
+                        : Colors.black, // default for others
                   ),
                 ),
               ),
             ),
-          ),
       ],
     );
   }
@@ -181,34 +189,7 @@ class _GradeStudentState extends State<GradeStudent> {
                   ],
                 ),
               ),
-              const SizedBox(height: 30),
-              Center(
-                child: Container(
-                  height: 42,
-                  width: 170,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 5,
-                          spreadRadius: 0,
-                          offset: Offset(0, 0)),
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      "Leave a Comment",
-                      style: GoogleFonts.urbanist(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
+
             ],
           ),
         ),

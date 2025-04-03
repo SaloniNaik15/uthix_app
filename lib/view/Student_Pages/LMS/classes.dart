@@ -19,6 +19,7 @@ class _ClassesState extends State<Classes> {
   String? token;
   bool isLoading = true;
 
+
   Map<String, String> classInfo = {
     "subject": "",
     "time": "",

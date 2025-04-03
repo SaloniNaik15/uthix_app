@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/live_student.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/submission_student.dart'; // For navigation if needed
 
+// SubmissionStudent page that receives announcementId and chapterId.
 class SubmissionStudent extends StatefulWidget {
   final String announcementId;
   final String chapterId;
@@ -37,6 +38,7 @@ class _SubmissionStudentState extends State<SubmissionStudent> {
     setState(() {
       token = prefs.getString('auth_token');
     });
+
     log("Loaded token: $token");
   }
 
@@ -57,6 +59,7 @@ class _SubmissionStudentState extends State<SubmissionStudent> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
+
             Stack(
               clipBehavior: Clip.none,
               children: [
@@ -116,12 +119,13 @@ class _SubmissionStudentState extends State<SubmissionStudent> {
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
               child: GestureDetector(
                 onTap: () {
-                  // Pass the parent's context to the bottom sheet.
+
                   showModalBottomSheet(
                     context: context,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                     ),
+
                     builder: (BuildContext bottomSheetContext) {
                       return UploadBottomSheet(
                         announcementId: widget.announcementId,
@@ -165,7 +169,9 @@ class UploadBottomSheet extends StatefulWidget {
   final String chapterId;
   final String token;
   final Dio dio;
+
   final BuildContext parentContext; // Parent's context for SnackBar
+
 
   const UploadBottomSheet({
     Key? key,
@@ -173,7 +179,9 @@ class UploadBottomSheet extends StatefulWidget {
     required this.chapterId,
     required this.token,
     required this.dio,
+
     required this.parentContext,
+
   }) : super(key: key);
 
   @override
@@ -198,12 +206,15 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
       setState(() {
         _selectedFilePath = result.files.single.path;
       });
+
       log("Selected file path: $_selectedFilePath");
+
     }
   }
 
   Future<void> _uploadAssignment() async {
     if (_selectedFilePath == null) {
+
       ScaffoldMessenger.of(widget.parentContext).showSnackBar(
         SnackBar(content: Text("Please choose a file to upload.")),
       );
@@ -213,6 +224,7 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
       isUploading = true;
     });
     try {
+
       String uploadUrl = "https://admin.uthix.com/api/announcements/${widget.announcementId}/assignments";
       FormData formData = FormData.fromMap({
         "announcement_id": widget.announcementId,
@@ -264,6 +276,7 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
     } catch (e) {
       log("Upload failed: $e");
       ScaffoldMessenger.of(widget.parentContext).showSnackBar(
+
         SnackBar(content: Text("File upload failed")),
       );
     } finally {
@@ -299,6 +312,7 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
               ),
             ),
             SizedBox(height: 16),
+
             _selectedFilePath != null
                 ? Text("Selected File: ${_selectedFilePath!}")
                 : Text("No file selected"),

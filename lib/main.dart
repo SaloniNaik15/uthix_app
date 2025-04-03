@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/push_notification_service.dart';
+import 'package:uthix_app/view/Student_Pages/Grade/chapter%20grades.dart';
 
 import 'package:uthix_app/view/Student_Pages/Modern_Tools/modern_tools.dart';
 import 'package:uthix_app/view/homeRegistration/new_registerlogin.dart';
@@ -56,14 +57,15 @@ class MainApp extends StatelessWidget {
           theme: ThemeData(
             textTheme: GoogleFonts.urbanistTextTheme(),
           ),
-          // home: Introscreen(),
-          home: child,
+          home: Introscreen(),
+          // home: child,
           // home: Roleselection(),
           // home: SellerDashboard(),
           // home: InstructorDashboard(),
           // home: ECommerce(),
           //home: NewRegisterlogin(),
           //home: SellerDashboard(),
+          // home: AllSubmissionsScreen(),
           //home: InstructorDashboard(),
           //home: ECommerce(),
         );
