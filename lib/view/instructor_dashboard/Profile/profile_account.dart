@@ -99,7 +99,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
           Container(
             height: 130,
             width: double.infinity,
-            decoration: BoxDecoration(color: Color(0xFFF6F6F6)),
+            decoration: BoxDecoration(color: Color(0xFFF2F2F2)),
             child: Stack(
               children: [
                 Padding(
