@@ -19,8 +19,7 @@ class _ClassesState extends State<Classes> {
   String? token;
   bool isLoading = true;
 
-  // Map to hold class/chapter details (derived from API's "chapter_title")
-  // We add "chapter_id" to pass later.
+
   Map<String, String> classInfo = {
     "subject": "",
     "time": "",
@@ -30,8 +29,7 @@ class _ClassesState extends State<Classes> {
     "chapter_id": "",
   };
 
-  // List to hold announcements; each announcement is a Map with keys:
-  // name, timestamp, comment, attachments (list), profile, announcement_id.
+
   List<Map<String, dynamic>> announcementsList = [];
   final Dio _dio = Dio();
 
@@ -358,7 +356,7 @@ class _AnnouncementCard extends StatelessWidget {
                     children: [
                       Text(
                         name,
-                        style: GoogleFonts.urbanist(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: Colors.black,

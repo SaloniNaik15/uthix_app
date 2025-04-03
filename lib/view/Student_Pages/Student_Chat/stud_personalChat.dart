@@ -15,8 +15,11 @@ class StudPersonalchat extends StatefulWidget {
   State<StudPersonalchat> createState() => _StudPersonalchatState();
 }
 
+String chatPartnerName = "";
+
 class _StudPersonalchatState extends State<StudPersonalchat> {
   List<ChatMessage> _messages = [];
+
   List<int> _sentMessageIds = [];
   String? accessLoginToken;
   bool isLoading = true;
@@ -94,11 +97,11 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
         setState(() {
           _messages = messagesJson.map((json) {
             ChatMessage msg = ChatMessage.fromJson(json);
-            bool senderFlag =
-                (msg.senderId == currentUserId); // ✅ Correct sender check
+            bool senderFlag = (msg.senderId == currentUserId);
             return msg.copyWith(isSender: senderFlag);
           }).toList();
 
+          // ✅ Sort messages in ASCENDING order (oldest → newest)
           _messages.sort((a, b) => DateTime.parse(a.createdAt)
               .compareTo(DateTime.parse(b.createdAt)));
 
@@ -216,7 +219,7 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
                       ),
                       const SizedBox(width: 15),
                       Text(
-                        "Ravi Pradhan",
+                        "",
                         style: GoogleFonts.urbanist(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -258,7 +261,7 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
                 : hasError
                     ? const Center(child: Text("Failed to load conversation"))
                     : ListView.builder(
-                        reverse: true, // Latest messages at bottom
+                        reverse: false, // Latest messages at bottom
                         itemCount: _messages.length,
                         itemBuilder: (context, index) {
                           return MessageBubble(message: _messages[index]);
@@ -416,8 +419,9 @@ class ChatMessage {
       message: json['message'],
       isRead: json['is_read'],
       createdAt: json['created_at'],
-      receiverName: json['receiver']['name'],
-      isSender: false, // default, will be updated later.
+      receiverName: json['sender']
+          ['name'], // Use sender's name, NOT receiver's!
+      isSender: false, // Will be updated later
     );
   }
 

@@ -99,6 +99,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
           Container(
             color: Color(0xFFF6F6F6),
             height: 130,
+
             width: MediaQuery.sizeOf(context).width,
             child: Padding(
               padding: EdgeInsets.only(left: 10),
@@ -108,6 +109,7 @@ class _ProfileAccountState extends State<ProfileAccount> {
                 children: [
                   // Text Section (on the left)
                   Column(
+
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center, // Center vertically
                     children: [

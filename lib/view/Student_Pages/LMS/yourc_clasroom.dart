@@ -1,9 +1,6 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'dart:developer';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/classWiseChapter.dart';
@@ -124,7 +121,7 @@ class _YourClasroomState extends State<YourClasroom> {
           title: Text(
             "Your Classroom",
             style: TextStyle(
-              fontSize: 18.sp,
+              fontSize: 20,
               fontWeight: FontWeight.w600,
               color: const Color.fromRGBO(96, 95, 95, 1),
             ),
@@ -188,8 +185,8 @@ class _YourClasroomState extends State<YourClasroom> {
                             Text(
                               classData["classroomName"] ??
                                   "Unknown Class",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 16.sp,
+                              style: TextStyle(
+                                fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: const Color.fromRGBO(
                                     96, 95, 95, 1),
@@ -198,16 +195,16 @@ class _YourClasroomState extends State<YourClasroom> {
                             SizedBox(height: 4.h),
                             Text(
                               "Subject: ${classData["subject"] ?? "N/A"}",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 14.sp,
+                              style: TextStyle(
+                                fontSize: 14,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.grey[700],
                               ),
                             ),
                             Text(
                               "Instructor: ${classData["instructor"] ?? "N/A"}",
-                              style: GoogleFonts.urbanist(
-                                fontSize: 14.sp,
+                              style: TextStyle(
+                                fontSize: 14,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.grey[700],
                               ),
@@ -221,15 +218,15 @@ class _YourClasroomState extends State<YourClasroom> {
                                 SizedBox(width: 4.w),
                                 Text("1000",
                                     style: TextStyle(
-                                        fontSize: 12.sp)),
+                                        fontSize: 12)),
                                 SizedBox(width: 12.w),
                                 Icon(Icons.star,
-                                    size: 16.sp,
+                                    size: 16,
                                     color: Colors.orange),
                                 SizedBox(width: 4.w),
                                 Text("4.0",
                                     style: TextStyle(
-                                        fontSize: 12.sp)),
+                                        fontSize: 12)),
                                 SizedBox(width: 12.w),
                                 Icon(Icons.access_time,
                                     size: 16.sp,
@@ -237,7 +234,7 @@ class _YourClasroomState extends State<YourClasroom> {
                                 SizedBox(width: 4.w),
                                 Text("45 Hours",
                                     style: TextStyle(
-                                        fontSize: 12.sp)),
+                                        fontSize: 12)),
                               ],
                             ),
                           ],

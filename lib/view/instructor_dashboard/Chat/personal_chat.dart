@@ -1,126 +1,294 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-class PersonalChat extends StatefulWidget {
-  const PersonalChat({Key? key, required conversationId}) : super(key: key);
+class Personalchat extends StatefulWidget {
+  final int conversationId; // This is used as the receiver_id
+
+  const Personalchat({Key? key, required this.conversationId})
+      : super(key: key);
 
   @override
-  State<PersonalChat> createState() => _PersonalChatState();
+  State<Personalchat> createState() => _PersonalchatState();
 }
 
-class _PersonalChatState extends State<PersonalChat> {
-  /// Example messages. Replace with your own data or fetch from API/db.
-  final List<Message> _messages = [
-    Message(
-      text: "Hi. What can I help you with?",
-      isSender: false,
-      time: "08:23 PM",
-    ),
-    Message(
-      text:
-      "Well, I noticed that you have a collection of competitive exam books and I would like to meet you in person and discuss exchange of books!",
-      isSender: true,
-      time: "08:32 PM",
-    ),
-    Message(
-      text:
-      "Indeed. I just saw that we are from the same Uni. How about meeting up at the cafeteria tomorrow?",
-      isSender: false,
-      time: "08:32 PM",
-    ),
-  ];
+class _PersonalchatState extends State<Personalchat> {
+  final ScrollController _scrollController = ScrollController();
 
+  List<ChatMessage> _messages = [];
+  List<int> _sentMessageIds = [];
+  String? accessLoginToken;
+  bool isLoading = true;
+  bool hasError = false;
   final TextEditingController _messageController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
-  void _sendMessage() {
+  // Assume the current user id is 2; update this as needed.
+  int currentUserId = 0; // Initially set to 0 but updated later
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    await _loadUserCredentials();
+    await _loadSentMessageIds();
+    await fetchConversation();
+  }
+
+  Future<void> _loadUserCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    int? userId = prefs.getInt('user_id');
+
+    log("Retrieved Token: $token");
+    log("Retrieved User ID: $userId");
+
+    setState(() {
+      accessLoginToken = token;
+      if (userId != null) {
+        currentUserId = userId; // ✅ Update with actual user ID
+      }
+    });
+  }
+
+  Future<void> _saveSentMessageIds() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('sentMessageIds', jsonEncode(_sentMessageIds));
+    log("Saved sent message ids: $_sentMessageIds");
+  }
+
+  Future<void> _loadSentMessageIds() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? jsonIds = prefs.getString('sentMessageIds');
+    if (jsonIds != null) {
+      List<dynamic> ids = jsonDecode(jsonIds);
+      _sentMessageIds = ids.map((e) => e as int).toList();
+      log("Loaded sent message ids: $_sentMessageIds");
+    } else {
+      log("No sent message ids found in storage.");
+    }
+  }
+
+  Future<void> fetchConversation() async {
+    try {
+      final url =
+          'https://admin.uthix.com/api/get-conversation/${widget.conversationId}';
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $accessLoginToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      log("Conversation API Response: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<dynamic> messagesJson = data['messages'];
+
+        setState(() {
+          _messages = messagesJson.map((json) {
+            ChatMessage msg = ChatMessage.fromJson(json);
+            bool senderFlag = (msg.senderId == currentUserId);
+            return msg.copyWith(isSender: senderFlag);
+          }).toList();
+
+          // ✅ Ensure sorting at this point
+          _messages.sort((a, b) => DateTime.parse(a.createdAt)
+              .compareTo(DateTime.parse(b.createdAt)));
+
+          isLoading = false;
+        });
+
+        // ✅ Scroll to bottom AFTER fetching messages
+        Future.delayed(Duration(milliseconds: 100), () {
+          if (_scrollController.hasClients) {
+            _scrollController
+                .jumpTo(_scrollController.position.maxScrollExtent);
+          }
+        });
+      } else {
+        throw Exception('Failed to load conversation');
+      }
+    } catch (e) {
+      log("Error fetching conversation: $e");
+      setState(() {
+        hasError = true;
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> sendMessage(String messageText) async {
+    try {
+      final url = "https://admin.uthix.com/api/send-message";
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          "Authorization": "Bearer $accessLoginToken",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "conversation_id": widget.conversationId,
+          "message": messageText,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final newMessage = ChatMessage.fromJson(data["data"]);
+
+        setState(() {
+          _messages.add(newMessage); // ✅ Ensure it is appended
+        });
+
+        // ✅ Scroll to bottom AFTER adding the new message
+        Future.delayed(Duration(milliseconds: 100), () {
+          if (_scrollController.hasClients) {
+            _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeOut,
+            );
+          }
+        });
+        await fetchConversation();
+
+        log("✅ Message sent and added at the bottom.");
+      }
+    } catch (e) {
+      log("❌ Error sending message: $e");
+    }
+  }
+
+  void _sendMessage() async {
     final String text = _messageController.text.trim();
     if (text.isNotEmpty) {
-      setState(() {
-        // Insert new message at the "bottom" of the list, so it appears last.
-        // Because the ListView is reversed, we actually insert at index 0.
-        _messages.insert(
-          0,
-          Message(
-            text: text,
-            isSender: true,
-            time: "Now",
-          ),
-        );
-      });
       _messageController.clear();
       _focusNode.unfocus();
+      await sendMessage(text);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Matches background from your design
-      backgroundColor: const Color(0xFFF3F4F6),
-
-      // ------------------- AppBar -------------------
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Row(
-          children: [
-            Text(
-              "Ravi Pradhan",
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.w600,
-                color: const Color.fromRGBO(43, 92, 116, 1),
-              ),
-            ),
-            SizedBox(width: 5.w),
-            // Small green circle to show "online"
-            Container(
-              height: 8.h,
-              width: 8.h,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color.fromRGBO(120, 170, 23, 1),
-              ),
-            ),
-          ],
-        ),
-      ),
-
-      // ------------------- Body -------------------
       body: Column(
         children: [
-          // -------- Messages List --------
-          Expanded(
-            child: ListView.builder(
-              reverse: true,
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                return MessageBubble(message: _messages[index]);
-              },
+          // Header Section
+          Padding(
+            padding: const EdgeInsets.only(left: 30, right: 30, top: 50),
+            child: SizedBox(
+              height: 85,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.06),
+                              offset: const Offset(0, 4),
+                              blurRadius: 8,
+                            ),
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              offset: const Offset(0, 0),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: IconButton(
+                            icon: const Icon(Icons.arrow_back, size: 25),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 15),
+                      Text(
+                        "Ravi Pradhan",
+                        style: GoogleFonts.urbanist(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: const Color.fromRGBO(43, 92, 116, 1),
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Container(
+                        height: 14,
+                        width: 14,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color.fromRGBO(120, 170, 23, 1),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Chat",
+                    style: GoogleFonts.urbanist(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: const Color.fromRGBO(43, 92, 116, 1),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-
-          // -------- Bottom Input Bar --------
+          const Divider(
+            thickness: 2,
+            color: Color.fromRGBO(200, 209, 215, 1),
+          ),
+          // Chat Message List
+          Expanded(
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : hasError
+                    ? const Center(child: Text("Failed to load conversation"))
+                    : ListView.builder(
+                        controller:
+                            _scrollController, // ✅ Attach scroll controller
+                        reverse: false, // ✅ Keeps messages in correct order
+                        itemCount: _messages.length,
+                        itemBuilder: (context, index) {
+                          final message =
+                              _messages[index]; // ✅ Use normal order
+                          return MessageBubble(message: message);
+                        },
+                      ),
+          ),
+          // Bottom Input Container
           Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             color: Colors.white,
-            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
             child: Row(
               children: [
-                // Left icons (Add, Mic)
+                // Icons container
                 Row(
                   children: [
-                    // "Add" icon
                     Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: Colors.grey,
-                          width: 1.w,
+                          width: 1.0,
                         ),
                       ),
                       child: IconButton(
@@ -136,27 +304,21 @@ class _PersonalChatState extends State<PersonalChat> {
                             ).createShader(bounds);
                           },
                           blendMode: BlendMode.srcIn,
-                          child: Icon(Icons.add, size: 22.sp),
+                          child: const Icon(Icons.add, size: 25),
                         ),
                         padding: EdgeInsets.zero,
-                        constraints: BoxConstraints(
-                          minWidth: 0.w,
-                          minHeight: 0.h,
-                        ),
-                        onPressed: () {
-                          // TODO: Handle "Add" action
-                        },
+                        constraints:
+                            const BoxConstraints(minWidth: 0, minHeight: 0),
+                        onPressed: () {},
                       ),
                     ),
-                    SizedBox(width: 5.w),
-
-                    // Mic icon
+                    const SizedBox(width: 8),
                     Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: Colors.grey,
-                          width: 1.w,
+                          width: 1.0,
                         ),
                       ),
                       child: IconButton(
@@ -172,57 +334,43 @@ class _PersonalChatState extends State<PersonalChat> {
                             ).createShader(bounds);
                           },
                           blendMode: BlendMode.srcIn,
-                          child: Icon(Icons.mic, size: 22.sp),
+                          child: const Icon(Icons.mic, size: 25),
                         ),
                         padding: EdgeInsets.zero,
-                        constraints: BoxConstraints(
-                          minWidth: 0.w,
-                          minHeight: 0.h,
-                        ),
-                        onPressed: () {
-                          // TODO: Handle "Mic" action
-                        },
+                        constraints:
+                            const BoxConstraints(minWidth: 0, minHeight: 0),
+                        onPressed: () {},
                       ),
                     ),
                   ],
                 ),
-
-                SizedBox(width: 8.w),
-
-                // Text Field
+                const SizedBox(width: 10),
                 Expanded(
                   child: TextField(
                     controller: _messageController,
                     focusNode: _focusNode,
                     decoration: InputDecoration(
                       hintText: "Type a message...",
-                      hintStyle: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.grey,
-                      ),
+                      hintStyle: GoogleFonts.urbanist(
+                          fontSize: 16, color: Colors.grey),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20.r),
+                        borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
                       fillColor: const Color.fromRGBO(246, 246, 246, 1),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 22.w,
-                        vertical: 12.h,
-                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
                     ),
                     onSubmitted: (value) => _sendMessage(),
                   ),
                 ),
-
-                SizedBox(width: 10.w),
-
-                // Send button
+                const SizedBox(width: 10),
                 GestureDetector(
                   onTap: _sendMessage,
                   child: Container(
-                    height: 40.h,
-                    width: 40.w,
+                    height: 50,
+                    width: 50,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
@@ -234,8 +382,8 @@ class _PersonalChatState extends State<PersonalChat> {
                         end: Alignment.bottomCenter,
                       ),
                     ),
-                    padding: EdgeInsets.all(10.w),
-                    child: Icon(Icons.send, color: Colors.white, size: 18.sp),
+                    padding: const EdgeInsets.all(10),
+                    child: const Icon(Icons.send, color: Colors.white),
                   ),
                 ),
               ],
@@ -247,118 +395,141 @@ class _PersonalChatState extends State<PersonalChat> {
   }
 }
 
-// ------------------- Model -------------------
-class Message {
-  final String text;
+// Model class for a chat message fetched from conversation API.
+class ChatMessage {
+  final int id;
+  final int senderId;
+  final int receiverId;
+  final String message;
+  final int isRead;
+  final String createdAt;
+  final String receiverName;
   final bool isSender;
-  final String time;
 
-  Message({
-    required this.text,
+  ChatMessage({
+    required this.id,
+    required this.senderId,
+    required this.receiverId,
+    required this.message,
+    required this.isRead,
+    required this.createdAt,
+    required this.receiverName,
     required this.isSender,
-    required this.time,
   });
+
+  factory ChatMessage.fromJson(Map<String, dynamic> json) {
+    return ChatMessage(
+      id: json['id'],
+      senderId: json['sender_id'],
+      receiverId: json['receiver_id'],
+      message: json['message'],
+      isRead: json['is_read'],
+      createdAt: json['created_at'],
+      receiverName: json['receiver']['name'],
+      isSender: false, // default, will be updated later.
+    );
+  }
+
+  ChatMessage copyWith({bool? isSender}) {
+    return ChatMessage(
+      id: id,
+      senderId: senderId,
+      receiverId: receiverId,
+      message: message,
+      isRead: isRead,
+      createdAt: createdAt,
+      receiverName: receiverName,
+      isSender: isSender ?? this.isSender,
+    );
+  }
 }
 
-// ------------------- Message Bubble -------------------
+// Message bubble widget to display a single chat message.
 class MessageBubble extends StatelessWidget {
-  final Message message;
+  final ChatMessage message;
 
   const MessageBubble({Key? key, required this.message}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final isSender = message.isSender;
+    bool isSender = message.isSender;
 
     return Align(
       alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-        child: Row(
-          mainAxisAlignment:
-          isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Sender's avatar only on left side if not sender
-            if (!isSender)
-              ClipOval(
-                child: Image.asset(
-                  'assets/login/profile.jpeg', // or a network image
-                  height: 40.h,
-                  width: 40.h,
-                  fit: BoxFit.cover,
+      child: Row(
+        mainAxisAlignment:
+            isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
+        children: [
+          if (!isSender) // Show profile image only for received messages
+            ClipOval(
+              child: Image.asset(
+                'assets/login/profile.jpeg',
+                height: 40,
+                width: 40,
+                fit: BoxFit.cover,
+              ),
+            ),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment:
+                isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!isSender)
+                    Text(
+                      message.receiverName.isNotEmpty
+                          ? message.receiverName
+                          : "Unknown",
+                      style: GoogleFonts.urbanist(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                  if (!isSender) const SizedBox(width: 5),
+                  Text(
+                    message.createdAt.contains('T')
+                        ? message.createdAt.split('T')[0]
+                        : message.createdAt,
+                    style:
+                        GoogleFonts.urbanist(fontSize: 10, color: Colors.grey),
+                  ),
+                  if (isSender) const SizedBox(width: 5),
+                  if (isSender)
+                    Text(
+                      'You',
+                      style: GoogleFonts.urbanist(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 2),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                margin: const EdgeInsets.symmetric(vertical: 5),
+                decoration: BoxDecoration(
+                  color: isSender
+                      ? Colors.white
+                      : const Color.fromRGBO(132, 162, 51, 1),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Text(
+                  message.message,
+                  style: GoogleFonts.urbanist(
+                    fontSize: 16,
+                    color: isSender ? Colors.black : Colors.white,
+                  ),
                 ),
               ),
-            if (!isSender) SizedBox(width: 8.w),
-
-            // Column for name/time and bubble
-            Column(
-              crossAxisAlignment:
-              isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-              children: [
-                // Name + time
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (!isSender)
-                      Text(
-                        'Ravi Pradhan',
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                    if (!isSender) SizedBox(width: 5.w),
-                    Text(
-                      message.time,
-                      style: TextStyle(
-                        fontSize: 8.sp,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    if (isSender) SizedBox(width: 5.w),
-                    if (isSender)
-                      Text(
-                        'You',
-                        style: TextStyle(
-                          fontSize: 10.sp,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                  ],
-                ),
-
-                SizedBox(height: 2.h),
-
-                // Actual message bubble
-                Container(
-                  // The message bubble won’t exceed 60% of screen width
-                  constraints: BoxConstraints(maxWidth: 0.6.sw),
-                  padding: EdgeInsets.symmetric(
-                    vertical: 10.h,
-                    horizontal: 15.w,
-                  ),
-                  margin: EdgeInsets.symmetric(vertical: 5.h),
-                  decoration: BoxDecoration(
-                    color: isSender
-                        ? const Color.fromRGBO(255, 255, 255, 1)
-                        : const Color.fromRGBO(43, 92, 116, 1),
-                    borderRadius: BorderRadius.circular(15.r),
-                  ),
-                  child: Text(
-                    message.text,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: isSender ? Colors.black : Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
