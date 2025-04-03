@@ -15,8 +15,11 @@ class StudPersonalchat extends StatefulWidget {
   State<StudPersonalchat> createState() => _StudPersonalchatState();
 }
 
+String chatPartnerName = "";
+
 class _StudPersonalchatState extends State<StudPersonalchat> {
   List<ChatMessage> _messages = [];
+
   List<int> _sentMessageIds = [];
   String? accessLoginToken;
   bool isLoading = true;
@@ -216,7 +219,7 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
                       ),
                       const SizedBox(width: 15),
                       Text(
-                        "Ravi Pradhan",
+                        "",
                         style: GoogleFonts.urbanist(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -416,8 +419,9 @@ class ChatMessage {
       message: json['message'],
       isRead: json['is_read'],
       createdAt: json['created_at'],
-      receiverName: json['receiver']['name'],
-      isSender: false, // default, will be updated later.
+      receiverName: json['sender']
+          ['name'], // Use sender's name, NOT receiver's!
+      isSender: false, // Will be updated later
     );
   }
 
