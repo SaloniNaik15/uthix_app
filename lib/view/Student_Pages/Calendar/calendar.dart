@@ -57,23 +57,6 @@ class _StudCalenderState extends State<StudCalender> {
               },
             ),
           ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 20),
-              child: CircleAvatar(
-                backgroundColor: Colors.white,
-                radius: 22.5.r,
-                child: ClipOval(
-                  child: Image.asset(
-                    "assets/login/profile.jpeg",
-                    fit: BoxFit.cover,
-                    width: 45, // Ensures it maintains a circular shape
-                    height: 45,
-                  ),
-                ),
-              ),
-            ),
-          ],
         ),
       ),
       body: Column(
