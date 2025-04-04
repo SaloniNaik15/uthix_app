@@ -65,6 +65,12 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
         List<dynamic> fetchedUploads = [];
         if (data["uploads"] is List) {
           fetchedUploads = data["uploads"];
+          fetchedUploads.sort((a, b) {
+            final dateA = DateTime.tryParse(a["created_at"] ?? '') ?? DateTime(2000);
+            final dateB = DateTime.tryParse(b["created_at"] ?? '') ?? DateTime(2000);
+            return dateB.compareTo(dateA); // Newest first
+          });
+
         }
         setState(() {
           uploads = fetchedUploads;

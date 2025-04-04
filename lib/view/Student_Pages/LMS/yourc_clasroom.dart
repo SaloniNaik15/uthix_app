@@ -62,7 +62,11 @@ class _YourClasroomState extends State<YourClasroom> {
 
       if (response.statusCode == 200 && response.data['status'] == true) {
         List<dynamic> rawData = response.data['data'];
-
+        rawData.sort((a, b) {
+          final aCreated = DateTime.tryParse(a['created_at'] ?? '') ?? DateTime(2000);
+          final bCreated = DateTime.tryParse(b['created_at'] ?? '') ?? DateTime(2000);
+          return bCreated.compareTo(aCreated); // 🔁 newest first
+        });
         List<Map<String, dynamic>> fetchedClasses =
         rawData.map<Map<String, dynamic>>((item) {
           final instructorUser = item['instructor']?['user'];
@@ -111,11 +115,11 @@ class _YourClasroomState extends State<YourClasroom> {
           backgroundColor: Colors.white,
           elevation: 0,
           leading: Padding(
-            padding: EdgeInsets.only(left: 20.w),
+            padding: EdgeInsets.only(left: 20),
             child: IconButton(
               onPressed: () => Navigator.of(context).pop(),
               icon: Icon(Icons.arrow_back_ios_outlined,
-                  color: Colors.black, size: 20.sp),
+                  color: Colors.black, size: 20),
             ),
           ),
           title: Text(
@@ -163,7 +167,7 @@ class _YourClasroomState extends State<YourClasroom> {
                         );
                       },
                       child: Container(
-                        margin: EdgeInsets.only(bottom: 16.h),
+                        margin: EdgeInsets.only(bottom: 16),
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -192,7 +196,7 @@ class _YourClasroomState extends State<YourClasroom> {
                                     96, 95, 95, 1),
                               ),
                             ),
-                            SizedBox(height: 4.h),
+                            SizedBox(height: 4),
                             Text(
                               "Subject: ${classData["subject"] ?? "N/A"}",
                               style: TextStyle(
@@ -209,29 +213,29 @@ class _YourClasroomState extends State<YourClasroom> {
                                 color: Colors.grey[700],
                               ),
                             ),
-                            SizedBox(height: 8.h),
+                            SizedBox(height: 8),
                             Row(
                               children: [
                                 Icon(Icons.group,
                                     size: 16.sp,
                                     color: Colors.blueGrey),
-                                SizedBox(width: 4.w),
+                                SizedBox(width: 4),
                                 Text("1000",
                                     style: TextStyle(
                                         fontSize: 12)),
-                                SizedBox(width: 12.w),
+                                SizedBox(width: 12),
                                 Icon(Icons.star,
                                     size: 16,
                                     color: Colors.orange),
-                                SizedBox(width: 4.w),
+                                SizedBox(width: 4),
                                 Text("4.0",
                                     style: TextStyle(
                                         fontSize: 12)),
-                                SizedBox(width: 12.w),
+                                SizedBox(width: 12),
                                 Icon(Icons.access_time,
                                     size: 16.sp,
                                     color: Colors.teal),
-                                SizedBox(width: 4.w),
+                                SizedBox(width: 4),
                                 Text("45 Hours",
                                     style: TextStyle(
                                         fontSize: 12)),

@@ -85,6 +85,13 @@ class _MyClassesState extends State<MyClasses> {
       debugPrint("Response Code: ${response.statusCode}");
       debugPrint("Response Data: ${response.data}");
       if (response.statusCode == 200 && response.data["status"] == true) {
+        List<dynamic> fetchedChapters = response.data['chapters'];
+
+        fetchedChapters.sort((a, b) {
+          final dateA = DateTime.tryParse(a["created_at"] ?? '') ?? DateTime(2000);
+          final dateB = DateTime.tryParse(b["created_at"] ?? '') ?? DateTime(2000);
+          return dateB.compareTo(dateA); // Newest first
+        });
         setState(() {
           // Use the "chapters" key as per your API JSON structure.
           classes = response.data['chapters'];

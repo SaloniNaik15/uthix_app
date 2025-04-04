@@ -34,6 +34,7 @@ class _AllSubmissionsScreenState extends State<AllSubmissionsScreen> {
     });
     await fetchSubmissions();
   }
+
   Future<void> fetchSubmissions() async {
     try {
       final dio = Dio();
@@ -44,9 +45,20 @@ class _AllSubmissionsScreenState extends State<AllSubmissionsScreen> {
 
       if (response.data['status'] == true) {
         final data = response.data['data'] as List;
+
+        List<Submission> sortedList = data
+            .map((json) => Submission.fromJson(json))
+            .toList();
+
+// Sort by submitted_at in descending order
+        sortedList.sort((a, b) {
+          DateTime dateA = DateTime.tryParse(a.dateTime) ?? DateTime(2000);
+          DateTime dateB = DateTime.tryParse(b.dateTime) ?? DateTime(2000);
+          return dateB.compareTo(dateA); // Newest first
+        });
+
         setState(() {
-          submissions =
-              data.map((json) => Submission.fromJson(json)).toList();
+          submissions = sortedList;
           isLoading = false;
         });
       } else {

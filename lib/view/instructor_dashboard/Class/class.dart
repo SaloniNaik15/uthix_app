@@ -101,6 +101,11 @@ class _InstructorClassState extends State<InstructorClass> {
         // Extract the chapter details from the response.
         final Map<String, dynamic> chapter = response.data["chapter_title"];
         final List announcements = chapter["announcements"] ?? [];
+        announcements.sort((a, b) {
+          final dateA = DateTime.tryParse(a["created_at"] ?? '') ?? DateTime(2000);
+          final dateB = DateTime.tryParse(b["created_at"] ?? '') ?? DateTime(2000);
+          return dateB.compareTo(dateA); // Newest first
+        });
         final instructorName = response.data["instructor_name"] ?? "No Mentor";
 
         setState(() {
