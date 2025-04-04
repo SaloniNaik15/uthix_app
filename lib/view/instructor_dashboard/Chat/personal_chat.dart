@@ -15,10 +15,11 @@ class Personalchat extends StatefulWidget {
   State<Personalchat> createState() => _PersonalchatState();
 }
 
-class _PersonalchatState extends State<Personalchat> {
-  final ScrollController _scrollController = ScrollController();
+String chatPartnerName = "";
 
+class _PersonalchatState extends State<Personalchat> {
   List<ChatMessage> _messages = [];
+
   List<int> _sentMessageIds = [];
   String? accessLoginToken;
   bool isLoading = true;
@@ -100,19 +101,11 @@ class _PersonalchatState extends State<Personalchat> {
             return msg.copyWith(isSender: senderFlag);
           }).toList();
 
-          // ✅ Ensure sorting at this point
+          // ✅ Sort messages in ASCENDING order (oldest → newest)
           _messages.sort((a, b) => DateTime.parse(a.createdAt)
               .compareTo(DateTime.parse(b.createdAt)));
 
           isLoading = false;
-        });
-
-        // ✅ Scroll to bottom AFTER fetching messages
-        Future.delayed(Duration(milliseconds: 100), () {
-          if (_scrollController.hasClients) {
-            _scrollController
-                .jumpTo(_scrollController.position.maxScrollExtent);
-          }
         });
       } else {
         throw Exception('Failed to load conversation');
@@ -126,45 +119,50 @@ class _PersonalchatState extends State<Personalchat> {
     }
   }
 
-  Future<void> sendMessage(String messageText) async {
+  Future<void> sendMessageToApi(String text) async {
+    final url = 'https://admin.uthix.com/api/send-message';
     try {
-      final url = "https://admin.uthix.com/api/send-message";
       final response = await http.post(
         Uri.parse(url),
         headers: {
-          "Authorization": "Bearer $accessLoginToken",
-          "Content-Type": "application/json",
+          'Authorization': 'Bearer $accessLoginToken',
+          'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          "conversation_id": widget.conversationId,
-          "message": messageText,
+          'sender_id': currentUserId, // ✅ Correct sender ID
+          'receiver_id': widget.conversationId.toString(),
+          'message': text,
+          'type': 'text',
         }),
       );
-
+      log("Send Message Response: ${response.body}");
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final newMessage = ChatMessage.fromJson(data["data"]);
+        final messageData = data['data'];
+
+        ChatMessage newMessage = ChatMessage(
+          id: messageData['id'],
+          senderId: currentUserId,
+          receiverId: int.parse(messageData['receiver_id'].toString()),
+          message: messageData['message'],
+          isRead: messageData['is_read'] ? 1 : 0,
+          createdAt: messageData['created_at'],
+          receiverName: '',
+          isSender: true,
+        );
+
+        _sentMessageIds.add(newMessage.id);
+        log("Sent message id added: ${newMessage.id} | _sentMessageIds: $_sentMessageIds");
+        await _saveSentMessageIds();
 
         setState(() {
-          _messages.add(newMessage); // ✅ Ensure it is appended
+          _messages.insert(0, newMessage);
         });
-
-        // ✅ Scroll to bottom AFTER adding the new message
-        Future.delayed(Duration(milliseconds: 100), () {
-          if (_scrollController.hasClients) {
-            _scrollController.animateTo(
-              _scrollController.position.maxScrollExtent,
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeOut,
-            );
-          }
-        });
-        await fetchConversation();
-
-        log("✅ Message sent and added at the bottom.");
+      } else {
+        throw Exception('Failed to send message');
       }
     } catch (e) {
-      log("❌ Error sending message: $e");
+      log("Error sending message: $e");
     }
   }
 
@@ -173,7 +171,7 @@ class _PersonalchatState extends State<Personalchat> {
     if (text.isNotEmpty) {
       _messageController.clear();
       _focusNode.unfocus();
-      await sendMessage(text);
+      await sendMessageToApi(text);
     }
   }
 
@@ -221,7 +219,7 @@ class _PersonalchatState extends State<Personalchat> {
                       ),
                       const SizedBox(width: 15),
                       Text(
-                        "Ravi Pradhan",
+                        "",
                         style: GoogleFonts.urbanist(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -263,14 +261,10 @@ class _PersonalchatState extends State<Personalchat> {
                 : hasError
                     ? const Center(child: Text("Failed to load conversation"))
                     : ListView.builder(
-                        controller:
-                            _scrollController, // ✅ Attach scroll controller
-                        reverse: false, // ✅ Keeps messages in correct order
+                        reverse: false, // Latest messages at bottom
                         itemCount: _messages.length,
                         itemBuilder: (context, index) {
-                          final message =
-                              _messages[index]; // ✅ Use normal order
-                          return MessageBubble(message: message);
+                          return MessageBubble(message: _messages[index]);
                         },
                       ),
           ),
@@ -425,8 +419,9 @@ class ChatMessage {
       message: json['message'],
       isRead: json['is_read'],
       createdAt: json['created_at'],
-      receiverName: json['receiver']['name'],
-      isSender: false, // default, will be updated later.
+      receiverName: json['sender']
+          ['name'], // Use sender's name, NOT receiver's!
+      isSender: false, // Will be updated later
     );
   }
 
@@ -463,7 +458,7 @@ class MessageBubble extends StatelessWidget {
           if (!isSender) // Show profile image only for received messages
             ClipOval(
               child: Image.asset(
-                'assets/login/profile.jpeg',
+                'assets/login/profile.png',
                 height: 40,
                 width: 40,
                 fit: BoxFit.cover,
