@@ -153,13 +153,29 @@ class _NewAnnouncementState extends State<NewAnnouncement> {
       initialDate: DateTime.now(),
       firstDate: DateTime(2022),
       lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary:Color(0xFF2B5C74),
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+              background: Colors.white,
+            ),
+            dialogBackgroundColor: Colors.white,
+          ),
+          child: child!,
+        );
+      },
     );
+
     if (pickedDate != null) {
       setState(() {
         _dueDate = pickedDate;
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
