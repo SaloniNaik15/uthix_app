@@ -132,6 +132,7 @@ class _ChatState extends State<Chat> {
     return Stack(
       children: [
         Scaffold(
+          backgroundColor: Colors.white,
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(80.h),
             child: AppBar(
@@ -329,34 +330,6 @@ class _ChatState extends State<Chat> {
                 ),
               ),
             ],
-          ),
-        ),
-        Positioned(
-          top: 100,
-          left: (MediaQuery.of(context).size.width - 80) / 2,
-          child: Container(
-            width: 80,
-            height: 80,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  Color.fromRGBO(255, 255, 255, 1),
-                  Color.fromRGBO(51, 152, 246, 0.75),
-                ],
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Container(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                ),
-              ),
-            ),
           ),
         ),
       ],

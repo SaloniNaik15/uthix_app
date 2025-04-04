@@ -15,10 +15,11 @@ class Personalchat extends StatefulWidget {
   State<Personalchat> createState() => _PersonalchatState();
 }
 
-class _PersonalchatState extends State<Personalchat> {
-  final ScrollController _scrollController = ScrollController();
+String chatPartnerName = "";
 
+class _PersonalchatState extends State<Personalchat> {
   List<ChatMessage> _messages = [];
+
   List<int> _sentMessageIds = [];
   String? accessLoginToken;
   bool isLoading = true;
@@ -100,19 +101,11 @@ class _PersonalchatState extends State<Personalchat> {
             return msg.copyWith(isSender: senderFlag);
           }).toList();
 
-          // ✅ Ensure sorting at this point
+          // ✅ Sort messages in ASCENDING order (oldest → newest)
           _messages.sort((a, b) => DateTime.parse(a.createdAt)
               .compareTo(DateTime.parse(b.createdAt)));
 
           isLoading = false;
-        });
-
-        // ✅ Scroll to bottom AFTER fetching messages
-        Future.delayed(Duration(milliseconds: 100), () {
-          if (_scrollController.hasClients) {
-            _scrollController
-                .jumpTo(_scrollController.position.maxScrollExtent);
-          }
         });
       } else {
         throw Exception('Failed to load conversation');
@@ -126,45 +119,50 @@ class _PersonalchatState extends State<Personalchat> {
     }
   }
 
-  Future<void> sendMessage(String messageText) async {
+  Future<void> sendMessageToApi(String text) async {
+    final url = 'https://admin.uthix.com/api/send-message';
     try {
-      final url = "https://admin.uthix.com/api/send-message";
       final response = await http.post(
         Uri.parse(url),
         headers: {
-          "Authorization": "Bearer $accessLoginToken",
-          "Content-Type": "application/json",
+          'Authorization': 'Bearer $accessLoginToken',
+          'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          "conversation_id": widget.conversationId,
-          "message": messageText,
+          'sender_id': currentUserId, // ✅ Correct sender ID
+          'receiver_id': widget.conversationId.toString(),
+          'message': text,
+          'type': 'text',
         }),
       );
-
+      log("Send Message Response: ${response.body}");
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final newMessage = ChatMessage.fromJson(data["data"]);
+        final messageData = data['data'];
+
+        ChatMessage newMessage = ChatMessage(
+          id: messageData['id'],
+          senderId: currentUserId,
+          receiverId: int.parse(messageData['receiver_id'].toString()),
+          message: messageData['message'],
+          isRead: messageData['is_read'] ? 1 : 0,
+          createdAt: messageData['created_at'],
+          receiverName: '',
+          isSender: true,
+        );
+
+        _sentMessageIds.add(newMessage.id);
+        log("Sent message id added: ${newMessage.id} | _sentMessageIds: $_sentMessageIds");
+        await _saveSentMessageIds();
 
         setState(() {
-          _messages.add(newMessage); // ✅ Ensure it is appended
+          _messages.insert(0, newMessage);
         });
-
-        // ✅ Scroll to bottom AFTER adding the new message
-        Future.delayed(Duration(milliseconds: 100), () {
-          if (_scrollController.hasClients) {
-            _scrollController.animateTo(
-              _scrollController.position.maxScrollExtent,
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeOut,
-            );
-          }
-        });
-        await fetchConversation();
-
-        log("✅ Message sent and added at the bottom.");
+      } else {
+        throw Exception('Failed to send message');
       }
     } catch (e) {
-      log("❌ Error sending message: $e");
+      log("Error sending message: $e");
     }
   }
 
@@ -173,73 +171,25 @@ class _PersonalchatState extends State<Personalchat> {
     if (text.isNotEmpty) {
       _messageController.clear();
       _focusNode.unfocus();
-      await sendMessage(text);
+      await sendMessageToApi(text);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
+
           // Header Section
           Padding(
-            padding: const EdgeInsets.only(left: 30, right: 30, top: 50),
+            padding: const EdgeInsets.only(left: 10, right: 10, top: 60),
             child: SizedBox(
               height: 85,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
-                              offset: const Offset(0, 4),
-                              blurRadius: 8,
-                            ),
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              offset: const Offset(0, 0),
-                              blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: IconButton(
-                            icon: const Icon(Icons.arrow_back, size: 25),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Text(
-                        "Ravi Pradhan",
-                        style: GoogleFonts.urbanist(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: const Color.fromRGBO(43, 92, 116, 1),
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Container(
-                        height: 14,
-                        width: 14,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color.fromRGBO(120, 170, 23, 1),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
                   Text(
                     "Chat",
                     style: GoogleFonts.urbanist(
@@ -252,6 +202,7 @@ class _PersonalchatState extends State<Personalchat> {
               ),
             ),
           ),
+
           const Divider(
             thickness: 2,
             color: Color.fromRGBO(200, 209, 215, 1),
@@ -263,21 +214,17 @@ class _PersonalchatState extends State<Personalchat> {
                 : hasError
                     ? const Center(child: Text("Failed to load conversation"))
                     : ListView.builder(
-                        controller:
-                            _scrollController, // ✅ Attach scroll controller
-                        reverse: false, // ✅ Keeps messages in correct order
+                        reverse: false, // Latest messages at bottom
                         itemCount: _messages.length,
                         itemBuilder: (context, index) {
-                          final message =
-                              _messages[index]; // ✅ Use normal order
-                          return MessageBubble(message: message);
+                          return MessageBubble(message: _messages[index]);
                         },
                       ),
           ),
           // Bottom Input Container
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            color: Colors.white,
+            color: Color(0xFFF5F5F5),
             child: Row(
               children: [
                 // Icons container
@@ -425,8 +372,9 @@ class ChatMessage {
       message: json['message'],
       isRead: json['is_read'],
       createdAt: json['created_at'],
-      receiverName: json['receiver']['name'],
-      isSender: false, // default, will be updated later.
+      receiverName: json['sender']
+          ['name'], // Use sender's name, NOT receiver's!
+      isSender: false, // Will be updated later
     );
   }
 
@@ -463,7 +411,7 @@ class MessageBubble extends StatelessWidget {
           if (!isSender) // Show profile image only for received messages
             ClipOval(
               child: Image.asset(
-                'assets/login/profile.jpeg',
+                'assets/login/profile.png',
                 height: 40,
                 width: 40,
                 fit: BoxFit.cover,
@@ -482,7 +430,7 @@ class MessageBubble extends StatelessWidget {
                       message.receiverName.isNotEmpty
                           ? message.receiverName
                           : "Unknown",
-                      style: GoogleFonts.urbanist(
+                      style:TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
@@ -494,13 +442,13 @@ class MessageBubble extends StatelessWidget {
                         ? message.createdAt.split('T')[0]
                         : message.createdAt,
                     style:
-                        GoogleFonts.urbanist(fontSize: 10, color: Colors.grey),
+                    TextStyle(fontSize: 10, color: Colors.grey),
                   ),
                   if (isSender) const SizedBox(width: 5),
                   if (isSender)
                     Text(
                       'You',
-                      style: GoogleFonts.urbanist(
+                      style:TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
@@ -516,12 +464,12 @@ class MessageBubble extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isSender
                       ? Colors.white
-                      : const Color.fromRGBO(132, 162, 51, 1),
+                      : Color(0xFF84A233),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Text(
                   message.message,
-                  style: GoogleFonts.urbanist(
+                  style: TextStyle(
                     fontSize: 16,
                     color: isSender ? Colors.black : Colors.white,
                   ),

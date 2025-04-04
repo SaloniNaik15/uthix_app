@@ -92,6 +92,7 @@ class _NewChatState extends State<NewChat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,7 +217,7 @@ class _NewChatState extends State<NewChat> {
                   width: 50,
                   height: 50,
                   child: ClipOval(
-                    child: Image.asset("assets/login/profile.jpeg",
+                    child: Image.asset("assets/login/profile.png",
                         fit: BoxFit.cover),
                   ),
                 ),

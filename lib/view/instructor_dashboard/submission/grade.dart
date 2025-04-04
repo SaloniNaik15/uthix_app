@@ -100,7 +100,7 @@ class _GradeState extends State<Grade> {
           },
         ),
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         // Save the current grade data locally after a successful submission.
         await _storeGrades();
         ScaffoldMessenger.of(context).showSnackBar(

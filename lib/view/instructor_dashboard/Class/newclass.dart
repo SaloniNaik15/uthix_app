@@ -158,6 +158,20 @@ class _NewclassState extends State<Newclass> {
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF2B5C74),
+              onPrimary: Colors.white, // text color on selected date
+              onSurface: Colors.black, // text color
+              background: Colors.white, // background color
+            ),
+            dialogBackgroundColor: Colors.white, // full dialog background
+          ),
+          child: child!,
+        );
+      },
     );
     setState(() {
       _selectdate = pickdate;
@@ -168,6 +182,25 @@ class _NewclassState extends State<Newclass> {
     TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            timePickerTheme: const TimePickerThemeData(
+              backgroundColor: Colors.white,
+              dialHandColor: Color(0xFF2B5C74),
+              hourMinuteTextColor: Colors.black,
+              dialTextColor: Colors.black,
+              entryModeIconColor:Color(0xFF2B5C74),
+            ),
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF2B5C74),
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       setState(() {
@@ -175,6 +208,7 @@ class _NewclassState extends State<Newclass> {
       });
     }
   }
+
 
   Widget _buildOptionRow(IconData icon, String title, String value,
       [VoidCallback? onTap]) {

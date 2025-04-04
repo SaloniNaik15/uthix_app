@@ -293,6 +293,7 @@ class _StudChatState extends State<StudChat> {
             ],
           ),
         ),
+
         Positioned(
           top: 100,
           left: (MediaQuery.of(context).size.width - 80) / 2,
@@ -325,6 +326,7 @@ class _StudChatState extends State<StudChat> {
             ),
           ),
         ),
+
       ],
     );
   }

@@ -303,16 +303,17 @@ class _InstructorClassState extends State<InstructorClass> {
                           ),
                         ),
                       )
-                          : ListView.builder(
+                      // Inside ListView.builder itemBuilder:
+
+                      :ListView.builder(
                         itemCount: announcementsData.length,
                         itemBuilder: (context, index) {
                           final announcement = announcementsData[index];
-                          // Use mentorName for all announcements.
                           final instructorName = mentorName;
                           final titleText = announcement["title"] ?? "No Title";
                           final attachments = announcement["attachments"] as List<dynamic>;
-                          // Here, instead of passing the announcement id, we pass the attachment id.
-                          final attachmentId = attachments.isNotEmpty ? attachments[0]["id"].toString() : "";
+                          final announcementId = announcement["id"].toString(); // ✅ CORRECT ANNOUNCEMENT ID
+
                           return GestureDetector(
                             onTap: () {},
                             child: Container(
@@ -331,7 +332,7 @@ class _InstructorClassState extends State<InstructorClass> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Instructor row.
+                                    // Instructor row
                                     Row(
                                       children: [
                                         CircleAvatar(
@@ -359,12 +360,11 @@ class _InstructorClassState extends State<InstructorClass> {
                                           color: Colors.white,
                                           onSelected: (value) {
                                             if (value == 'view_submission') {
-                                              // Pass the attachment id from the attachments array.
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) => ViewAssignmnets(
-                                                    announcementId: attachmentId,
+                                                    announcementId: announcementId, // ✅ correct ID passed
                                                   ),
                                                 ),
                                               );
@@ -372,7 +372,7 @@ class _InstructorClassState extends State<InstructorClass> {
                                           },
                                           itemBuilder: (BuildContext context) {
                                             return [
-                                              PopupMenuItem<String>(
+                                              const PopupMenuItem<String>(
                                                 value: 'view_submission',
                                                 child: Text("View Submission"),
                                               ),
@@ -383,7 +383,7 @@ class _InstructorClassState extends State<InstructorClass> {
                                       ],
                                     ),
                                     SizedBox(height: 8.h),
-                                    // Announcement title.
+                                    // Announcement title
                                     Text(
                                       titleText,
                                       style: TextStyle(
@@ -392,19 +392,20 @@ class _InstructorClassState extends State<InstructorClass> {
                                       ),
                                     ),
                                     SizedBox(height: 10.h),
-                                    // Attachments display.
+                                    // Attachments display
                                     attachments.isNotEmpty
                                         ? GestureDetector(
                                       onTap: () {
-                                        // Open the first attachment.
-                                        final String attachmentUrl = "https://admin.uthix.com/${attachments[0]["attachment_file"]}";
+                                        final String attachmentUrl =
+                                            "https://admin.uthix.com/${attachments[0]["attachment_file"]}";
                                         _openAttachment(attachmentUrl);
                                       },
                                       child: Padding(
                                         padding: EdgeInsets.only(bottom: 12.h),
                                         child: Row(
                                           children: [
-                                            const Icon(Icons.attach_file, color: Colors.grey, size: 14),
+                                            const Icon(Icons.attach_file,
+                                                color: Colors.grey, size: 14),
                                             SizedBox(width: 5.w),
                                             Expanded(
                                               child: Text(
