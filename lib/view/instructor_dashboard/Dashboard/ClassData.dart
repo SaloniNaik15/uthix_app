@@ -86,6 +86,15 @@ class _ClassDataState extends State<ClassData> {
       );
       // The API returns a JSON with "status" and "classrooms".
       if (response.statusCode == 200 && response.data["status"] == true) {
+        List<dynamic> fetchedClasses = response.data["classrooms"];
+
+// Sort the list by created_at descending (newest first)
+        fetchedClasses.sort((a, b) {
+          final dateA = DateTime.tryParse(a["created_at"] ?? '') ?? DateTime(2000);
+          final dateB = DateTime.tryParse(b["created_at"] ?? '') ?? DateTime(2000);
+          return dateB.compareTo(dateA); // newest first
+        });
+
         setState(() {
           classes = response.data["classrooms"];
           isLoading = false;
