@@ -21,8 +21,8 @@ class _StudRecordingState extends State<StudRecording> {
         elevation: 0,
         title: Text(
           "Recordings",
-          style: GoogleFonts.urbanist(
-            fontSize: 20.sp,
+          style: TextStyle(
+            fontSize: 20,
             fontWeight: FontWeight.w600,
             color: Colors.white,
           ),
@@ -34,32 +34,32 @@ class _StudRecordingState extends State<StudRecording> {
       ),
       body: Column(
         children: [
-          SizedBox(height: 10.h),
+          SizedBox(height: 10),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 30.w),
+            padding: EdgeInsets.symmetric(horizontal: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 20.h),
+                SizedBox(height: 20),
                 Container(
-                  height: 37.h,
-                  width: 167.w,
+                  height: 37,
+                  width: 167,
                   decoration: BoxDecoration(
                     color: const Color.fromRGBO(246, 246, 246, 1),
                     borderRadius: BorderRadius.circular(10.r),
                     border: Border.all(
                       color: const Color.fromRGBO(175, 175, 175, 1),
-                      width: 1.w,
+                      width: 1,
                     ),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(8.w),
+                    padding: EdgeInsets.all(8),
                     child: Row(
                       children: [
                         Text(
                           selectedClass,
                           style: GoogleFonts.urbanist(
-                            fontSize: 14.sp,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: const Color.fromRGBO(96, 95, 95, 1),
                           ),
@@ -75,9 +75,9 @@ class _StudRecordingState extends State<StudRecording> {
                   child: Row(
                     children: [
                       _sortButton("Newest"),
-                      SizedBox(width: 10.w),
+                      SizedBox(width: 10),
                       _sortButton("Oldest"),
-                      SizedBox(width: 10.w),
+                      SizedBox(width: 10),
                       _sortButton("A-Z"),
                     ],
                   ),
@@ -85,25 +85,25 @@ class _StudRecordingState extends State<StudRecording> {
               ],
             ),
           ),
-          SizedBox(height: 40.h),
+          SizedBox(height: 40),
           Expanded(
             child: ListView.builder(
               itemCount: 10,
-              padding: EdgeInsets.symmetric(horizontal: 30.w),
+              padding: EdgeInsets.symmetric(horizontal: 10),
               itemBuilder: (context, index) {
                 return Padding(
-                  padding: EdgeInsets.only(bottom: 15.h),
+                  padding: EdgeInsets.only(bottom: 15),
                   child: Row(
                     children: [
                       SizedBox(
-                        width: 40.w,
-                        height: 40.h,
+                        width: 40,
+                        height: 40,
                         child: Image.asset(
                           "assets/files_icons/video.png",
                           fit: BoxFit.cover,
                         ),
                       ),
-                      SizedBox(width: 15.w),
+                      SizedBox(width: 15),
                       Flexible(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,7 +112,7 @@ class _StudRecordingState extends State<StudRecording> {
                             Text(
                               "Class Name, Topic",
                               style: GoogleFonts.urbanist(
-                                fontSize: 14.sp,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.black,
                               ),
@@ -121,7 +121,7 @@ class _StudRecordingState extends State<StudRecording> {
                             Text(
                               "61 GB, Modified by Instructor on 13/01/2025",
                               style: GoogleFonts.urbanist(
-                                fontSize: 14.sp,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.black,
                               ),
@@ -144,15 +144,15 @@ class _StudRecordingState extends State<StudRecording> {
 
   Widget _iconButton(IconData icon, VoidCallback onPressed) {
     return IconButton(
-      icon: Icon(icon, size: 25.sp, color: Colors.white),
+      icon: Icon(icon, size: 25, color: Colors.white),
       onPressed: onPressed,
     );
   }
 
   Widget _sortButton(String text) {
     return Container(
-      height: 47.h,
-      width: 100.w,
+      height: 47,
+      width: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(38.r),
         color: const Color.fromRGBO(43, 92, 116, 1),
@@ -161,7 +161,7 @@ class _StudRecordingState extends State<StudRecording> {
         child: Text(
           text,
           style: GoogleFonts.urbanist(
-            fontSize: 14.sp,
+            fontSize: 14,
             fontWeight: FontWeight.w700,
             color: Colors.white,
           ),
