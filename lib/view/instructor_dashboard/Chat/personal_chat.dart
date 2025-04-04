@@ -178,66 +178,18 @@ class _PersonalchatState extends State<Personalchat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
+
           // Header Section
           Padding(
-            padding: const EdgeInsets.only(left: 30, right: 30, top: 50),
+            padding: const EdgeInsets.only(left: 10, right: 10, top: 60),
             child: SizedBox(
               height: 85,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
-                              offset: const Offset(0, 4),
-                              blurRadius: 8,
-                            ),
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              offset: const Offset(0, 0),
-                              blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: IconButton(
-                            icon: const Icon(Icons.arrow_back, size: 25),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Text(
-                        "",
-                        style: GoogleFonts.urbanist(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: const Color.fromRGBO(43, 92, 116, 1),
-                        ),
-                      ),
-                      const SizedBox(width: 5),
-                      Container(
-                        height: 14,
-                        width: 14,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color.fromRGBO(120, 170, 23, 1),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
                   Text(
                     "Chat",
                     style: GoogleFonts.urbanist(
@@ -250,6 +202,7 @@ class _PersonalchatState extends State<Personalchat> {
               ),
             ),
           ),
+
           const Divider(
             thickness: 2,
             color: Color.fromRGBO(200, 209, 215, 1),
@@ -271,7 +224,7 @@ class _PersonalchatState extends State<Personalchat> {
           // Bottom Input Container
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            color: Colors.white,
+            color: Color(0xFFF5F5F5),
             child: Row(
               children: [
                 // Icons container
@@ -477,7 +430,7 @@ class MessageBubble extends StatelessWidget {
                       message.receiverName.isNotEmpty
                           ? message.receiverName
                           : "Unknown",
-                      style: GoogleFonts.urbanist(
+                      style:TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
@@ -489,13 +442,13 @@ class MessageBubble extends StatelessWidget {
                         ? message.createdAt.split('T')[0]
                         : message.createdAt,
                     style:
-                        GoogleFonts.urbanist(fontSize: 10, color: Colors.grey),
+                    TextStyle(fontSize: 10, color: Colors.grey),
                   ),
                   if (isSender) const SizedBox(width: 5),
                   if (isSender)
                     Text(
                       'You',
-                      style: GoogleFonts.urbanist(
+                      style:TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
@@ -511,12 +464,12 @@ class MessageBubble extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isSender
                       ? Colors.white
-                      : const Color.fromRGBO(132, 162, 51, 1),
+                      : Color(0xFF84A233),
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Text(
                   message.message,
-                  style: GoogleFonts.urbanist(
+                  style: TextStyle(
                     fontSize: 16,
                     color: isSender ? Colors.black : Colors.white,
                   ),
