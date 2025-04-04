@@ -139,7 +139,7 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
             // Extract student details from the "students" object (with name inside "user")
             final student = upload["students"];
             final studentName = student?["user"]?["name"] ?? "No Name";
-            final studentClass = "N/A";
+           // final studentClass = "N/A";
             final submissionDescription =
                 upload["title"] ?? (upload["comment"] ?? "No Description");
 
@@ -198,13 +198,13 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
                                     fontWeight: FontWeight.w500,
                                     color: Colors.black),
                               ),
-                              Text(
-                                "Class: $studentClass",
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black54),
-                              ),
+                              // Text(
+                              //   "Class: $studentClass",
+                              //   style: TextStyle(
+                              //       fontSize: 12,
+                              //       fontWeight: FontWeight.w400,
+                              //       color: Colors.black54),
+                              // ),
                             ],
                           ),
                           Spacer(),
@@ -230,13 +230,15 @@ class _ViewAssignmnetsState extends State<ViewAssignmnets> {
                                 child: Text(
                                   "Grade",
                                   style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color.fromRGBO(255, 255, 255, 1)),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color.fromRGBO(255, 255, 255, 1),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
+
                         ],
                       ),
                       SizedBox(height: 20.h),
