@@ -119,13 +119,12 @@ class _SubmissionStudentState extends State<SubmissionStudent> {
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
               child: GestureDetector(
                 onTap: () {
-
                   showModalBottomSheet(
                     context: context,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
                     ),
-
                     builder: (BuildContext bottomSheetContext) {
                       return UploadBottomSheet(
                         announcementId: widget.announcementId,
@@ -172,16 +171,13 @@ class UploadBottomSheet extends StatefulWidget {
 
   final BuildContext parentContext; // Parent's context for SnackBar
 
-
   const UploadBottomSheet({
     Key? key,
     required this.announcementId,
     required this.chapterId,
     required this.token,
     required this.dio,
-
     required this.parentContext,
-
   }) : super(key: key);
 
   @override
@@ -208,13 +204,11 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
       });
 
       log("Selected file path: $_selectedFilePath");
-
     }
   }
 
   Future<void> _uploadAssignment() async {
     if (_selectedFilePath == null) {
-
       ScaffoldMessenger.of(widget.parentContext).showSnackBar(
         SnackBar(content: Text("Please choose a file to upload.")),
       );
@@ -224,8 +218,8 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
       isUploading = true;
     });
     try {
-
-      String uploadUrl = "https://admin.uthix.com/api/announcements/${widget.announcementId}/assignments";
+      String uploadUrl =
+          "https://admin.uthix.com/api/announcements/${widget.announcementId}/assignments";
       FormData formData = FormData.fromMap({
         "announcement_id": widget.announcementId,
         "chapter_id": widget.chapterId,
@@ -259,7 +253,11 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
       if (response.statusCode == 201 &&
           responseData["assignment_upload"] != null &&
           responseData["message"] != null &&
-          responseData["message"].toString().trim().toLowerCase().contains("successfully")) {
+          responseData["message"]
+              .toString()
+              .trim()
+              .toLowerCase()
+              .contains("successfully")) {
         // Show the success SnackBar on the parent's context.
         ScaffoldMessenger.of(widget.parentContext).showSnackBar(
           SnackBar(content: Text("File uploaded successfully")),
@@ -276,7 +274,6 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
     } catch (e) {
       log("Upload failed: $e");
       ScaffoldMessenger.of(widget.parentContext).showSnackBar(
-
         SnackBar(content: Text("File upload failed")),
       );
     } finally {
@@ -290,7 +287,8 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       // This padding ensures the bottom sheet adjusts for the keyboard.
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 16),
+      padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom + 16),
       child: Container(
         color: Colors.white, // White background.
         padding: EdgeInsets.all(16),
@@ -323,7 +321,8 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.grey[300],
               ),
-              child: Text("Choose File", style: TextStyle(fontSize: 14, color: Colors.black)),
+              child: Text("Choose File",
+                  style: TextStyle(fontSize: 14, color: Colors.black)),
             ),
             SizedBox(height: 16),
             // Upload button.
@@ -334,9 +333,10 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
               onPressed: isUploading ? null : _uploadAssignment,
               child: isUploading
                   ? CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              )
-                  : Text("Upload", style: TextStyle(fontSize: 14, color: Colors.white)),
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    )
+                  : Text("Upload",
+                      style: TextStyle(fontSize: 14, color: Colors.white)),
             ),
           ],
         ),
