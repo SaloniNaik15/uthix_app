@@ -8,9 +8,9 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:uthix_app/modal/nav_itemStudent.dart';
 import 'package:uthix_app/modal/navbarWidgetStudent.dart';
-
 import 'package:uthix_app/view/Student_Pages/Student_Chat/stud_newChart.dart';
 import 'package:uthix_app/view/Student_Pages/Student_Chat/stud_personalChat.dart';
 
@@ -24,6 +24,8 @@ class StudChat extends StatefulWidget {
 class _StudChatState extends State<StudChat> {
   int selectedIndex = 3;
   String? accessLoginToken;
+  String? profileImageUrl;
+  int currentUserId = 0;
   List<dynamic> messages = [];
   bool isLoading = true;
   bool hasError = false;
@@ -39,21 +41,26 @@ class _StudChatState extends State<StudChat> {
     await fetchMessages();
   }
 
-  int currentUserId = 0;
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token'); // Retrieve token
+    String? token = prefs.getString('auth_token');
     int? userId = prefs.getInt('user_id');
+    String? imageFromPrefs = prefs.getString('student_profile_image_url');
 
-    log("Retrieved Token: $token");
-    log("CHAT-STUDENT Retrieved User ID: $userId");
+    // Convert filename to full URL if needed
+    String? imageUrl = (imageFromPrefs != null && !imageFromPrefs.startsWith("http"))
+        ? "https://admin.uthix.com/storage/images/student/$imageFromPrefs"
+        : imageFromPrefs;
 
     setState(() {
       accessLoginToken = token;
-      if (userId != null) {
-        currentUserId = userId; // ✅ Update with actual user ID
-      }
+      currentUserId = userId ?? 0;
+      profileImageUrl = imageUrl;
     });
+
+    log("Retrieved Token: $token");
+    log("CHAT-STUDENT Retrieved User ID: $userId");
+    log("Final Resolved Profile Image URL: $profileImageUrl");
   }
 
   Future<void> fetchMessages() async {
@@ -71,30 +78,21 @@ class _StudChatState extends State<StudChat> {
         final data = jsonDecode(response.body);
         List<dynamic> rawMessages = data['messages'];
 
-        // Group messages by the other participant (sender OR receiver)
         Map<int, dynamic> groupedMessages = {};
-
         for (var message in rawMessages) {
           int senderId = message['sender']['id'];
           int receiverId = message['receiver']['id'];
-
-          // Determine the other participant (who you're chatting with)
           int otherUserId = senderId == currentUserId ? receiverId : senderId;
 
-          // Get the existing message for the user
           var existingMessage = groupedMessages[otherUserId];
-
-          // If there's no existing message or this one is newer, update it
           if (existingMessage == null ||
-              DateTime.parse(message['created_at'])
-                  .isAfter(DateTime.parse(existingMessage['created_at']))) {
+              DateTime.parse(message['created_at']).isAfter(DateTime.parse(existingMessage['created_at']))) {
             groupedMessages[otherUserId] = message;
           }
         }
 
         setState(() {
-          messages = groupedMessages.values
-              .toList(); // Ensure latest messages are displayed first
+          messages = groupedMessages.values.toList();
           isLoading = false;
         });
       } else {
@@ -118,11 +116,7 @@ class _StudChatState extends State<StudChat> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => navStudItems[index]["page"]),
-      ).then((_) {
-        setState(() {
-          selectedIndex = 3;
-        });
-      });
+      ).then((_) => setState(() => selectedIndex = 3));
     }
   }
 
@@ -139,9 +133,7 @@ class _StudChatState extends State<StudChat> {
               elevation: 0,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: () => Navigator.pop(context),
               ),
               title: Text(
                 "Chat",
@@ -160,23 +152,20 @@ class _StudChatState extends State<StudChat> {
                 children: [
                   const SizedBox(height: 10),
                   Expanded(
-                    // <-- Added to take remaining space
                     child: ListView.builder(
                       padding: EdgeInsets.zero,
-                      physics: BouncingScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       itemCount: messages.length,
                       itemBuilder: (context, index) {
                         final message = messages[index];
                         final senderId = message['sender']['id'];
                         final receiverId = message['receiver']['id'];
-
-                        // Determine the chat partner (not the current user)
                         final otherUser = senderId == currentUserId
                             ? message['receiver']
                             : message['sender'];
+
                         final otherUserName = otherUser['name'] ?? "Unknown";
-                        final messageText = message['message'] ??
-                            "No message"; // Fallback if message is empty
+                        final messageText = message['message'] ?? "No message";
                         final createdAt = message['created_at'] ?? "";
                         final formattedDate = createdAt.contains('T')
                             ? createdAt.split('T')[0]
@@ -187,8 +176,8 @@ class _StudChatState extends State<StudChat> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => StudPersonalchat(
-                                    conversationId: otherUser['id']),
+                                builder: (context) =>
+                                    StudPersonalchat(conversationId: otherUser['id']),
                               ),
                             );
                           },
@@ -197,36 +186,24 @@ class _StudChatState extends State<StudChat> {
                                 vertical: 10, horizontal: 20),
                             child: Row(
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   width: 60,
                                   height: 60,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(1.0),
-                                    child: ClipOval(
-                                      child: Image.asset(
-                                        "assets/login/profile.jpeg",
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                Icon(Icons.person,
-                                                    size: 50,
-                                                    color: Colors.grey),
-                                      ),
-                                    ),
+                                  child: CircleAvatar(
+                                    backgroundImage: AssetImage("assets/login/profile.png"),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Row(
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              otherUserName, // Show the actual chat partner's name
+                                              otherUserName,
                                               style: GoogleFonts.urbanist(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w500,
@@ -247,21 +224,15 @@ class _StudChatState extends State<StudChat> {
                                         ],
                                       ),
                                       const SizedBox(height: 5),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              messageText,
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
-                                              style: GoogleFonts.urbanist(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w400,
-                                                color: Colors.black87,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                                      Text(
+                                        messageText,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: GoogleFonts.urbanist(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                          color: Colors.black87,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -293,14 +264,14 @@ class _StudChatState extends State<StudChat> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => StudNewchart()),
+                      MaterialPageRoute(builder: (context) => const StudNewchart()),
                     );
                   },
                   child: Container(
                     height: 64,
                     width: 64,
                     decoration: BoxDecoration(
-                      color: Color.fromRGBO(43, 92, 116, 1),
+                      color: const Color(0xFF2B5C74),
                       borderRadius: BorderRadius.circular(32),
                       boxShadow: [
                         BoxShadow(
@@ -315,22 +286,47 @@ class _StudChatState extends State<StudChat> {
                         ),
                       ],
                     ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Icon(Icons.chat_bubble, size: 30, color: Colors.white),
-                        Center(
-                          child: Icon(Icons.add,
-                              size: 20, color: Color.fromRGBO(43, 92, 116, 1)),
-                        ),
-                      ],
-                    ),
+                    child: const Icon(Icons.chat_bubble, size: 30, color: Colors.white),
                   ),
                 ),
               ),
             ],
           ),
         ),
+
+        Positioned(
+          top: 100,
+          left: (MediaQuery.of(context).size.width - 80) / 2,
+          child: Container(
+            width: 80,
+            height: 80,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Color.fromRGBO(255, 255, 255, 1),
+                  Color.fromRGBO(51, 152, 246, 0.75),
+                ],
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: CircleAvatar(
+                radius: 40,
+                backgroundColor: Colors.white,
+                backgroundImage: profileImageUrl != null && profileImageUrl!.isNotEmpty
+                    ? NetworkImage(profileImageUrl!)
+                    : const AssetImage('assets/login/profile.png') as ImageProvider,
+                onBackgroundImageError: (_, __) {
+                  debugPrint("❌ Error loading profile image from cache");
+                },
+              ),
+            ),
+          ),
+        ),
+
       ],
     );
   }

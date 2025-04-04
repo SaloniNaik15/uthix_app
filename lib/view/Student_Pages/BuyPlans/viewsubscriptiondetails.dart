@@ -36,7 +36,7 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
                   Text(
                     "Subscription Details",
                     style:
-                        TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600),
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                   ),
                   SizedBox(height: 10.h),
                   _buildCurrentPlanRow(),
@@ -51,7 +51,7 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
                         Text(
                           "Plan Features",
                           style: TextStyle(
-                              fontSize: 20.sp, fontWeight: FontWeight.w600),
+                              fontSize: 20, fontWeight: FontWeight.w600),
                         ),
                         SizedBox(height: 10.h),
                         Column(
@@ -72,7 +72,7 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
                       Expanded(
                         child: _buildButton("Cancel Subscription", Colors.red),
                       ),
-                      SizedBox(width: 10.w), // Small spacing
+                      SizedBox(width: 10), // Small spacing
                       Expanded(
                         child: _buildButton(
                             "Manage subscription", const Color(0xFF2B6074)),
@@ -96,9 +96,9 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Current Plan",
-                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500)),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
             Text("You are currently on the Standard plan",
-                style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500)),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
           ],
         ),
         const Spacer(),
@@ -116,10 +116,10 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
           children: [
             Text("Rs 899",
                 style: TextStyle(
-                    fontSize: 24.sp,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold)), // Rs 899 in bold
             Text("/month",
-                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500)),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
           ],
         ),
         const Spacer(),
@@ -130,14 +130,14 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
 
   Widget _buildStatusContainer(String text, Color color) {
     return Container(
-      height: 20.h,
-      width: 65.w,
+      height: 25,
+      width: 65,
       decoration:
           BoxDecoration(color: color, borderRadius: BorderRadius.circular(20)),
       child: Center(
         child: Text(text,
             style: TextStyle(
-                fontSize: 12.sp,
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: Colors.white)),
       ),
@@ -146,15 +146,15 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
 
   Widget _buildBorderContainer(String text, Color color) {
     return Container(
-      height: 33.h,
-      width: 94.w,
+      height: 33,
+      width: 94,
       decoration: BoxDecoration(
           border: Border.all(color: color),
           borderRadius: BorderRadius.circular(20)),
       child: Center(
         child: Text(text,
             style: TextStyle(
-                fontSize: 12.sp, fontWeight: FontWeight.w500, color: color)),
+                fontSize: 12, fontWeight: FontWeight.w500, color: color)),
       ),
     );
   }
@@ -164,11 +164,11 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Icon(Icons.check, color: Color(0xFF2B6074)),
-        SizedBox(width: 10.w),
+        SizedBox(width: 10),
         Expanded(
           child: Text(
             text,
-            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             softWrap: true,
             overflow: TextOverflow.visible,
           ),
@@ -183,7 +183,7 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
       children: List.generate(
           40,
           (index) => Text("-",
-              style: TextStyle(color: Colors.black, fontSize: 18.sp))),
+              style: TextStyle(color: Colors.black, fontSize: 18))),
     );
   }
 
@@ -191,7 +191,7 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
-        padding: EdgeInsets.symmetric(horizontal: 5 .w, vertical: 12.h),
+        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -200,7 +200,7 @@ class _ViewSubscriptionDetailsState extends State<ViewSubscriptionDetails> {
       child: Text(
         text,
         style: TextStyle(
-            fontSize: 12.sp, fontWeight: FontWeight.w600, color: Colors.white),
+            fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
       ),
     );
   }

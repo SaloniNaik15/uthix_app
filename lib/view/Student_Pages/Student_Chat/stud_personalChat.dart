@@ -178,66 +178,43 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [
           // Header Section
           Padding(
-            padding: const EdgeInsets.only(left: 30, right: 30, top: 50),
+            padding: const EdgeInsets.only(left: 10, right: 10, top: 50),
             child: SizedBox(
               height: 85,
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
-                              offset: const Offset(0, 4),
-                              blurRadius: 8,
-                            ),
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              offset: const Offset(0, 0),
-                              blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: IconButton(
-                            icon: const Icon(Icons.arrow_back, size: 25),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ),
+                  Row(children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios, size: 25),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    const SizedBox(width: 15),
+                    Text(
+                      "",
+                      style: GoogleFonts.urbanist(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: const Color.fromRGBO(43, 92, 116, 1),
                       ),
-                      const SizedBox(width: 15),
-                      Text(
-                        "",
-                        style: GoogleFonts.urbanist(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: const Color.fromRGBO(43, 92, 116, 1),
-                        ),
+                    ),
+                    const SizedBox(width: 5),
+                    Container(
+                      height: 14,
+                      width: 14,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color.fromRGBO(120, 170, 23, 1),
                       ),
-                      const SizedBox(width: 5),
-                      Container(
-                        height: 14,
-                        width: 14,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color.fromRGBO(120, 170, 23, 1),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
+                    ),
+                  ]),
+                  const SizedBox(height: 10),
                   Text(
                     "Chat",
                     style: GoogleFonts.urbanist(

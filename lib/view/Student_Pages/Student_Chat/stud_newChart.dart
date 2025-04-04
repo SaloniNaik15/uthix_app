@@ -92,6 +92,7 @@ class _StudNewchartState extends State<StudNewchart> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +120,7 @@ class _StudNewchartState extends State<StudNewchart> {
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.only(left: 30, right: 30, top: 25),
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
       child: Row(
         children: [
           _buildIcon(
@@ -181,7 +182,7 @@ class _StudNewchartState extends State<StudNewchart> {
 
   Widget _buildSuggestionsTitle() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Text(
         "Suggestions",
         style: GoogleFonts.urbanist(
@@ -207,7 +208,7 @@ class _StudNewchartState extends State<StudNewchart> {
         );
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         child: Column(
           children: [
             Row(

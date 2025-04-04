@@ -118,7 +118,7 @@ class _StudentManageAccountState extends State<StudentManageAccount> {
                 backgroundColor: Colors.grey[300],
                 backgroundImage: profileImageUrl != null
                     ? NetworkImage(profileImageUrl!)
-                    : const AssetImage("assets/login/profile.jpeg") as ImageProvider,
+                    : const AssetImage("assets/login/profile.png") as ImageProvider,
                 onBackgroundImageError: (_, __) {
                   setState(() {
                     profileImageUrl = null;

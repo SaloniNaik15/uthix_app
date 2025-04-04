@@ -105,13 +105,13 @@ class _BuyPlansState extends State<BuyPlans> {
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
       child: Row(
         children: [
-          Icon(Icons.check, color: Colors.green, size: 20.w),
-          SizedBox(width: 8.w),
+          Icon(Icons.check, color: Colors.green, size: 20),
+          SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
               style: TextStyle(
-                fontSize: 14.sp,
+                fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: Colors.black,
               ),
@@ -124,19 +124,18 @@ class _BuyPlansState extends State<BuyPlans> {
 
   Widget _buildbenefits(String imagePath, String text) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: EdgeInsets.only(right: 8.w),
-            child: Image.asset(imagePath, width: 24.w, height: 24.h),
+            padding: EdgeInsets.only(right: 8),
+            child: Image.asset(imagePath, width: 24, height: 24),
           ),
           Expanded(
             child: Text(text,
                 style: TextStyle(
-                    fontSize: 10.sp,
-                    fontFamily: "Urbanist",
+                    fontSize: 10,
                     fontWeight: FontWeight.w400,
                     color: Colors.black)),
           ),
@@ -155,8 +154,8 @@ class _BuyPlansState extends State<BuyPlans> {
     }
 
     return Container(
-      padding: EdgeInsets.all(10.w),
-      margin: EdgeInsets.symmetric(vertical: 10.h),
+      padding: EdgeInsets.all(10),
+      margin: EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey, width: 2),
         borderRadius: BorderRadius.circular(15),
@@ -173,10 +172,10 @@ class _BuyPlansState extends State<BuyPlans> {
                 children: [
                   Text(plan["name"],
                       style: TextStyle(
-                          fontSize: 18.sp, fontWeight: FontWeight.w600)),
+                          fontSize: 18, fontWeight: FontWeight.w600)),
                   Text(plan["description"],
                       style: TextStyle(
-                          fontSize: 14.sp, fontWeight: FontWeight.w400)),
+                          fontSize: 14, fontWeight: FontWeight.w400)),
                 ],
               ),
               Column(
@@ -184,24 +183,24 @@ class _BuyPlansState extends State<BuyPlans> {
                 children: [
                   Text("Rs. ${plan["price"]}",
                       style: TextStyle(
-                          fontSize: 18.sp, fontWeight: FontWeight.w600)),
+                          fontSize: 18, fontWeight: FontWeight.w600)),
                   Text("/${plan["duration"]}",
                       style: TextStyle(
-                          fontSize: 14.sp, fontWeight: FontWeight.w400)),
+                          fontSize: 14, fontWeight: FontWeight.w400)),
                 ],
               ),
             ],
           ),
-          SizedBox(height: 20.h),
+          SizedBox(height: 20),
           // Features List
           ...features.map((feature) => _buildFeatureRow(feature)).toList(),
-          SizedBox(height: 20.h),
+          SizedBox(height: 20),
           // Select Plan Button
           Align(
             alignment: Alignment.center,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 12.h),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
                 ),
@@ -213,7 +212,7 @@ class _BuyPlansState extends State<BuyPlans> {
               child: Text(
                 "Select ${plan["name"]} Plan",
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
@@ -239,13 +238,13 @@ class _BuyPlansState extends State<BuyPlans> {
         title: Text(
           "Choose Your Plan",
           style: TextStyle(
-              fontSize: 18.sp,
+              fontSize: 18,
               fontWeight: FontWeight.w500,
-              color: Colors.grey[700]),
+              color: Colors.black),
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(10.w),
+        padding: EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -258,7 +257,7 @@ class _BuyPlansState extends State<BuyPlans> {
                     _buildbenefits(feature['icon']!, feature['text']!))
                 .toList(),
             SizedBox(
-              height: 20.h,
+              height: 20,
             ),
             // API Data or Loading Indicator
             Expanded(

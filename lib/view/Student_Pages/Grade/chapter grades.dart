@@ -129,7 +129,7 @@ class _AllSubmissionsScreenState extends State<AllSubmissionsScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                              GradeStudent(announcementId: submission.announcementId),
+                                  GradeStudent(assignmentUploadId: submission.assignmentUploadId),
                             ),
                           );
                         },
@@ -212,7 +212,7 @@ class PdfTagButton extends StatelessWidget {
 }
 
 class Submission {
-  final int announcementId;
+  final int assignmentUploadId;
   final String subject;
   final String chapter;
   final String announcement;
@@ -220,7 +220,7 @@ class Submission {
   final List<String> attachments;
 
   Submission({
-    required this.announcementId,
+    required this.assignmentUploadId,
     required this.subject,
     required this.chapter,
     required this.announcement,
@@ -234,7 +234,9 @@ class Submission {
         : null;
 
     return Submission(
-      announcementId: json['id'],
+      assignmentUploadId: (upload != null && upload['id'] != null)
+          ? upload['id'] as int
+          : 0,
       subject: json['title'] ?? 'N/A',
       chapter: 'Chapter ${json['chapter_id'] ?? 'N/A'}',
       announcement: json['title'] ?? 'N/A',

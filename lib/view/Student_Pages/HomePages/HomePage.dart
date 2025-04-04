@@ -15,6 +15,7 @@ import 'package:uthix_app/view/Student_Pages/Modern_Tools/modern_tools.dart';
 import 'package:uthix_app/view/Student_Pages/Progress/progress_tracking.dart';
 
 import '../Student Account Details/Student_Profile.dart';
+import '../Student_Chat/stud_chat.dart';
 
 class HomePages extends StatefulWidget {
   const HomePages({super.key});
@@ -275,7 +276,7 @@ class _HomePagesState extends State<HomePages> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => UnderConstructionScreen(),
+                              builder: (context) => StudChat(),
                             ),
                           );
                         } else if (dashBoard[index]["title"] == "DEMO CLASSES") {

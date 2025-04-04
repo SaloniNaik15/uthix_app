@@ -1,9 +1,13 @@
-// ignore_for_file: deprecated_member_use
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProgressTracking extends StatefulWidget {
   const ProgressTracking({super.key});
@@ -13,15 +17,109 @@ class ProgressTracking extends StatefulWidget {
 }
 
 class _ProgressTrackingState extends State<ProgressTracking> {
+  String? accessLoginToken;
+  String? userName;
+  String? profileImageUrl;
+  ImageProvider _getProfileImage() {
+    if (profileImageUrl != null && profileImageUrl!.isNotEmpty) {
+
+      if (profileImageUrl!.startsWith("http")) {
+        return NetworkImage(profileImageUrl!);
+      } else {
+        return FileImage(File(profileImageUrl!));
+      }
+    } else {
+      return const AssetImage('assets/login/profile.png');
+    }
+  }
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    accessLoginToken = prefs.getString('auth_token');
+
+    String? storedImage = prefs.getString('student_profile_image_url');
+    if (storedImage != null && !storedImage.startsWith("http")) {
+      profileImageUrl = "https://admin.uthix.com/storage/images/student/$storedImage";
+    } else {
+      profileImageUrl = storedImage;
+    }
+
+    log("Retrieved Token: $accessLoginToken");
+    log("Final Resolved Image URL: $profileImageUrl");
+
+    await _loadProfileFromCache();
+    await _fetchUserProfile();
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<void> _loadProfileFromCache() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? cachedProfile = prefs.getString("cached_profile");
+    if (cachedProfile != null) {
+      try {
+        final data = jsonDecode(cachedProfile);
+        setState(() {
+          userName = data["name"];
+        });
+        log("Loaded profile from cache.");
+      } catch (e) {
+        log("Error decoding cached profile: $e");
+      }
+    }
+  }
+
+  Future<void> _fetchUserProfile() async {
+    try {
+      final dio = Dio();
+      final response = await dio.get(
+        "https://admin.uthix.com/api/profile",
+        options: Options(
+          headers: {"Authorization": "Bearer $accessLoginToken"},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        String? imageFileName = data["image"];
+        String? fullImageUrl = (imageFileName != null && imageFileName.isNotEmpty)
+            ? "https://admin.uthix.com/storage/images/student/$imageFileName"
+            : null;
+
+        setState(() {
+          userName = data["name"];
+          profileImageUrl = fullImageUrl;
+        });
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString("cached_profile", jsonEncode(data));
+        prefs.setString("student_profile_image_url", imageFileName ?? "");
+
+        log("Profile updated from API and cached.");
+      } else {
+        log("Failed to fetch user profile: ${response.statusMessage}");
+      }
+    } catch (e) {
+      log("Error fetching user profile: $e");
+    }
+  }
+
   Widget buildInfoContainer(String title, String value) {
     return Container(
       height: 102,
       width: 102,
       decoration: BoxDecoration(
-        color: Color.fromRGBO(246, 246, 246, 1),
-        border: Border.all(
-          color: Color.fromRGBO(217, 217, 217, 1),
-        ),
+        color: const Color.fromRGBO(246, 246, 246, 1),
+        border: Border.all(color: const Color.fromRGBO(217, 217, 217, 1)),
         borderRadius: BorderRadius.circular(17),
       ),
       child: Column(
@@ -50,18 +148,18 @@ class _ProgressTrackingState extends State<ProgressTracking> {
 
   Widget buildCategoryContainer(String title) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       decoration: BoxDecoration(
-        color: Color.fromRGBO(246, 246, 246, 1),
-        border: Border.all(color: Color.fromRGBO(217, 217, 217, 1)),
+        color: const Color.fromRGBO(246, 246, 246, 1),
+        border: Border.all(color: const Color.fromRGBO(217, 217, 217, 1)),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: const Color.fromRGBO(96, 95, 95, 1),
+          color: Color.fromRGBO(96, 95, 95, 1),
         ),
       ),
     );
@@ -74,9 +172,9 @@ class _ProgressTrackingState extends State<ProgressTracking> {
           height: 15,
           width: 15,
           decoration:
-              BoxDecoration(shape: BoxShape.circle, color: Colors.green),
+          const BoxDecoration(shape: BoxShape.circle, color: Colors.green),
         ),
-        SizedBox(width: 3),
+        const SizedBox(width: 3),
         Text(
           text,
           style: GoogleFonts.urbanist(
@@ -92,7 +190,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
   Widget buildBarChart() {
     return Expanded(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: BarChart(
           BarChartData(
             alignment: BarChartAlignment.center,
@@ -101,7 +199,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
             titlesData: FlTitlesData(
               leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
               rightTitles:
-                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              AxisTitles(sideTitles: SideTitles(showTitles: false)),
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
@@ -124,13 +222,13 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                     return (value.toInt() < 0 || value.toInt() >= labels.length)
                         ? Container()
                         : Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Text(
-                              labels[value.toInt()],
-                              style: GoogleFonts.urbanist(
-                                  fontSize: 8, fontWeight: FontWeight.w700),
-                            ),
-                          );
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        labels[value.toInt()],
+                        style: GoogleFonts.urbanist(
+                            fontSize: 8, fontWeight: FontWeight.w700),
+                      ),
+                    );
                   },
                   reservedSize: 50.h,
                 ),
@@ -150,13 +248,13 @@ class _ProgressTrackingState extends State<ProgressTracking> {
       height: 310.h,
       width: 340.w,
       decoration: BoxDecoration(
-        color: Color.fromRGBO(246, 246, 246, 1),
-        border: Border.all(color: Color.fromRGBO(217, 217, 217, 1)),
+        color: const Color.fromRGBO(246, 246, 246, 1),
+        border: Border.all(color: const Color.fromRGBO(217, 217, 217, 1)),
         borderRadius: BorderRadius.circular(17),
       ),
       child: Column(
         children: [
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -164,14 +262,14 @@ class _ProgressTrackingState extends State<ProgressTracking> {
               buildCategoryContainer("Track Scores"),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           buildBarChart(),
-          Divider(
+          const Divider(
             thickness: 1,
             color: Color.fromRGBO(217, 217, 217, 1),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -191,10 +289,10 @@ class _ProgressTrackingState extends State<ProgressTracking> {
         x: index,
         barRods: [
           BarChartRodData(
-            toY: (index + 1) * 7.0, // Example values, adjust as needed
-            width: 20, // **Increase width for wider bars**
-            borderRadius: BorderRadius.zero, // **Make bars rectangular**
-            color: Colors.blue, // Customize color
+            toY: (index + 1) * 7.0,
+            width: 20,
+            borderRadius: BorderRadius.zero,
+            color: Colors.blue,
           ),
         ],
       );
@@ -203,28 +301,29 @@ class _ProgressTrackingState extends State<ProgressTracking> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return isLoading
+        ? const Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(child: CircularProgressIndicator()),
+    )
+        : Stack(
       clipBehavior: Clip.none,
       children: [
         Scaffold(
           backgroundColor: Colors.white,
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(80), // Custom AppBar height
+            preferredSize: const Size.fromHeight(80),
             child: AppBar(
               backgroundColor: const Color.fromRGBO(43, 92, 116, 1),
-              elevation: 0, // Removes shadow
-
-              automaticallyImplyLeading: false, // Removes default back arrow
+              elevation: 0,
+              automaticallyImplyLeading: false,
               flexibleSpace: Padding(
-                padding: EdgeInsets.only(
-                    top: 10,
-                    left: 10,
-                    right: 10), // Adjust for top alignment
+                padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.arrow_back_ios_outlined,
                         size: 20,
                         color: Colors.white,
@@ -237,7 +336,7 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                       child: Center(
                         child: Text(
                           "My Progress",
-                          style: GoogleFonts.urbanist(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -245,83 +344,53 @@ class _ProgressTrackingState extends State<ProgressTracking> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 48), // width matches IconButton width
+                    const SizedBox(width: 48),
                   ],
                 ),
               ),
             ),
           ),
           body: SingleChildScrollView(
-            child: Stack(
-              clipBehavior: Clip.none,
+            child: Column(
               children: [
-                Column(
-                  children: [
-                    const SizedBox(
-                      height: 70,
-                    ),
-                    Text(
-                      "Mahima Mandal",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: const Color.fromRGBO(43, 92, 116, 1),
-                      ),
-                    ),
-                    Text(
-                      "Class X B",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: const Color.fromRGBO(96, 95, 95, 1),
-                      ),
-                    ),
-
-                    Text(
-                      "+91 XXXXX XXXXX",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: const Color.fromRGBO(96, 95, 95, 1),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 30.h,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          buildInfoContainer("Last Grade", "70%"),
-                          buildInfoContainer("Assignment", "5/8"),
-                          buildInfoContainer("Attendance", "77%"),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 25),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "My Performance Chart",
-                          style: GoogleFonts.urbanist(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: const Color.fromRGBO(96, 95, 95, 1),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    buildStatisticsContainer()
-                  ],
+                const SizedBox(height: 50),
+                Text(
+                  userName ?? '',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Color.fromRGBO(43, 92, 116, 1),
+                  ),
                 ),
+                const SizedBox(height: 30),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      buildInfoContainer("Last Grade", "70%"),
+                      buildInfoContainer("Assignment", "5/8"),
+                      buildInfoContainer("Attendance", "77%"),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.only(left: 25),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "My Performance Chart",
+                      style: GoogleFonts.urbanist(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: const Color.fromRGBO(96, 95, 95, 1),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                buildStatisticsContainer(),
               ],
             ),
           ),
@@ -345,12 +414,15 @@ class _ProgressTrackingState extends State<ProgressTracking> {
             ),
             child: Padding(
               padding: const EdgeInsets.all(5),
-              child: Container(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                ),
-              ),
+              child: CircleAvatar(
+                radius: 40,
+                backgroundImage: profileImageUrl != null
+                    ? NetworkImage(profileImageUrl!)
+                    : const AssetImage('assets/login/profile.png') as ImageProvider,
+                onBackgroundImageError: (_, __) {
+                  debugPrint("❌ Error loading profile image");
+                },
+              )
             ),
           ),
         ),

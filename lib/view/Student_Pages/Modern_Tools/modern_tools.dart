@@ -50,22 +50,6 @@ class _ModernToolsState extends State<ModernTools> {
           leading: Padding(
             padding: const EdgeInsets.only(left: 20),
             child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    offset: const Offset(0, 4),
-                    blurRadius: 8,
-                  ),
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    offset: const Offset(0, 0),
-                    blurRadius: 4,
-                  ),
-                ],
-              ),
               child: Center(
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back_ios_outlined,
@@ -86,31 +70,6 @@ class _ModernToolsState extends State<ModernTools> {
             ),
           ),
           centerTitle: true,
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 20),
-              child: Container(
-                height: 45,
-                width: 45,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
-                      offset: const Offset(0, 4),
-                      blurRadius: 8,
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    "assets/login/profile.jpeg",
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
-          ],
         ),
       ),
       body: Stack(
