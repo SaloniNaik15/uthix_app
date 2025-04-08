@@ -13,7 +13,7 @@ final List<Map<String, dynamic>> navStudItems = [
   {
     "icon": Icons.find_in_page,
     "title": "Find",
-    "page": UnderConstructionScreen()
+    "page": ECommerce()
   },
   {
     "icon": Icons.chat_outlined,

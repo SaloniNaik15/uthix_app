@@ -14,6 +14,7 @@ import 'package:uthix_app/view/Student_Pages/LMS/yourc_clasroom.dart';
 import 'package:uthix_app/view/Student_Pages/Modern_Tools/modern_tools.dart';
 import 'package:uthix_app/view/Student_Pages/Progress/progress_tracking.dart';
 
+import '../../Ecommerce/e_commerce.dart';
 import '../Student Account Details/Student_Profile.dart';
 import '../Student_Chat/stud_chat.dart';
 
@@ -248,7 +249,7 @@ class _HomePagesState extends State<HomePages> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => UnderConstructionScreen(),
+                              builder: (context) => BuyTextBooks(),
                             ),
                           );
                         } else if (dashBoard[index]["title"] == "MY CLASSES") {

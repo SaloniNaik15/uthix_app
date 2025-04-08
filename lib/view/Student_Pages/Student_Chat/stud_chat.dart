@@ -127,7 +127,7 @@ class _StudChatState extends State<StudChat> {
         Scaffold(
           backgroundColor: Colors.white,
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(80.h),
+            preferredSize: Size.fromHeight(70),
             child: AppBar(
               backgroundColor: const Color(0xFF2B5C74),
               elevation: 0,
@@ -150,7 +150,7 @@ class _StudChatState extends State<StudChat> {
             children: [
               Column(
                 children: [
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 30),
                   Expanded(
                     child: ListView.builder(
                       padding: EdgeInsets.zero,
@@ -187,8 +187,8 @@ class _StudChatState extends State<StudChat> {
                             child: Row(
                               children: [
                                 const SizedBox(
-                                  width: 60,
-                                  height: 60,
+                                  width: 50,
+                                  height: 50,
                                   child: CircleAvatar(
                                     backgroundImage: AssetImage("assets/login/profile.png"),
                                   ),
@@ -295,7 +295,7 @@ class _StudChatState extends State<StudChat> {
         ),
 
         Positioned(
-          top: 100,
+          top: 70,
           left: (MediaQuery.of(context).size.width - 80) / 2,
           child: Container(
             width: 80,
