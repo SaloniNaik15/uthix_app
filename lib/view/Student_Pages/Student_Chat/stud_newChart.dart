@@ -198,12 +198,13 @@ class _StudNewchartState extends State<StudNewchart> {
     return InkWell(
       onTap: () {
         int conversationId = user["id"]; // ✅ Pass as conversationId
+        String otherUserName=user["name"];
 
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) =>
-                StudPersonalchat(conversationId: conversationId),
+                StudPersonalchat(conversationId: conversationId,otherUserName: otherUserName,),
           ),
         );
       },

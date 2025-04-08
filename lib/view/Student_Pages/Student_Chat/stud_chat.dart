@@ -48,9 +48,10 @@ class _StudChatState extends State<StudChat> {
     String? imageFromPrefs = prefs.getString('student_profile_image_url');
 
     // Convert filename to full URL if needed
-    String? imageUrl = (imageFromPrefs != null && !imageFromPrefs.startsWith("http"))
-        ? "https://admin.uthix.com/storage/images/student/$imageFromPrefs"
-        : imageFromPrefs;
+    String? imageUrl =
+        (imageFromPrefs != null && !imageFromPrefs.startsWith("http"))
+            ? "https://admin.uthix.com/storage/images/student/$imageFromPrefs"
+            : imageFromPrefs;
 
     setState(() {
       accessLoginToken = token;
@@ -86,7 +87,8 @@ class _StudChatState extends State<StudChat> {
 
           var existingMessage = groupedMessages[otherUserId];
           if (existingMessage == null ||
-              DateTime.parse(message['created_at']).isAfter(DateTime.parse(existingMessage['created_at']))) {
+              DateTime.parse(message['created_at'])
+                  .isAfter(DateTime.parse(existingMessage['created_at']))) {
             groupedMessages[otherUserId] = message;
           }
         }
@@ -176,8 +178,10 @@ class _StudChatState extends State<StudChat> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    StudPersonalchat(conversationId: otherUser['id']),
+                                builder: (context) => StudPersonalchat(
+                                  conversationId: otherUser['id'],
+                                  otherUserName: otherUserName,
+                                ),
                               ),
                             );
                           },
@@ -190,13 +194,15 @@ class _StudChatState extends State<StudChat> {
                                   width: 50,
                                   height: 50,
                                   child: CircleAvatar(
-                                    backgroundImage: AssetImage("assets/login/profile.png"),
+                                    backgroundImage:
+                                        AssetImage("assets/login/profile.png"),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Row(
@@ -264,7 +270,8 @@ class _StudChatState extends State<StudChat> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const StudNewchart()),
+                      MaterialPageRoute(
+                          builder: (context) => const StudNewchart()),
                     );
                   },
                   child: Container(
@@ -286,14 +293,14 @@ class _StudChatState extends State<StudChat> {
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.chat_bubble, size: 30, color: Colors.white),
+                    child: const Icon(Icons.chat_bubble,
+                        size: 30, color: Colors.white),
                   ),
                 ),
               ),
             ],
           ),
         ),
-
         Positioned(
           top: 70,
           left: (MediaQuery.of(context).size.width - 80) / 2,
@@ -316,9 +323,11 @@ class _StudChatState extends State<StudChat> {
               child: CircleAvatar(
                 radius: 40,
                 backgroundColor: Colors.white,
-                backgroundImage: profileImageUrl != null && profileImageUrl!.isNotEmpty
-                    ? NetworkImage(profileImageUrl!)
-                    : const AssetImage('assets/login/profile.png') as ImageProvider,
+                backgroundImage:
+                    profileImageUrl != null && profileImageUrl!.isNotEmpty
+                        ? NetworkImage(profileImageUrl!)
+                        : const AssetImage('assets/login/profile.png')
+                            as ImageProvider,
                 onBackgroundImageError: (_, __) {
                   debugPrint("❌ Error loading profile image from cache");
                 },
@@ -326,7 +335,6 @@ class _StudChatState extends State<StudChat> {
             ),
           ),
         ),
-
       ],
     );
   }
