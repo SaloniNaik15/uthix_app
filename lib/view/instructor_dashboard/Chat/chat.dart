@@ -189,7 +189,7 @@ class _ChatState extends State<Chat> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => Personalchat(
-                                    conversationId: otherUser['id']),
+                                    conversationId: otherUser['id'],otherUserName:otherUser["name"]),
                               ),
                             );
                           },

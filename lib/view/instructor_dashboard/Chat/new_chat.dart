@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer';
 
 import 'package:uthix_app/view/Student_Pages/Student_Chat/stud_personalChat.dart';
+import 'package:uthix_app/view/instructor_dashboard/Chat/personal_chat.dart';
 
 class NewChat extends StatefulWidget {
   const NewChat({super.key});
@@ -197,13 +198,16 @@ class _NewChatState extends State<NewChat> {
   Widget _buildSuggestionItem(Map<String, dynamic> user) {
     return InkWell(
       onTap: () {
-        int conversationId = user["id"]; // ✅ Pass as conversationId
+        int conversationId = user["id"];
+        String otherUserName = user["name"];
 
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                StudPersonalchat(conversationId: conversationId),
+            builder: (context) => Personalchat(
+              conversationId: conversationId,
+              otherUserName: otherUserName,
+            ),
           ),
         );
       },

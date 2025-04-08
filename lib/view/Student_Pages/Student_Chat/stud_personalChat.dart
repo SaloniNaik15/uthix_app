@@ -6,10 +6,14 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StudPersonalchat extends StatefulWidget {
-  final int conversationId; // This is used as the receiver_id
+  final int conversationId;
+  final String otherUserName;
 
-  const StudPersonalchat({Key? key, required this.conversationId})
-      : super(key: key);
+  const StudPersonalchat({
+    Key? key,
+    required this.conversationId,
+    required this.otherUserName,
+  }) : super(key: key);
 
   @override
   State<StudPersonalchat> createState() => _StudPersonalchatState();
@@ -179,25 +183,29 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        children: [
-          // Header Section
-          Padding(
-            padding: const EdgeInsets.only(left: 10, right: 10, top: 10),
-            child: SizedBox(
-              height: 85,
-              child: Column(
-                children: [
-                  Row(children: [
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(85),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          flexibleSpace: Padding(
+            padding: const EdgeInsets.only(top: 40, left: 10, right: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, size: 25),
+                      icon: const Icon(Icons.arrow_back_ios,
+                          size: 25, color: Color.fromRGBO(43, 92, 116, 1)),
                       onPressed: () {
                         Navigator.pop(context);
                       },
                     ),
-                    const SizedBox(width: 15),
+                    const SizedBox(width: 10),
                     Text(
-                      "",
+                      widget.otherUserName,
                       style: GoogleFonts.urbanist(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -213,152 +221,169 @@ class _StudPersonalchatState extends State<StudPersonalchat> {
                         color: Color.fromRGBO(120, 170, 23, 1),
                       ),
                     ),
-                  ]),
-                  const SizedBox(height: 10),
-                  Text(
+                  ],
+                ),
+                Align(
+                  child: Text(
                     "Chat",
-                    style: GoogleFonts.urbanist(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: const Color.fromRGBO(43, 92, 116, 1),
+                      color: Color.fromRGBO(43, 92, 116, 1),
                     ),
+                    textAlign: TextAlign.center,
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: Stack(
+        children: [
+          // Background image with opacity
+          Opacity(
+            opacity: 0.30,
+            child: Image.asset(
+              "assets/registration/splash.png",
+              fit: BoxFit.cover,
+              height: double.infinity,
+              width: double.infinity,
             ),
           ),
           const Divider(
             thickness: 2,
             color: Color.fromRGBO(200, 209, 215, 1),
           ),
-          // Chat Message List
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : hasError
-                    ? const Center(child: Text("Failed to load conversation"))
-                    : ListView.builder(
-                        reverse: false, // Latest messages at bottom
-                        itemCount: _messages.length,
-                        itemBuilder: (context, index) {
-                          return MessageBubble(message: _messages[index]);
-                        },
-                      ),
-          ),
-          // Bottom Input Container
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            color: Colors.white,
-            child: Row(
-              children: [
-                // Icons container
-                Row(
+
+          // Foreground content
+          Column(
+            children: [
+              const SizedBox(height: 15),
+              Expanded(
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : hasError
+                        ? const Center(
+                            child: Text("Failed to load conversation"))
+                        : ListView.builder(
+                            reverse: false,
+                            itemCount: _messages.length,
+                            itemBuilder: (context, index) {
+                              return MessageBubble(message: _messages[index]);
+                            },
+                          ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                color: Colors.white
+                    .withOpacity(0.9), // slightly transparent input bar
+                child: Row(
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 1.0,
+                    Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.grey, width: 1.0),
+                          ),
+                          child: IconButton(
+                            icon: ShaderMask(
+                              shaderCallback: (Rect bounds) {
+                                return const LinearGradient(
+                                  colors: [
+                                    Color.fromRGBO(51, 152, 247, 1),
+                                    Color.fromRGBO(43, 92, 116, 1),
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ).createShader(bounds);
+                              },
+                              blendMode: BlendMode.srcIn,
+                              child: const Icon(Icons.add, size: 25),
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints:
+                                const BoxConstraints(minWidth: 0, minHeight: 0),
+                            onPressed: () {},
+                          ),
                         ),
-                      ),
-                      child: IconButton(
-                        icon: ShaderMask(
-                          shaderCallback: (Rect bounds) {
-                            return const LinearGradient(
-                              colors: [
-                                Color.fromRGBO(51, 152, 247, 1),
-                                Color.fromRGBO(43, 92, 116, 1),
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ).createShader(bounds);
-                          },
-                          blendMode: BlendMode.srcIn,
-                          child: const Icon(Icons.add, size: 25),
+                        const SizedBox(width: 8),
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.grey, width: 1.0),
+                          ),
+                          child: IconButton(
+                            icon: ShaderMask(
+                              shaderCallback: (Rect bounds) {
+                                return const LinearGradient(
+                                  colors: [
+                                    Color.fromRGBO(51, 152, 247, 1),
+                                    Color.fromRGBO(43, 92, 116, 1),
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ).createShader(bounds);
+                              },
+                              blendMode: BlendMode.srcIn,
+                              child: const Icon(Icons.mic, size: 25),
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints:
+                                const BoxConstraints(minWidth: 0, minHeight: 0),
+                            onPressed: () {},
+                          ),
                         ),
-                        padding: EdgeInsets.zero,
-                        constraints:
-                            const BoxConstraints(minWidth: 0, minHeight: 0),
-                        onPressed: () {},
+                      ],
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: _messageController,
+                        focusNode: _focusNode,
+                        decoration: InputDecoration(
+                          hintText: "Type a message...",
+                          hintStyle: GoogleFonts.urbanist(
+                              fontSize: 16, color: Colors.grey),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: const Color.fromRGBO(246, 246, 246, 1),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                        ),
+                        onSubmitted: (value) => _sendMessage(),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 1.0,
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: _sendMessage,
+                      child: Container(
+                        height: 50,
+                        width: 50,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [
+                              Color.fromRGBO(51, 152, 247, 1),
+                              Color.fromRGBO(43, 92, 116, 1),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
                         ),
-                      ),
-                      child: IconButton(
-                        icon: ShaderMask(
-                          shaderCallback: (Rect bounds) {
-                            return const LinearGradient(
-                              colors: [
-                                Color.fromRGBO(51, 152, 247, 1),
-                                Color.fromRGBO(43, 92, 116, 1),
-                              ],
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                            ).createShader(bounds);
-                          },
-                          blendMode: BlendMode.srcIn,
-                          child: const Icon(Icons.mic, size: 25),
-                        ),
-                        padding: EdgeInsets.zero,
-                        constraints:
-                            const BoxConstraints(minWidth: 0, minHeight: 0),
-                        onPressed: () {},
+                        padding: const EdgeInsets.all(10),
+                        child: const Icon(Icons.send, color: Colors.white),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    focusNode: _focusNode,
-                    decoration: InputDecoration(
-                      hintText: "Type a message...",
-                      hintStyle: GoogleFonts.urbanist(
-                          fontSize: 16, color: Colors.grey),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: BorderSide.none,
-                      ),
-                      filled: true,
-                      fillColor: const Color.fromRGBO(246, 246, 246, 1),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
-                    ),
-                    onSubmitted: (value) => _sendMessage(),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: _sendMessage,
-                  child: Container(
-                    height: 50,
-                    width: 50,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [
-                          Color.fromRGBO(51, 152, 247, 1),
-                          Color.fromRGBO(43, 92, 116, 1),
-                        ],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                    ),
-                    padding: const EdgeInsets.all(10),
-                    child: const Icon(Icons.send, color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
@@ -423,85 +448,87 @@ class MessageBubble extends StatelessWidget {
   const MessageBubble({Key? key, required this.message}) : super(key: key);
 
   @override
+  @override
   Widget build(BuildContext context) {
     bool isSender = message.isSender;
 
-    return Align(
-      alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
-      child: Row(
-        mainAxisAlignment:
-            isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
-        children: [
-          if (!isSender) // Show profile image only for received messages
-            ClipOval(
-              child: Image.asset(
-                'assets/login/profile.png',
-                height: 40,
-                width: 40,
-                fit: BoxFit.cover,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12), // <-- Added padding
+      child: Align(
+        alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
+        child: Row(
+          mainAxisAlignment:
+              isSender ? MainAxisAlignment.end : MainAxisAlignment.start,
+          children: [
+            if (!isSender) // Show profile image only for received messages
+              ClipOval(
+                child: Image.asset(
+                  'assets/login/profile.png',
+                  height: 40,
+                  width: 40,
+                  fit: BoxFit.cover,
+                ),
               ),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment:
+                  isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (!isSender)
+                      Text(
+                        message.receiverName.isNotEmpty
+                            ? message.receiverName
+                            : "Unknown",
+                        style: GoogleFonts.urbanist(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                    if (!isSender) const SizedBox(width: 5),
+                    Text(
+                      message.createdAt.contains('T')
+                          ? message.createdAt.split('T')[0]
+                          : message.createdAt,
+                      style: GoogleFonts.urbanist(
+                          fontSize: 10, color: Colors.grey),
+                    ),
+                    if (isSender) const SizedBox(width: 5),
+                    if (isSender)
+                      Text(
+                        'You',
+                        style: GoogleFonts.urbanist(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  margin: const EdgeInsets.symmetric(vertical: 5),
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(132, 162, 51, 1),
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Text(
+                    message.message,
+                    style: GoogleFonts.urbanist(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment:
-                isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (!isSender)
-                    Text(
-                      message.receiverName.isNotEmpty
-                          ? message.receiverName
-                          : "Unknown",
-                      style: GoogleFonts.urbanist(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
-                    ),
-                  if (!isSender) const SizedBox(width: 5),
-                  Text(
-                    message.createdAt.contains('T')
-                        ? message.createdAt.split('T')[0]
-                        : message.createdAt,
-                    style:
-                        GoogleFonts.urbanist(fontSize: 10, color: Colors.grey),
-                  ),
-                  if (isSender) const SizedBox(width: 5),
-                  if (isSender)
-                    Text(
-                      'You',
-                      style: GoogleFonts.urbanist(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                margin: const EdgeInsets.symmetric(vertical: 5),
-                decoration: BoxDecoration(
-                  color: isSender
-                      ? Colors.white
-                      : const Color.fromRGBO(132, 162, 51, 1),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Text(
-                  message.message,
-                  style: GoogleFonts.urbanist(
-                    fontSize: 16,
-                    color: isSender ? Colors.black : Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
