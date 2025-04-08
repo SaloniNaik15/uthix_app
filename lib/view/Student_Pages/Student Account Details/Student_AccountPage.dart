@@ -190,7 +190,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                   SizedBox(height: 10.h),
                   Container(
                     height: 130,
-                    width: 420,
+                    width: MediaQuery.sizeOf(context).width,
                     decoration: BoxDecoration(
                       color: const Color.fromRGBO(229, 243, 255, 1),
                     ),
@@ -227,7 +227,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                         ),
                         Positioned(
                           top: 0,
-                          left: 289,
+                          right: 0,
                           child: Transform.rotate(
                             angle: -1.12 * (3.14159 / 180),
                             child: Opacity(
