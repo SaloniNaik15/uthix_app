@@ -49,7 +49,7 @@ class _AddressScreenState extends State<AddressScreen> {
             child: Text(
               "My Addresses",
               style: TextStyle(fontSize: 22,
-                  fontFamily: "Urbanist",
+
                   fontWeight: FontWeight.bold),
             ),
           ),
@@ -67,7 +67,6 @@ class _AddressScreenState extends State<AddressScreen> {
                 "+Add New Address",
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: "Urbanist",
                   color: Color(0xFF2B5C74),
                   fontWeight: FontWeight.bold,
                 ),
@@ -91,7 +90,7 @@ class _AddressScreenState extends State<AddressScreen> {
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
                           address["type"]!,
-                          style: TextStyle(fontSize: 16, fontFamily: "Urbanist",fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
 
@@ -162,7 +161,7 @@ class _AddressScreenState extends State<AddressScreen> {
                                 side: BorderSide(color: Colors.grey),
                                 padding: EdgeInsets.symmetric(horizontal: 40),
                               ),
-                              child: Text("Remove", style: TextStyle(fontFamily: "Urbanist",color: Colors.black)),
+                              child: Text("Remove", style: TextStyle(color: Colors.black)),
                             ),
                           ],
                         ),

@@ -35,7 +35,7 @@ class _ManageYourAccountState extends State<YourAccount> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -43,11 +43,11 @@ class _ManageYourAccountState extends State<YourAccount> {
               "Your Account",
               style: TextStyle(
                 fontSize: 20,
-                fontFamily: "Urbanist",
+
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 50), // Space below title
+            const SizedBox(height: 40), // Space below title
             Container(
               decoration: BoxDecoration(
                   color: Color(0xFFF4F4F4),
@@ -163,7 +163,7 @@ class _ManageYourAccountState extends State<YourAccount> {
           fontSize: 16,
           color: Colors.black,
           fontWeight: FontWeight.w600,
-          fontFamily: "Urbanist",
+
         ),
       ),
       subtitle: subtitle.isNotEmpty
@@ -171,7 +171,7 @@ class _ManageYourAccountState extends State<YourAccount> {
           style: const TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.w500,
-            fontFamily: "Urbanist",
+
           ))
           : null,
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.black),

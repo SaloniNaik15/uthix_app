@@ -36,7 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               "Settings",
               style: TextStyle(
                 fontSize: 22,
-                fontFamily: "Urbanist",
+
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -51,11 +51,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: CheckboxListTile(
               title: const Text(
                 "Notifications",
-                style: TextStyle(fontSize: 16, fontFamily: "Urbanist",fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
               subtitle: const Text(
                 "This will not affect any order updates",
-                style: TextStyle(fontSize: 14, fontFamily: "Urbanist",fontWeight: FontWeight.w400),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
               ),
               value: isNotificationsEnabled,
               onChanged: (bool? newValue) {
@@ -76,11 +76,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: CheckboxListTile(
               title: const Text(
                 "Optimized Experience",
-                style: TextStyle(fontSize: 16,fontFamily: "Urbanist",fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 16,fontWeight: FontWeight.w600),
               ),
               subtitle: const Text(
                 "For optimized connection quality",
-                style: TextStyle(fontSize: 14,  fontFamily: "Urbanist",fontWeight: FontWeight.w400),
+                style: TextStyle(fontSize: 14,  fontWeight: FontWeight.w400),
               ),
               value: isOptimizedExperienceEnabled,
               onChanged: (bool? newValue) {

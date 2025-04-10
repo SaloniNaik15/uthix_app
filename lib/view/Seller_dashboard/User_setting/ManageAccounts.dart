@@ -9,7 +9,7 @@ class ManageAccountScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF605F5F)),
+          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -25,7 +25,6 @@ class ManageAccountScreen extends StatelessWidget {
                 "Manage your Account",
                 style: TextStyle(
                   fontSize: 20,
-                  fontFamily: "Urbanist",
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -40,7 +39,7 @@ class ManageAccountScreen extends StatelessWidget {
                 "Mahima Mandal",
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: "Urbanist",
+
                   fontWeight: FontWeight.bold,
                   color:  Color(0xFF2B5C74),
                 ),
@@ -48,7 +47,7 @@ class ManageAccountScreen extends StatelessWidget {
               const Text(
                 "Class X B\nDelhi Public School, New Delhi\n+91 XXXXXX XXXXX",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, fontFamily: "Urbanist",fontWeight: FontWeight.w400),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
               ),
               const SizedBox(height: 20),
 
@@ -70,9 +69,9 @@ class ManageAccountScreen extends StatelessWidget {
                       ),
                       child: Text(
                         "Add Account",
-                        style: TextStyle(color: Colors.black, fontFamily: "Urbanist",fontSize: 16),
+                        style: TextStyle(color: Colors.black, fontSize: 16),
                       ),
-                    ),
+                    )
                   ),
                 ],
               ),

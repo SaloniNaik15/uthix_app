@@ -144,8 +144,7 @@ class _CreateStoreState extends State<CreateStore> {
         title: const Text(
           "Create Store",
           style: TextStyle(
-            fontSize: 16,
-            fontFamily: 'Urbanist',
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Color(0xFF605F5F),
           ),
@@ -165,7 +164,6 @@ class _CreateStoreState extends State<CreateStore> {
                   "Hi Revantaha",
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Urbanist',
                     fontWeight: FontWeight.w500,
                     color: Color(0xFF605F5F),
                   ),
@@ -188,7 +186,6 @@ class _CreateStoreState extends State<CreateStore> {
                       "Create a New Store and Start Adding Books",
                       style: TextStyle(
                         fontSize: 16,
-                        fontFamily: 'Urbanist',
                         fontWeight: FontWeight.w500,
                         color: Colors.black,
                       ),
@@ -198,7 +195,7 @@ class _CreateStoreState extends State<CreateStore> {
                     _buildTextField(
                         "Store Name", "e.g., Class A", _storeNameController),
                     _buildTextField(
-                        "Address", "e.g., Class B", _addressController),
+                        "Address", "location", _addressController),
                     _buildTextField(
                         "School/University", "e.g., BHU", _schoolController),
                     _buildTextField(
@@ -266,7 +263,6 @@ class _CreateStoreState extends State<CreateStore> {
           label,
           style: const TextStyle(
             fontSize: 16,
-            fontFamily: 'Urbanist',
             fontWeight: FontWeight.w500,
             color: Color(0xFF605F5F),
           ),
@@ -282,7 +278,6 @@ class _CreateStoreState extends State<CreateStore> {
             fillColor: const Color(0xFFF6F6F6),
             hintText: hint,
             hintStyle: const TextStyle(
-              fontFamily: 'Urbanist',
               fontStyle: FontStyle.italic,
             ),
           ),
