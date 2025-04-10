@@ -30,7 +30,7 @@ class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
   Future<void> fetchOrders() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token =
-        prefs.getString('auth_token'); // ✅ Retrieve token dynamically
+        prefs.getString('auth_token');
 
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -53,7 +53,7 @@ class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
       if (response.statusCode == 200) {
         List fetchedOrders = response.data['orders'] ?? [];
 
-        // ✅ Sort orders by latest first (Descending order based on created_at)
+        //  Sort orders by latest first (Descending order based on created_at)
         fetchedOrders.sort((a, b) {
           DateTime dateA = DateTime.parse(a['created_at']);
           DateTime dateB = DateTime.parse(b['created_at']);
@@ -81,21 +81,22 @@ class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF605F5F)),
+          icon: const Icon(Icons.arrow_back_ios, size: 25,),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           "Orders and Tracking",
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Urbanist',
             fontWeight: FontWeight.bold,
-            color: Color(0xFF605F5F),
+            color: Colors.black
           ),
         ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+      ))
           : orders.isEmpty
               ? const Center(child: Text("No orders found."))
               : SingleChildScrollView(
@@ -202,10 +203,9 @@ class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        UnderConstructionScreen(),
-                                    // OrderProcessing(
-                                    //   orderId: order['id'],
-                                    // ),
+                                    OrderProcessing(
+                                      orderId: order['id'],
+                                    ),
                                   ),
                                 );
                               },
