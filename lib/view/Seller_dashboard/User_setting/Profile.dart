@@ -43,7 +43,7 @@ class _ManageProfileState extends State<Profile> {
     setState(() {
       email = prefs.getString("email") ?? "No Email Found";
       password = prefs.getString("password") ?? "No Password Found";
-      accessToken = prefs.getString("userToken") ?? "";
+      accessToken = prefs.getString("auth_token") ?? "";
     });
 
     log("Retrieved Email: $email");

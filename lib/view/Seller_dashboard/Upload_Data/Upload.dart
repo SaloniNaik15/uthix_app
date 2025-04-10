@@ -41,7 +41,7 @@ class _UploadDataState extends State<UploadData> {
 
       email = prefs.getString("email") ?? "No Email Found";
       password = prefs.getString("password") ?? "No Password Found";
-      accessToken = prefs.getString("userToken") ?? "No accessToken";
+      accessToken = prefs.getString("auth_token") ?? "No accessToken";
     });
 
     log(" Recived Selected Category: $selectedCategory");
@@ -183,8 +183,6 @@ class _UploadDataState extends State<UploadData> {
               ],
             ),
           ),
-
-          // Bottom Card with Camera & Gallery Buttons
           Positioned(
             bottom: 0,
             left: 0,
@@ -246,7 +244,6 @@ class _UploadDataState extends State<UploadData> {
   }
 }
 
-// Widget to display each step in the upload process
 Widget buildStep(
     {required String imagePath,
     required String title,
