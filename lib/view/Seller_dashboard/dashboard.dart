@@ -234,7 +234,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                     context,
                     'Create Store',
                     'assets/Seller_dashboard_images/create_store.png',
-                    UnderConstructionScreen(),
+                    CreateStore(),
                   ),
                   buildGridItem(
                     context,
@@ -242,19 +242,17 @@ class _SellerDashboardState extends State<SellerDashboard> {
                     'assets/Seller_dashboard_images/manage_stores.png',
                     ManageStoreData(),
                   ),
-                  Center(
-                    child: buildGridItem(
+                  buildGridItem(
                       context,
                       'My Profile',
                       'assets/Seller_dashboard_images/my_profile.png',
                       YourAccount(),
                     ),
-                  ),
+
                 ],
               ),
             ),
           ),
-          // Wrap the My Profile grid item in a Center widget
         ],
       ),
     );
@@ -297,7 +295,6 @@ class _SellerDashboardState extends State<SellerDashboard> {
                 "Orders",
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Urbanist',
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF605F5F),
                 ),

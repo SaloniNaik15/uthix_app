@@ -155,7 +155,6 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                 "Personal Details",
                 style: TextStyle(
                   fontSize: 20,
-                  fontFamily: 'Urbanist',
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
@@ -165,7 +164,6 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                 "Edit your Personal Details before uploading",
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Urbanist',
                   fontWeight: FontWeight.w400,
                   color: Colors.black,
                 ),
