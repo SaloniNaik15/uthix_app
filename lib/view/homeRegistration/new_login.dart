@@ -7,13 +7,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
 import 'package:uthix_app/view/homeRegistration/forgot1.dart';
 import 'package:uthix_app/view/homeRegistration/mailIdPage.dart';
-import 'package:uthix_app/view/homeRegistration/new_registration.dart';
 import 'package:uthix_app/view/homeRegistration/registration.dart';
-import 'package:uthix_app/view/homeRegistration/successfulregister.dart';
+// import 'package:uthix_app/view/homeRegistration/successfulregister.dart';
 
 import 'package:uthix_app/view/instructor_dashboard/panding.dart';
 
-import 'package:uthix_app/view/login/start_login.dart';
+// import 'package:uthix_app/view/login/start_login.dart';
 
 import '../Seller_dashboard/dashboard.dart';
 import '../Student_Pages/Student Account Details/Student_Profile.dart';

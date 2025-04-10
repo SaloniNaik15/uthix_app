@@ -5,8 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:uthix_app/view/homeRegistration/RoleSelection.dart';
 import 'package:uthix_app/view/homeRegistration/mailIdPage.dart';
 import 'package:uthix_app/view/homeRegistration/new_login.dart';
-import 'package:uthix_app/view/homeRegistration/successfulregister.dart';
-import 'package:uthix_app/view/login/start_login.dart';
+// import 'package:uthix_app/view/homeRegistration/successfulregister.dart';
+// import 'package:uthix_app/view/login/start_login.dart';
 
 import 'new_login.dart';
 

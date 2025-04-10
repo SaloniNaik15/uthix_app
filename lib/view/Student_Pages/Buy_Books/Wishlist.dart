@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../login/start_login.dart';
+// import '../../login/start_login.dart';
+import '../../homeRegistration/new_login.dart';
 import 'BookDetails.dart';
 import 'StudentCart.dart';
 
@@ -191,7 +192,7 @@ class _BookListState extends State<BookList> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => StartLogin()),
+      MaterialPageRoute(builder: (context) => NewLogin()),
     );
   }
 

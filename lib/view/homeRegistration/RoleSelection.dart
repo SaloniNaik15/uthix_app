@@ -79,9 +79,24 @@ class Roleselection extends StatelessWidget {
                         );
                       },
                     ),
+
                   ],
                 ),
-              )
+              ),
+              SizedBox(height: 20.h),
+               _buildOptionCard(
+                  imagePath: "assets/registration/Seller.png",
+                  label: "Vendor",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Mailidpage(role: "seller"),
+                      ),
+                    );
+                  },
+                ),
+
             ],
           ),
         ),
@@ -97,7 +112,7 @@ class Roleselection extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: 120.w,
-        padding: EdgeInsets.symmetric(vertical: 16.h),
+        padding: EdgeInsets.symmetric(vertical: 14.h),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12.r),
