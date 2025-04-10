@@ -3,7 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../login/start_login.dart';
+// import '../../login/start_login.dart';
+import '../../homeRegistration/new_login.dart';
 import 'Student_Add_Address.dart';
 
 class StudentAddress extends StatefulWidget {
@@ -88,7 +89,7 @@ class _StudentAddressState extends State<StudentAddress> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => StartLogin()),
+      MaterialPageRoute(builder: (context) => NewLogin()),
     );
   }
 

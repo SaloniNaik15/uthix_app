@@ -204,6 +204,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
           Expanded(
             child: Container(
               width: double.infinity,
+              height: double.infinity,
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('assets/instructor/background.png'),
@@ -211,38 +212,49 @@ class _SellerDashboardState extends State<SellerDashboard> {
                 ),
               ),
               child: GridView.count(
-                padding: const EdgeInsets.only(top: 60, left: 20, right: 20),
+                padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
                 crossAxisCount: 2,
                 crossAxisSpacing: 12.0,
                 mainAxisSpacing: 10.0,
                 childAspectRatio: 0.99,
                 children: [
-                  buildGridItem(context, 'Upload',
-                      'assets/Seller_dashboard_images/upload.png', null),
                   buildGridItem(
-                      context,
-                      'Inventory',
-                      'assets/Seller_dashboard_images/inventory.png',
-                      InventoryData()),
+                    context,
+                    'Upload',
+                    'assets/Seller_dashboard_images/upload.png',
+                    null,
+                  ),
                   buildGridItem(
-                      context,
-                      'Create Store',
-                      'assets/Seller_dashboard_images/create_store.png',
-                      UnderConstructionScreen()),
+                    context,
+                    'Inventory',
+                    'assets/Seller_dashboard_images/inventory.png',
+                    InventoryData(),
+                  ),
                   buildGridItem(
-                      context,
-                      'Manage Stores',
-                      'assets/Seller_dashboard_images/manage_stores.png',
-                      ManageStoreData()),
+                    context,
+                    'Create Store',
+                    'assets/Seller_dashboard_images/create_store.png',
+                    UnderConstructionScreen(),
+                  ),
                   buildGridItem(
+                    context,
+                    'Manage Stores',
+                    'assets/Seller_dashboard_images/manage_stores.png',
+                    ManageStoreData(),
+                  ),
+                  Center(
+                    child: buildGridItem(
                       context,
                       'My Profile',
                       'assets/Seller_dashboard_images/my_profile.png',
-                      YourAccount()),
+                      YourAccount(),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
+          // Wrap the My Profile grid item in a Center widget
         ],
       ),
     );

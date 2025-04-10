@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../login/start_login.dart';
+import '../../../Logout.dart';
+// import '../../login/start_login.dart';
 import 'FrequentlyAskedQuestions.dart';
 import 'HelpDesk.dart';
 import 'ManageAccounts.dart';
@@ -14,16 +15,7 @@ class YourAccount extends StatefulWidget {
   @override
   State<YourAccount> createState() => _ManageYourAccountState();
 }
-Future<void> logoutUser(BuildContext context) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.remove('auth_token');
-  await prefs.remove('user_role');
 
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => StartLogin()),
-  );
-}
 class _ManageYourAccountState extends State<YourAccount> {
   @override
   Widget build(BuildContext context) {
@@ -146,7 +138,6 @@ class _ManageYourAccountState extends State<YourAccount> {
                       "Log out",
                       style: TextStyle(
                           color: Colors.red,
-                          fontFamily: "Urbanist",
                           fontWeight: FontWeight.bold),
                     )),
               ),

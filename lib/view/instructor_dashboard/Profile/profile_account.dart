@@ -12,7 +12,7 @@ import 'package:uthix_app/view/instructor_dashboard/Profile/instructor_manage.da
 import 'package:uthix_app/view/instructor_dashboard/Profile/instructor_settings.dart';
 
 import '../../../Logout.dart';
-import '../../login/start_login.dart';
+// import '../../login/start_login.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
