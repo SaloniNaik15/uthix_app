@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// import '../../login/start_login.dart';
 import '../Student Account Details/Student_Add_Address.dart';
 
 class AddAddressScreen extends StatefulWidget {
@@ -15,6 +14,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   final Dio _dio = Dio();
   String _addressType = "Home";
   bool _isDefault = false;
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _altPhoneController = TextEditingController();
@@ -26,6 +26,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   final TextEditingController _streetController = TextEditingController();
 
   int? _userId;
+  String? _pinError; // To store pincode error message
 
   @override
   void initState() {
@@ -110,9 +111,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
           Navigator.pop(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text(
-                    "Failed to save address: ${response.data["message"]}")),
+            SnackBar(content: Text("Failed to save address: ${response.data["message"]}")),
           );
         }
       } else if (response.statusCode == 401) {
@@ -126,8 +125,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
           SnackBar(content: Text("Unexpected redirection. Try again later.")),
         );
       } else {
-        print(
-            "Unexpected error: ${response.statusCode}, Response: ${response.data}");
+        print("Unexpected error: ${response.statusCode}, Response: ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error: ${response.data.toString()}")),
         );
@@ -149,13 +147,32 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         final data = response.data;
         if (data != null && data["status"] == true) {
           setState(() {
+            _pinError = null; // Clear any previous error
             _cityController.text = data["city"] ?? "";
             _stateController.text = data["state"] ?? "";
           });
+        } else {
+          // The API indicates the pin is not valid
+          setState(() {
+            _pinError = "Incorrect pincode";
+            _cityController.text = "";
+            _stateController.text = "";
+          });
         }
+      } else {
+        setState(() {
+          _pinError = "Incorrect pincode";
+          _cityController.text = "";
+          _stateController.text = "";
+        });
       }
     } catch (e) {
       print("Error fetching city and state: $e");
+      setState(() {
+        _pinError = "Network error";
+        _cityController.text = "";
+        _stateController.text = "";
+      });
     }
   }
 
@@ -167,8 +184,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text("Add Address",
-            style: TextStyle(
-                fontSize: 22, fontWeight: FontWeight.bold)),
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, size: 20),
           onPressed: () => Navigator.pop(context),
@@ -183,19 +199,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               _buildTextField("Name*", controller: _nameController),
               SizedBox(height: 10),
               _buildTextField("Mobile Number*",
-                  keyboardType: TextInputType.phone,
-                  controller: _phoneController),
+                  keyboardType: TextInputType.phone, controller: _phoneController),
               SizedBox(height: 10),
               _buildTextField("Alternate Phone",
-                  keyboardType: TextInputType.phone,
-                  controller: _altPhoneController),
-              SizedBox(height: 10),
-              ListTile(
-                leading: Icon(Icons.my_location, size: 20),
-                title: Text("Use my current Location",
-                    style: TextStyle(fontSize: 14)),
-                onTap: () {},
-              ),
+                  keyboardType: TextInputType.phone, controller: _altPhoneController),
               SizedBox(height: 10),
               _buildTextField("Pin Code*",
                   keyboardType: TextInputType.number,
@@ -203,8 +210,14 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   onChanged: (value) {
                     if (value.length == 6) {
                       _fetchCityAndState(value);
+                    } else {
+                      // Clear error if not 6 digits
+                      setState(() {
+                        _pinError = null;
+                      });
                     }
-                  }),
+                  },
+                  errorText: _pinError),
               SizedBox(height: 10),
               _buildTextField("Address (House No, Building, Street, Area)*",
                   controller: _areaController,
@@ -222,12 +235,13 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               Row(
                 children: [
                   Expanded(
-                      child: _buildTextField("City / District*",
-                          controller: _cityController)),
+                    child: _buildTextField("City / District*",
+                        controller: _cityController),
+                  ),
                   SizedBox(width: 10),
                   Expanded(
-                      child: _buildTextField("State*",
-                          controller: _stateController)),
+                    child: _buildTextField("State*", controller: _stateController),
+                  ),
                 ],
               ),
               SizedBox(height: 10),
@@ -236,6 +250,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                 children: [
                   Expanded(
                     child: RadioListTile(
+                      activeColor: Color(0xFF2B5C74),
                       title: Text("Home",
                           style: TextStyle(color: Colors.black, fontSize: 14)),
                       value: "Home",
@@ -247,6 +262,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   ),
                   Expanded(
                     child: RadioListTile(
+                      activeColor: Color(0xFF2B5C74),
                       title: Text("Office",
                           style: TextStyle(color: Colors.black, fontSize: 14)),
                       value: "Office",
@@ -261,6 +277,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               ListTile(
                 leading: Checkbox(
                   value: _isDefault,
+                  activeColor: Color(0xFF2B5C74),
                   onChanged: (value) {
                     setState(() => _isDefault = value!);
                   },
@@ -278,7 +295,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         side: BorderSide(color: Colors.grey, width: 1),
                       ),
                       child: Text("Cancel",
-                          style: TextStyle(color: Colors.black, fontSize: 14)),
+                          style:
+                          TextStyle(color: Colors.black, fontSize: 14)),
                     ),
                   ),
                   SizedBox(width: 10),
@@ -305,20 +323,31 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         TextEditingController? controller,
         String? helperText,
         TextStyle? helperStyle,
-        Function(String)? onChanged}) {
+        Function(String)? onChanged,
+        String? errorText}) {
     return TextFormField(
       controller: controller,
       onChanged: onChanged,
       decoration: InputDecoration(
         labelText: label,
+        errorText: errorText,
         labelStyle: TextStyle(
           fontWeight: FontWeight.w400,
           fontSize: 14,
         ),
-        border: OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Color(0xFFD2D2D2), width: 1),
         ),
-        fillColor: Color(0xFFD2D2D2),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFF2B5C74), width: 1),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.red, width: 1),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Colors.red, width: 1),
+        ),
+        fillColor: Colors.white38,
         filled: label == "City / District*" || label == "State*" ? true : false,
         helperText: helperText,
         helperStyle: helperStyle,

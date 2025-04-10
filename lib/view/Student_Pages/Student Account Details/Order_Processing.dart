@@ -83,7 +83,9 @@ class _OrderProcessingState extends State<OrderProcessing> {
         ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+      ))
           : hasError || orderDetails == null
           ? const Center(
         child: Text("Failed to load order details."),

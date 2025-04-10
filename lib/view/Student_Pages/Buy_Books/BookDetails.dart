@@ -63,7 +63,9 @@ class _BookdetailsState extends State<Bookdetails> {
             future: productFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+                ));
               } else if (snapshot.hasError) {
                 return Center(
                   child: Text(
