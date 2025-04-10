@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer';
@@ -29,6 +30,7 @@ class _InventoryDataState extends State<InventoryData> {
     'Lab Equipment',
     'Book Marks'
   ];
+  String selectedFilter = 'All'; // Put this in your state
 
   @override
   void initState() {
@@ -235,8 +237,8 @@ class _InventoryDataState extends State<InventoryData> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
+            children: [
+              const Text(
                 "My Catalogue",
                 style: TextStyle(
                   fontSize: 20,
@@ -245,10 +247,10 @@ class _InventoryDataState extends State<InventoryData> {
                   color: Colors.black,
                 ),
               ),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               Text(
-                '200 Items',
-                style: TextStyle(
+                "Total Products: ${products.length}",
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w300,
                   color: Colors.black87,
@@ -267,6 +269,12 @@ class _InventoryDataState extends State<InventoryData> {
               thickness: 1,
             ),
             const SizedBox(height: 15),
+            buildFilterChips(filters, selectedFilter, (filter) {
+              setState(() {
+                selectedFilter = filter;
+              });
+              print("Selected: $filter");
+            }),
             // Filters and other UI components
 
             // Display products once fetched
@@ -321,149 +329,181 @@ class BookList extends StatelessWidget {
           itemCount: products.length,
           itemBuilder: (context, index) {
             final product = products[index];
-
-            return GestureDetector(
-              onTap: () {
-                print('Tapped on: ${product['title']}');
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Image Card with Rating (Optional, based on your API data)
-                  Container(
-                    padding: const EdgeInsets.all(10.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          color: Colors.grey.withOpacity(0.5), width: 2),
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 4,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: Stack(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: product['thumbnail_img'] != null &&
-                                  product['thumbnail_img'].isNotEmpty
-                              ? (product['thumbnail_img'].startsWith("/") ||
-                                      product['thumbnail_img']
-                                          .contains("data/user"))
-                                  // ✅ Local Image
-                                  ? Image.file(
-                                      File(product['thumbnail_img']),
-                                      height: 160,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) => Icon(
-                                        Icons.image_not_supported,
-                                        size: 50,
-                                        color: Colors.grey,
-                                      ),
-                                    )
-                                  // ✅ Server Image
-                                  : Image.network(
-                                      product['thumbnail_img']
-                                              .startsWith("http")
-                                          ? product['thumbnail_img']
-                                          : "https://admin.uthix.com/uploads/${product['thumbnail_img']}",
-                                      height: 160,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                      loadingBuilder:
-                                          (context, child, loadingProgress) {
-                                        if (loadingProgress == null)
-                                          return child;
-                                        return Center(
-                                            child: CircularProgressIndicator());
-                                      },
-                                      errorBuilder:
-                                          (context, error, stackTrace) => Icon(
-                                        Icons.image_not_supported,
-                                        size: 50,
-                                        color: Colors.grey,
-                                      ),
-                                    )
-                              // ✅ Placeholder if no image
-                              : Icon(
-                                  Icons.image,
-                                  size: 50,
-                                  color: Colors.grey,
-                                ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // Book Title
-                  Container(
-                    height: 40,
-                    child: Text(
-                      product['title'] ?? 'No title',
-                      textAlign: TextAlign.left,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontFamily: 'Urbanist',
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 2,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // Book Price
-                  Text(
-                    '\$${product['price'] ?? '0'}',
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontFamily: 'Urbanist',
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // View Details Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () async {
-                        // ✅ Make it async
-
-                        log("📖 Title: ${latestBookTitle} (${latestBookTitle.runtimeType})");
-                        log("🆔 Product ID: ${latestProductId} (${latestProductId.runtimeType})");
-
-                        if (latestProductId != null) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Viewdetails(
-                                productTitle:
-                                    latestBookTitle ?? "Unknown Title",
-                                productId: latestProductId?.toString() ??
-                                    "N/A", // Convert to String
-                              ),
-                            ),
-                          );
-                        } else {
-                          log("❌ Could not fetch latest Product ID");
-                        }
-                      },
-                      icon: Icon(Icons.info),
-                      label: Text("View Details"),
-                    ),
-                  ),
-                ],
-              ),
-            );
+            return buildProductCard(context, product);
           },
         ),
       ),
     );
   }
+
+  Widget buildProductCard(BuildContext context, Map<String, dynamic> product) {
+    return GestureDetector(
+      onTap: () {
+        print('Tapped on: ${product['title']}');
+      },
+      child: Container(
+        height: 400.h,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: EdgeInsets.all(5.w),
+              decoration: BoxDecoration(
+                border:
+                    Border.all(color: Colors.grey.withOpacity(0.5), width: 2.w),
+                borderRadius: BorderRadius.circular(10.r),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4.r,
+                    spreadRadius: 2.r,
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.r),
+                child: product['thumbnail_img'] != null &&
+                        product['thumbnail_img'].isNotEmpty
+                    ? (product['thumbnail_img'].startsWith("/") ||
+                            product['thumbnail_img'].contains("data/user"))
+                        ? Image.file(
+                            File(product['thumbnail_img']),
+                            height: 160.h,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.image_not_supported,
+                              size: 50.sp,
+                              color: Colors.grey,
+                            ),
+                          )
+                        : Image.network(
+                            product['thumbnail_img'].startsWith("http")
+                                ? product['thumbnail_img']
+                                : "https://admin.uthix.com/uploads/${product['thumbnail_img']}",
+                            height: 160.h,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, progress) =>
+                                progress == null
+                                    ? child
+                                    : Center(
+                                        child: CircularProgressIndicator()),
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.image_not_supported,
+                              size: 50.sp,
+                              color: Colors.grey,
+                            ),
+                          )
+                    : Icon(Icons.image, size: 50.sp, color: Colors.grey),
+              ),
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(top: 8.h),
+              child: Text(
+                product['title'] ?? 'No title',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+
+            Padding(
+              padding: EdgeInsets.only(top: 6.h),
+              child: Text(
+                '\$${product['price'] ?? '0'}',
+                style: TextStyle(
+                  fontSize: 12.sp,
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+
+            // 📎 View Details Button
+            const SizedBox(
+              height: 3,
+            ),
+            OutlinedButton.icon(
+              onPressed: () {
+                if (product['id'] != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Viewdetails(
+                        productTitle: product['title'] ?? "Unknown Title",
+                        productId: product['id'].toString(),
+                      ),
+                    ),
+                  );
+                } else {
+                  log("❌ Could not fetch product ID");
+                }
+              },
+              icon: Icon(Icons.info, size: 16.sp, color: Colors.black),
+              label: Text(
+                "View Details",
+                style: TextStyle(fontSize: 12.sp, color: Colors.black),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+Widget buildFilterChips(List<String> filters, String selectedFilter,
+    Function(String) onFilterSelected) {
+  return SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: Row(
+      children: filters.map((filter) {
+        final isSelected = filter == selectedFilter;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+          child: GestureDetector(
+            onTap: () => onFilterSelected(filter),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? const Color.fromRGBO(43, 96, 116, 1)
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isSelected
+                      ? const Color.fromRGBO(43, 96, 116, 1)
+                      : Colors.grey.shade300,
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Text(
+                filter,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: isSelected ? Colors.white : Colors.black87,
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    ),
+  );
 }

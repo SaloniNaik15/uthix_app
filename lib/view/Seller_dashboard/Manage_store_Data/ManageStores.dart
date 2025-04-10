@@ -63,8 +63,8 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                const ManageOrders()), // Replace OrderPage with your actual page
+                          builder: (context) => const ManageOrders(),
+                        ),
                       ),
                       child:
                           Image.asset("assets/icons/orderIcon.png", height: 35),
@@ -229,8 +229,7 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                         ),
                         child: const Center(
                           child: Column(
-                            mainAxisSize:
-                                MainAxisSize.min, // Keeps content centered
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 "Visitors",
@@ -239,9 +238,9 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                                     fontFamily: 'Urbanist',
                                     fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 5), // Spacing between texts
+                              SizedBox(height: 5),
                               Text(
-                                "3.1k", // Example count (replace with dynamic value)
+                                "3.1k",
                                 style: TextStyle(
                                     fontSize: 16,
                                     fontFamily: 'Urbanist',
@@ -335,13 +334,10 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                       ),
                     ),
                     child: const Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 15), // Adds padding inside the Card
+                      padding: EdgeInsets.symmetric(horizontal: 15),
                       child: Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween, // Spaces elements
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Start Text
                           Text(
                             "Low Stock Items",
                             style: TextStyle(
@@ -349,8 +345,6 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                                 fontFamily: 'Urbanist',
                                 fontWeight: FontWeight.bold),
                           ),
-
-                          // End Texts
                           Text(
                             "20",
                             style: TextStyle(

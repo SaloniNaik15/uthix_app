@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
@@ -42,7 +43,6 @@ class _CreateStoreState extends State<CreateStore> {
         _selectedImage = File(pickedFile.path);
       });
 
-      // Save the image path in SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString("logo", pickedFile.path);
 
@@ -50,8 +50,7 @@ class _CreateStoreState extends State<CreateStore> {
     }
   }
 
-  /// Saves the store data locally AND calls the API to create the store.
-  /// This API call uses Dio with a dynamic authentication token.
+  /// Uploads store data with logo to the backend
   Future<void> _createStore() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -63,28 +62,29 @@ class _CreateStoreState extends State<CreateStore> {
       "school": _schoolController.text,
     };
 
-    // Create a FormData object. If a logo is selected, attach it.
+    // Create FormData and attach the image if selected
     FormData formData = FormData.fromMap(storeData);
+
     if (_selectedImage != null && await _selectedImage!.exists()) {
       formData.files.add(MapEntry(
         "logo",
         await MultipartFile.fromFile(
           _selectedImage!.path,
           filename: p.basename(_selectedImage!.path),
+          contentType: MediaType("image", "jpeg"), // You can make this dynamic
         ),
       ));
-      // Also add the image path to the store data if needed locally.
-      storeData["logo"] = _selectedImage!.path;
     } else {
+      // Optional: Only if backend allows empty field
       formData.fields.add(MapEntry("logo", ""));
     }
 
-    // Save store data locally for later use if needed.
+    // Save the raw store data locally
     String jsonData = json.encode(storeData);
     await prefs.setString("storeData", jsonData);
     log("Stored Data: $jsonData");
 
-    // Retrieve dynamic authentication token
+    // Fetch authentication token
     String? token = prefs.getString("auth_token");
     if (token == null || token.isEmpty) {
       log("⚠️ Authentication token is missing.");
@@ -96,34 +96,35 @@ class _CreateStoreState extends State<CreateStore> {
     }
 
     try {
-      // Create Dio instance and call the API. Adjust the endpoint as needed.
       Dio dio = Dio();
       Response response = await dio.post(
-        "https://admin.uthix.com/api/vendor-store",
+        "https://admin.uthix.com/api/vendor-store", // Replace with your endpoint
         data: formData,
         options: Options(
           headers: {
-            "Authorization": "Bearer $token", // Dynamic token
+            "Authorization": "Bearer $token",
             "Content-Type": "multipart/form-data",
           },
         ),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        log("Store created successfully: ${response.data}");
-        // Navigate to Personal Details screen upon successful creation.
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PersonalDetails()),
-        );
+        log("✅ Store created successfully: ${response.data}");
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => PersonalDetails()));
       } else {
-        log("Store creation failed: ${response.statusCode}, ${response.data}");
+        log("❌ Store creation failed: ${response.statusCode}, ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Failed to create store: ${response.data}")),
         );
       }
     } catch (e) {
-      log("Error creating store: $e");
+      if (e is DioException && e.response != null) {
+        log("❌ Dio error: ${e.response?.statusCode} - ${e.response?.data}");
+      } else {
+        log("❌ Unexpected error: $e");
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Network error. Please try again. Error: $e")),
       );

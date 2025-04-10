@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../UpcomingPage.dart';
@@ -65,7 +66,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? savedEmail = prefs.getString("email");
     String? savedPassword = prefs.getString("password");
-    String? savedaccessToken = prefs.getString("userToken");
+    String? savedaccessToken = prefs.getString("auth_token");
 
     log("Retrieved Email: $savedEmail");
     log("Retrieved Password: $savedPassword");
@@ -234,7 +235,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                     context,
                     'Create Store',
                     'assets/Seller_dashboard_images/create_store.png',
-                    UnderConstructionScreen(),
+                    CreateStore(),
                   ),
                   buildGridItem(
                     context,
@@ -242,13 +243,11 @@ class _SellerDashboardState extends State<SellerDashboard> {
                     'assets/Seller_dashboard_images/manage_stores.png',
                     ManageStoreData(),
                   ),
-                  Center(
-                    child: buildGridItem(
-                      context,
-                      'My Profile',
-                      'assets/Seller_dashboard_images/my_profile.png',
-                      YourAccount(),
-                    ),
+                  buildGridItem(
+                    context,
+                    'My Profile',
+                    'assets/Seller_dashboard_images/my_profile.png',
+                    YourAccount(),
                   ),
                 ],
               ),
@@ -372,9 +371,10 @@ class _SellerDashboardState extends State<SellerDashboard> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setDialogState) {
             return AlertDialog(
+              backgroundColor: Colors.white,
               title: const Text("Select a Category"),
               content: SizedBox(
-                width: double.maxFinite, // Ensures dialog width is adaptive
+                width: double.maxFinite,
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -435,11 +435,8 @@ class _SellerDashboardState extends State<SellerDashboard> {
       return;
     }
 
-    // Delay the dialog to be shown after the current frame is completed
-    // Delay the dialog to be shown after the current frame is completed
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!context.mounted)
-        return; // Ensure the widget is still part of the tree
+      if (!context.mounted) return;
 
       showDialog(
         context: context,
@@ -447,6 +444,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
           return StatefulBuilder(
             builder: (BuildContext dialogContext, StateSetter setDialogState) {
               return AlertDialog(
+                backgroundColor: Colors.white,
                 title: Text("Select a Subcategory for $parentName"),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
