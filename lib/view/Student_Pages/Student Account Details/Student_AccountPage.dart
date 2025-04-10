@@ -20,6 +20,7 @@ import '../BuyPlans/buyplans.dart';
 import '../BuyPlans/viewsubscriptiondetails.dart';
 import '../Buy_Books/Coupons.dart';
 import '../Buy_Books/Wishlist.dart';
+import 'Order_Processing.dart';
 import 'Order_Tracking.dart';
 import 'Student_Address.dart';
 import 'Student_FAQ.dart';
@@ -265,11 +266,11 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                             childAspectRatio: 3.5,
                             children: [
                               _buildGridItem(Icons.inventory_2_outlined,
-                                  "Orders", context, UnderConstructionScreen()),
+                                  "Orders", context, OrdersTrackingPage()),
                               _buildGridItem(Icons.local_offer_outlined,
                                   "Coupons", context, CouponsScreen()),
                               _buildGridItem(Icons.favorite_border, "Wishlist",
-                                  context, UnderConstructionScreen()),
+                                  context, Wishlist()),
                               _buildGridItem(Icons.person_outline, "Profile",
                                   context, StudentProfile()),
                             ],
@@ -299,7 +300,7 @@ class _StudentAccountPagesState extends State<StudentAccountPages> {
                                 icon: Icons.location_on_outlined,
                                 title: "My Addresses",
                                 subtitle: "Add or edit your addresses",
-                                navigateTo: UnderConstructionScreen(),
+                                navigateTo: StudentAddress(address: {},),
                                 context: context,
                               ),
                               const Divider(height: 1),
