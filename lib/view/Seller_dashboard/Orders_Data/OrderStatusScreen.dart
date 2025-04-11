@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'Pending.dart'; // ← make sure this is imported
+import 'Pending.dart';
 
-class OrderStatusScreen extends StatelessWidget {
+class OrderStatusScreen extends StatefulWidget {
   final String statusMessage;
   final Color iconCircleColor;
   final IconData statusIcon;
@@ -15,6 +15,28 @@ class OrderStatusScreen extends StatelessWidget {
     required this.statusIcon,
     this.showButtons = false,
   });
+
+  @override
+  State<OrderStatusScreen> createState() => _OrderStatusScreenState();
+}
+
+class _OrderStatusScreenState extends State<OrderStatusScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    // Auto-navigate after 3 seconds if showButtons is false
+    if (!widget.showButtons) {
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const Pending()),
+          );
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,18 +55,18 @@ class OrderStatusScreen extends StatelessWidget {
                     height: 80,
                     width: 80,
                     decoration: BoxDecoration(
-                      color: iconCircleColor,
+                      color: widget.iconCircleColor,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      statusIcon,
+                      widget.statusIcon,
                       color: Colors.white,
                       size: 49,
                     ),
                   ),
                   const SizedBox(height: 30),
                   Text(
-                    statusMessage,
+                    widget.statusMessage,
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -54,8 +76,8 @@ class OrderStatusScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 30),
 
-                  // 👇 Show buttons only if showButtons is true
-                  if (showButtons)
+                  // Only show buttons if specified
+                  if (widget.showButtons)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
