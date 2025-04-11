@@ -59,7 +59,7 @@ class _ManageYourAccountState extends State<YourAccount> {
                     icon: Icons.person_outline,
                     title: "Profile",
                     subtitle: "",
-                    navigateTo: Profile(),
+                    navigateTo: ProfileScreen(),
                     context: context
                   ),
                   const Divider(
@@ -70,16 +70,6 @@ class _ManageYourAccountState extends State<YourAccount> {
                     title: "Help Desk",
                     subtitle: "Connect with us",
                     navigateTo: HelpDesk(),
-                    context: context,
-                  ),
-                  const Divider(
-                    height: 1,
-                  ),
-                  _buildListTile(
-                    icon: Icons.location_on_outlined,
-                    title: "My Addresses",
-                    subtitle: "Add or edit your addresses",
-                    navigateTo: AddressScreen(),
                     context: context,
                   ),
                   const Divider(

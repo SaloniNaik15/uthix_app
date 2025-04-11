@@ -1,139 +1,146 @@
-import 'dart:convert';
-import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Profile extends StatefulWidget {
-  const Profile({super.key});
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
 
   @override
-  State<Profile> createState() => _ManageProfileState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ManageProfileState extends State<Profile> {
+class _ProfileScreenState extends State<ProfileScreen> {
   final String apiUrl = "https://admin.uthix.com/api/vendor/profile";
-  Map<String, dynamic> profileData = {};
+  int? vendorId;
+  int? userId;
   bool isLoading = true;
-  String? email;
-  String? password;
-  String? accessToken;
+  String? token;
+
+  // Controllers for input fields
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController genderController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+
+  String? image;
 
   @override
   void initState() {
     super.initState();
-    _initializeData();
+    _loadAuthTokenAndFetchData();
   }
 
-  Future<void> _initializeData() async {
-    await _loadUserCredentials();
-    if (accessToken != null && accessToken!.isNotEmpty) {
-      fetchProfileData();
+  Future<void> _loadAuthTokenAndFetchData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    token = prefs.getString("auth_token");
+    debugPrint("[log] Retrieved Token: $token");
+
+    if (token != null && token!.isNotEmpty) {
+      await fetchProfileData();
     } else {
-      log("Access token is missing, skipping API call");
+      setState(() => isLoading = false);
+      debugPrint("Token is missing.");
+    }
+  }
+  Future<void> fetchProfileData() async {
+    try {
+      final dio = Dio();
+      final response = await dio.get(
+        apiUrl,
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data['data'];
+        final user = data['user'];
+
+        setState(() {
+          vendorId = data['id'];
+          userId = data['user_id'];
+          nameController.text = user['name'] ?? "";
+          emailController.text = user['email'] ?? "";
+          phoneController.text = user['phone']?.toString() ?? "";
+          genderController.text = data['gender'] ?? "";
+          addressController.text = data['store_address'] ?? "";
+          image = user['image'];
+          isLoading = false;
+        });
+      } else {
+        debugPrint("API error: ${response.statusCode}");
+        setState(() => isLoading = false);
+      }
+    } catch (e) {
+      debugPrint("Error fetching profile: $e");
       setState(() => isLoading = false);
     }
   }
 
-  Future<void> _loadUserCredentials() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    if (!mounted) return;
-
-    setState(() {
-      email = prefs.getString("email") ?? "No Email Found";
-      password = prefs.getString("password") ?? "No Password Found";
-      accessToken = prefs.getString("auth_token") ?? "";
-    });
-
-    log("Retrieved Email: $email");
-    log("Retrieved Password: $password");
-    log("Retrieved Access Token: $accessToken");
-  }
-
-  Future<void> fetchProfileData() async {
-    if (accessToken == null || accessToken!.isEmpty) {
-      log("Cannot fetch profile data: Access token is missing");
-      return;
-    }
-
+  Future<void> updateProfileData() async {
     try {
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: {
-          "Authorization": "Bearer $accessToken",
-          "Content-Type": "application/json",
+      final dio = Dio();
+      final response = await dio.post(
+        apiUrl,
+        data: {
+          "id": vendorId,
+          "user_id": userId,
+          "name": nameController.text,
+          "email": emailController.text,
+          "phone": phoneController.text,
+          "gender": genderController.text,
+          "store_address": addressController.text,
         },
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Content-Type": "application/json",
+          },
+        ),
       );
 
-      if (!mounted) return;
-
-      log("API Response Code: ${response.statusCode}");
-      log("API Response Body: ${response.body}");
-
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          profileData = data["data"];
-          isLoading = false;
-        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Profile updated successfully")),
+        );
+        await fetchProfileData(); // Refresh the updated values
       } else {
-        log("Error: ${response.statusCode} - ${response.body}");
+        debugPrint("Update failed: ${response.statusCode}");
       }
     } catch (e) {
-      log("Error fetching data: $e");
+      debugPrint("Error updating profile: $e");
     }
   }
 
-  Future<void> updateProfile(String field, String value) async {
-    log("🛠️ Sending Update Request...");
-
-    final Map<String, dynamic> requestData = {
-      "id": profileData["id"],
-      "user_id": profileData["user_id"],
-      "name": profileData["name"],
-      "mobile": profileData["mobile"],
-      "gender": profileData["gender"],
-      "dob": profileData["dob"],
-      "address": profileData["address"],
-      "store_name": profileData["store_name"],
-      "store_address": profileData["store_address"],
-      "logo": profileData["logo"],
-      "school": profileData["school"],
-      "counter": profileData["counter"],
-      "status": profileData["status"],
-      "isApproved": profileData["isApproved"],
-      "created_at": profileData["created_at"],
-      "updated_at": DateTime.now().toIso8601String(),
-      field: value, // Field to update
-    };
-
-    log("📌 Request Data: ${json.encode(requestData)}");
-
-    try {
-      final response = await http.put(
-        Uri.parse(""), // Ensure ID is included
-        headers: {
-          "Authorization": "Bearer $accessToken",
-          "Content-Type": "application/json",
-        },
-        body: json.encode(requestData),
-      );
-
-      log("📥 Response Status Code: ${response.statusCode}");
-      log("📜 Response Body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        log("✅ Profile Updated Successfully: $field -> $value");
-
-        // Refresh profile data after update
-        await fetchProfileData();
-      } else {
-        log("⚠️ Profile update failed: ${response.statusCode} - ${response.body}");
-      }
-    } catch (e) {
-      log("❌ Error updating profile: $e");
-    }
+  Widget buildTextField(String label, IconData icon, TextEditingController controller, {required bool readOnly}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F1F1),
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.grey[700]),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextFormField(
+              controller: controller,
+              readOnly: readOnly,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                hintText: label,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -141,269 +148,79 @@ class _ManageProfileState extends State<Profile> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Color(0xFF2B5C74),
+        backgroundColor: const Color(0xFF2B5C74),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_outlined, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
         title: const Text(
           "Profile",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 25,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.bold),
         ),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(
-                      'assets/Seller_dashboard_images/ManageStoreBackground.png'),
-                  fit: BoxFit.cover,
+          : Column(
+        children: [
+          const SizedBox(height: 20),
+          Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundImage: image != null
+                    ? NetworkImage("https://admin.uthix.com/storage/images/user/$image")
+                    : const AssetImage("assets/icons/profile.png") as ImageProvider,
+              ),
+              Positioned(
+                bottom: 0,
+                right: 4,
+                child: CircleAvatar(
+                  radius: 15,
+                  backgroundColor: Colors.white,
+                  child: const Icon(Icons.camera_alt, size: 16, color: Colors.blue),
                 ),
               ),
-              child: Column(
-                children: [
-                  Stack(
-                    children: [
-                      ColoredBox(
-                        color: Color(0xFF2B5C74),
-                        child: SizedBox(
-                          height: 40,
-                          width: MediaQuery.sizeOf(context).width,
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Stack(
-                          children: [
-                            Container(
-                              width: 100,
-                              height: 100,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  colors: [Colors.white, Colors.blue],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                              ),
-                              child: CircleAvatar(
-                                radius: 50,
-                                backgroundColor: Colors.transparent,
-                                child: CircleAvatar(
-                                    radius: 45,
-                                    backgroundImage:
-                                        AssetImage("assets/icons/profile.png")),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: -1,
-                              right: -1,
-                              child: CircleAvatar(
-                                backgroundColor: Colors.white,
-                                radius: 18,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.blue,
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 4,
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Icon(
-                                    Icons.camera_alt,
-                                    color: Colors.white,
-                                    size: 22,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    profileData["name"] ?? "User",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: ListView(
-                        children: [
-                          ProfileField(
-                            icon: Icons.email,
-                            label: "Email",
-                            hint: "Enter your email",
-                            initialValue: email ?? "",
-                            onSave: (value) => updateProfile("email", value),
-                          ),
-                          ProfileField(
-                            icon: Icons.lock,
-                            label: "Password",
-                            hint: "Enter your password",
-                            initialValue: password ?? "",
-                            isPassword: true,
-                            onSave: (value) => updateProfile("password", value),
-                          ),
-                          ProfileField(
-                            icon: Icons.person,
-                            label: "Name",
-                            hint: "Enter your name",
-                            initialValue: profileData["name"] ?? "",
-                            onSave: (value) => updateProfile("name", value),
-                          ),
-                          ProfileField(
-                            icon: Icons.phone,
-                            label: "Phone",
-                            hint: "Enter your phone number",
-                            initialValue: profileData["mobile"] ?? "",
-                            onSave: (value) => updateProfile("mobile", value),
-                          ),
-                          ProfileField(
-                            icon: Icons.male,
-                            label: "Gender",
-                            hint: "Select your gender",
-                            initialValue: profileData["gender"] ?? "",
-                            onSave: (value) => updateProfile("gender", value),
-                          ),
-                          ProfileField(
-                            icon: Icons.location_on,
-                            label: "Current Address",
-                            hint: "Enter your current address",
-                            initialValue: profileData["address"] ?? "",
-                            onSave: (value) => updateProfile("address", value),
-                          ),
-                          ProfileField(
-                            icon: Icons.school,
-                            label: "University",
-                            hint: "Enter your university",
-                            initialValue: profileData["school"] ?? "",
-                            onSave: (value) => updateProfile("school", value),
-                          ),
-                          ProfileField(
-                            icon: Icons.location_on,
-                            label: "Permanent Address",
-                            hint: "Enter your permanent address",
-                            initialValue: profileData["store_address"] ?? "",
-                            onSave: (value) =>
-                                updateProfile("store_address", value),
-                          ),
-                          ProfileField(
-                            icon: Icons.school,
-                            label: "Student ID",
-                            hint: "Enter your student ID",
-                            initialValue: profileData["user_id"].toString(),
-                            onSave: (value) => updateProfile("user_id", value),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            "${nameController.text} (You)",
+            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              children: [
+                buildTextField("Name", Icons.person, nameController, readOnly: false),
+                buildTextField("Phone", Icons.phone, phoneController, readOnly: false),
+                buildTextField("Email", Icons.email, emailController, readOnly: true),
+                buildTextField("Gender", Icons.male, genderController, readOnly: false),
+                buildTextField("Store Address", Icons.location_on, addressController, readOnly: false),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: ElevatedButton(
+              onPressed: updateProfileData,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2B5C74),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: const Text(
+                "Update Profile",
+                style: TextStyle(fontSize: 16, color: Colors.white),
               ),
             ),
-    );
-  }
-}
-
-class ProfileField extends StatefulWidget {
-  final IconData icon;
-  final String label;
-  final String hint;
-  final String? initialValue;
-  final bool isPassword;
-  final Function(String) onSave; // Callback for saving changes
-
-  ProfileField({
-    required this.icon,
-    required this.label,
-    required this.hint,
-    this.initialValue,
-    this.isPassword = false,
-    required this.onSave,
-  });
-
-  @override
-  _ProfileFieldState createState() => _ProfileFieldState();
-}
-
-class _ProfileFieldState extends State<ProfileField> {
-  late TextEditingController controller;
-  bool isEditing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = TextEditingController(text: widget.initialValue ?? "");
-  }
-
-  Future<void> saveChanges() async {
-    String updatedValue = controller.text;
-    if (updatedValue.isNotEmpty) {
-      await widget.onSave(updatedValue); // Call the API function
-
-      log("Updated Field: ${widget.label}"); // Log the field name
-      log("Updated Value: $updatedValue"); // Log the new value
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 2),
-        decoration: BoxDecoration(
-          color: Color(0xFFFCFCFC),
-          borderRadius: BorderRadius.circular(50),
-          border: Border.all(color: Color(0xFFD2D2D2)),
-        ),
-        child: Row(
-          children: [
-            Icon(widget.icon, color: Colors.black54),
-            SizedBox(width: 8),
-            Expanded(
-              child: TextFormField(
-                controller: controller,
-                obscureText: widget.isPassword,
-                decoration: InputDecoration(border: InputBorder.none),
-                enabled: isEditing,
-                onFieldSubmitted: (_) => saveChanges(), // Save on enter key
-              ),
-            ),
-            IconButton(
-              icon: Icon(isEditing ? Icons.save : Icons.edit,
-                  color: Colors.black54),
-              onPressed: () {
-                if (isEditing) {
-                  saveChanges();
-                }
-                setState(() {
-                  isEditing = !isEditing;
-                });
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
