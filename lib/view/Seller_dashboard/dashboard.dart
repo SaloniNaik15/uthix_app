@@ -180,6 +180,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         title: const Padding(
           padding: EdgeInsets.all(10.0),
@@ -187,7 +188,6 @@ class _SellerDashboardState extends State<SellerDashboard> {
             "Seller Dashboard",
             style: TextStyle(
               fontSize: 20,
-              fontFamily: 'Urbanist',
               fontWeight: FontWeight.bold,
               color: Color(0xFF605F5F),
             ),
@@ -244,13 +244,17 @@ class _SellerDashboardState extends State<SellerDashboard> {
                     ManageStoreData(),
                   ),
                   buildGridItem(
-
-                 
-                      context,
-                      'My Profile',
-                      'assets/Seller_dashboard_images/my_profile.png',
-                      YourAccount(),
-                    ),
+                    context,
+                    'My Profile',
+                    'assets/Seller_dashboard_images/my_profile.png',
+                    YourAccount(),
+                  ),
+                  buildGridItem(
+                    context,
+                    'Orders',
+                    'assets/Seller_dashboard_images/my_profile.png',
+                    YourAccount(),
+                  ),
                 ],
               ),
             ),
@@ -284,32 +288,10 @@ class _SellerDashboardState extends State<SellerDashboard> {
                 "Revantaha Stationers",
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Urbanist',
+
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF605F5F),
                 ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const Text(
-                "Orders",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF605F5F),
-                ),
-              ),
-              const SizedBox(width: 10),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => UnderConstructionScreen()));
-                },
-                child: Image.asset('assets/icons/orderIcon.png', height: 35),
               ),
             ],
           ),
