@@ -1,66 +1,46 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:uthix_app/view/Seller_dashboard/Orders_Data/OrderStatusScreen.dart';
+import 'package:uthix_app/view/Seller_dashboard/Orders_Data/UpdateStatus.dart';
 import 'OrderDetails.dart';
 
-class ManageOrders extends StatefulWidget {
-  const ManageOrders({super.key});
+class InTransit extends StatefulWidget {
+  const InTransit({super.key});
 
   @override
-  State<ManageOrders> createState() => _ManageOrdersState();
+  State<InTransit> createState() => _InTransitState();
 }
 
-class _ManageOrdersState extends State<ManageOrders> {
-  List<dynamic> orders = [];
-
-  @override
-  void initState() {
-    super.initState();
-    fetchOrders();
-  }
-
-  Future<void> fetchOrders() async {
-    const String apiUrl = "https://admin.uthix.com/api/vendor/all-orders";
-    const String token = "154|puvWRhP4wDQToAwdo8MLAtih4yrsFkqX81OVIjnS78678cbd";
-
-    try {
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: {
-          "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
-      );
-
-      log("Response Status Code: ${response.statusCode}");
-      log("Response Body: ${response.body}"); // Logs full API response
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        print("Parsed Data: $data"); // Logs parsed JSON data
-
-        if (data['status'] &&
-            data['orders'] != null &&
-            data['orders'].isNotEmpty) {
-          setState(() {
-            orders = data['orders'];
-          });
-        } else {
-          setState(() {
-            orders = []; // Set orders to empty if no orders are found
-          });
-          log("No orders found."); // Log message for debugging
+class _InTransitState extends State<InTransit> {
+  List<dynamic> orders = [
+    {
+      'total_amount': 299.0,
+      'address':
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim',
+      'order_items': [
+        {
+          'product': {
+            'title': 'Flutter for Beginners',
+            'description': 'A complete guide to learning Flutter.',
+            'thumbnail_img': 'assets/Seller_dashboard_images/book.jpg',
+          }
         }
-      } else {
-        throw Exception("Failed to load orders: ${response.body}");
-      }
-    } catch (e) {
-      print("Error fetching orders: $e");
+      ]
+    },
+    {
+      'total_amount': 199.0,
+      'address':
+          ' Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim',
+      'order_items': [
+        {
+          'product': {
+            'title': 'Advanced Flutter',
+            'description': 'Deep dive into widgets and performance.',
+            'thumbnail_img': 'assets/Seller_dashboard_images/book.jpg',
+          }
+        }
+      ]
     }
-  }
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -91,19 +71,20 @@ class _ManageOrdersState extends State<ManageOrders> {
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF2B5C74),
       leading: IconButton(
-        icon:
-            const Icon(Icons.arrow_back_ios_outlined, color: Color(0xFF605F5F)),
+        icon: const Icon(Icons.arrow_back_ios_outlined, color: Colors.white),
         onPressed: () => Navigator.pop(context),
       ),
-      title: const Text(
-        "Orders and Tracking",
-        style: TextStyle(
-          fontSize: 20,
-          fontFamily: 'Urbanist',
-          fontWeight: FontWeight.bold,
-          color: Color(0xFF605F5F),
+      title: Center(
+        child: const Text(
+          "In Transit",
+          style: TextStyle(
+            fontSize: 20,
+            fontFamily: 'Urbanist',
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
       ),
     );
@@ -155,13 +136,69 @@ class _ManageOrdersState extends State<ManageOrders> {
               const SizedBox(height: 10),
               _buildDivider(),
               const SizedBox(height: 12),
-              //_buildOrderAddress(order),
+              _buildAddressSection(order['address']),
+              _buildDivider(),
               const SizedBox(height: 10),
-              _buildUpdateStatusButton(context),
+              _buildActionButton(context),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAddressSection(String address) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Shipping Address",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            fontFamily: 'Urbanist',
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          address,
+          style: const TextStyle(
+            fontSize: 14,
+            fontFamily: 'Urbanist',
+            color: Colors.black87,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Orderdetails(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF2B5C74),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: const Text(
+              "View Details",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -206,61 +243,7 @@ class _ManageOrdersState extends State<ManageOrders> {
             ],
           ),
         ),
-        IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Orderdetails()),
-            );
-          },
-          icon:
-              const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey),
-        ),
       ],
-    );
-  }
-
-  // Widget _buildOrderAddress(dynamic order) {
-  //   return Text.rich(
-  //     TextSpan(
-  //       children: [
-  //         const TextSpan(
-  //           text: "Order Number: ",
-  //           style:
-  //               TextStyle(fontFamily: 'Urbanist', fontWeight: FontWeight.w400),
-  //         ),
-  //         TextSpan(
-  //           text: order['order_number'] ?? "N/A",
-  //           style: const TextStyle(
-  //               fontFamily: 'Urbanist', fontWeight: FontWeight.w400),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  Widget _buildUpdateStatusButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const Orderdetails()),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF2B5C74),
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(40),
-          ),
-        ),
-        child: const Text(
-          "Update Status",
-          style: TextStyle(fontSize: 15, color: Colors.white),
-        ),
-      ),
     );
   }
 
@@ -288,7 +271,7 @@ class _ManageOrdersState extends State<ManageOrders> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: thumbnailImg != null && thumbnailImg.isNotEmpty
-            ? Image.network(
+            ? Image.asset(
                 thumbnailImg,
                 height: 100,
                 width: 100,
@@ -306,7 +289,7 @@ class _ManageOrdersState extends State<ManageOrders> {
 
   Widget _buildDivider() {
     return const Divider(
-      color: Color(0xFF605F5F),
+      color: Color(0xFFF3F3F3),
       thickness: 2,
     );
   }

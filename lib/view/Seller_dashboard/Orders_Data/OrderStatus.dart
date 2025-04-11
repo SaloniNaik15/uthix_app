@@ -1,15 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:uthix_app/view/Seller_dashboard/Orders_Data/UpdateStatus.dart';
 
-class Orderdetails extends StatefulWidget {
-  const Orderdetails({super.key});
+class OrderStatus extends StatefulWidget {
+  const OrderStatus({super.key});
 
   @override
-  State<Orderdetails> createState() => _OrderdetailsState();
+  State<OrderStatus> createState() => _OrderStatusState();
 }
 
-class _OrderdetailsState extends State<Orderdetails> {
+class _OrderStatusState extends State<OrderStatus> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,11 +37,11 @@ class _OrderdetailsState extends State<Orderdetails> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            OrderAndTrackingCard(), // Single Card containing Order + Tracking
+            OrderAndTrackingCard(),
             SizedBox(height: 16),
-            AddressSection(), // Separate Address Section
+            AddressSection(),
             SizedBox(height: 16),
-            PriceDetailsSection(), // Separate Price Details Section
+            PriceDetailsSection(),
           ],
         ),
       ),
@@ -50,7 +49,7 @@ class _OrderdetailsState extends State<Orderdetails> {
   }
 }
 
-//  Single Card for Order Details + Tracking
+// ======================= ORDER + TRACKING =======================
 class OrderAndTrackingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -65,7 +64,6 @@ class OrderAndTrackingCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Order ID
             Text(
               "Order ID: 74678698759669160",
               style: TextStyle(fontSize: 14, color: Colors.grey),
@@ -74,7 +72,7 @@ class OrderAndTrackingCard extends StatelessWidget {
             Divider(),
             SizedBox(height: 12),
 
-            // Order Summary
+            // Book Summary
             Row(
               children: [
                 Expanded(
@@ -96,7 +94,6 @@ class OrderAndTrackingCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Product Image
                 Card(
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
@@ -121,39 +118,41 @@ class OrderAndTrackingCard extends StatelessWidget {
             Divider(),
             SizedBox(height: 12),
 
-            // Tracking Section Inside the Same Card
-
+            // Tracking Steps
             TrackingStep(
-                title: "Order Confirmed", date: "Thu Jan 23", completed: true),
+              title: "Order Confirmed. Thu Jan 23",
+              completed: true,
+            ),
             SizedBox(height: 10),
             TrackingStep(
-                title: "Shipped",
-                date: "The item has left the facility, New Delhi, Thu Jan 23",
-                completed: true),
+              title: "Shipped",
+              subtitle: "The item has left the facility, New Delhi, Thu Jan 23",
+              completed: true,
+            ),
             SizedBox(height: 10),
-            TrackingStep(title: "Out for Delivery", completed: false),
-            SizedBox(height: 20),
-            TrackingStep(title: "Delivery Today by 11 PM", completed: false),
+            TrackingStep(
+              title: "Out for Delivery",
+              completed: true,
+            ),
+            SizedBox(height: 10),
+            TrackingStep(
+              title: "Delivery Today by 11 PM",
+              completed: true,
+              isLast: true,
+            ),
             SizedBox(height: 25),
 
-            // Update Button inside the same card
+            // Delivered button
             Center(
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const UpdateStatus(),
-                    ),
-                  );
-                },
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                   padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
                 ),
-                child: Text("Update", style: TextStyle(color: Colors.white)),
+                child: Text("Delivered", style: TextStyle(color: Colors.white)),
               ),
             ),
           ],
@@ -163,44 +162,63 @@ class OrderAndTrackingCard extends StatelessWidget {
   }
 }
 
-// Tracking Step Widget
+// ======================= TRACKING STEP =======================
 class TrackingStep extends StatelessWidget {
   final String title;
-  final String? date;
+  final String? subtitle;
+  final bool isLast;
   final bool completed;
 
-  TrackingStep({required this.title, this.date, required this.completed});
+  TrackingStep({
+    required this.title,
+    this.subtitle,
+    required this.completed,
+    this.isLast = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Column(
           children: [
             Icon(
-              completed ? Icons.check_circle : Icons.radio_button_unchecked,
-              color: completed ? Colors.green : Colors.grey,
+              Icons.check_circle,
+              color: Colors.green,
+              size: 20,
             ),
-            if (date != null)
-              Container(height: 30, width: 2, color: Colors.green),
+            if (!isLast)
+              Container(
+                width: 2,
+                height: 40,
+                color: Colors.green,
+              ),
           ],
         ),
-        SizedBox(width: 10),
+        SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: completed ? Colors.black : Colors.grey),
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                ),
               ),
-              if (date != null)
-                Text(
-                  date!,
-                  style: TextStyle(color: Colors.grey),
+              if (subtitle != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: Text(
+                    subtitle!,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.black54,
+                    ),
+                  ),
                 ),
             ],
           ),
@@ -210,7 +228,7 @@ class TrackingStep extends StatelessWidget {
   }
 }
 
-//  Separate Address Section
+// ======================= ADDRESS SECTION =======================
 class AddressSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -241,7 +259,7 @@ class AddressSection extends StatelessWidget {
   }
 }
 
-//  Separate Price Details Section
+// ======================= PRICE SECTION =======================
 class PriceDetailsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

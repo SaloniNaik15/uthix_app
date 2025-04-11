@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uthix_app/view/Seller_dashboard/Orders_Data/MyOrders.dart';
 
 import '../../UpcomingPage.dart';
 import 'Create_Store_Data/CreateStore.dart';
 import 'Inventory_data/Inventory.dart';
 import 'Manage_store_Data/ManageStores.dart';
-import 'Orders_Data/Oders.dart';
+import 'Orders_Data/Pending.dart';
 import 'Upload_Data/Upload.dart';
 import 'User_setting/YourAccount.dart';
 
@@ -292,6 +293,14 @@ class _SellerDashboardState extends State<SellerDashboard> {
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF605F5F),
                 ),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MyOrders()));
+                },
+                child: Image.asset('assets/icons/orderIcon.png', height: 35),
               ),
             ],
           ),
