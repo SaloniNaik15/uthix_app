@@ -5,8 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Seller_dashboard/Upload_Data/Book_Details.dart';
 
-import '../Create_Store_Data/Personal_details.dart';
-
 class UploadedPhotos extends StatefulWidget {
   final String category;
   final List<File> imageFiles;

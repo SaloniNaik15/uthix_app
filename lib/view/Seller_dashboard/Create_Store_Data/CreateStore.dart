@@ -5,10 +5,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as img;
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
-import 'package:path/path.dart' as p;
-import 'package:uthix_app/view/Seller_dashboard/Create_Store_Data/Personal_details.dart';
 
 class CreateStore extends StatefulWidget {
   const CreateStore({super.key});
@@ -23,7 +24,7 @@ class _CreateStoreState extends State<CreateStore> {
   final TextEditingController _schoolController = TextEditingController();
   final TextEditingController _counterController = TextEditingController();
 
-  File? _selectedImage; // Stores selected image file
+  File? _selectedImage;
 
   @override
   void dispose() {
@@ -39,22 +40,42 @@ class _CreateStoreState extends State<CreateStore> {
         await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
+      File imageFile = File(pickedFile.path);
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("logo", pickedFile.path);
+      // Read and compress
+      final bytes = await imageFile.readAsBytes();
+      img.Image? originalImage = img.decodeImage(bytes);
 
-      log("Saved Image Path: ${pickedFile.path}");
+      if (originalImage != null) {
+        // Resize and compress
+        img.Image resized =
+            img.copyResize(originalImage, width: 800); // Max width
+        final compressedBytes =
+            img.encodeJpg(resized, quality: 80); // adjust quality
+
+        // Save to temp dir
+        final tempDir = await getTemporaryDirectory();
+        final compressedPath =
+            '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+        File compressedFile =
+            await File(compressedPath).writeAsBytes(compressedBytes);
+
+        setState(() {
+          _selectedImage = compressedFile;
+        });
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString("logo", compressedFile.path);
+
+        log("Compressed Image Path: $compressedPath");
+        log("Image Size: ${compressedFile.lengthSync() / 1024} KB");
+      }
     }
   }
 
-  /// Uploads store data with logo to the backend
   Future<void> _createStore() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // Build store data from text fields
     Map<String, dynamic> storeData = {
       "store_name": _storeNameController.text,
       "store_address": _addressController.text,
@@ -62,7 +83,6 @@ class _CreateStoreState extends State<CreateStore> {
       "school": _schoolController.text,
     };
 
-    // Create FormData and attach the image if selected
     FormData formData = FormData.fromMap(storeData);
 
     if (_selectedImage != null && await _selectedImage!.exists()) {
@@ -71,20 +91,17 @@ class _CreateStoreState extends State<CreateStore> {
         await MultipartFile.fromFile(
           _selectedImage!.path,
           filename: p.basename(_selectedImage!.path),
-          contentType: MediaType("image", "jpeg"), // You can make this dynamic
+          contentType: MediaType("image", "jpeg"),
         ),
       ));
     } else {
-      // Optional: Only if backend allows empty field
       formData.fields.add(MapEntry("logo", ""));
     }
 
-    // Save the raw store data locally
     String jsonData = json.encode(storeData);
     await prefs.setString("storeData", jsonData);
     log("Stored Data: $jsonData");
 
-    // Fetch authentication token
     String? token = prefs.getString("auth_token");
     if (token == null || token.isEmpty) {
       log("⚠️ Authentication token is missing.");
@@ -98,7 +115,7 @@ class _CreateStoreState extends State<CreateStore> {
     try {
       Dio dio = Dio();
       Response response = await dio.post(
-        "https://admin.uthix.com/api/vendor-store", // Replace with your endpoint
+        "https://admin.uthix.com/api/vendor-store",
         data: formData,
         options: Options(
           headers: {
@@ -110,8 +127,6 @@ class _CreateStoreState extends State<CreateStore> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         log("✅ Store created successfully: ${response.data}");
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => PersonalDetails()));
       } else {
         log("❌ Store creation failed: ${response.statusCode}, ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
@@ -205,7 +220,6 @@ class _CreateStoreState extends State<CreateStore> {
                     _buildTextField(
                         "Counter No.", "e.g., 0010", _counterController),
                     const SizedBox(height: 10),
-                    // Image Picker for Logo
                     GestureDetector(
                       onTap: _pickImage,
                       child: Container(

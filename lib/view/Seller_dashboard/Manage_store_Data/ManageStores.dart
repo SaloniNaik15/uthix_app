@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:uthix_app/view/Seller_dashboard/Orders_Data/MyOrders.dart';
 
-import '../Orders_Data/Oders.dart';
+import '../Orders_Data/Pending.dart';
 
 class ManageStoreData extends StatefulWidget {
   const ManageStoreData({super.key});
@@ -63,7 +64,7 @@ class _ManageStoreDataState extends State<ManageStoreData> {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ManageOrders(),
+                          builder: (context) => const MyOrders(),
                         ),
                       ),
                       child:
