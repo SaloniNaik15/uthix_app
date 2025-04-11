@@ -294,7 +294,9 @@ class _StudentcartState extends State<Studentcart> {
         ),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+      ))
           : cartItems.isEmpty
           ? Center(
         child: Text(

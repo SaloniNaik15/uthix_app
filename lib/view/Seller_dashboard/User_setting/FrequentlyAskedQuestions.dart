@@ -55,7 +55,6 @@ class _ManageFrequentlyaskedquestionsState extends State<Frequentlyaskedquestion
                 "Frequently Asked Questions",
                 style: TextStyle(
                   fontSize: 20,
-                  fontFamily: "Urbanist",
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -82,7 +81,7 @@ class _ManageFrequentlyaskedquestionsState extends State<Frequentlyaskedquestion
                               style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.black,
-                                  fontFamily: "Urbanist"),
+                                  ),
                             ),
                           ),
                         const Divider(height: 1),
@@ -109,7 +108,6 @@ class _ManageFrequentlyaskedquestionsState extends State<Frequentlyaskedquestion
           fontSize: 16,
           color: Colors.black,
           fontWeight: FontWeight.w600,
-          fontFamily: "Urbanist",
         ),
       ),
       trailing: Icon(

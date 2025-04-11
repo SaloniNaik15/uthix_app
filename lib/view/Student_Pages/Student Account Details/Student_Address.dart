@@ -149,7 +149,9 @@ class _StudentAddressState extends State<StudentAddress> {
           ),
           Expanded(
             child: addresses.isEmpty
-                ? Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+            ))
                 : ListView.builder(
               itemCount: addresses.length,
               itemBuilder: (context, index) {

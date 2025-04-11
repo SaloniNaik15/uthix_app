@@ -245,16 +245,17 @@ class _SellerDashboardState extends State<SellerDashboard> {
                     ManageStoreData(),
                   ),
                   buildGridItem(
-                    context,
-                    'My Profile',
-                    'assets/Seller_dashboard_images/my_profile.png',
-                    YourAccount(),
-                  ),
+
+                 
+                      context,
+                      'My Profile',
+                      'assets/Seller_dashboard_images/my_profile.png',
+                      YourAccount(),
+                    ),
                 ],
               ),
             ),
           ),
-          // Wrap the My Profile grid item in a Center widget
         ],
       ),
     );
@@ -297,7 +298,6 @@ class _SellerDashboardState extends State<SellerDashboard> {
                 "Orders",
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Urbanist',
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF605F5F),
                 ),

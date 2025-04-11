@@ -68,7 +68,9 @@ class _AddressSelectionSheetState extends State<AddressSelectionSheet> {
         Container(
           decoration: const BoxDecoration(color: Colors.white),
           child: isLoading
-              ? Center(child: CircularProgressIndicator())
+              ? Center(child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+          ))
               : Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,

@@ -136,7 +136,7 @@ class _BuybookspagesState extends State<Buybookspages> {
       child: CircleAvatar(
         backgroundColor: Colors.white,
         child: IconButton(
-            icon: Icon(icon, color: Colors.black, size: 20.sp),
+            icon: Icon(icon, color: Colors.black, size: 25),
             onPressed: onTap),
       ),
     );
@@ -151,7 +151,7 @@ class _BuybookspagesState extends State<Buybookspages> {
         backgroundColor: Colors.white,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios,
-              color: const Color(0xFF605F5F), size: 20.sp),
+              color: const Color(0xFF605F5F), size: 25),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -173,7 +173,9 @@ class _BuybookspagesState extends State<Buybookspages> {
         elevation: 0,
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+      ))
           : products.isEmpty
           ? Center(
           child: Text("No products available.",
@@ -343,7 +345,7 @@ class _BookItemsListState extends State<BookItemsList> {
         },
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token', // ✅ Dynamic Token
+            'Authorization': 'Bearer $token',
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           },
@@ -407,8 +409,8 @@ class _BookItemsListState extends State<BookItemsList> {
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: 10.w,
-              mainAxisSpacing: 12.h,
+              crossAxisSpacing: 15,
+              mainAxisSpacing: 10,
               childAspectRatio: aspectRatio,
             ),
             itemCount: widget.books.length,
@@ -574,7 +576,7 @@ class _BookItemsListState extends State<BookItemsList> {
                             label: Text('Add to Bag',
                                 style: TextStyle(color: Colors.white, fontSize: 12.sp)),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF2B5C74),
+                              backgroundColor:  Color(0xFF2B5C74),
                               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.r),

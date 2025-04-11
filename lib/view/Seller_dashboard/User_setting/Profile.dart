@@ -155,7 +155,6 @@ class _ManageProfileState extends State<Profile> {
           style: TextStyle(
             color: Colors.white,
             fontSize: 25,
-            fontFamily: "Urbanist",
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -242,7 +241,6 @@ class _ManageProfileState extends State<Profile> {
                     profileData["name"] ?? "User",
                     style: const TextStyle(
                       fontSize: 16,
-                      fontFamily: "Urbanist",
                       fontWeight: FontWeight.bold,
                     ),
                   ),
