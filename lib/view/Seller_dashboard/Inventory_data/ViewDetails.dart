@@ -102,7 +102,7 @@ class _ViewdetailsState extends State<Viewdetails> {
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    String? savedaccessToken = prefs.getString("userToken");
+    String? savedaccessToken = prefs.getString("auth_token");
 
     log("Retrieved acesstoken: $savedaccessToken");
 
@@ -123,7 +123,6 @@ class _ViewdetailsState extends State<Viewdetails> {
           prefs.getString('book_description_${widget.productTitle}') ??
               'No description available';
 
-      // ✅ Retrieve price as int directly
       bookPrice = prefs.getInt('book_price_${widget.productTitle}') ?? 0;
     });
 
@@ -135,22 +134,17 @@ class _ViewdetailsState extends State<Viewdetails> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     try {
-      // ✅ Retrieve stored thumbnail from SharedPreferences
       String? storedThumbnail =
           prefs.getString('local_thumbnail_${widget.productTitle}');
 
-      // ✅ Retrieve stored list of images from SharedPreferences
       List<String>? storedImages =
           prefs.getStringList('local_images_${widget.productTitle}');
 
-      // ✅ Set the retrieved data to state
       setState(() {
-        ///productThumbnail = storedThumbnail ?? ''; // Set thumbnail if exists
-        productsImages = storedImages ?? []; // Set images if exists
+        productsImages = storedImages ?? [];
         isLoading = false;
       });
 
-      //log("📌 Retrieved Thumbnail for ${widget.productTitle}: $productThumbnail");
       log("📌 Retrieved Images for ${widget.productTitle}: $productsImages");
     } catch (e) {
       log("❌ Error fetching product details: $e");
@@ -478,26 +472,22 @@ class _ViewdetailsState extends State<Viewdetails> {
                       SizedBox(height: 10),
 
                       Positioned(
-                        bottom: 20, // Distance from the bottom
-                        right: 20, // Distance from the right
+                        bottom: 20,
+                        right: 20,
                         child: OutlinedButton(
                           onPressed: () {
-                            // Button's action
                             print("Button Pressed");
                           },
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 100,
-                                vertical: 12), // Adjust padding
-                            textStyle: const TextStyle(
-                                fontSize: 16), // Adjust text size
+                                horizontal: 100, vertical: 12),
+                            textStyle: const TextStyle(fontSize: 16),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  5), // Adjust border radius
+                              borderRadius: BorderRadius.circular(5),
                             ),
                             side: const BorderSide(
-                              color: Colors.grey, // Outline color
-                              width: 1, // Outline width
+                              color: Colors.grey,
+                              width: 1,
                             ),
                           ),
                           child: const Text(

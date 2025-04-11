@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/BuyBooksPages.dart';
 import 'StudentSearch.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BuyTextBooks extends StatefulWidget {
   // Make categoryId optional.
@@ -32,8 +33,7 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
 
       if (response.statusCode == 200) {
         final jsonData = response.data;
-        if (jsonData.containsKey('categories') &&
-            jsonData['categories'] is List) {
+        if (jsonData.containsKey('categories') && jsonData['categories'] is List) {
           setState(() {
             categories = (jsonData['categories'] as List)
                 .map((item) => {
@@ -77,7 +77,7 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
           title: Text(
             "Buy Textbooks",
             style: TextStyle(
-              fontSize: 18.sp,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -119,19 +119,16 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
         children: [
           Column(
             children: [
-              //SizedBox(height: 10.h),
               isLoading
                   ? Center(child: CircularProgressIndicator())
                   : categories.isEmpty
                   ? Center(
-                child: Text("No categories available.",
-                    style: TextStyle(fontSize: 18.sp)),
+                child: Text("No categories available.", style: TextStyle(fontSize: 20)),
               )
                   : Expanded(
                 child: GridView.builder(
                   padding: EdgeInsets.all(10.w),
-                  gridDelegate:
-                  SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 1.0.w,
                     mainAxisSpacing: 0.5.h,
@@ -140,7 +137,6 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
                   itemCount: categories.length,
                   itemBuilder: (context, index) {
                     final category = categories[index];
-
                     return buildGridItem(
                       context,
                       category['id'] as int,
@@ -176,17 +172,24 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(20.r),
-              child: Image.network(
-                image,
+              child: CachedNetworkImage(
+                imageUrl: image,
                 width: 150.w,
                 height: 130.h,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
+                placeholder: (context, url) => Container(
+                  width: 150.w,
+                  height: 130.h,
+                  color: Colors.grey.shade300,
+                  child: Center(child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+                  )),
+                ),
+                errorWidget: (context, url, error) => Container(
                   width: 150.w,
                   height: 130.h,
                   color: Colors.grey,
-                  child: Icon(Icons.image_not_supported,
-                      color: Colors.white, size: 100.sp),
+                  child: Icon(Icons.image_not_supported, color: Colors.white, size: 100.sp),
                 ),
               ),
             ),

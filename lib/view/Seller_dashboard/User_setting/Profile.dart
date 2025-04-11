@@ -43,7 +43,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       debugPrint("Token is missing.");
     }
   }
-
   Future<void> fetchProfileData() async {
     try {
       final dio = Dio();

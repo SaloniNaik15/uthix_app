@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
-// import '../../login/start_login.dart';
 import '../../homeRegistration/new_login.dart';
 import 'BookDetails.dart';
 import 'StudentCart.dart';
@@ -32,16 +32,16 @@ class _WishlistState extends State<Wishlist> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: const Color(0xFF605F5F), size: 20.sp),
+          icon: Icon(Icons.arrow_back_ios, color: const Color(0xFF605F5F), size: 25),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           "Wishlist",
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.shopping_bag_outlined, color: Colors.black, size: 20.sp),
+            icon: Icon(Icons.shopping_bag_outlined, color: Colors.black, size: 25),
             onPressed: () {
               Navigator.push(
                 context,
@@ -247,7 +247,9 @@ class _BookListState extends State<BookList> {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? const Center(child: CircularProgressIndicator())
+        ? const Center(child: CircularProgressIndicator(
+      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+    ))
         : books.isEmpty
         ? const Center(child: Text("No books found in wishlist"))
         : Padding(
@@ -281,15 +283,24 @@ class _BookListState extends State<BookList> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8.r),
-                      child: Image.network(
-                        book['image'],
+                      child: CachedNetworkImage(
+                        imageUrl: book['image'],
                         height: 150.h,
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Icon(
-                          Icons.image_not_supported,
-                          size: 100.sp,
+                        placeholder: (context, url) => Container(
+                          height: 150.h,
+                          width: double.infinity,
+                          color: Colors.grey.shade300,
+                          child: const Center(child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+                          )),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          height: 150.h,
+                          width: double.infinity,
                           color: Colors.grey,
+                          child: Icon(Icons.image_not_supported, size: 100.sp, color: Colors.white),
                         ),
                       ),
                     ),
@@ -350,8 +361,9 @@ class _BookListState extends State<BookList> {
                   onPressed: () {
                     addToCart(context, book, 1);
                   },
-                  icon: Icon(Icons.shopping_bag_outlined, size: 16.sp,color: Colors.black,),
-                  label: Text('Move to Bag', style: TextStyle(fontSize: 12.sp,fontWeight: FontWeight.bold)),
+                  icon: Icon(Icons.shopping_bag_outlined, size: 16.sp, color: Colors.black),
+                  label: Text('Move to Bag',
+                      style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold)),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF605F5F),
                     side: const BorderSide(color: Color(0xFFAFAFAF)),

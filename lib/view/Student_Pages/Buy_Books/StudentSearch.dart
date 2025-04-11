@@ -217,13 +217,13 @@ class _StudentSearchState extends State<StudentSearch> {
         elevation: 0,
         leading: IconButton(
           icon:
-          Icon(Icons.arrow_back_ios, color: const Color(0xFF605F5F), size: 20.sp),
+          Icon(Icons.arrow_back_ios, color: const Color(0xFF605F5F), size: 25),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           "Recent Searches",
           style: TextStyle(
-            fontSize: 18.sp,
+            fontSize: 20,
             fontWeight: FontWeight.normal,
             color: Colors.black,
           ),
@@ -270,7 +270,9 @@ class _StudentSearchState extends State<StudentSearch> {
             buildFilterTabs(),
             SizedBox(height: 16.h),
             isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+            ))
                 : searchResults.isEmpty
                 ? Center(
                 child: Text("No results found",
