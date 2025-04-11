@@ -7,11 +7,13 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Seller_dashboard/Orders_Data/MyOrders.dart';
 import 'package:uthix_app/view/Seller_dashboard/Orders_Data/MyOrders.dart';
+import 'package:uthix_app/view/Seller_dashboard/Orders_Data/MyOrders.dart';
 
 import '../../UpcomingPage.dart';
 import 'Create_Store_Data/CreateStore.dart';
 import 'Inventory_data/Inventory.dart';
 import 'Manage_store_Data/ManageStores.dart';
+import 'Orders_Data/Pending.dart';
 import 'Orders_Data/Pending.dart';
 import 'Orders_Data/Pending.dart';
 import 'Upload_Data/Upload.dart';
@@ -191,6 +193,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
             style: TextStyle(
               fontSize: 20,
               fontFamily: 'Urbanist',
+              fontFamily: 'Urbanist',
               fontWeight: FontWeight.bold,
               color: Color(0xFF605F5F),
             ),
@@ -263,6 +266,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
             ),
           ),
           // Wrap the My Profile grid item in a Center widget
+          // Wrap the My Profile grid item in a Center widget
         ],
       ),
     );
@@ -309,6 +313,14 @@ class _SellerDashboardState extends State<SellerDashboard> {
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF605F5F),
                 ),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MyOrders()));
+                },
+                child: Image.asset('assets/icons/orderIcon.png', height: 35),
               ),
             ],
           ),
