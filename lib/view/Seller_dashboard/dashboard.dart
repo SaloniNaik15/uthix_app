@@ -172,6 +172,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
       log("Error: $e");
     }
   }
+
   Future<void> checkStoreAndNavigate(BuildContext context) async {
     try {
       final response = await dio.get(
@@ -215,6 +216,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
       debugPrint("❌ Error checking store: $e");
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -347,9 +349,9 @@ class _SellerDashboardState extends State<SellerDashboard> {
       onTap: () {
         if (title == 'Upload') {
           showUploadMenu(context);
-        } else if (title =='Create Store') {
+        } else if (title == 'Create Store') {
           checkStoreAndNavigate(context);
-        }else if(nextScreen != null){
+        } else if (nextScreen != null) {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => nextScreen));
         }

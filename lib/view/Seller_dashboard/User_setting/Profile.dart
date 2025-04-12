@@ -206,7 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundImage: _pickedImageFile != null
                     ? FileImage(_pickedImageFile!)
                     : image != null
-                    ? NetworkImage("https://admin.uthix.com/storage/images/vendor/$image")
+                    ? NetworkImage("https://admin.uthix.com/storage/images/instructor/profile_image/$image")
                     : const AssetImage("assets/icons/profile.png") as ImageProvider,
               ),
               Positioned(
