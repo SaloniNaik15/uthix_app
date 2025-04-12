@@ -72,16 +72,16 @@ class _ManageYourAccountState extends State<YourAccount> {
                     navigateTo: HelpDesk(),
                     context: context,
                   ),
-                  const Divider(
-                    height: 1,
-                  ),
-                  _buildListTile(
-                    icon: Icons.manage_accounts_outlined,
-                    title: "Manage Accounts",
-                    subtitle: "Your account and saved addresses",
-                    navigateTo: ManageAccountScreen(),
-                    context: context,
-                  ),
+                  // const Divider(
+                  //   height: 1,
+                  // ),
+                  // _buildListTile(
+                  //   icon: Icons.manage_accounts_outlined,
+                  //   title: "Manage Accounts",
+                  //   subtitle: "Your account and saved addresses",
+                  //   navigateTo: ManageAccountScreen(),
+                  //   context: context,
+                  // ),
                   const Divider(
                     height: 1,
                   ),
