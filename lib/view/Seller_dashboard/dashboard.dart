@@ -193,7 +193,6 @@ class _SellerDashboardState extends State<SellerDashboard> {
             style: TextStyle(
               fontSize: 20,
               fontFamily: 'Urbanist',
-              fontFamily: 'Urbanist',
               fontWeight: FontWeight.bold,
               color: Color(0xFF605F5F),
             ),
