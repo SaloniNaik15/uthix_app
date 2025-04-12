@@ -79,7 +79,7 @@ class _RejectedState extends State<Rejected> {
       ),
       title: Center(
         child: const Text(
-          "Delivered",
+          "Rejected",
           style: TextStyle(
             fontSize: 20,
             fontFamily: 'Urbanist',
@@ -179,22 +179,17 @@ class _RejectedState extends State<Rejected> {
         Expanded(
           child: ElevatedButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const OrderStatus(),
-                ),
-              );
+             
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2B5C74),
+              backgroundColor: Colors.red,
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
               ),
             ),
             child: const Text(
-              "View Details",
+              "Rejected",
               style: TextStyle(color: Colors.white),
             ),
           ),
