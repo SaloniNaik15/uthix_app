@@ -253,8 +253,8 @@ class _SellerDashboardState extends State<SellerDashboard> {
                   buildGridItem(
                     context,
                     'Orders',
-                    'assets/Seller_dashboard_images/my_profile.png',
-                    YourAccount(),
+                    'assets/Seller_dashboard_images/orders.png',
+                    MyOrders(),
                   ),
                 ],
               ),
@@ -293,14 +293,6 @@ class _SellerDashboardState extends State<SellerDashboard> {
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF605F5F),
                 ),
-              ),
-              const SizedBox(width: 10),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => MyOrders()));
-                },
-                child: Image.asset('assets/icons/orderIcon.png', height: 35),
               ),
             ],
           ),
