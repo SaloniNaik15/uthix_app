@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Seller_dashboard/Orders_Data/MyOrders.dart';
 import 'Create_Store_Data/CreateStore.dart';
@@ -196,7 +196,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text("Store already created."),
-                backgroundColor: Colors.red,
+                backgroundColor: Color(0xFF2B5C74),
               ),
             );
           }
@@ -219,90 +219,96 @@ class _SellerDashboardState extends State<SellerDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: const Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Text(
-            "Seller Dashboard",
-            style: TextStyle(
-              fontSize: 20,
-              fontFamily: 'Urbanist',
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF605F5F),
+    return WillPopScope(
+      onWillPop: () async{
+        SystemNavigator.pop();
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          title: const Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Text(
+              "Seller Dashboard",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF605F5F),
+              ),
             ),
           ),
+          elevation: 0,
         ),
-        elevation: 0,
-      ),
-      backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Divider(color: Colors.grey, thickness: 1),
-          buildTopBar(),
-          const SizedBox(height: 10),
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/instructor/background.png'),
-                  fit: BoxFit.cover,
+        backgroundColor: Colors.white,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Divider(color: Colors.grey, thickness: 1),
+            buildTopBar(),
+            const SizedBox(height: 10),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                height: double.infinity,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/instructor/background.png'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: GridView.count(
+                  padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12.0,
+                  mainAxisSpacing: 10.0,
+                  childAspectRatio: 0.99,
+                  children: [
+                    buildGridItem(
+                      context,
+                      'Upload',
+                      'assets/Seller_dashboard_images/upload.png',
+                      null,
+                    ),
+                    buildGridItem(
+                      context,
+                      'Inventory',
+                      'assets/Seller_dashboard_images/inventory.png',
+                      InventoryData(),
+                    ),
+                    buildGridItem(
+                      context,
+                      'Create Store',
+                      'assets/Seller_dashboard_images/create_store.png',
+                      null,
+                    ),
+                    buildGridItem(
+                      context,
+                      'Manage Stores',
+                      'assets/Seller_dashboard_images/manage_stores.png',
+                      ManageStoreData(),
+                    ),
+                    buildGridItem(
+                      context,
+                      'My Profile',
+                      'assets/Seller_dashboard_images/my_profile.png',
+                      YourAccount(),
+                    ),
+                    buildGridItem(
+                      context,
+                      'Orders',
+                      'assets/Seller_dashboard_images/orders.png',
+                      MyOrders(),
+                    ),
+                  ],
                 ),
               ),
-              child: GridView.count(
-                padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
-                crossAxisCount: 2,
-                crossAxisSpacing: 12.0,
-                mainAxisSpacing: 10.0,
-                childAspectRatio: 0.99,
-                children: [
-                  buildGridItem(
-                    context,
-                    'Upload',
-                    'assets/Seller_dashboard_images/upload.png',
-                    null,
-                  ),
-                  buildGridItem(
-                    context,
-                    'Inventory',
-                    'assets/Seller_dashboard_images/inventory.png',
-                    InventoryData(),
-                  ),
-                  buildGridItem(
-                    context,
-                    'Create Store',
-                    'assets/Seller_dashboard_images/create_store.png',
-                    null,
-                  ),
-                  buildGridItem(
-                    context,
-                    'Manage Stores',
-                    'assets/Seller_dashboard_images/manage_stores.png',
-                    ManageStoreData(),
-                  ),
-                  buildGridItem(
-                    context,
-                    'My Profile',
-                    'assets/Seller_dashboard_images/my_profile.png',
-                    YourAccount(),
-                  ),
-                  buildGridItem(
-                    context,
-                    'Orders',
-                    'assets/Seller_dashboard_images/orders.png',
-                    MyOrders(),
-                  ),
-                ],
-              ),
             ),
-          ),
-          // Wrap the My Profile grid item in a Center widget
-          // Wrap the My Profile grid item in a Center widget
-        ],
+            // Wrap the My Profile grid item in a Center widget
+            // Wrap the My Profile grid item in a Center widget
+          ],
+        ),
       ),
     );
   }

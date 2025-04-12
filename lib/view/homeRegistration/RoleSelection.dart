@@ -86,7 +86,7 @@ class Roleselection extends StatelessWidget {
               SizedBox(height: 20.h),
                _buildOptionCard(
                   imagePath: "assets/registration/Seller.png",
-                  label: "Vendor",
+                  label: "Seller",
                   onTap: () {
                     Navigator.push(
                       context,
