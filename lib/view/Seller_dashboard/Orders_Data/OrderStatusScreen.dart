@@ -16,6 +16,30 @@ class OrderStatusScreen extends StatefulWidget {
     this.showButtons = false,
   });
 
+//hello
+
+  @override
+  State<OrderStatusScreen> createState() => _OrderStatusScreenState();
+}
+
+class _OrderStatusScreenState extends State<OrderStatusScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    // Auto-navigate after 3 seconds if showButtons is false
+    if (!widget.showButtons) {
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const Pending()),
+          );
+        }
+      });
+    }
+  }
+
   @override
   State<OrderStatusScreen> createState() => _OrderStatusScreenState();
 }
