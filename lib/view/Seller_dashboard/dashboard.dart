@@ -2,20 +2,12 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Seller_dashboard/Orders_Data/MyOrders.dart';
-import 'package:uthix_app/view/Seller_dashboard/Orders_Data/MyOrders.dart';
-import 'package:uthix_app/view/Seller_dashboard/Orders_Data/MyOrders.dart';
-
-import '../../UpcomingPage.dart';
 import 'Create_Store_Data/CreateStore.dart';
 import 'Inventory_data/Inventory.dart';
 import 'Manage_store_Data/ManageStores.dart';
-import 'Orders_Data/Pending.dart';
-import 'Orders_Data/Pending.dart';
-import 'Orders_Data/Pending.dart';
 import 'Upload_Data/Upload.dart';
 import 'User_setting/YourAccount.dart';
 
@@ -180,7 +172,49 @@ class _SellerDashboardState extends State<SellerDashboard> {
       log("Error: $e");
     }
   }
+  Future<void> checkStoreAndNavigate(BuildContext context) async {
+    try {
+      final response = await dio.get(
+        'https://admin.uthix.com/api/vendor-store-status',
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $accessToken",
+            "Accept": "application/json",
+          },
+        ),
+      );
 
+      log("Store Check Response: ${response.data}");
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+
+        if (data["status"] == true) {
+          // Store already exists
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Store already created."),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        } else {
+          // Store doesn't exist, navigate to CreateStore
+          if (context.mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CreateStore()),
+            );
+          }
+        }
+      } else {
+        debugPrint("Store check failed: ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("❌ Error checking store: $e");
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -240,7 +274,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                     context,
                     'Create Store',
                     'assets/Seller_dashboard_images/create_store.png',
-                    CreateStore(),
+                    null,
                   ),
                   buildGridItem(
                     context,
@@ -313,7 +347,9 @@ class _SellerDashboardState extends State<SellerDashboard> {
       onTap: () {
         if (title == 'Upload') {
           showUploadMenu(context);
-        } else if (nextScreen != null) {
+        } else if (title =='Create Store') {
+          checkStoreAndNavigate(context);
+        }else if(nextScreen != null){
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => nextScreen));
         }
