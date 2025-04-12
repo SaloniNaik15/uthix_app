@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -16,7 +19,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isLoading = true;
   String? token;
 
-  // Controllers for input fields
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
@@ -24,6 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController addressController = TextEditingController();
 
   String? image;
+  File? _pickedImageFile;
 
   @override
   void initState() {
@@ -43,6 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       debugPrint("Token is missing.");
     }
   }
+
   Future<void> fetchProfileData() async {
     try {
       final dio = Dio();
@@ -81,24 +85,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _pickedImageFile = File(pickedFile.path);
+      });
+    }
+  }
+
   Future<void> updateProfileData() async {
     try {
       final dio = Dio();
+      FormData formData = FormData.fromMap({
+        "id": vendorId,
+        "user_id": userId,
+        "name": nameController.text,
+        "email": emailController.text,
+        "phone": phoneController.text,
+        "gender": genderController.text,
+        "store_address": addressController.text,
+        if (_pickedImageFile != null)
+          "image": await MultipartFile.fromFile(
+            _pickedImageFile!.path,
+            filename: _pickedImageFile!.path.split('/').last,
+          ),
+      });
+      formData.fields.forEach((field) {
+        debugPrint("📦 FIELD: ${field.key} = ${field.value}");
+      });
+      if (_pickedImageFile != null) {
+        debugPrint("📸 Image to Upload: ${_pickedImageFile!.path}");
+      }
+
       final response = await dio.post(
         apiUrl,
-        data: {
-          "id": vendorId,
-          "user_id": userId,
-          "name": nameController.text,
-          "email": emailController.text,
-          "phone": phoneController.text,
-          "gender": genderController.text,
-          "store_address": addressController.text,
-        },
+        data: formData,
         options: Options(
           headers: {
             "Authorization": "Bearer $token",
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
         ),
       );
@@ -107,12 +134,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Profile updated successfully")),
         );
-        await fetchProfileData(); // Refresh the updated values
+        await fetchProfileData();
+        setState(() {
+          _pickedImageFile = null;
+        });
       } else {
         debugPrint("Update failed: ${response.statusCode}");
       }
     } catch (e) {
-      debugPrint("Error updating profile: $e");
+      if (e is DioException && e.response != null) {
+        debugPrint("[log] ❌ Upload Error Response: ${e.response!.data}");
+      }
+      debugPrint("❌ Error updating profile: $e");
     }
   }
 
@@ -170,17 +203,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               CircleAvatar(
                 radius: 40,
-                backgroundImage: image != null
+                backgroundImage: _pickedImageFile != null
+                    ? FileImage(_pickedImageFile!)
+                    : image != null
                     ? NetworkImage("https://admin.uthix.com/storage/images/user/$image")
                     : const AssetImage("assets/icons/profile.png") as ImageProvider,
               ),
               Positioned(
                 bottom: 0,
                 right: 4,
-                child: CircleAvatar(
-                  radius: 15,
-                  backgroundColor: Colors.white,
-                  child: const Icon(Icons.camera_alt, size: 16, color: Colors.blue),
+                child: GestureDetector(
+                  onTap: pickImage,
+                  child: CircleAvatar(
+                    radius: 15,
+                    backgroundColor: Colors.white,
+                    child: const Icon(Icons.camera_alt, size: 16, color: Colors.blue),
+                  ),
                 ),
               ),
             ],
