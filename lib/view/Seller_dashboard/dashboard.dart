@@ -302,19 +302,6 @@ class _SellerDashboardState extends State<SellerDashboard> {
               ),
             ],
           ),
-          Row(
-            children: [
-              const Text(
-                "Orders",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontFamily: 'Urbanist',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF605F5F),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -345,7 +332,6 @@ class _SellerDashboardState extends State<SellerDashboard> {
             Text(
               title,
               style: const TextStyle(
-                fontFamily: 'Urbanist',
                 fontWeight: FontWeight.w500,
                 color: Color(0xFF605F5F),
               ),
