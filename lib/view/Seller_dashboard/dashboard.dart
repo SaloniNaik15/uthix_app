@@ -310,14 +310,6 @@ class _SellerDashboardState extends State<SellerDashboard> {
                   color: Color(0xFF605F5F),
                 ),
               ),
-              const SizedBox(width: 10),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => MyOrders()));
-                },
-                child: Image.asset('assets/icons/orderIcon.png', height: 35),
-              ),
             ],
           ),
         ],
