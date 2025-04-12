@@ -14,8 +14,8 @@ class UploadData extends StatefulWidget {
 }
 
 class _UploadDataState extends State<UploadData> {
-  final ImagePicker _picker = ImagePicker(); // Initialize ImagePicker
-  List<File> selectedImages = []; // Store multiple images
+  final ImagePicker _picker = ImagePicker();
+  List<File> selectedImages = [];
   String? selectedCategory;
   String? selectedSubcategory;
   String? email;
@@ -25,7 +25,7 @@ class _UploadDataState extends State<UploadData> {
   @override
   void initState() {
     super.initState();
-    _initializeData(); // Call the async function
+    _initializeData();
   }
 
   Future<void> _initializeData() async {
@@ -38,56 +38,49 @@ class _UploadDataState extends State<UploadData> {
       selectedCategory =
           prefs.getString("selectedCategoryName") ?? "Uncategorized";
       selectedSubcategory = prefs.getString("selectedSubcategoryName");
-
       email = prefs.getString("email") ?? "No Email Found";
       password = prefs.getString("password") ?? "No Password Found";
       accessToken = prefs.getString("auth_token") ?? "No accessToken";
     });
 
-    log(" Recived Selected Category: $selectedCategory");
-    log("Recieved Selected Sub Category: $selectedSubcategory");
+    log("Received Selected Category: $selectedCategory");
+    log("Received Selected Sub Category: $selectedSubcategory");
     log("Email: $email");
     log("Password: $password");
     log("Access Token: $accessToken");
   }
 
-  // Pick an image from the camera
-  // Pick an image from the camera
   Future<void> pickImageFromCamera() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
     if (image != null) {
       File imageFile = File(image.path);
-      selectedImages.add(imageFile); // Add image to list
+      selectedImages.add(imageFile);
       log("Captured Image Path: ${imageFile.path}");
-
-      // Log all image paths in the list
       log("Current Images in List: ${selectedImages.map((file) => file.path).toList()}");
-
       navigateToUploadedPhotos(selectedImages);
     }
   }
 
-// Pick an image from the gallery
   Future<void> pickImageFromGallery() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       File imageFile = File(image.path);
-      selectedImages.add(imageFile); // Add image to list
+      selectedImages.add(imageFile);
       log("Selected Image Path: ${imageFile.path}");
-
-      // Log all image paths in the list
       log("Current Images in List: ${selectedImages.map((file) => file.path).toList()}");
-
       navigateToUploadedPhotos(selectedImages);
     }
   }
 
-  // Navigate to Uploaded Photos screen with the selected category
   void navigateToUploadedPhotos(List<File> imageFiles) {
-    if (selectedCategory == null || selectedCategory!.isEmpty) {
+    if (selectedCategory == null ||
+        selectedCategory!.isEmpty ||
+        selectedSubcategory == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Please select a category before uploading.")),
+          content: Text(
+              "Please select a category and subcategory before uploading."),
+        ),
       );
       return;
     }
@@ -134,16 +127,51 @@ class _UploadDataState extends State<UploadData> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // ✅ Top info box
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFFAF7),
+                    borderRadius: BorderRadius.circular(10),
+                    border:
+                        Border.all(color: const Color(0xFFB0D9CE), width: 1),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Selected Details",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Urbanist',
+                          color: Color(0xFF2E7D64),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Category: ${selectedCategory ?? "Uncategorized"}",
+                        style: const TextStyle(
+                            fontSize: 14, fontFamily: 'Urbanist'),
+                      ),
+                      Text(
+                        "Subcategory: ${selectedSubcategory ?? "Not selected"}",
+                        style: const TextStyle(
+                            fontSize: 14, fontFamily: 'Urbanist'),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF9F9F9),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: const Color(0xFFD2D2D2),
-                      width: 2,
-                    ),
+                    border:
+                        Border.all(color: const Color(0xFFD2D2D2), width: 2),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,10 +222,7 @@ class _UploadDataState extends State<UploadData> {
                 decoration: BoxDecoration(
                   color: const Color(0xFFF9F9F9),
                   borderRadius: BorderRadius.circular(30),
-                  border: Border.all(
-                    color: const Color(0xFFD2D2D2),
-                    width: 1,
-                  ),
+                  border: Border.all(color: const Color(0xFFD2D2D2), width: 1),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -220,9 +245,10 @@ class _UploadDataState extends State<UploadData> {
                       ),
                       const SizedBox(width: 50),
                       IconButton(
-                          icon: const Icon(Icons.photo,
-                              color: Colors.black, size: 35),
-                          onPressed: pickImageFromGallery),
+                        icon: const Icon(Icons.photo,
+                            color: Colors.black, size: 35),
+                        onPressed: pickImageFromGallery,
+                      ),
                       const Text(
                         "Gallery",
                         style: TextStyle(
@@ -244,10 +270,11 @@ class _UploadDataState extends State<UploadData> {
   }
 }
 
-Widget buildStep(
-    {required String imagePath,
-    required String title,
-    required String description}) {
+Widget buildStep({
+  required String imagePath,
+  required String title,
+  required String description,
+}) {
   return Padding(
     padding: const EdgeInsets.symmetric(vertical: 10.0),
     child: Row(

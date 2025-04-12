@@ -3,11 +3,13 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as dio;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Student_Pages/Buy_Books/BookDetails.dart';
 import 'package:http/http.dart' as http;
@@ -28,7 +30,7 @@ class Viewdetails extends StatefulWidget {
 class _ViewdetailsState extends State<Viewdetails> {
   String? accessToken;
   Map<String, dynamic>? productDetails;
-  List<dynamic> productsImages = [];
+  List<String> allImageUrls = [];
   bool isLoading = true;
   String bookName = 'hii';
   int bookPrice = 0; // ✅ Use this
@@ -36,6 +38,7 @@ class _ViewdetailsState extends State<Viewdetails> {
   String description = "N/A";
   double? rating;
   String? review;
+  Dio dio = Dio();
 
   @override
   void initState() {
@@ -47,9 +50,9 @@ class _ViewdetailsState extends State<Viewdetails> {
 
   Future<void> _initializeData() async {
     await _loadUserCredentials();
-    await fetchProductDetails();
     await fetchProductAdditionalDetails();
     await fetchReviewAndRating();
+    await fetchProducts();
   }
 
   Future<void> fetchReviewAndRating() async {
@@ -129,26 +132,51 @@ class _ViewdetailsState extends State<Viewdetails> {
     log("📖 Book Details Loaded: $bookName, Price: $bookPrice");
   }
 
-  Future<void> fetchProductDetails() async {
-    log("🔍 Fetching product details for Title: ${widget.productTitle}");
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  Future<void> fetchProducts() async {
+    const String url = 'https://admin.uthix.com/api/get/vendor/products';
 
     try {
-      String? storedThumbnail =
-          prefs.getString('local_thumbnail_${widget.productTitle}');
+      final response = await dio.get(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+            'Accept': 'application/json',
+          },
+        ),
+      );
 
-      List<String>? storedImages =
-          prefs.getStringList('local_images_${widget.productTitle}');
+      if (response.statusCode == 200) {
+        var jsonResponse = response.data;
 
-      setState(() {
-        productsImages = storedImages ?? [];
-        isLoading = false;
-      });
+        log("✅ Full API Response: ${jsonEncode(jsonResponse)}");
 
-      log("📌 Retrieved Images for ${widget.productTitle}: $productsImages");
+        List<dynamic> fetchedProducts = jsonResponse['products'];
+
+        // Extract all image URLs from all products
+        List<String> imageUrls = [];
+
+        for (var product in fetchedProducts) {
+          if (product['images'] != null && product['images'].isNotEmpty) {
+            for (var image in product['images']) {
+              final imageUrl =
+                  'https://admin.uthix.com/storage/image/products/${image['image_path']}';
+              imageUrls.add(imageUrl);
+            }
+          }
+        }
+
+        log("✅ Total images fetched: ${imageUrls.length}");
+
+        setState(() {
+          allImageUrls = imageUrls;
+        });
+      } else {
+        log("❌ Failed to fetch products: ${response.statusCode}");
+        log("❌ Response body: ${response.data}");
+      }
     } catch (e) {
-      log("❌ Error fetching product details: $e");
-      setState(() => isLoading = false);
+      log("❌ Error fetching products: $e");
     }
   }
 
@@ -174,101 +202,63 @@ class _ViewdetailsState extends State<Viewdetails> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Image carousel or grid view
                   SizedBox(
-                    height: 200,
+                    height: 300,
                     child: GridView.builder(
                       scrollDirection: Axis.horizontal,
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        crossAxisSpacing: 20,
+                        crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
-                        childAspectRatio: 0.55, // Adjust space between images
+                        childAspectRatio: 1, // square container (1:1 ratio)
                       ),
-                      itemCount: productsImages.length,
+                      itemCount: allImageUrls.length,
                       itemBuilder: (context, index) {
                         return Stack(
                           children: [
-                            Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: productsImages[index]
-                                          .startsWith("http")
-                                      ? Image.network(
-                                          productsImages[index], // Server image
-                                          fit: BoxFit.cover,
-                                          width: 100,
-                                          height: 100,
-                                          loadingBuilder: (context, child,
-                                              loadingProgress) {
-                                            if (loadingProgress == null)
-                                              return child;
-                                            return SizedBox(
-                                              width: 100,
-                                              height: 100,
-                                              child: Center(
-                                                  child:
-                                                      CircularProgressIndicator()),
-                                            );
-                                          },
-                                          errorBuilder:
-                                              (context, error, stackTrace) =>
-                                                  Container(
-                                            width: 100,
-                                            height: 100,
-                                            color: Colors.grey[300],
-                                            child: Icon(
-                                                Icons.image_not_supported,
-                                                size: 40,
-                                                color: Colors.grey),
-                                          ),
-                                        )
-                                      : Image.file(
-                                          File(productsImages[
-                                              index]), // Local image
-                                          fit: BoxFit.cover,
-                                          width: 100,
-                                          height: 100,
-                                          errorBuilder:
-                                              (context, error, stackTrace) =>
-                                                  Container(
-                                            width: 100,
-                                            height: 100,
-                                            color: Colors.grey[300],
-                                            child: Icon(
-                                                Icons.image_not_supported,
-                                                size: 40,
-                                                color: Colors.grey),
-                                          ),
-                                        ),
+                            Container(
+                              height: 140, // fixed height
+                              width: 140, // fixed width
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.grey[200],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  allImageUrls[index],
+                                  fit: BoxFit
+                                      .contain, // scales proportionally, no cropping
                                 ),
-                                Positioned(
-                                  top: 5,
-                                  right: 5,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        productsImages.removeAt(
-                                            index); // Remove image on tap
-                                      });
-                                    },
-                                    child: CircleAvatar(
-                                      radius: 12,
-                                      backgroundColor: Colors.white,
-                                      child: Icon(Icons.close,
-                                          size: 14, color: Colors.black),
-                                    ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: GestureDetector(
+                                onTap: () {
+                                  print('Remove image at index $index');
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.8),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.close,
+                                    size: 18,
+                                    color: Colors.black,
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
                           ],
                         );
                       },
                     ),
                   ),
+
                   const SizedBox(height: 20),
                   // Text description for the item
                   Text(
