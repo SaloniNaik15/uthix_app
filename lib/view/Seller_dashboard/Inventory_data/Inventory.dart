@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart'; // Import Dio
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer';
 
@@ -17,10 +17,8 @@ class InventoryData extends StatefulWidget {
 
 class _InventoryDataState extends State<InventoryData> {
   int selectedIndex = -1;
-  List<dynamic> products = []; // To store fetched products
+  List<dynamic> products = [];
   String? accessToken;
-  String? productId;
-  String? bookTitle;
 
   final List<String> filters = [
     'All',
@@ -30,24 +28,23 @@ class _InventoryDataState extends State<InventoryData> {
     'Lab Equipment',
     'Book Marks'
   ];
-  String selectedFilter = 'All'; // Put this in your state
+  String selectedFilter = 'All';
+
+  Dio dio = Dio(); // Instantiate Dio
 
   @override
   void initState() {
     super.initState();
-    _initializeData(); // Call the async function
+    _initializeData();
   }
 
   Future<void> _initializeData() async {
     await _loadUserCredentials();
-    await fetchLatestProductId();
-
     await fetchProducts();
   }
 
   Future<void> _loadUserCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
     String? savedaccessToken = prefs.getString("auth_token");
 
     log("Retrieved acesstoken: $savedaccessToken");
@@ -57,161 +54,39 @@ class _InventoryDataState extends State<InventoryData> {
     });
   }
 
-  /// Fetch the latest book title stored in SharedPreferences
-  Future<String?> getLatestBookTitle() async {
-    final prefs = await SharedPreferences.getInstance();
-    Set<String> keys = prefs.getKeys(); // Get all stored keys
-
-    List<String> bookTitles = [];
-
-    // Extract book titles from keys
-    for (String key in keys) {
-      if (key.startsWith("book_title_")) {
-        String? bookTitle = prefs.getString(key);
-        if (bookTitle != null) {
-          bookTitles.add(bookTitle);
-        }
-      }
-    }
-
-    if (bookTitles.isEmpty) {
-      log("❌ No book titles found in SharedPreferences");
-      return null;
-    }
-
-    // Assuming the last added title is the latest
-    String latestBookTitle = bookTitles.last;
-    log("✅ Latest Book Title Retrieved: $latestBookTitle");
-
-    return latestBookTitle;
-  }
-
-  /// Get product ID using book title
-  Future<String?> getProductIdByTitle(String bookTitle) async {
-    final prefs = await SharedPreferences.getInstance();
-    String key = "product_id_$bookTitle";
-    String? productId = prefs.getString(key);
-
-    if (productId == null) {
-      log("❌ No Product ID found for book title: $bookTitle");
-      return null;
-    }
-
-    log("✅ Retrieved Product ID for '$bookTitle': $productId");
-    return productId;
-  }
-
-  /// Fetch latest product ID dynamically
-  String? latestBookTitle;
-  String? latestProductId;
-
-  Future<void> fetchLatestProductId() async {
-    latestBookTitle = await getLatestBookTitle(); // ✅ Store in variable
-    if (latestBookTitle != null) {
-      latestProductId =
-          await getProductIdByTitle(latestBookTitle!); // ✅ Store in variable
-      log("📝 Stored Latest Product ID: ${latestProductId ?? 'Not Found'}");
-    } else {
-      log("❌ Could not fetch latest Product ID");
-    }
-  }
-
   Future<void> fetchProducts() async {
-    final url = 'https://admin.uthix.com/api/get/vendor/products';
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    const String url = 'https://admin.uthix.com/api/get/vendor/products';
 
     try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {'Authorization': 'Bearer $accessToken'},
+      final response = await dio.get(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+            'Accept': 'application/json',
+          },
+        ),
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        var jsonResponse = response.data;
+
+        // 🔥 Log full JSON response here
+        log("✅ Full API Response: ${jsonEncode(jsonResponse)}");
+
+        List<dynamic> fetchedProducts = jsonResponse['products'];
+
+        log("✅ Products fetched: ${fetchedProducts.length}");
 
         setState(() {
-          products = (data['products'] as List).map((item) {
-            String bookTitle = item['title'] ?? 'unknown_title';
-            int bookPrice = (item['price'] is int)
-                ? item['price']
-                : int.tryParse(item['price']?.toString() ?? '0') ?? 0;
-
-            String bookDescription = item['description'] ?? 'No description';
-            String bookAuthor = item['author'] ?? 'Unknown author';
-
-            // ✅ Store Book Details in SharedPreferences
-            prefs.setString('book_title_$bookTitle', bookTitle);
-            prefs.setInt('book_price_$bookTitle', bookPrice);
-            prefs.setString('book_description_$bookTitle', bookDescription);
-            prefs.setString('book_author_$bookTitle', bookAuthor);
-
-            // ✅ Log to check stored values
-            log("📌 Stored in SharedPreferences:");
-            log("   🔹 Title: $bookTitle");
-            log("   🔹 Price: $bookPrice");
-            log("   🔹 Description: $bookDescription");
-            log("   🔹 Author: $bookAuthor");
-
-            // ✅ Retrieve stored local & server thumbnail from SharedPreferences
-            String? localThumbnail =
-                prefs.getString('local_thumbnail_$bookTitle');
-            String? serverThumbnail = item['thumbnail_img'];
-            String? storedServerThumbnail =
-                prefs.getString('server_thumbnail_$bookTitle');
-
-            // ✅ Prefer Local Image first, then Server Image
-            String finalThumbnail = '';
-            if (localThumbnail != null && localThumbnail.isNotEmpty) {
-              finalThumbnail = localThumbnail; // Use local image if exists
-            } else if (serverThumbnail != null && serverThumbnail.isNotEmpty) {
-              finalThumbnail =
-                  "https://admin.uthix.com/uploads/$serverThumbnail"; // Use server image
-            } else if (storedServerThumbnail != null &&
-                storedServerThumbnail.isNotEmpty) {
-              finalThumbnail =
-                  storedServerThumbnail; // Use stored server image if API fails
-            }
-
-            // ✅ Retrieve stored local & server images
-            List<String>? localImages =
-                prefs.getStringList('local_images_$bookTitle');
-            List<String> serverImages = [];
-            if (item['images'] != null) {
-              serverImages = (item['images'] as List)
-                  .map<String>((img) =>
-                      "https://admin.uthix.com/uploads/${img['image_path']}")
-                  .toList();
-            }
-
-            // ✅ If local images exist, use them instead of server images
-            List<String> finalImages = [];
-            if (localImages != null && localImages.isNotEmpty) {
-              finalImages = localImages;
-            } else if (serverImages.isNotEmpty) {
-              finalImages = serverImages;
-            }
-
-            log("📌 Final Thumbnail for $bookTitle: $finalThumbnail");
-            log("📌 Final Images for $bookTitle: $finalImages");
-
-            return {
-              'title': bookTitle,
-              'price': bookPrice,
-              'description': bookDescription,
-              'author': bookAuthor,
-              'thumbnail_img':
-                  finalThumbnail, // ✅ Uses local first, then server
-              'images': finalImages, // ✅ Uses local first, then server
-            };
-          }).toList();
+          products = fetchedProducts;
         });
-
-        print("✅ Products Updated with Local & Server Images!");
       } else {
-        print('❌ Failed to load products: ${response.statusCode}');
+        log("❌ Failed to fetch products: ${response.statusCode}");
+        log("❌ Response body: ${response.data}");
       }
     } catch (e) {
-      print('❌ Error: $e');
+      log("❌ Error fetching products: $e");
     }
   }
 
@@ -235,7 +110,6 @@ class _InventoryDataState extends State<InventoryData> {
         title: Padding(
           padding: const EdgeInsets.only(left: 10),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
@@ -264,10 +138,7 @@ class _InventoryDataState extends State<InventoryData> {
         child: Column(
           children: [
             const SizedBox(height: 10),
-            const Divider(
-              color: Colors.grey,
-              thickness: 1,
-            ),
+            const Divider(color: Colors.grey, thickness: 1),
             const SizedBox(height: 15),
             buildFilterChips(filters, selectedFilter, (filter) {
               setState(() {
@@ -275,22 +146,23 @@ class _InventoryDataState extends State<InventoryData> {
               });
               print("Selected: $filter");
             }),
-            // Filters and other UI components
-
-            // Display products once fetched
-            Column(
-              children: [
-                if (products.isEmpty)
-                  const Center(
-                      child:
-                          CircularProgressIndicator()) // Show loading indicator
-                else
-                  BookList(
-                      products: products,
-                      latestProductId: latestProductId,
-                      latestBookTitle:
-                          latestBookTitle), // Pass products to the BookList widget
-              ],
+            const SizedBox(height: 10),
+            Builder(
+              builder: (context) {
+                if (products.isEmpty) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 60),
+                      child: Text(
+                        'No products found.',
+                        style: TextStyle(fontSize: 16, color: Colors.black54),
+                      ),
+                    ),
+                  );
+                } else {
+                  return BookList(products: products);
+                }
+              },
             ),
           ],
         ),
@@ -299,18 +171,10 @@ class _InventoryDataState extends State<InventoryData> {
   }
 }
 
-// ignore: must_be_immutable
 class BookList extends StatelessWidget {
-  final List<dynamic> products; // List to store fetched products
-  String? latestProductId;
-  String? latestBookTitle;
+  final List<dynamic> products;
 
-  BookList(
-      {Key? key,
-      required this.products,
-      required this.latestProductId,
-      required this.latestBookTitle})
-      : super(key: key);
+  const BookList({Key? key, required this.products}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -337,16 +201,24 @@ class BookList extends StatelessWidget {
   }
 
   Widget buildProductCard(BuildContext context, Map<String, dynamic> product) {
+    // Extract the first image URL from the product's images array and update the path
+    String? imageUrl;
+    if (product['images'] != null && product['images'].isNotEmpty) {
+      imageUrl =
+          'https://admin.uthix.com/storage/image/products/${product['images'][0]['image_path']}';
+    }
+
     return GestureDetector(
       onTap: () {
         print('Tapped on: ${product['title']}');
       },
       child: Container(
-        height: 400.h,
+        height: 550.h,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
+              height: 180.h,
               padding: EdgeInsets.all(5.w),
               decoration: BoxDecoration(
                 border:
@@ -363,43 +235,17 @@ class BookList extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
-                child: product['thumbnail_img'] != null &&
-                        product['thumbnail_img'].isNotEmpty
-                    ? (product['thumbnail_img'].startsWith("/") ||
-                            product['thumbnail_img'].contains("data/user"))
-                        ? Image.file(
-                            File(product['thumbnail_img']),
-                            height: 160.h,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Icon(
-                              Icons.image_not_supported,
-                              size: 50.sp,
-                              color: Colors.grey,
-                            ),
-                          )
-                        : Image.network(
-                            product['thumbnail_img'].startsWith("http")
-                                ? product['thumbnail_img']
-                                : "https://admin.uthix.com/uploads/${product['thumbnail_img']}",
-                            height: 160.h,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, progress) =>
-                                progress == null
-                                    ? child
-                                    : Center(
-                                        child: CircularProgressIndicator()),
-                            errorBuilder: (_, __, ___) => Icon(
-                              Icons.image_not_supported,
-                              size: 50.sp,
-                              color: Colors.grey,
-                            ),
-                          )
-                    : Icon(Icons.image, size: 50.sp, color: Colors.grey),
+                child: imageUrl != null
+                    ? Image.network(
+                        imageUrl,
+                        fit: BoxFit
+                            .cover, // Ensures the image fills the container
+                      )
+                    : Container(
+                        color: Colors.grey[200],
+                      ),
               ),
             ),
-
             Padding(
               padding: EdgeInsets.only(top: 8.h),
               child: Text(
@@ -413,7 +259,6 @@ class BookList extends StatelessWidget {
                 ),
               ),
             ),
-
             Padding(
               padding: EdgeInsets.only(top: 6.h),
               child: Text(
@@ -426,11 +271,7 @@ class BookList extends StatelessWidget {
                 ),
               ),
             ),
-
-            // 📎 View Details Button
-            const SizedBox(
-              height: 3,
-            ),
+            const SizedBox(height: 3),
             OutlinedButton.icon(
               onPressed: () {
                 if (product['id'] != null) {
