@@ -72,7 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           phoneController.text = user['phone']?.toString() ?? "";
           genderController.text = data['gender'] ?? "";
           addressController.text = data['store_address'] ?? "";
-          image = user['image'];
+          image = data['profile_image'];
           isLoading = false;
         });
       } else {
@@ -107,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         "gender": genderController.text,
         "store_address": addressController.text,
         if (_pickedImageFile != null)
-          "image": await MultipartFile.fromFile(
+          "profile_image": await MultipartFile.fromFile(
             _pickedImageFile!.path,
             filename: _pickedImageFile!.path.split('/').last,
           ),
@@ -206,7 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundImage: _pickedImageFile != null
                     ? FileImage(_pickedImageFile!)
                     : image != null
-                    ? NetworkImage("https://admin.uthix.com/storage/images/user/$image")
+                    ? NetworkImage("https://admin.uthix.com/storage/images/vendor/$image")
                     : const AssetImage("assets/icons/profile.png") as ImageProvider,
               ),
               Positioned(
