@@ -1,9 +1,16 @@
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Seller_dashboard/Orders_Data/UpdateStatus.dart';
 
 class Orderdetails extends StatefulWidget {
-  const Orderdetails({super.key});
+  final int productId;
+
+  const Orderdetails({super.key, required this.productId});
 
   @override
   State<Orderdetails> createState() => _OrderdetailsState();
@@ -38,11 +45,11 @@ class _OrderdetailsState extends State<Orderdetails> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            OrderAndTrackingCard(), // Single Card containing Order + Tracking
+            OrderAndTrackingCard(productId: widget.productId), // ✅ Fixed here
             SizedBox(height: 16),
-            AddressSection(), // Separate Address Section
+            AddressSection(),
             SizedBox(height: 16),
-            PriceDetailsSection(), // Separate Price Details Section
+            PriceDetailsSection(),
           ],
         ),
       ),
@@ -50,8 +57,19 @@ class _OrderdetailsState extends State<Orderdetails> {
   }
 }
 
-//  Single Card for Order Details + Tracking
-class OrderAndTrackingCard extends StatelessWidget {
+class OrderAndTrackingCard extends StatefulWidget {
+  final int productId; // ✅ Add this
+
+  const OrderAndTrackingCard({
+    Key? key,
+    required this.productId, // ✅ And this
+  }) : super(key: key);
+
+  @override
+  State<OrderAndTrackingCard> createState() => _OrderAndTrackingCardState();
+}
+
+class _OrderAndTrackingCardState extends State<OrderAndTrackingCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -65,7 +83,6 @@ class OrderAndTrackingCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Order ID
             Text(
               "Order ID: 74678698759669160",
               style: TextStyle(fontSize: 14, color: Colors.grey),
@@ -96,7 +113,6 @@ class OrderAndTrackingCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Product Image
                 Card(
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
@@ -121,8 +137,7 @@ class OrderAndTrackingCard extends StatelessWidget {
             Divider(),
             SizedBox(height: 12),
 
-            // Tracking Section Inside the Same Card
-
+            // Tracking
             TrackingStep(
                 title: "Order Confirmed", date: "Thu Jan 23", completed: true),
             SizedBox(height: 10),
@@ -136,14 +151,15 @@ class OrderAndTrackingCard extends StatelessWidget {
             TrackingStep(title: "Delivery Today by 11 PM", completed: false),
             SizedBox(height: 25),
 
-            // Update Button inside the same card
+            // ✅ Update Button
             Center(
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const UpdateStatus(),
+                      builder: (context) =>
+                          UpdateStatus(productId: widget.productId),
                     ),
                   );
                 },
@@ -153,7 +169,8 @@ class OrderAndTrackingCard extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
                 ),
-                child: Text("Update", style: TextStyle(color: Colors.white)),
+                child:
+                    Text("Update", style: TextStyle(color: Colors.white)),
               ),
             ),
           ],
@@ -163,7 +180,6 @@ class OrderAndTrackingCard extends StatelessWidget {
   }
 }
 
-// Tracking Step Widget
 class TrackingStep extends StatelessWidget {
   final String title;
   final String? date;
@@ -210,7 +226,6 @@ class TrackingStep extends StatelessWidget {
   }
 }
 
-//  Separate Address Section
 class AddressSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -241,7 +256,6 @@ class AddressSection extends StatelessWidget {
   }
 }
 
-//  Separate Price Details Section
 class PriceDetailsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

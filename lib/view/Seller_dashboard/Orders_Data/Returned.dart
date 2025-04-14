@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,12 +31,11 @@ class _ReturnedState extends State<Returned> {
         log("❌ Auth token not found");
         return;
       }
+
       Dio dio = Dio();
 
-      // 🔐 Replace with your actual token
-
       final response = await dio.get(
-        'https://your-api.com/api/orders?status=${widget.status}', // 🔁 Replace with actual API
+        'https://admin.uthix.com/api/vendor-order-status/${widget.status}',
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -47,15 +45,23 @@ class _ReturnedState extends State<Returned> {
       );
 
       if (response.statusCode == 200) {
-        setState(() {
-          orders = response.data;
-          isLoading = false;
-        });
+        var data = response.data;
+        if (data['orders'] != null && data['orders'] is List) {
+          setState(() {
+            orders = data['orders'];
+            isLoading = false;
+          });
+        } else {
+          log("❌ 'orders' not found or invalid format: ${data['orders']}");
+          setState(() => isLoading = false);
+        }
       } else {
         print("Error: ${response.statusMessage}");
+        setState(() => isLoading = false);
       }
     } catch (e) {
       print("Failed to fetch orders: $e");
+      setState(() => isLoading = false);
     }
   }
 
@@ -136,6 +142,9 @@ class _ReturnedState extends State<Returned> {
   }
 
   Widget _buildOrderCard(BuildContext context, dynamic order) {
+    var product = order['items'][0];
+    String? thumbnailImg = product['image'];
+
     return SizedBox(
       width: double.infinity,
       child: Card(
@@ -151,11 +160,49 @@ class _ReturnedState extends State<Returned> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildOrderDetails(context, order),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildImageCard(thumbnailImg),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          product['title'] ?? "Unknown Product",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'Urbanist',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          product['description'] ?? "No description available",
+                          style: TextStyle(
+                            color: Colors.grey[700],
+                            fontFamily: 'Urbanist',
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "₹${product['price']}",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Urbanist',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 10),
               _buildDivider(),
               const SizedBox(height: 12),
-              _buildAddressSection(order['address']),
+              _buildAddressSection(order['shipping_address']),
               _buildDivider(),
               const SizedBox(height: 10),
               _buildActionButton(context),
@@ -166,52 +213,7 @@ class _ReturnedState extends State<Returned> {
     );
   }
 
-  Widget _buildOrderDetails(BuildContext context, dynamic order) {
-    var product = order['order_items'][0]['product'];
-    String? thumbnailImg = product['thumbnail_img'];
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildImageCard(thumbnailImg),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                product['title'] ?? "Unknown Product",
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Urbanist',
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                product['description'] ?? "No description available",
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontFamily: 'Urbanist',
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "₹${order['total_amount']}",
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Urbanist',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAddressSection(String address) {
+  Widget _buildAddressSection(dynamic address) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -225,7 +227,7 @@ class _ReturnedState extends State<Returned> {
         ),
         const SizedBox(height: 4),
         Text(
-          address,
+          "${address['street_address'] ?? ''} ${address['landmark'] ?? ''}, ${address['city'] ?? ''}, ${address['state'] ?? ''} ${address['pincode'] ?? ''}",
           style: const TextStyle(
             fontSize: 14,
             fontFamily: 'Urbanist',
