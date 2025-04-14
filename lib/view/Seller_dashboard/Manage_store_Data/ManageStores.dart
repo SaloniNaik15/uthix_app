@@ -26,7 +26,7 @@ class _ManageStoreDataState extends State<ManageStoreData> {
   int bestSellingItems = 50;
 
   final String apiUrl = "https://admin.uthix.com/api/vendor/profile";
-  final String logoBaseUrl = "https://admin.uthix.com/storage/images/instructor/logo/";
+  final String logoBaseUrl = "https://admin.uthix.com/storage/images/logos/";
   bool isLoading = true;
 
   @override
