@@ -108,11 +108,11 @@ class _MyOrdersState extends State<MyOrders> {
           children: [
             _roundedBox("PENDING", const Color(0xFF35B395), () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => const Pending()));
+                  context, MaterialPageRoute(builder: (_) => const Pending(status: 'pending',)));
             }),
             _roundedBox("IN TRANSIT", const Color(0xFF18617E), () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => InTransit()));
+                  context, MaterialPageRoute(builder: (_) => InTransit(status: 'intransit',)));
             }),
           ],
         ),
@@ -122,11 +122,11 @@ class _MyOrdersState extends State<MyOrders> {
           children: [
             _roundedBox("DELIVERED", const Color(0xFFCA752A), () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => Deliverd()));
+                  context, MaterialPageRoute(builder: (_) => Deliverd(status: 'delivered',)));
             }),
             _roundedBox("RETURNED", const Color(0xFF149643), () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => Returned()));
+                  context, MaterialPageRoute(builder: (_) => Returned(status: 'returned',)));
             }),
           ],
         ),
@@ -134,7 +134,7 @@ class _MyOrdersState extends State<MyOrders> {
         Center(
           child: _roundedBox("REJECTED", const Color(0xFFF44236), () {
             Navigator.push(
-                context, MaterialPageRoute(builder: (_) => Rejected()));
+                context, MaterialPageRoute(builder: (_) => Rejected(status: 'rejected',)));
           }),
         ),
       ],
