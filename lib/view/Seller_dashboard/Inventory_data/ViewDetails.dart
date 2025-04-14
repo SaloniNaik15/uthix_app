@@ -18,10 +18,8 @@ import 'CustomerReviews.dart';
 import 'Inventory.dart';
 
 class Viewdetails extends StatefulWidget {
-  final String productTitle;
-  final String productId;
-  const Viewdetails(
-      {super.key, required this.productTitle, required this.productId});
+  final Map<String, dynamic> product;
+  const Viewdetails({super.key, required this.product});
 
   @override
   State<Viewdetails> createState() => _ViewdetailsState();
@@ -29,7 +27,7 @@ class Viewdetails extends StatefulWidget {
 
 class _ViewdetailsState extends State<Viewdetails> {
   String? accessToken;
-  Map<String, dynamic>? productDetails;
+  late Map<String, dynamic> productDetails;
   List<String> allImageUrls = [];
   bool isLoading = true;
   String bookName = 'hii';
@@ -39,25 +37,24 @@ class _ViewdetailsState extends State<Viewdetails> {
   double? rating;
   String? review;
   Dio dio = Dio();
+  List<dynamic> product = [];
 
   @override
   void initState() {
     super.initState();
-    log("📦 Received Product ID: ${widget.productId}");
-    log("📖 Received Product Title: ${widget.productTitle}");
+    productDetails = widget.product;
     _initializeData(); // Call the async function
   }
 
   Future<void> _initializeData() async {
     await _loadUserCredentials();
-    await fetchProductAdditionalDetails();
     await fetchReviewAndRating();
     await fetchProducts();
   }
 
   Future<void> fetchReviewAndRating() async {
     final String url =
-        'https://admin.uthix.com/api/vendor/review/${widget.productId}';
+        'https://admin.uthix.com/api/vendor/review/${productDetails['id']}';
 
     try {
       final response = await http.get(
@@ -112,24 +109,6 @@ class _ViewdetailsState extends State<Viewdetails> {
     setState(() {
       accessToken = savedaccessToken ?? "No accesstoken";
     });
-  }
-
-  Future<void> fetchProductAdditionalDetails() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    setState(() {
-      bookName = prefs.getString('book_title_${widget.productTitle}') ??
-          'Unknown Title';
-      authorname = prefs.getString('book_author_${widget.productTitle}') ??
-          'Unknown Author';
-      description =
-          prefs.getString('book_description_${widget.productTitle}') ??
-              'No description available';
-
-      bookPrice = prefs.getInt('book_price_${widget.productTitle}') ?? 0;
-    });
-
-    log("📖 Book Details Loaded: $bookName, Price: $bookPrice");
   }
 
   Future<void> fetchProducts() async {
@@ -262,21 +241,14 @@ class _ViewdetailsState extends State<Viewdetails> {
                   const SizedBox(height: 20),
                   // Text description for the item
                   Text(
-                    bookName,
+                    productDetails['title'] ?? 'Product Details',
                     style: TextStyle(
                       fontSize: 14,
                       fontFamily: 'Urbanist',
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const Text(
-                    "Hard Cover",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Urbanist',
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
+
                   SizedBox(
                     height: 10,
                   ),
@@ -315,7 +287,7 @@ class _ViewdetailsState extends State<Viewdetails> {
                                 .start, // Align text to the start
                             children: [
                               Text(
-                                bookPrice.toString(),
+                                productDetails['price'].toString(),
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.blue,
@@ -325,17 +297,17 @@ class _ViewdetailsState extends State<Viewdetails> {
                               ),
                             ],
                           ),
-                          Container(
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF6F6F6),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              "6 out of 10 sold",
-                              style: TextStyle(),
-                            ),
-                          ),
+                          // Container(
+                          //   padding: EdgeInsets.all(8),
+                          //   decoration: BoxDecoration(
+                          //     color: const Color(0xFFF6F6F6),
+                          //     borderRadius: BorderRadius.circular(8),
+                          //   ),
+                          //   child: const Text(
+                          //     "6 out of 10 sold",
+                          //     style: TextStyle(),
+                          //   ),
+                          // ),
                         ],
                       ),
                       const SizedBox(height: 8), // Spacing between elements
@@ -348,7 +320,7 @@ class _ViewdetailsState extends State<Viewdetails> {
                               MainAxisAlignment.spaceBetween, // Center content
                           children: [
                             Text(
-                              authorname,
+                              productDetails['author'],
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
@@ -367,7 +339,7 @@ class _ViewdetailsState extends State<Viewdetails> {
                             ),
                             const SizedBox(width: 10),
                             Text(
-                              "January",
+                              productDetails['language'],
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
@@ -399,7 +371,7 @@ class _ViewdetailsState extends State<Viewdetails> {
                         height: 10,
                       ),
                       Text(
-                        description,
+                        productDetails['description'],
                         style: const TextStyle(
                           fontSize: 14,
                           fontFamily: 'Urbanist',
@@ -425,7 +397,7 @@ class _ViewdetailsState extends State<Viewdetails> {
                                 ),
                                 StatItemVenodr(
                                   title: 'ALL BOOKS',
-                                  value: '50',
+                                  value: productDetails['stock'].toString(),
                                   icon: Icons.book, // Show an icon
                                   backgroundColor: Color(0xFFEFFCFA),
                                 ),
@@ -517,8 +489,8 @@ Widget reviewAndRating(dynamic rating, dynamic review) {
         children: [
           Container(
             padding: EdgeInsets.all(5),
-            width: 70,
-            height: 35,
+            width: 75,
+            height: 55,
             decoration: BoxDecoration(
               shape: BoxShape.rectangle,
               borderRadius: BorderRadius.circular(10),
