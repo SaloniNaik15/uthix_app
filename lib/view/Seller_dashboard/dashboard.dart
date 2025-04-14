@@ -194,9 +194,13 @@ class _SellerDashboardState extends State<SellerDashboard> {
           // Store already exists
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Store already created."),
+              SnackBar(
+                content: const Text(" Store Already Created"),
+                duration: const Duration(seconds: 3),
                 backgroundColor: Color(0xFF2B5C74),
+                behavior: SnackBarBehavior.floating,
+                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
             );
           }

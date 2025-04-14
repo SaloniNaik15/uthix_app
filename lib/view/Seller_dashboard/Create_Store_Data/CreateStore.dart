@@ -126,6 +126,16 @@ class _CreateStoreState extends State<CreateStore> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(" Store created successfully "),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
         log("✅ Store created successfully: ${response.data}");
       } else {
         log("❌ Store creation failed: ${response.statusCode}, ${response.data}");
