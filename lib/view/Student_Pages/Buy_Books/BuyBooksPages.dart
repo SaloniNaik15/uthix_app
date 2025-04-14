@@ -56,14 +56,14 @@ class _BuybookspagesState extends State<Buybookspages> {
         'https://admin.uthix.com/api/products',
         queryParameters: {"category_id": categoryId},
         options: Options(
-          headers: {"Authorization": "Bearer $authToken"}, // Use dynamic token
+          headers: {"Authorization": "Bearer $authToken"},
         ),
       );
 
       if (response.statusCode == 200) {
         setState(() {
           products =
-          List<Map<String, dynamic>>.from(response.data['products'] ?? []);
+              List<Map<String, dynamic>>.from(response.data['products'] ?? []);
           isLoading = false;
         });
       } else {
@@ -136,8 +136,7 @@ class _BuybookspagesState extends State<Buybookspages> {
       child: CircleAvatar(
         backgroundColor: Colors.white,
         child: IconButton(
-            icon: Icon(icon, color: Colors.black, size: 25),
-            onPressed: onTap),
+            icon: Icon(icon, color: Colors.black, size: 25), onPressed: onTap),
       ),
     );
   }
@@ -157,15 +156,17 @@ class _BuybookspagesState extends State<Buybookspages> {
         actions: [
           _iconButton(
               Icons.search,
-                  () => Navigator.push(
+              () => Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => StudentSearch(categoryId: null)))),
-          _iconButton(Icons.favorite_border,
-                  () => Navigator.push(context, MaterialPageRoute(builder: (context) => Wishlist()))),
+          _iconButton(
+              Icons.favorite_border,
+              () => Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => Wishlist()))),
           _iconButton(
               Icons.shopping_bag_outlined,
-                  () => Navigator.push(
+              () => Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => Studentcart(cartItems: [])))),
@@ -173,35 +174,36 @@ class _BuybookspagesState extends State<Buybookspages> {
         elevation: 0,
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
-      ))
-          : products.isEmpty
           ? Center(
-          child: Text("No products available.",
-              style: TextStyle(fontSize: 14.sp)))
-          : Padding(
-        padding: EdgeInsets.all(8.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Products",
-                style: TextStyle(
-                    fontSize: 18.sp, fontWeight: FontWeight.bold)),
-            SizedBox(height: 5.h),
-            Text("${products.length} Items",
-                style: TextStyle(
-                    fontSize: 14.sp, color: Colors.black87)),
-            SizedBox(height: 10.h),
-            Expanded(
-              child: BookItemsList(
-                books: products,
-                addToCart: addToCart,
-              ),
-            ),
-          ],
-        ),
-      ),
+              child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+            ))
+          : products.isEmpty
+              ? Center(
+                  child: Text("No products available.",
+                      style: TextStyle(fontSize: 14.sp)))
+              : Padding(
+                  padding: EdgeInsets.all(8.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Products",
+                          style: TextStyle(
+                              fontSize: 18.sp, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 5.h),
+                      Text("${products.length} Items",
+                          style: TextStyle(
+                              fontSize: 14.sp, color: Colors.black87)),
+                      SizedBox(height: 10.h),
+                      Expanded(
+                        child: BookItemsList(
+                          books: products,
+                          addToCart: addToCart,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
       bottomNavigationBar: const SortByButton(),
     );
   }
@@ -275,7 +277,8 @@ class SortByButton extends StatelessWidget {
 
 class BookItemsList extends StatefulWidget {
   final List<Map<String, dynamic>> books;
-  final Future<void> Function(BuildContext, Map<String, dynamic>, int) addToCart;
+  final Future<void> Function(BuildContext, Map<String, dynamic>, int)
+      addToCart;
 
   const BookItemsList({
     Key? key,
@@ -424,7 +427,7 @@ class _BookItemsListState extends State<BookItemsList> {
               final String imageUrl = book['first_image'] != null
                   ? 'https://admin.uthix.com/storage/image/products/${book['first_image']['image_path']}'
                   : "https://via.placeholder.com/150";
-      
+
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -483,7 +486,8 @@ class _BookItemsListState extends State<BookItemsList> {
                             bottom: 5.h,
                             left: 5.w,
                             child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 5.w, vertical: 2.h),
                               decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.8),
                                 borderRadius: BorderRadius.circular(5.r),
@@ -500,7 +504,8 @@ class _BookItemsListState extends State<BookItemsList> {
                                     ),
                                   ),
                                   SizedBox(width: 2.w),
-                                  Icon(Icons.star, color: Colors.amber, size: 14.sp),
+                                  Icon(Icons.star,
+                                      color: Colors.amber, size: 14.sp),
                                 ],
                               ),
                             ),
@@ -553,7 +558,9 @@ class _BookItemsListState extends State<BookItemsList> {
                       children: [
                         IconButton(
                           icon: Icon(
-                            isInWishlist ? Icons.favorite : Icons.favorite_border,
+                            isInWishlist
+                                ? Icons.favorite
+                                : Icons.favorite_border,
                             color: const Color(0xFF2B5C74),
                             size: 25.sp,
                           ),
@@ -568,16 +575,20 @@ class _BookItemsListState extends State<BookItemsList> {
                                 await widget.addToCart(context, book, quantity);
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Book data is missing!")),
+                                  const SnackBar(
+                                      content: Text("Book data is missing!")),
                                 );
                               }
                             },
-                            icon: Icon(Icons.shopping_bag_outlined, size: 16.sp, color: Colors.white),
+                            icon: Icon(Icons.shopping_bag_outlined,
+                                size: 16.sp, color: Colors.white),
                             label: Text('Add to Bag',
-                                style: TextStyle(color: Colors.white, fontSize: 12.sp)),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 12.sp)),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:  Color(0xFF2B5C74),
-                              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+                              backgroundColor: Color(0xFF2B5C74),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10.w, vertical: 8.h),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.r),
                               ),
@@ -596,5 +607,3 @@ class _BookItemsListState extends State<BookItemsList> {
     );
   }
 }
-
-
