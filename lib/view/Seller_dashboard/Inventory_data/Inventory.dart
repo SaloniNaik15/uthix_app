@@ -274,19 +274,14 @@ class BookList extends StatelessWidget {
             const SizedBox(height: 3),
             OutlinedButton.icon(
               onPressed: () {
-                if (product['id'] != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Viewdetails(
-                        productTitle: product['title'] ?? "Unknown Title",
-                        productId: product['id'].toString(),
-                      ),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Viewdetails(
+                      product: product,
                     ),
-                  );
-                } else {
-                  log("❌ Could not fetch product ID");
-                }
+                  ),
+                );
               },
               icon: Icon(Icons.info, size: 16.sp, color: Colors.black),
               label: Text(
