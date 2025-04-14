@@ -40,7 +40,21 @@ class _SellerDashboardState extends State<SellerDashboard> {
   }
 
   Future<void> _loadUserCredentials() async {
-    // User credentials logic if needed
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+
+    if (token != null && token.isNotEmpty) {
+      setState(() {
+        accessToken = token;
+      });
+      log("✅ Token Loaded: $accessToken");
+
+      // ✅ Only call fetchParentCategories after token is loaded
+      await fetchParentCategories();
+    } else {
+      log("❌ Token is null or empty");
+      // Optional: Navigate to login screen
+    }
   }
 
   final Dio dio = Dio();
@@ -308,7 +322,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
                 "Revantaha Stationers",
                 style: TextStyle(
                   fontSize: 16,
-                  fontFamily: 'Urbanist',
+
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF605F5F),
                 ),
