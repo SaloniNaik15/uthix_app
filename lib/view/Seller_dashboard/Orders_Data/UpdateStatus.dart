@@ -1,8 +1,15 @@
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UpdateStatus extends StatefulWidget {
-  const UpdateStatus({super.key});
+  final int productId;
+
+  const UpdateStatus({super.key, required this.productId});
 
   @override
   State<UpdateStatus> createState() => _UpdateStatusState();
@@ -11,6 +18,42 @@ class UpdateStatus extends StatefulWidget {
 class _UpdateStatusState extends State<UpdateStatus> {
   String selectedStatus = "Cancelled";
   String tempStatus = "Cancelled";
+  Dio dio = Dio();
+
+  Future<void> updateOrderStatus(int productId, String status) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("auth_token");
+
+      if (token == null) {
+        log("❌ Auth token not found");
+        return;
+      }
+
+      var response = await Dio().post(
+        'https://admin.uthix.com/api/vendor-update-order-status',
+        data: jsonEncode({
+          'product_id': productId,
+          'status': status,
+        }),
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data['status'] == true) {
+        log('✅ Order status updated successfully');
+      } else {
+        log('❌ Failed to update order status');
+      }
+    } catch (e) {
+      log("❌ Error updating order status: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +67,7 @@ class _UpdateStatusState extends State<UpdateStatus> {
             Navigator.pop(context);
           },
         ),
-        title: Text(
+        title: const Text(
           'Vendor Order Status Update',
           style: TextStyle(color: Colors.black),
         ),
@@ -35,9 +78,7 @@ class _UpdateStatusState extends State<UpdateStatus> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
-              height: 30,
-            ),
+            const SizedBox(height: 30),
             Container(
               width: 350.w,
               padding: EdgeInsets.all(16.w),
@@ -50,11 +91,9 @@ class _UpdateStatusState extends State<UpdateStatus> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top Row: Order Info + Image
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Order Details
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,15 +138,13 @@ class _UpdateStatusState extends State<UpdateStatus> {
                           ],
                         ),
                       ),
-
-                      // Thumbnail Image
                       Card(
                         color: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.asset(
@@ -122,8 +159,6 @@ class _UpdateStatusState extends State<UpdateStatus> {
                     ],
                   ),
                   SizedBox(height: 20.h),
-
-                  // Update Status Label
                   Text(
                     "Update Status:",
                     style: TextStyle(
@@ -132,8 +167,6 @@ class _UpdateStatusState extends State<UpdateStatus> {
                     ),
                   ),
                   SizedBox(height: 8.h),
-
-                  // Dropdown
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12.w),
                     decoration: BoxDecoration(
@@ -146,10 +179,6 @@ class _UpdateStatusState extends State<UpdateStatus> {
                         icon: const Icon(Icons.arrow_drop_down),
                         items: const [
                           DropdownMenuItem(
-                              value: "Pending", child: Text("Pending")),
-                          DropdownMenuItem(
-                              value: "Accepted", child: Text("Accepted")),
-                          DropdownMenuItem(
                               value: "Cancelled", child: Text("Cancelled")),
                         ],
                         onChanged: (value) {
@@ -161,20 +190,30 @@ class _UpdateStatusState extends State<UpdateStatus> {
                     ),
                   ),
                   SizedBox(height: 20.h),
-
-                  // Update Status Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        setState(() {
-                          selectedStatus = tempStatus;
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Status updated to $selectedStatus'),
-                          ),
-                        );
+                        final parsedId = widget.productId;
+                        if (parsedId != null) {
+                          updateOrderStatus(parsedId, 'rejected');
+                          setState(() {
+                            selectedStatus = tempStatus;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text('Status updated to $selectedStatus'),
+                            ),
+                          );
+                        } else {
+                          log("❌ Invalid product ID");
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Invalid product ID.'),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2B5C74),

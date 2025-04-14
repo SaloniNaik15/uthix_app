@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +15,7 @@ class InTransit extends StatefulWidget {
 class _InTransitState extends State<InTransit> {
   late List<dynamic> orders = [];
   late Dio dio;
+  bool isLoading = true; // Track loading state
 
   @override
   void initState() {
@@ -32,8 +32,12 @@ class _InTransitState extends State<InTransit> {
 
       if (token == null) {
         log("❌ Auth token not found");
+        setState(() {
+          isLoading = false; // Stop loading if token is not found
+        });
         return;
       }
+
       final response = await dio.get(
         'https://admin.uthix.com/api/vendor-order-status/${widget.status}',
         options: Options(
@@ -42,17 +46,38 @@ class _InTransitState extends State<InTransit> {
           },
         ),
       );
+
       if (response.statusCode == 200) {
+        // Loop through orders and extract item ids
         setState(() {
-          orders =
-              response.data['orders']; // Set the orders from the API response
+          orders = response.data['orders'].map((order) {
+            // Extract the items and their IDs
+            List<dynamic> itemIds = order['items'].map((item) {
+              return item['id']; // Get the item ID
+            }).toList();
+
+            // Add the order ID and item IDs to the order data
+            return {
+              'order_id': order['order_id'],
+              'item_ids': itemIds, // Store item IDs here
+              'shipping_address': order['shipping_address'],
+              'items': order['items'], // Store items data here
+            };
+          }).toList();
+          isLoading = false; // Stop loading after data is fetched
         });
       } else {
         // Handle error if status code is not 200
         print('Failed to load orders: ${response.statusCode}');
+        setState(() {
+          isLoading = false; // Stop loading on error
+        });
       }
     } catch (e) {
       print('Error fetching orders: $e');
+      setState(() {
+        isLoading = false; // Stop loading on error
+      });
       // Optionally, show an error message to the user
     }
   }
@@ -62,25 +87,29 @@ class _InTransitState extends State<InTransit> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(context),
-      body: orders.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSearchBar(),
-                  const SizedBox(height: 15),
-                  _buildDivider(),
-                  const SizedBox(height: 20),
-                  ...orders
-                      .map((order) => _buildOrderCard(context, order))
-                      .toList(),
-                  const SizedBox(height: 15),
-                  _buildDivider(),
-                ],
-              ),
-            ),
+      body: isLoading
+          ? const Center(
+              child:
+                  CircularProgressIndicator()) // Show loading spinner while fetching data
+          : orders.isEmpty
+              ? const Center(child: Text("No orders found."))
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSearchBar(),
+                      const SizedBox(height: 15),
+                      _buildDivider(),
+                      const SizedBox(height: 20),
+                      ...orders
+                          .map((order) => _buildOrderCard(context, order))
+                          .toList(),
+                      const SizedBox(height: 15),
+                      _buildDivider(),
+                    ],
+                  ),
+                ),
     );
   }
 
@@ -154,7 +183,8 @@ class _InTransitState extends State<InTransit> {
               _buildAddressSection(order['shipping_address']),
               _buildDivider(),
               const SizedBox(height: 10),
-              _buildActionButton(context),
+              _buildActionButton(
+                  context, order['items']), // Pass the order's items here
             ],
           ),
         ),
@@ -163,6 +193,17 @@ class _InTransitState extends State<InTransit> {
   }
 
   Widget _buildAddressSection(dynamic shippingAddress) {
+    if (shippingAddress == null) {
+      return const Text(
+        "Shipping Address: Not available",
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+          fontFamily: 'Urbanist',
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -176,7 +217,7 @@ class _InTransitState extends State<InTransit> {
         ),
         const SizedBox(height: 4),
         Text(
-          "${shippingAddress['landmark']}, ${shippingAddress['city']}, ${shippingAddress['state']}",
+          "${shippingAddress['landmark'] ?? 'No landmark available'}, ${shippingAddress['city'] ?? 'No city available'}, ${shippingAddress['state'] ?? 'No state available'}",
           style: const TextStyle(
             fontSize: 14,
             fontFamily: 'Urbanist',
@@ -187,95 +228,60 @@ class _InTransitState extends State<InTransit> {
     );
   }
 
-  Widget _buildActionButton(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const Orderdetails(),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2B5C74),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-            ),
-            child: const Text(
-              "View Details",
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildOrderDetails(BuildContext context, dynamic order) {
-    var product = order['items'][0];
-    String? thumbnailImg = product['image'];
+    if (order == null || order['items'] == null) {
+      return const Center(child: Text("No items found in the order."));
+    }
 
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildImageCard(thumbnailImg),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                product['title'] ?? "Unknown Product",
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Urbanist',
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                product['description'] ?? "No description available",
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontFamily: 'Urbanist',
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "₹${product['price']}",
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Urbanist',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+      children: order['items'].map<Widget>((product) {
+        if (product == null) {
+          return const SizedBox.shrink();
+        }
 
-  Widget _buildContainer({required Widget child}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: child,
+        String? thumbnailImg = product['image'];
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildImageCard(thumbnailImg),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product['title'] ?? "Unknown Product",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontFamily: 'Urbanist',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    product['description'] ?? "No description available",
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontFamily: 'Urbanist',
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "₹${product['price'] ?? 'N/A'}",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Urbanist',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      }).toList(),
     );
   }
 
@@ -299,6 +305,61 @@ class _InTransitState extends State<InTransit> {
             : Image.asset("assets/Seller_dashboard_images/book.jpg",
                 height: 100, width: 100, fit: BoxFit.cover),
       ),
+    );
+  }
+
+  Widget _buildActionButton(BuildContext context, dynamic items) {
+    return Column(
+      children: items.map<Widget>((product) {
+        return Row(
+          children: [
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  int productId = product['id'];
+                  // Log the product id before navigation
+                  log("Navigating to OrderDetails with Product ID: $productId");
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Orderdetails(productId: productId),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2B5C74),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                child: const Text(
+                  "View Details",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildContainer({required Widget child}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: child,
     );
   }
 
