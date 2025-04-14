@@ -1,4 +1,4 @@
-// import 'package:dio/dio.dart';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -164,19 +164,19 @@ class _StudentcartState extends State<Studentcart> {
       );
 
       if (response.statusCode == 201 && response.data['message'] == "Order placed successfully") {
-        // if (context.mounted) {
-        //   Navigator.pushReplacement(
-        //     context,
-        //     MaterialPageRoute(
-        //       builder: (context) => PaymentScreen(
-        //         orderId: response.data['order_id'],
-        //         orderNumber: response.data['order_number'],
-        //         totalPrice: totalPrice.toInt(),
-        //         addressId: selectedAddressId,
-        //       ),
-        //     ),
-        //   );
-        // }
+        if (context.mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PaymentScreen(
+                orderId: response.data['order_id'],
+                orderNumber: response.data['order_number'],
+                totalPrice: totalPrice.toInt(),
+                addressId: selectedAddressId,
+              ),
+            ),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
