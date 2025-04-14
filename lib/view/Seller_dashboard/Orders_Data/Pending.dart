@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,6 +32,7 @@ class _PendingState extends State<Pending> {
         log("❌ Auth token not found");
         return;
       }
+
       var response = await Dio().get(
         'https://admin.uthix.com/api/vendor-order-status/${widget.status}',
         options: Options(
@@ -81,7 +81,7 @@ class _PendingState extends State<Pending> {
           headers: {
             "Authorization": "Bearer $token",
             "Accept": "application/json",
-            "Content-Type": "application/json", // ✅ Ensure JSON content-type
+            "Content-Type": "application/json",
           },
         ),
       );
@@ -173,7 +173,6 @@ class _PendingState extends State<Pending> {
   }
 
   Widget _buildOrderCard(BuildContext context, dynamic order) {
-    var product = order['items'][0];
     var shipping = order['shipping_address'];
 
     return SizedBox(
@@ -191,14 +190,23 @@ class _PendingState extends State<Pending> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildOrderDetails(context, product),
+              // Loop through all items in the order
+              if (order['items'] != null)
+                ...order['items'].map<Widget>((product) {
+                  return _buildOrderDetails(context, product);
+                }).toList(),
               const SizedBox(height: 10),
               _buildDivider(),
               const SizedBox(height: 12),
               _buildAddressSection(shipping),
               _buildDivider(),
               const SizedBox(height: 10),
-              _buildActionButtons(context, product['id']),
+              // Optionally add action buttons if you want them for all products
+              if (order['items'] != null && order['items'].isNotEmpty)
+                _buildActionButtons(
+                    context,
+                    order['items'][0]
+                        ['id']), // Apply action buttons for the first item
             ],
           ),
         ),
@@ -274,6 +282,17 @@ class _PendingState extends State<Pending> {
   }
 
   Widget _buildAddressSection(dynamic shipping) {
+    if (shipping == null) {
+      return const Text(
+        "No shipping address available.",
+        style: TextStyle(
+          fontSize: 14,
+          fontFamily: 'Urbanist',
+          color: Colors.red,
+        ),
+      );
+    }
+
     String addressText = "${shipping['name'] ?? ''}, "
         "${shipping['phone'] ?? ''}, "
         "${shipping['city'] ?? ''}, "
@@ -310,6 +329,7 @@ class _PendingState extends State<Pending> {
         Expanded(
           child: ElevatedButton(
             onPressed: () {
+              updateOrderStatus(productId, 'intransit');
               log("Accept Order button pressed for product ID: $productId");
               showDialog(
                 context: context,
@@ -369,28 +389,34 @@ class _PendingState extends State<Pending> {
     );
   }
 
+  Widget _buildActionButton(
+    BuildContext context,
+    String label,
+    VoidCallback onPressed,
+    Color color,
+  ) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      ),
+      child: Text(label),
+    );
+  }
+
   Widget _buildContainer({required Widget child}) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: const Color(0xFFF4F4F4),
       ),
       child: child,
     );
   }
 
   Widget _buildDivider() {
-    return const Divider(
-      color: Color(0xFFF3F3F3),
-      thickness: 2,
-    );
+    return const Divider(color: Color(0xFFF4F4F4), height: 1);
   }
 }
 

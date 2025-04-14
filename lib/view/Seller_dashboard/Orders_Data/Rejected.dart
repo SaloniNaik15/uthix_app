@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
@@ -32,6 +31,7 @@ class _RejectedState extends State<Rejected> {
         log("❌ Auth token not found");
         return;
       }
+
       final dio = Dio();
       final response = await dio.get(
         'https://admin.uthix.com/api/vendor-order-status/${widget.status}',
@@ -42,10 +42,10 @@ class _RejectedState extends State<Rejected> {
           },
         ),
       );
+
       if (response.statusCode == 200) {
         setState(() {
-          // Ensure we grab the 'orders' part of the response
-          orders = List.from(response.data['orders']);
+          orders = List.from(response.data['orders'] ?? []);
           isLoading = false;
         });
       } else {
@@ -59,7 +59,7 @@ class _RejectedState extends State<Rejected> {
         isLoading = false;
         hasError = true;
       });
-      print('Error fetching orders: $e');
+      log('Error fetching orders: $e');
     }
   }
 
@@ -67,9 +67,10 @@ class _RejectedState extends State<Rejected> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: _buildAppBar(context),
+      appBar: _buildAppBar(),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator()) // Showing loading indicator
           : hasError
               ? const Center(child: Text("Failed to load orders"))
               : orders.isEmpty
@@ -94,24 +95,23 @@ class _RejectedState extends State<Rejected> {
     );
   }
 
-  AppBar _buildAppBar(BuildContext context) {
+  AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: const Color(0xFF2B5C74),
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_outlined, color: Colors.white),
         onPressed: () => Navigator.pop(context),
       ),
-      title: Center(
-        child: const Text(
-          "Rejected",
-          style: TextStyle(
-            fontSize: 20,
-            fontFamily: 'Urbanist',
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+      title: const Text(
+        "Rejected",
+        style: TextStyle(
+          fontSize: 20,
+          fontFamily: 'Urbanist',
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
         ),
       ),
+      centerTitle: true,
     );
   }
 
@@ -157,14 +157,14 @@ class _RejectedState extends State<Rejected> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildOrderDetails(context, order),
+              _buildOrderDetails(order),
               const SizedBox(height: 10),
               _buildDivider(),
               const SizedBox(height: 12),
               _buildAddressSection(order['shipping_address']),
               _buildDivider(),
               const SizedBox(height: 10),
-              _buildActionButton(context),
+              _buildActionButton(),
             ],
           ),
         ),
@@ -172,7 +172,23 @@ class _RejectedState extends State<Rejected> {
     );
   }
 
-  Widget _buildAddressSection(Map<String, dynamic> address) {
+  Widget _buildAddressSection(dynamic address) {
+    if (address is! Map) {
+      return const Text(
+        "Shipping Address: Not available",
+        style: TextStyle(
+          fontSize: 14,
+          fontFamily: 'Urbanist',
+          color: Colors.black87,
+        ),
+      );
+    }
+
+    final name = address['name'] ?? 'N/A';
+    final landmark = address['landmark'] ?? 'N/A';
+    final city = address['city'] ?? 'N/A';
+    final state = address['state'] ?? 'N/A';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -186,7 +202,7 @@ class _RejectedState extends State<Rejected> {
         ),
         const SizedBox(height: 4),
         Text(
-          "${address['name']}, ${address['landmark']}, ${address['city']}, ${address['state']}",
+          "$name, $landmark, $city, $state",
           style: const TextStyle(
             fontSize: 14,
             fontFamily: 'Urbanist',
@@ -197,7 +213,89 @@ class _RejectedState extends State<Rejected> {
     );
   }
 
-  Widget _buildActionButton(BuildContext context) {
+  Widget _buildOrderDetails(dynamic order) {
+    var product = (order['items'] is List && order['items'].isNotEmpty)
+        ? order['items'][0]
+        : {};
+
+    String title = product['title'] ?? "Unknown Product";
+    String description = product['description'] ?? "No description";
+    String price = product['price']?.toString() ?? "0";
+    String? thumbnailImg = product['image'];
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildImageCard(thumbnailImg),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontFamily: 'Urbanist',
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "₹$price",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Urbanist',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildImageCard(String? thumbnailImg) {
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: thumbnailImg != null && thumbnailImg.isNotEmpty
+            ? Image.network(
+                "https://admin.uthix.com/storage/image/products/$thumbnailImg",
+                height: 100,
+                width: 100,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    "assets/Seller_dashboard_images/book.jpg",
+                    height: 100,
+                    width: 100,
+                    fit: BoxFit.cover,
+                  );
+                },
+              )
+            : Image.asset(
+                "assets/Seller_dashboard_images/book.jpg",
+                height: 100,
+                width: 100,
+                fit: BoxFit.cover,
+              ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton() {
     return Row(
       children: [
         Expanded(
@@ -220,51 +318,6 @@ class _RejectedState extends State<Rejected> {
     );
   }
 
-  Widget _buildOrderDetails(BuildContext context, dynamic order) {
-    var product = order['items'][0];
-    String? thumbnailImg = product['image'];
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildImageCard(thumbnailImg),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                product['title'] ?? "Unknown Product",
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Urbanist',
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                product['description'] ?? "No description available",
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontFamily: 'Urbanist',
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "₹${order['total_amount']}",
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Urbanist',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildContainer({required Widget child}) {
     return Container(
       decoration: BoxDecoration(
@@ -279,29 +332,6 @@ class _RejectedState extends State<Rejected> {
         ],
       ),
       child: child,
-    );
-  }
-
-  Widget _buildImageCard(String? thumbnailImg) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: thumbnailImg != null && thumbnailImg.isNotEmpty
-            ? Image.network(
-                "https://admin.uthix.com/images/$thumbnailImg",
-                height: 100,
-                width: 100,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset("assets/Seller_dashboard_images/book.jpg",
-                      height: 100, width: 100, fit: BoxFit.cover);
-                },
-              )
-            : Image.asset("assets/Seller_dashboard_images/book.jpg",
-                height: 100, width: 100, fit: BoxFit.cover),
-      ),
     );
   }
 

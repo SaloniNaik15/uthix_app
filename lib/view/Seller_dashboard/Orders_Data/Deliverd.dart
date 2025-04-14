@@ -70,7 +70,7 @@ class _DeliverdState extends State<Deliverd> {
       backgroundColor: Colors.white,
       appBar: _buildAppBar(context),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: Text("No orders found."))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
