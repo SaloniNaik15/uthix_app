@@ -1,46 +1,61 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:uthix_app/view/Seller_dashboard/Orders_Data/OrderStatusScreen.dart';
-import 'package:uthix_app/view/Seller_dashboard/Orders_Data/UpdateStatus.dart';
-import 'OrderDetails.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uthix_app/view/Seller_dashboard/Orders_Data/OrderDetails.dart';
 
 class InTransit extends StatefulWidget {
-  const InTransit({super.key});
+  final String status;
+  const InTransit({super.key, required this.status});
 
   @override
   State<InTransit> createState() => _InTransitState();
 }
 
 class _InTransitState extends State<InTransit> {
-  List<dynamic> orders = [
-    {
-      'total_amount': 299.0,
-      'address':
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim',
-      'order_items': [
-        {
-          'product': {
-            'title': 'Flutter for Beginners',
-            'description': 'A complete guide to learning Flutter.',
-            'thumbnail_img': 'assets/Seller_dashboard_images/book.jpg',
-          }
-        }
-      ]
-    },
-    {
-      'total_amount': 199.0,
-      'address':
-          ' Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim',
-      'order_items': [
-        {
-          'product': {
-            'title': 'Advanced Flutter',
-            'description': 'Deep dive into widgets and performance.',
-            'thumbnail_img': 'assets/Seller_dashboard_images/book.jpg',
-          }
-        }
-      ]
+  late List<dynamic> orders = [];
+  late Dio dio;
+
+  @override
+  void initState() {
+    super.initState();
+    dio = Dio();
+    fetchOrders();
+  }
+
+  // Fetch orders from the API
+  Future<void> fetchOrders() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("auth_token");
+
+      if (token == null) {
+        log("❌ Auth token not found");
+        return;
+      }
+      final response = await dio.get(
+        'https://admin.uthix.com/api/vendor-order-status/${widget.status}',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        setState(() {
+          orders =
+              response.data['orders']; // Set the orders from the API response
+        });
+      } else {
+        // Handle error if status code is not 200
+        print('Failed to load orders: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching orders: $e');
+      // Optionally, show an error message to the user
     }
-  ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +151,7 @@ class _InTransitState extends State<InTransit> {
               const SizedBox(height: 10),
               _buildDivider(),
               const SizedBox(height: 12),
-              _buildAddressSection(order['address']),
+              _buildAddressSection(order['shipping_address']),
               _buildDivider(),
               const SizedBox(height: 10),
               _buildActionButton(context),
@@ -147,7 +162,7 @@ class _InTransitState extends State<InTransit> {
     );
   }
 
-  Widget _buildAddressSection(String address) {
+  Widget _buildAddressSection(dynamic shippingAddress) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -161,7 +176,7 @@ class _InTransitState extends State<InTransit> {
         ),
         const SizedBox(height: 4),
         Text(
-          address,
+          "${shippingAddress['landmark']}, ${shippingAddress['city']}, ${shippingAddress['state']}",
           style: const TextStyle(
             fontSize: 14,
             fontFamily: 'Urbanist',
@@ -203,8 +218,8 @@ class _InTransitState extends State<InTransit> {
   }
 
   Widget _buildOrderDetails(BuildContext context, dynamic order) {
-    var product = order['order_items'][0]['product'];
-    String? thumbnailImg = product['thumbnail_img'];
+    var product = order['items'][0];
+    String? thumbnailImg = product['image'];
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,7 +248,7 @@ class _InTransitState extends State<InTransit> {
               ),
               const SizedBox(height: 8),
               Text(
-                "₹${order['total_amount']}",
+                "₹${product['price']}",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -271,8 +286,8 @@ class _InTransitState extends State<InTransit> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: thumbnailImg != null && thumbnailImg.isNotEmpty
-            ? Image.asset(
-                thumbnailImg,
+            ? Image.network(
+                'https://admin.uthix.com/storage/image/products/$thumbnailImg',
                 height: 100,
                 width: 100,
                 fit: BoxFit.cover,

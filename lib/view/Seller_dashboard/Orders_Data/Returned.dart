@@ -1,74 +1,90 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:uthix_app/UpcomingPage.dart';
-import 'package:uthix_app/view/Seller_dashboard/Orders_Data/OrderStatus.dart';
-import 'package:uthix_app/view/Seller_dashboard/Orders_Data/OrderStatusScreen.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Seller_dashboard/Orders_Data/ReturnDetails.dart';
-import 'package:uthix_app/view/Seller_dashboard/Orders_Data/UpdateStatus.dart';
-import 'OrderDetails.dart';
 
 class Returned extends StatefulWidget {
-  const Returned({super.key});
+  final String status;
+  const Returned({super.key, required this.status});
 
   @override
   State<Returned> createState() => _ReturnedState();
 }
 
 class _ReturnedState extends State<Returned> {
-  List<dynamic> orders = [
-    {
-      'total_amount': 299.0,
-      'address':
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim',
-      'order_items': [
-        {
-          'product': {
-            'title': 'Flutter for Beginners',
-            'description': 'A complete guide to learning Flutter.',
-            'thumbnail_img': 'assets/Seller_dashboard_images/book.jpg',
-          }
-        }
-      ]
-    },
-    {
-      'total_amount': 199.0,
-      'address':
-          ' Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim',
-      'order_items': [
-        {
-          'product': {
-            'title': 'Advanced Flutter',
-            'description': 'Deep dive into widgets and performance.',
-            'thumbnail_img': 'assets/Seller_dashboard_images/book.jpg',
-          }
-        }
-      ]
+  List<dynamic> orders = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchReturnedOrders();
+  }
+
+  Future<void> fetchReturnedOrders() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("auth_token");
+
+      if (token == null) {
+        log("❌ Auth token not found");
+        return;
+      }
+      Dio dio = Dio();
+
+      // 🔐 Replace with your actual token
+
+      final response = await dio.get(
+        'https://your-api.com/api/orders?status=${widget.status}', // 🔁 Replace with actual API
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          orders = response.data;
+          isLoading = false;
+        });
+      } else {
+        print("Error: ${response.statusMessage}");
+      }
+    } catch (e) {
+      print("Failed to fetch orders: $e");
     }
-  ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(context),
-      body: orders.isEmpty
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSearchBar(),
-                  const SizedBox(height: 15),
-                  _buildDivider(),
-                  const SizedBox(height: 20),
-                  ...orders
-                      .map((order) => _buildOrderCard(context, order))
-                      .toList(),
-                  const SizedBox(height: 15),
-                  _buildDivider(),
-                ],
-              ),
-            ),
+          : orders.isEmpty
+              ? const Center(child: Text('No returned orders found.'))
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSearchBar(),
+                      const SizedBox(height: 15),
+                      _buildDivider(),
+                      const SizedBox(height: 20),
+                      ...orders
+                          .map((order) => _buildOrderCard(context, order))
+                          .toList(),
+                      const SizedBox(height: 15),
+                      _buildDivider(),
+                    ],
+                  ),
+                ),
     );
   }
 
@@ -79,8 +95,8 @@ class _ReturnedState extends State<Returned> {
         icon: const Icon(Icons.arrow_back_ios_outlined, color: Colors.white),
         onPressed: () => Navigator.pop(context),
       ),
-      title: Center(
-        child: const Text(
+      title: const Center(
+        child: Text(
           "Returned",
           style: TextStyle(
             fontSize: 20,
@@ -150,6 +166,51 @@ class _ReturnedState extends State<Returned> {
     );
   }
 
+  Widget _buildOrderDetails(BuildContext context, dynamic order) {
+    var product = order['order_items'][0]['product'];
+    String? thumbnailImg = product['thumbnail_img'];
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildImageCard(thumbnailImg),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                product['title'] ?? "Unknown Product",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontFamily: 'Urbanist',
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                product['description'] ?? "No description available",
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontFamily: 'Urbanist',
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "₹${order['total_amount']}",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Urbanist',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildAddressSection(String address) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,48 +266,34 @@ class _ReturnedState extends State<Returned> {
     );
   }
 
-  Widget _buildOrderDetails(BuildContext context, dynamic order) {
-    var product = order['order_items'][0]['product'];
-    String? thumbnailImg = product['thumbnail_img'];
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildImageCard(thumbnailImg),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                product['title'] ?? "Unknown Product",
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Urbanist',
-                  fontWeight: FontWeight.bold,
-                ),
+  Widget _buildImageCard(String? thumbnailImg) {
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: thumbnailImg != null && thumbnailImg.isNotEmpty
+            ? Image.network(
+                'https://admin.uthix.com/storage/image/products/$thumbnailImg',
+                height: 100,
+                width: 100,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    "assets/Seller_dashboard_images/book.jpg",
+                    height: 100,
+                    width: 100,
+                    fit: BoxFit.cover,
+                  );
+                },
+              )
+            : Image.asset(
+                "assets/Seller_dashboard_images/book.jpg",
+                height: 100,
+                width: 100,
+                fit: BoxFit.cover,
               ),
-              const SizedBox(height: 4),
-              Text(
-                product['description'] ?? "No description available",
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontFamily: 'Urbanist',
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                "₹${order['total_amount']}",
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Urbanist',
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -264,29 +311,6 @@ class _ReturnedState extends State<Returned> {
         ],
       ),
       child: child,
-    );
-  }
-
-  Widget _buildImageCard(String? thumbnailImg) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: thumbnailImg != null && thumbnailImg.isNotEmpty
-            ? Image.asset(
-                thumbnailImg,
-                height: 100,
-                width: 100,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset("assets/Seller_dashboard_images/book.jpg",
-                      height: 100, width: 100, fit: BoxFit.cover);
-                },
-              )
-            : Image.asset("assets/Seller_dashboard_images/book.jpg",
-                height: 100, width: 100, fit: BoxFit.cover),
-      ),
     );
   }
 

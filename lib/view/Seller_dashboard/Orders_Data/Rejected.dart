@@ -1,72 +1,96 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:uthix_app/view/Seller_dashboard/Orders_Data/OrderStatus.dart';
-import 'package:uthix_app/view/Seller_dashboard/Orders_Data/OrderStatusScreen.dart';
-import 'package:uthix_app/view/Seller_dashboard/Orders_Data/UpdateStatus.dart';
-import 'OrderDetails.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Rejected extends StatefulWidget {
-  const Rejected({super.key});
+  final String status;
+  const Rejected({super.key, required this.status});
 
   @override
   State<Rejected> createState() => _RejectedState();
 }
 
 class _RejectedState extends State<Rejected> {
-  List<dynamic> orders = [
-    {
-      'total_amount': 299.0,
-      'address':
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim',
-      'order_items': [
-        {
-          'product': {
-            'title': 'Flutter for Beginners',
-            'description': 'A complete guide to learning Flutter.',
-            'thumbnail_img': 'assets/Seller_dashboard_images/book.jpg',
-          }
-        }
-      ]
-    },
-    {
-      'total_amount': 199.0,
-      'address':
-          ' Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim',
-      'order_items': [
-        {
-          'product': {
-            'title': 'Advanced Flutter',
-            'description': 'Deep dive into widgets and performance.',
-            'thumbnail_img': 'assets/Seller_dashboard_images/book.jpg',
-          }
-        }
-      ]
+  List<dynamic> orders = [];
+  bool isLoading = true;
+  bool hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchOrders();
+  }
+
+  Future<void> _fetchOrders() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("auth_token");
+
+      if (token == null) {
+        log("❌ Auth token not found");
+        return;
+      }
+      final dio = Dio();
+      final response = await dio.get(
+        'https://admin.uthix.com/api/vendor-order-status/${widget.status}',
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            'Accept': 'application/json',
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        setState(() {
+          // Ensure we grab the 'orders' part of the response
+          orders = List.from(response.data['orders']);
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+          hasError = true;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        hasError = true;
+      });
+      print('Error fetching orders: $e');
     }
-  ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(context),
-      body: orders.isEmpty
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSearchBar(),
-                  const SizedBox(height: 15),
-                  _buildDivider(),
-                  const SizedBox(height: 20),
-                  ...orders
-                      .map((order) => _buildOrderCard(context, order))
-                      .toList(),
-                  const SizedBox(height: 15),
-                  _buildDivider(),
-                ],
-              ),
-            ),
+          : hasError
+              ? const Center(child: Text("Failed to load orders"))
+              : orders.isEmpty
+                  ? const Center(child: Text("No rejected orders found"))
+                  : SingleChildScrollView(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSearchBar(),
+                          const SizedBox(height: 15),
+                          _buildDivider(),
+                          const SizedBox(height: 20),
+                          ...orders
+                              .map((order) => _buildOrderCard(context, order))
+                              .toList(),
+                          const SizedBox(height: 15),
+                          _buildDivider(),
+                        ],
+                      ),
+                    ),
     );
   }
 
@@ -137,7 +161,7 @@ class _RejectedState extends State<Rejected> {
               const SizedBox(height: 10),
               _buildDivider(),
               const SizedBox(height: 12),
-              _buildAddressSection(order['address']),
+              _buildAddressSection(order['shipping_address']),
               _buildDivider(),
               const SizedBox(height: 10),
               _buildActionButton(context),
@@ -148,7 +172,7 @@ class _RejectedState extends State<Rejected> {
     );
   }
 
-  Widget _buildAddressSection(String address) {
+  Widget _buildAddressSection(Map<String, dynamic> address) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -162,7 +186,7 @@ class _RejectedState extends State<Rejected> {
         ),
         const SizedBox(height: 4),
         Text(
-          address,
+          "${address['name']}, ${address['landmark']}, ${address['city']}, ${address['state']}",
           style: const TextStyle(
             fontSize: 14,
             fontFamily: 'Urbanist',
@@ -178,9 +202,7 @@ class _RejectedState extends State<Rejected> {
       children: [
         Expanded(
           child: ElevatedButton(
-            onPressed: () {
-             
-            },
+            onPressed: () {},
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
               padding: const EdgeInsets.symmetric(vertical: 12),
@@ -199,8 +221,8 @@ class _RejectedState extends State<Rejected> {
   }
 
   Widget _buildOrderDetails(BuildContext context, dynamic order) {
-    var product = order['order_items'][0]['product'];
-    String? thumbnailImg = product['thumbnail_img'];
+    var product = order['items'][0];
+    String? thumbnailImg = product['image'];
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,8 +289,8 @@ class _RejectedState extends State<Rejected> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: thumbnailImg != null && thumbnailImg.isNotEmpty
-            ? Image.asset(
-                thumbnailImg,
+            ? Image.network(
+                "https://admin.uthix.com/images/$thumbnailImg",
                 height: 100,
                 width: 100,
                 fit: BoxFit.cover,

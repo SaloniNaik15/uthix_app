@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Seller_dashboard/Orders_Data/MyOrders.dart';
 import 'Create_Store_Data/CreateStore.dart';
 import 'Inventory_data/Inventory.dart';
@@ -30,7 +29,6 @@ class _SellerDashboardState extends State<SellerDashboard> {
   String? accessToken;
 
   @override
-  @override
   void initState() {
     super.initState();
     _initializeData(); // Call the async function
@@ -41,39 +39,8 @@ class _SellerDashboardState extends State<SellerDashboard> {
     await fetchParentCategories();
   }
 
-  Future<void> _saveSelectedCategory(
-      String categoryId, String selectedCategory) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString("selectedCategoryId", categoryId);
-    await prefs.setString("selectedCategoryName", selectedCategory);
-    log("Saved selected category ID: $categoryId");
-    log("Saved selected category NAme: $selectedCategory");
-  }
-
-  Future<void> _saveSelectedSubcategory(
-      String subcategoryId, String subcategoryName) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString("selectedSubcategoryId", subcategoryId);
-    await prefs.setString("selectedSubcategoryName", subcategoryName);
-    log("Saved selected subcategory ID: $subcategoryId");
-    log("Saved selected subcategory Name: $subcategoryName");
-  }
-
   Future<void> _loadUserCredentials() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? savedEmail = prefs.getString("email");
-    String? savedPassword = prefs.getString("password");
-    String? savedaccessToken = prefs.getString("auth_token");
-
-    log("Retrieved Email: $savedEmail");
-    log("Retrieved Password: $savedPassword");
-    log("Retrieved acesstoken: $savedaccessToken");
-
-    setState(() {
-      email = savedEmail ?? "No Email Found";
-      password = savedPassword ?? "No Password Found";
-      accessToken = savedaccessToken ?? "No accesstoken";
-    });
+    // User credentials logic if needed
   }
 
   final Dio dio = Dio();
@@ -195,12 +162,14 @@ class _SellerDashboardState extends State<SellerDashboard> {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text(" Store Already Created"),
+                content: const Text("Store Already Created"),
                 duration: const Duration(seconds: 3),
                 backgroundColor: Color(0xFF2B5C74),
                 behavior: SnackBarBehavior.floating,
-                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
             );
           }
@@ -224,7 +193,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async{
+      onWillPop: () async {
         SystemNavigator.pop();
         return false;
       },
@@ -309,8 +278,6 @@ class _SellerDashboardState extends State<SellerDashboard> {
                 ),
               ),
             ),
-            // Wrap the My Profile grid item in a Center widget
-            // Wrap the My Profile grid item in a Center widget
           ],
         ),
       ),
@@ -392,6 +359,8 @@ class _SellerDashboardState extends State<SellerDashboard> {
   }
 
   void showUploadMenu(BuildContext context) {
+    final parentContext = context;
+
     if (categories.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("No categories available")),
@@ -399,7 +368,10 @@ class _SellerDashboardState extends State<SellerDashboard> {
       return;
     }
 
+    // ✅ Reset selections here
     selectedCategory = null;
+    selectedCategoryName = null;
+    selectedSubcategory = null;
 
     showDialog(
       context: context,
@@ -429,24 +401,34 @@ class _SellerDashboardState extends State<SellerDashboard> {
                               selectedCategoryName = categoryName ?? "Unknown";
                             });
 
+                            log("Selected Category: $selectedCategoryName (ID: $selectedCategory)");
+
                             Navigator.pop(context);
-                            _saveSelectedCategory(categoryId, categoryName!);
 
                             await fetchSubcategories(int.parse(categoryId));
 
                             if (subcategories.isNotEmpty) {
                               showSubcategoryMenu(
-                                  context, categoryId, categoryName);
+                                parentContext,
+                                categoryId,
+                                categoryName!,
+                              );
                             } else {
+                              // If no subcategories, navigate directly
                               Navigator.push(
-                                context,
+                                parentContext,
                                 MaterialPageRoute(
-                                  builder: (context) => UploadData(),
+                                  builder: (context) => UploadData(
+                                    categoryId: categoryId,
+                                    categoryName: categoryName!,
+                                    subcategoryId: null,
+                                    subcategoryName: null,
+                                  ),
                                 ),
                               );
                             }
                           },
-                          activeColor: const Color.fromRGBO(43, 96, 116, 1),
+                          activeColor: const Color(0xFF2B5C74),
                         ),
                       );
                     }).toList(),
@@ -460,74 +442,62 @@ class _SellerDashboardState extends State<SellerDashboard> {
     );
   }
 
-  void showSubcategoryMenu(
-      BuildContext context, String parentId, String parentName) async {
-    if (subcategories.isEmpty) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("No subcategories available for $parentName")),
-        );
-      }
-      return;
-    }
+  void showSubcategoryMenu(BuildContext context, String parentCategoryId,
+      String parentCategoryName) {
+    selectedSubcategory = null; // ✅ Reset subcategory selection before dialog
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!context.mounted) return;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Text("Select a Subcategory"),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: subcategories.map((subcategory) {
+                      final subcategoryName = subcategory['cat_title'];
+                      final subcategoryId = subcategory['id'].toString();
 
-      showDialog(
-        context: context,
-        builder: (BuildContext dialogContext) {
-          return StatefulBuilder(
-            builder: (BuildContext dialogContext, StateSetter setDialogState) {
-              return AlertDialog(
-                backgroundColor: Colors.white,
-                title: Text("Select a Subcategory for $parentName"),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: subcategories.map((subcategory) {
-                    final subcategoryName =
-                        subcategory['cat_title'] ?? "Unknown";
-                    final subcategoryId = subcategory['id'].toString();
+                      return ListTile(
+                        title: Text(subcategoryName ?? "Unknown"),
+                        trailing: Radio<String>(
+                          value: subcategoryId,
+                          groupValue: selectedSubcategory,
+                          onChanged: (value) async {
+                            setState(() {
+                              selectedSubcategory = value;
+                            });
 
-                    return ListTile(
-                      title: Text(subcategoryName),
-                      trailing: Radio<String>(
-                        value: subcategoryId,
-                        groupValue: selectedCategory,
-                        onChanged: (value) {
-                          setDialogState(() {
-                            selectedCategory = value;
-                            selectedCategoryName = subcategoryName;
-                          });
+                            log("Selected Parent Category: $parentCategoryName (ID: $parentCategoryId)");
+                            log("Selected Subcategory: $subcategoryName (ID: $subcategoryId)");
 
-                          // After selection, navigate to UploadData screen
-                          if (dialogContext.mounted) {
-                            Navigator.pop(dialogContext); // Close the dialog
-                          }
+                            Navigator.pop(context);
 
-                          _saveSelectedSubcategory(
-                              subcategoryId, subcategoryName);
-
-                          // Ensure the page is still mounted before navigation
-                          if (context.mounted) {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => UploadData(),
+                                builder: (context) => UploadData(
+                                  categoryId: parentCategoryId,
+                                  categoryName: parentCategoryName,
+                                  subcategoryId: subcategoryId,
+                                  subcategoryName: subcategoryName!,
+                                ),
                               ),
                             );
-                          }
-                        },
-                        activeColor: const Color.fromRGBO(43, 96, 116, 1),
-                      ),
-                    );
-                  }).toList(),
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
-              );
-            },
-          );
-        },
-      );
-    });
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }

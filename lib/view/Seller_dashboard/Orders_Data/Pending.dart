@@ -1,70 +1,127 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:developer';
 
+import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'OrderDetails.dart';
 
 class Pending extends StatefulWidget {
-  const Pending({super.key});
+  final String status;
+  const Pending({super.key, required this.status});
 
   @override
   State<Pending> createState() => _PendingState();
 }
 
 class _PendingState extends State<Pending> {
-  List<dynamic> orders = [
-    {
-      'total_amount': 299.0,
-      'address':
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim',
-      'order_items': [
-        {
-          'product': {
-            'title': 'Flutter for Beginners',
-            'description': 'A complete guide to learning Flutter.',
-            'thumbnail_img': 'assets/Seller_dashboard_images/book.jpg',
-          }
-        }
-      ]
-    },
-    {
-      'total_amount': 199.0,
-      'address':
-          ' Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim',
-      'order_items': [
-        {
-          'product': {
-            'title': 'Advanced Flutter',
-            'description': 'Deep dive into widgets and performance.',
-            'thumbnail_img': 'assets/Seller_dashboard_images/book.jpg',
-          }
-        }
-      ]
+  List<dynamic> orders = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchOrders();
+  }
+
+  Future<void> fetchOrders() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("auth_token");
+
+      if (token == null) {
+        log("❌ Auth token not found");
+        return;
+      }
+      var response = await Dio().get(
+        'https://admin.uthix.com/api/vendor-order-status/${widget.status}',
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data['status'] == true) {
+        setState(() {
+          orders = response.data['orders'];
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching orders: $e");
+      setState(() {
+        isLoading = false;
+      });
     }
-  ];
+  }
+
+  Future<void> updateOrderStatus(int productId, String status) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("auth_token");
+
+      if (token == null) {
+        log("❌ Auth token not found");
+        return;
+      }
+
+      var response = await Dio().post(
+        'https://admin.uthix.com/api/vendor-update-order-status',
+        data: jsonEncode({
+          'product_id': productId,
+          'status': status,
+        }),
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Accept": "application/json",
+            "Content-Type": "application/json", // ✅ Ensure JSON content-type
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data['status'] == true) {
+        log('✅ Order status updated successfully');
+      } else {
+        log('❌ Failed to update order status');
+      }
+    } catch (e) {
+      log("❌ Error updating order status: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(context),
-      body: orders.isEmpty
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSearchBar(),
-                  const SizedBox(height: 15),
-                  _buildDivider(),
-                  const SizedBox(height: 20),
-                  ...orders
-                      .map((order) => _buildOrderCard(context, order))
-                      .toList(),
-                  const SizedBox(height: 15),
-                  _buildDivider(),
-                ],
-              ),
-            ),
+          : orders.isEmpty
+              ? const Center(child: Text("No orders found."))
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSearchBar(),
+                      const SizedBox(height: 15),
+                      _buildDivider(),
+                      const SizedBox(height: 20),
+                      ...orders
+                          .map((order) => _buildOrderCard(context, order))
+                          .toList(),
+                      const SizedBox(height: 15),
+                      _buildDivider(),
+                    ],
+                  ),
+                ),
     );
   }
 
@@ -75,8 +132,8 @@ class _PendingState extends State<Pending> {
         icon: const Icon(Icons.arrow_back_ios_outlined, color: Colors.white),
         onPressed: () => Navigator.pop(context),
       ),
-      title: Center(
-        child: const Text(
+      title: const Center(
+        child: Text(
           "Pending Orders",
           style: TextStyle(
             fontSize: 20,
@@ -116,6 +173,9 @@ class _PendingState extends State<Pending> {
   }
 
   Widget _buildOrderCard(BuildContext context, dynamic order) {
+    var product = order['items'][0];
+    var shipping = order['shipping_address'];
+
     return SizedBox(
       width: double.infinity,
       child: Card(
@@ -131,14 +191,14 @@ class _PendingState extends State<Pending> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildOrderDetails(context, order),
+              _buildOrderDetails(context, product),
               const SizedBox(height: 10),
               _buildDivider(),
               const SizedBox(height: 12),
-              _buildAddressSection(order['address']),
+              _buildAddressSection(shipping),
               _buildDivider(),
               const SizedBox(height: 10),
-              _buildActionButtons(context),
+              _buildActionButtons(context, product['id']),
             ],
           ),
         ),
@@ -146,104 +206,13 @@ class _PendingState extends State<Pending> {
     );
   }
 
-  Widget _buildAddressSection(String address) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Shipping Address",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-            fontFamily: 'Urbanist',
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          address,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Urbanist',
-            color: Colors.black87,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionButtons(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {
-              // Show the Order Status as a dialog for accepting the order
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return OrderStatusDialog(
-                    statusMessage: 'Order Accepted Successfully',
-                    iconCircleColor: Colors.green,
-                    statusIcon: Icons.check,
-                  );
-                },
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2B5C74),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-            ),
-            child: const Text(
-              "Accept Order",
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {
-              // Show the Order Status as a dialog for rejecting the order with buttons
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return OrderStatusDialog(
-                    statusMessage: 'Are you sure you want to reject the order?',
-                    iconCircleColor: Colors.red,
-                    statusIcon: Icons.close,
-                    showButtons: true, // Show OK & Cancel buttons
-                  );
-                },
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFF44236),
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-            ),
-            child: const Text(
-              "Decline Order",
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOrderDetails(BuildContext context, dynamic order) {
-    var product = order['order_items'][0]['product'];
-    String? thumbnailImg = product['thumbnail_img'];
+  Widget _buildOrderDetails(BuildContext context, dynamic product) {
+    String? imageUrl = product['image'];
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildImageCard(thumbnailImg),
+        _buildImageCard(imageUrl),
         const SizedBox(width: 10),
         Expanded(
           child: Column(
@@ -267,7 +236,7 @@ class _PendingState extends State<Pending> {
               ),
               const SizedBox(height: 8),
               Text(
-                "₹${order['total_amount']}",
+                "₹${product['price']}",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -275,6 +244,125 @@ class _PendingState extends State<Pending> {
                 ),
               ),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildImageCard(String? imageUrl) {
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: imageUrl != null && imageUrl.isNotEmpty
+            ? Image.network(
+                'https://admin.uthix.com/storage/image/products/$imageUrl',
+                height: 100,
+                width: 100,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset("assets/Seller_dashboard_images/book.jpg",
+                      height: 100, width: 100, fit: BoxFit.cover);
+                },
+              )
+            : Image.asset("assets/Seller_dashboard_images/book.jpg",
+                height: 100, width: 100, fit: BoxFit.cover),
+      ),
+    );
+  }
+
+  Widget _buildAddressSection(dynamic shipping) {
+    String addressText = "${shipping['name'] ?? ''}, "
+        "${shipping['phone'] ?? ''}, "
+        "${shipping['city'] ?? ''}, "
+        "${shipping['state'] ?? ''}, "
+        "${shipping['landmark'] ?? ''}";
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Shipping Address",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            fontFamily: 'Urbanist',
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          addressText,
+          style: const TextStyle(
+            fontSize: 14,
+            fontFamily: 'Urbanist',
+            color: Colors.black87,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context, int productId) {
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {
+              log("Accept Order button pressed for product ID: $productId");
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return OrderStatusDialog(
+                    statusMessage: 'Order Accepted Successfully',
+                    iconCircleColor: Colors.green,
+                    statusIcon: Icons.check,
+                  );
+                },
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF2B5C74),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: const Text("Accept Order",
+                style: TextStyle(color: Colors.white)),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: () {
+              log("Decline Order button pressed for product ID: $productId");
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return OrderStatusDialog(
+                    statusMessage: 'Are you sure you want to reject the order?',
+                    iconCircleColor: Colors.red,
+                    statusIcon: Icons.close,
+                    showButtons: true,
+                    onOkPressed: () {
+                      updateOrderStatus(productId, 'rejected');
+                      Navigator.pop(context); // Close the dialog
+                    },
+                  );
+                },
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFF44236),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: const Text("Decline Order",
+                style: TextStyle(color: Colors.white)),
           ),
         ),
       ],
@@ -298,29 +386,6 @@ class _PendingState extends State<Pending> {
     );
   }
 
-  Widget _buildImageCard(String? thumbnailImg) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: thumbnailImg != null && thumbnailImg.isNotEmpty
-            ? Image.asset(
-                thumbnailImg,
-                height: 100,
-                width: 100,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset("assets/Seller_dashboard_images/book.jpg",
-                      height: 100, width: 100, fit: BoxFit.cover);
-                },
-              )
-            : Image.asset("assets/Seller_dashboard_images/book.jpg",
-                height: 100, width: 100, fit: BoxFit.cover),
-      ),
-    );
-  }
-
   Widget _buildDivider() {
     return const Divider(
       color: Color(0xFFF3F3F3),
@@ -334,6 +399,7 @@ class OrderStatusDialog extends StatelessWidget {
   final Color iconCircleColor;
   final IconData statusIcon;
   final bool showButtons;
+  final VoidCallback? onOkPressed;
 
   const OrderStatusDialog({
     super.key,
@@ -341,6 +407,7 @@ class OrderStatusDialog extends StatelessWidget {
     required this.iconCircleColor,
     required this.statusIcon,
     this.showButtons = false,
+    this.onOkPressed,
   });
 
   @override
@@ -382,11 +449,7 @@ class OrderStatusDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _button("OK", const Color(0xFF2B5C74), () {
-                  Navigator.pop(context); // Close the first dialog
-                  _showOrderCancelledDialog(
-                      context); // Show the second dialog (Order Cancelled)
-                }),
+                _button("OK", const Color(0xFF2B5C74), onOkPressed ?? () {}),
                 _button("Cancel", Colors.red, () {
                   Navigator.pop(context); // Close the dialog
                 }),
@@ -411,33 +474,6 @@ class OrderStatusDialog extends StatelessWidget {
         label,
         style: const TextStyle(color: Colors.white, fontSize: 16),
       ),
-    );
-  }
-
-  void _showOrderCancelledDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          contentPadding: EdgeInsets.all(20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.cancel, color: Colors.red, size: 80),
-              const SizedBox(height: 20),
-              const Text(
-                "Order Rejected",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }

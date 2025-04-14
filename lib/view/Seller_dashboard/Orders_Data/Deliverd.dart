@@ -1,54 +1,75 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Seller_dashboard/Orders_Data/OrderStatus.dart';
-import 'package:uthix_app/view/Seller_dashboard/Orders_Data/OrderStatusScreen.dart';
-import 'package:uthix_app/view/Seller_dashboard/Orders_Data/UpdateStatus.dart';
-import 'OrderDetails.dart';
 
 class Deliverd extends StatefulWidget {
-  const Deliverd({super.key});
+  final String status;
+  const Deliverd({super.key, required this.status});
 
   @override
   State<Deliverd> createState() => _DeliverdState();
 }
 
 class _DeliverdState extends State<Deliverd> {
-  List<dynamic> orders = [
-    {
-      'total_amount': 299.0,
-      'address':
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim',
-      'order_items': [
-        {
-          'product': {
-            'title': 'Flutter for Beginners',
-            'description': 'A complete guide to learning Flutter.',
-            'thumbnail_img': 'assets/Seller_dashboard_images/book.jpg',
-          }
-        }
-      ]
-    },
-    {
-      'total_amount': 199.0,
-      'address':
-          ' Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim',
-      'order_items': [
-        {
-          'product': {
-            'title': 'Advanced Flutter',
-            'description': 'Deep dive into widgets and performance.',
-            'thumbnail_img': 'assets/Seller_dashboard_images/book.jpg',
-          }
-        }
-      ]
+  List<dynamic> orders = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchOrders();
+  }
+
+  Future<void> fetchOrders() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("auth_token");
+
+      if (token == null) {
+        log("❌ Auth token not found");
+        return;
+      }
+      final dio = Dio();
+
+      final response = await dio.get(
+        'https://admin.uthix.com/api/vendor-order-status/${widget.status}',
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            'Accept': 'application/json',
+          },
+        ),
+      );
+
+      if (response.data != null && response.data['status'] == true) {
+        setState(() {
+          orders = response.data['orders'];
+          isLoading = false;
+        });
+      } else {
+        // Handle case where the response is not successful
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      // Handle errors like network issues or wrong API call
+      setState(() {
+        isLoading = false;
+      });
+      print("Error fetching orders: $e");
     }
-  ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(context),
-      body: orders.isEmpty
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
@@ -137,7 +158,7 @@ class _DeliverdState extends State<Deliverd> {
               const SizedBox(height: 10),
               _buildDivider(),
               const SizedBox(height: 12),
-              _buildAddressSection(order['address']),
+              _buildAddressSection(order['shipping_address']),
               _buildDivider(),
               const SizedBox(height: 10),
               _buildActionButton(context),
@@ -148,7 +169,7 @@ class _DeliverdState extends State<Deliverd> {
     );
   }
 
-  Widget _buildAddressSection(String address) {
+  Widget _buildAddressSection(Map<String, dynamic> address) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -162,7 +183,7 @@ class _DeliverdState extends State<Deliverd> {
         ),
         const SizedBox(height: 4),
         Text(
-          address,
+          '${address['name']}, ${address['landmark']}, ${address['city']}, ${address['state']}',
           style: const TextStyle(
             fontSize: 14,
             fontFamily: 'Urbanist',
@@ -204,8 +225,8 @@ class _DeliverdState extends State<Deliverd> {
   }
 
   Widget _buildOrderDetails(BuildContext context, dynamic order) {
-    var product = order['order_items'][0]['product'];
-    String? thumbnailImg = product['thumbnail_img'];
+    var product = order['items'][0];
+    String thumbnailImg = product['image'];
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,7 +255,7 @@ class _DeliverdState extends State<Deliverd> {
               ),
               const SizedBox(height: 8),
               Text(
-                "₹${order['total_amount']}",
+                "₹${product['price']}",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -265,25 +286,26 @@ class _DeliverdState extends State<Deliverd> {
     );
   }
 
-  Widget _buildImageCard(String? thumbnailImg) {
+  Widget _buildImageCard(String thumbnailImg) {
     return Card(
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: thumbnailImg != null && thumbnailImg.isNotEmpty
-            ? Image.asset(
-                thumbnailImg,
-                height: 100,
-                width: 100,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset("assets/Seller_dashboard_images/book.jpg",
-                      height: 100, width: 100, fit: BoxFit.cover);
-                },
-              )
-            : Image.asset("assets/Seller_dashboard_images/book.jpg",
-                height: 100, width: 100, fit: BoxFit.cover),
+        child: Image.network(
+          'https://admin.uthix.com/storage/image/products/$thumbnailImg',
+          height: 100,
+          width: 100,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              "assets/Seller_dashboard_images/book.jpg",
+              height: 100,
+              width: 100,
+              fit: BoxFit.cover,
+            );
+          },
+        ),
       ),
     );
   }
