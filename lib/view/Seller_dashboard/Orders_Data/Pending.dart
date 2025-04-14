@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:uthix_app/view/Seller_dashboard/Orders_Data/OrderStatusScreen.dart';
+
 import 'OrderDetails.dart';
 
 class Pending extends StatefulWidget {
@@ -177,15 +177,16 @@ class _PendingState extends State<Pending> {
         Expanded(
           child: ElevatedButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const OrderStatusScreen(
-                    statusMessage: 'Order Accepted Succesfully',
+              // Show the Order Status as a dialog for accepting the order
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return OrderStatusDialog(
+                    statusMessage: 'Order Accepted Successfully',
                     iconCircleColor: Colors.green,
                     statusIcon: Icons.check,
-                  ),
-                ),
+                  );
+                },
               );
             },
             style: ElevatedButton.styleFrom(
@@ -205,16 +206,17 @@ class _PendingState extends State<Pending> {
         Expanded(
           child: ElevatedButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const OrderStatusScreen(
+              // Show the Order Status as a dialog for rejecting the order with buttons
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return OrderStatusDialog(
                     statusMessage: 'Are you sure you want to reject the order?',
                     iconCircleColor: Colors.red,
                     statusIcon: Icons.close,
-                    showButtons: true, // 👈 this shows OK & Cancel buttons
-                  ),
-                ),
+                    showButtons: true, // Show OK & Cancel buttons
+                  );
+                },
               );
             },
             style: ElevatedButton.styleFrom(
@@ -323,6 +325,119 @@ class _PendingState extends State<Pending> {
     return const Divider(
       color: Color(0xFFF3F3F3),
       thickness: 2,
+    );
+  }
+}
+
+class OrderStatusDialog extends StatelessWidget {
+  final String statusMessage;
+  final Color iconCircleColor;
+  final IconData statusIcon;
+  final bool showButtons;
+
+  const OrderStatusDialog({
+    super.key,
+    required this.statusMessage,
+    required this.iconCircleColor,
+    required this.statusIcon,
+    this.showButtons = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Colors.white,
+      contentPadding: EdgeInsets.all(20),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 80,
+            width: 80,
+            decoration: BoxDecoration(
+              color: iconCircleColor,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              statusIcon,
+              color: Colors.white,
+              size: 49,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            statusMessage,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          if (showButtons)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _button("OK", const Color(0xFF2B5C74), () {
+                  Navigator.pop(context); // Close the first dialog
+                  _showOrderCancelledDialog(
+                      context); // Show the second dialog (Order Cancelled)
+                }),
+                _button("Cancel", Colors.red, () {
+                  Navigator.pop(context); // Close the dialog
+                }),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _button(String label, Color color, VoidCallback onTap) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(color: Colors.white, fontSize: 16),
+      ),
+    );
+  }
+
+  void _showOrderCancelledDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          contentPadding: EdgeInsets.all(20),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.cancel, color: Colors.red, size: 80),
+              const SizedBox(height: 20),
+              const Text(
+                "Order Rejected",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
