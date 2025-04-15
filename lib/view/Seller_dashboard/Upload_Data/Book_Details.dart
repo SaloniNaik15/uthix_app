@@ -342,6 +342,7 @@ class _BookDetailsState extends State<BookDetails> {
                 child: ElevatedButton(
                   onPressed: _submitForm,
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFF2B5C74),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -349,7 +350,7 @@ class _BookDetailsState extends State<BookDetails> {
                   ),
                   child: const Text(
                     'Upload Book',
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
               ),
