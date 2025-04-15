@@ -21,7 +21,10 @@ class _InTransitState extends State<InTransit> {
   void initState() {
     super.initState();
     dio = Dio();
-    fetchOrders();
+    // Trigger fetchOrders when the screen is visible
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchOrders();
+    });
   }
 
   // Fetch orders from the API
@@ -48,15 +51,12 @@ class _InTransitState extends State<InTransit> {
       );
 
       if (response.statusCode == 200) {
-        // Loop through orders and extract item ids
         setState(() {
           orders = response.data['orders'].map((order) {
-            // Extract the items and their IDs
             List<dynamic> itemIds = order['items'].map((item) {
               return item['id']; // Get the item ID
             }).toList();
 
-            // Add the order ID and item IDs to the order data
             return {
               'order_id': order['order_id'],
               'item_ids': itemIds, // Store item IDs here
@@ -67,7 +67,6 @@ class _InTransitState extends State<InTransit> {
           isLoading = false; // Stop loading after data is fetched
         });
       } else {
-        // Handle error if status code is not 200
         print('Failed to load orders: ${response.statusCode}');
         setState(() {
           isLoading = false; // Stop loading on error
@@ -78,7 +77,6 @@ class _InTransitState extends State<InTransit> {
       setState(() {
         isLoading = false; // Stop loading on error
       });
-      // Optionally, show an error message to the user
     }
   }
 
@@ -183,8 +181,7 @@ class _InTransitState extends State<InTransit> {
               _buildAddressSection(order['shipping_address']),
               _buildDivider(),
               const SizedBox(height: 10),
-              _buildActionButton(
-                  context, order['items']), // Pass the order's items here
+              _buildActionButton(context, order['items']),
             ],
           ),
         ),
