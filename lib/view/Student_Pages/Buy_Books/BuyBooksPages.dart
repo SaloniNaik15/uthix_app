@@ -47,14 +47,13 @@ class _BuybookspagesState extends State<Buybookspages> {
     }
   }
 
-  // 🔹 Fetch Products API Call
   Future<void> fetchProducts(int categoryId) async {
     if (authToken == null) return;
 
     try {
+      // Updated API endpoint with category id in the URL path
       final response = await dio.get(
-        'https://admin.uthix.com/api/products',
-        queryParameters: {"category_id": categoryId},
+        'https://admin.uthix.com/api/categories/$categoryId/products',
         options: Options(
           headers: {"Authorization": "Bearer $authToken"},
         ),
@@ -62,8 +61,8 @@ class _BuybookspagesState extends State<Buybookspages> {
 
       if (response.statusCode == 200) {
         setState(() {
-          products =
-              List<Map<String, dynamic>>.from(response.data['products'] ?? []);
+          // Assuming the API response structure still includes 'products'
+          products = List<Map<String, dynamic>>.from(response.data['products'] ?? []);
           isLoading = false;
         });
       } else {
@@ -78,6 +77,7 @@ class _BuybookspagesState extends State<Buybookspages> {
       });
     }
   }
+
 
   //  Add to Cart API Call
   Future<void> addToCart(
@@ -181,7 +181,7 @@ class _BuybookspagesState extends State<Buybookspages> {
           : products.isEmpty
               ? Center(
                   child: Text("No products available.",
-                      style: TextStyle(fontSize: 14.sp)))
+                      style: TextStyle(fontSize: 14)))
               : Padding(
                   padding: EdgeInsets.all(8.w),
                   child: Column(
@@ -189,11 +189,11 @@ class _BuybookspagesState extends State<Buybookspages> {
                     children: [
                       Text("Products",
                           style: TextStyle(
-                              fontSize: 18.sp, fontWeight: FontWeight.bold)),
+                              fontSize: 18, fontWeight: FontWeight.bold)),
                       SizedBox(height: 5.h),
                       Text("${products.length} Items",
                           style: TextStyle(
-                              fontSize: 14.sp, color: Colors.black87)),
+                              fontSize: 14, color: Colors.black87)),
                       SizedBox(height: 10.h),
                       Expanded(
                         child: BookItemsList(
@@ -225,8 +225,7 @@ class SortByButton extends StatelessWidget {
             padding: EdgeInsets.only(top: 20.h),
             child: Text("Sort by",
                 style: TextStyle(
-                    fontSize: 18.sp,
-                    fontFamily: 'Urbanist',
+                    fontSize: 18,
                     fontWeight: FontWeight.w500)),
           ),
           Divider(),
@@ -245,8 +244,7 @@ class SortByButton extends StatelessWidget {
     return ListTile(
       title: Text(title,
           style: TextStyle(
-            fontSize: 16.sp,
-            fontFamily: 'Urbanist',
+            fontSize: 16,
           )),
       onTap: () => Navigator.pop(context),
     );
@@ -264,10 +262,10 @@ class SortByButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.swap_vert, size: 18.sp, color: Colors.black54),
+            Icon(Icons.swap_vert, size: 18, color: Colors.black54),
             SizedBox(width: 8.w),
             Text("Sort by",
-                style: TextStyle(fontSize: 16.sp, color: Colors.black)),
+                style: TextStyle(fontSize: 16, color: Colors.black)),
           ],
         ),
       ),
@@ -498,7 +496,7 @@ class _BookItemsListState extends State<BookItemsList> {
                                   Text(
                                     rating,
                                     style: TextStyle(
-                                      fontSize: 12.sp,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
                                     ),
@@ -519,8 +517,7 @@ class _BookItemsListState extends State<BookItemsList> {
                       title,
                       textAlign: TextAlign.left,
                       style: TextStyle(
-                        fontSize: 14.sp,
-                        fontFamily: 'Urbanist',
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                       maxLines: 2,
@@ -532,8 +529,7 @@ class _BookItemsListState extends State<BookItemsList> {
                       "Author: $author",
                       textAlign: TextAlign.left,
                       style: TextStyle(
-                        fontSize: 12.sp,
-                        fontFamily: 'Urbanist',
+                        fontSize: 12,
                         fontWeight: FontWeight.w400,
                         color: Colors.black87,
                       ),
@@ -546,8 +542,7 @@ class _BookItemsListState extends State<BookItemsList> {
                       "₹$price",
                       textAlign: TextAlign.left,
                       style: TextStyle(
-                        fontSize: 14.sp,
-                        fontFamily: 'Urbanist',
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -562,7 +557,7 @@ class _BookItemsListState extends State<BookItemsList> {
                                 ? Icons.favorite
                                 : Icons.favorite_border,
                             color: const Color(0xFF2B5C74),
-                            size: 25.sp,
+                            size: 25,
                           ),
                           onPressed: () => addToWishlist(context, book),
                         ),
@@ -581,10 +576,10 @@ class _BookItemsListState extends State<BookItemsList> {
                               }
                             },
                             icon: Icon(Icons.shopping_bag_outlined,
-                                size: 16.sp, color: Colors.white),
+                                size: 16, color: Colors.white),
                             label: Text('Add to Bag',
                                 style: TextStyle(
-                                    color: Colors.white, fontSize: 12.sp)),
+                                    color: Colors.white, fontSize: 12)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Color(0xFF2B5C74),
                               padding: EdgeInsets.symmetric(
