@@ -35,13 +35,17 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
         final jsonData = response.data;
         if (jsonData.containsKey('categories') && jsonData['categories'] is List) {
           setState(() {
+            // Filter to include only categories where parent_category_id is not null
             categories = (jsonData['categories'] as List)
+                .where((item) => item['parent_category_id'] != null)
                 .map((item) => {
               'id': item['id'] is int ? item['id'] : 0,
               'cat_title': item['cat_title']?.toString() ?? 'No Title',
               'cat_image': item['cat_image'] != null
                   ? 'https://admin.uthix.com/storage/image/category/${item['cat_image']}'
                   : '',
+              // Keep the parent_category_id if needed later
+              'parent_category_id': item['parent_category_id'],
             })
                 .toList();
             isLoading = false;
@@ -60,6 +64,8 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
       setState(() => isLoading = false);
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +126,9 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
           Column(
             children: [
               isLoading
-                  ? Center(child: CircularProgressIndicator())
+                  ? Center(child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+              ))
                   : categories.isEmpty
                   ? Center(
                 child: Text("No categories available.", style: TextStyle(fontSize: 20)),
@@ -166,6 +174,7 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
           ),
         );
       },
+
       child: Container(
         margin: EdgeInsets.all(8.w),
         child: Stack(
@@ -215,7 +224,7 @@ class _BuyTextBooksState extends State<BuyTextBooks> {
                     name,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 16.sp,
+                      fontSize: 16,
                       fontWeight: FontWeight.w400,
                     ),
                     textAlign: TextAlign.center,
