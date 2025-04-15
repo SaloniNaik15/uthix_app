@@ -112,7 +112,14 @@ class _BuybookspagesState extends State<Buybookspages> {
 
       if (response.statusCode == 201 && response.data["status"] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Product added to cart!")),
+          SnackBar(
+            content: const Text("Product added to cart"),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
