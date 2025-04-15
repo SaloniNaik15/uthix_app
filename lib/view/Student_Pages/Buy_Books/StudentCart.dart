@@ -43,7 +43,7 @@ class _StudentcartState extends State<Studentcart> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content:
-            Text("Authentication failed. Please login again.", style: TextStyle(fontSize: 14.sp))),
+            Text("Authentication failed. Please login again.", style: TextStyle(fontSize: 14))),
       );
       return;
     }
@@ -113,7 +113,7 @@ class _StudentcartState extends State<Studentcart> {
     if (cartItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("⚠️ Cart is empty. Please add items to proceed.", style: TextStyle(fontSize: 14.sp))),
+            content: Text("⚠️ Cart is empty. Please add items to proceed.", style: TextStyle(fontSize: 14))),
       );
       return;
     }
@@ -121,7 +121,7 @@ class _StudentcartState extends State<Studentcart> {
     if (selectedAddressId == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("⚠️ Please select a valid delivery address.", style: TextStyle(fontSize: 14.sp))),
+            content: Text("⚠️ Please select a valid delivery address.", style: TextStyle(fontSize: 14))),
       );
       return;
     }
@@ -183,13 +183,13 @@ class _StudentcartState extends State<Studentcart> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text("❌ Failed to place order: ${response.data['message'] ?? 'Unknown error'}",
-                  style: TextStyle(fontSize: 14.sp))),
+                  style: TextStyle(fontSize: 14))),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("❌ Error placing order: ${e.toString()}", style: TextStyle(fontSize: 14.sp))),
+            content: Text("❌ Error placing order: ${e.toString()}", style: TextStyle(fontSize: 14))),
       );
     }
   }
@@ -210,17 +210,17 @@ class _StudentcartState extends State<Studentcart> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text("Item removed from cart!", style: TextStyle(fontSize: 14.sp))),
+              content: Text("Item removed from cart!", style: TextStyle(fontSize: 14))),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text("Failed to remove item: ${response.data['message']}", style: TextStyle(fontSize: 14.sp))),
+              content: Text("Failed to remove item: ${response.data['message']}", style: TextStyle(fontSize: 14))),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}", style: TextStyle(fontSize: 14.sp))),
+        SnackBar(content: Text("Error: ${e.toString()}", style: TextStyle(fontSize: 14))),
       );
     }
   }
@@ -232,7 +232,7 @@ class _StudentcartState extends State<Studentcart> {
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("Authentication failed. Please login again.", style: TextStyle(fontSize: 14.sp))),
+            content: Text("Authentication failed. Please login again.", style: TextStyle(fontSize: 14))),
       );
       return;
     }
@@ -280,7 +280,7 @@ class _StudentcartState extends State<Studentcart> {
           "My Cart",
           style: TextStyle(
               color: Colors.black,
-              fontWeight: FontWeight.bold,fontSize: 18.sp),
+              fontWeight: FontWeight.bold,fontSize: 18),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -303,7 +303,7 @@ class _StudentcartState extends State<Studentcart> {
           ? Center(
         child: Text(
           "Cart is Empty",
-          style: TextStyle(fontSize: 18.sp,),
+          style: TextStyle(fontSize: 18,),
         ),
       )
           : Container(
@@ -328,14 +328,14 @@ class _StudentcartState extends State<Studentcart> {
                           Text(
                             "Deliver to this address:",
                             style: TextStyle(
-                                fontSize: 14.sp,
+                                fontSize: 14,
                                ),
                           ),
                           SizedBox(width: 5.w),
                           Text(
                             selectedAddress,
                             style: TextStyle(
-                                fontSize: 14.sp,
+                                fontSize: 14,
 
                                 fontWeight: FontWeight.normal),
                           ),
@@ -347,7 +347,7 @@ class _StudentcartState extends State<Studentcart> {
                       child: Text(
                         "Change",
                         style: TextStyle(
-                            fontSize: 14.sp,
+                            fontSize: 14,
 
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF2B5C74)),
@@ -421,7 +421,7 @@ class _StudentcartState extends State<Studentcart> {
                           color: Colors.black,
 
                           fontWeight: FontWeight.bold,
-                          fontSize: 14.sp),
+                          fontSize: 14),
                     ),
                   ),
                 ],
@@ -462,7 +462,7 @@ class _StudentcartState extends State<Studentcart> {
                           color: Colors.white,
 
                           fontWeight: FontWeight.bold,
-                          fontSize: 16.sp,
+                          fontSize: 16,
                         )),
                   ],
                 ),
@@ -520,7 +520,7 @@ class _StudentcartState extends State<Studentcart> {
                 Text(
                   title,
                   style: TextStyle(
-                      fontSize: 16.sp,
+                      fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: Colors.black),
                   maxLines: 1,
@@ -529,7 +529,7 @@ class _StudentcartState extends State<Studentcart> {
                 SizedBox(height: 5.h),
                 Text(
                   description,
-                  style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                  style: TextStyle(fontSize: 12, color: Colors.black87),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -538,7 +538,7 @@ class _StudentcartState extends State<Studentcart> {
                   children: [
                     IconButton(
                       icon: Icon(Icons.remove_circle_outline,
-                          color: Colors.black, size: 20.sp),
+                          color: Colors.black, size: 20),
                       onPressed: () {
                         setState(() {
                           if (cartItems[index]['quantity'] > 1) {
@@ -553,7 +553,7 @@ class _StudentcartState extends State<Studentcart> {
                     Text(
                       "${cartItems[index]['quantity']}",
                       style: TextStyle(
-                          fontSize: 14.sp, fontWeight: FontWeight.bold),
+                          fontSize: 14, fontWeight: FontWeight.bold),
                     ),
                     IconButton(
                       icon: Icon(Icons.add_circle_outline,
@@ -583,7 +583,7 @@ class _StudentcartState extends State<Studentcart> {
               Text(
                 "₹${price.toInt()}",
                 style: TextStyle(
-                    fontSize: 16.sp,
+                    fontSize: 16,
                     fontWeight: FontWeight.w500),
               ),
             ],
@@ -601,12 +601,12 @@ class _StudentcartState extends State<Studentcart> {
         children: [
           Text(title,
               style: TextStyle(
-                  fontSize: isBold ? 16.sp : 14.sp,
+                  fontSize: isBold ? 16 : 14,
                   fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
                   )),
           Text(value,
               style: TextStyle(
-                  fontSize: isBold ? 16.sp : 14.sp,
+                  fontSize: isBold ? 16 : 14,
                   fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
                   )),
         ],
