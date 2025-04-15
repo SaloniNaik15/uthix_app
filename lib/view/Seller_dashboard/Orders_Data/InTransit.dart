@@ -18,13 +18,16 @@ class _InTransitState extends State<InTransit> {
   bool isLoading = true; // Track loading state
 
   @override
+  @override
   void initState() {
     super.initState();
     dio = Dio();
-    // Trigger fetchOrders when the screen is visible
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      fetchOrders();
-    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    fetchOrders();
   }
 
   // Fetch orders from the API
@@ -54,28 +57,28 @@ class _InTransitState extends State<InTransit> {
         setState(() {
           orders = response.data['orders'].map((order) {
             List<dynamic> itemIds = order['items'].map((item) {
-              return item['id']; // Get the item ID
+              return item['id'];
             }).toList();
 
             return {
               'order_id': order['order_id'],
-              'item_ids': itemIds, // Store item IDs here
+              'item_ids': itemIds,
               'shipping_address': order['shipping_address'],
-              'items': order['items'], // Store items data here
+              'items': order['items'],
             };
           }).toList();
-          isLoading = false; // Stop loading after data is fetched
+          isLoading = false;
         });
       } else {
         print('Failed to load orders: ${response.statusCode}');
         setState(() {
-          isLoading = false; // Stop loading on error
+          isLoading = false;
         });
       }
     } catch (e) {
       print('Error fetching orders: $e');
       setState(() {
-        isLoading = false; // Stop loading on error
+        isLoading = false;
       });
     }
   }

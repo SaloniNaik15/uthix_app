@@ -56,7 +56,7 @@ class _PendingState extends State<Pending> {
         });
       }
     } catch (e) {
-      print("Error fetching orders: $e");
+      log("❌ Error fetching orders: $e");
       setState(() {
         isLoading = false;
       });
@@ -76,10 +76,7 @@ class _PendingState extends State<Pending> {
 
       var response = await Dio().post(
         'https://admin.uthix.com/api/vendor-update-order-status',
-        data: jsonEncode({
-          'product_id': productId,
-          'status': status,
-        }),
+        data: jsonEncode({'product_id': productId, 'status': status}),
         options: Options(
           headers: {
             "Authorization": "Bearer $token",
@@ -92,22 +89,17 @@ class _PendingState extends State<Pending> {
       if (response.statusCode == 200 && response.data['status'] == true) {
         log('✅ Order status updated successfully');
 
-        // Navigate to the appropriate screen based on status
-        if (status == 'intransit') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => InTransit(status: 'in_transit'),
-            ),
-          );
-        } else if (status == 'rejected') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Rejected(status: 'rejected'),
-            ),
-          );
-        }
+        // if (status == 'intransit') {
+        //   Navigator.pushReplacement(
+        //     context,
+        //     MaterialPageRoute(builder: (_) => InTransit(status: 'in_transit')),
+        //   );
+        // } else if (status == 'rejected') {
+        //   Navigator.pushReplacement(
+        //     context,
+        //     MaterialPageRoute(builder: (_) => Rejected(status: 'rejected')),
+        //   );
+        // }
       } else {
         log('❌ Failed to update order status');
       }
@@ -128,7 +120,6 @@ class _PendingState extends State<Pending> {
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildSearchBar(),
                       const SizedBox(height: 15),
@@ -156,11 +147,10 @@ class _PendingState extends State<Pending> {
         child: Text(
           "Pending Orders",
           style: TextStyle(
-            fontSize: 20,
-            fontFamily: 'Urbanist',
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+              fontSize: 20,
+              fontFamily: 'Urbanist',
+              fontWeight: FontWeight.bold,
+              color: Colors.white),
         ),
       ),
     );
@@ -210,7 +200,6 @@ class _PendingState extends State<Pending> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Loop through all items in the order
               if (order['items'] != null)
                 ...order['items'].map<Widget>((product) {
                   return _buildOrderDetails(context, product);
@@ -221,12 +210,8 @@ class _PendingState extends State<Pending> {
               _buildAddressSection(shipping),
               _buildDivider(),
               const SizedBox(height: 10),
-              // Optionally add action buttons if you want them for all products
               if (order['items'] != null && order['items'].isNotEmpty)
-                _buildActionButtons(
-                    context,
-                    order['items'][0]
-                        ['id']), // Apply action buttons for the first item
+                _buildActionButtons(context, order['items'][0]['id']),
             ],
           ),
         ),
@@ -249,27 +234,23 @@ class _PendingState extends State<Pending> {
               Text(
                 product['title'] ?? "Unknown Product",
                 style: const TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Urbanist',
-                  fontWeight: FontWeight.bold,
-                ),
+                    fontSize: 18,
+                    fontFamily: 'Urbanist',
+                    fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
               Text(
                 product['description'] ?? "No description available",
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontFamily: 'Urbanist',
-                ),
+                style:
+                    TextStyle(color: Colors.grey[700], fontFamily: 'Urbanist'),
               ),
               const SizedBox(height: 8),
               Text(
                 "₹${product['price']}",
                 style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Urbanist',
-                ),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Urbanist'),
               ),
             ],
           ),
@@ -290,10 +271,11 @@ class _PendingState extends State<Pending> {
                 height: 100,
                 width: 100,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset("assets/Seller_dashboard_images/book.jpg",
-                      height: 100, width: 100, fit: BoxFit.cover);
-                },
+                errorBuilder: (_, __, ___) => Image.asset(
+                    "assets/Seller_dashboard_images/book.jpg",
+                    height: 100,
+                    width: 100,
+                    fit: BoxFit.cover),
               )
             : Image.asset("assets/Seller_dashboard_images/book.jpg",
                 height: 100, width: 100, fit: BoxFit.cover),
@@ -303,42 +285,22 @@ class _PendingState extends State<Pending> {
 
   Widget _buildAddressSection(dynamic shipping) {
     if (shipping == null) {
-      return const Text(
-        "No shipping address available.",
-        style: TextStyle(
-          fontSize: 14,
-          fontFamily: 'Urbanist',
-          color: Colors.red,
-        ),
-      );
+      return const Text("No shipping address available.",
+          style: TextStyle(fontSize: 14, color: Colors.red));
     }
 
-    String addressText = "${shipping['name'] ?? ''}, "
-        "${shipping['phone'] ?? ''}, "
-        "${shipping['city'] ?? ''}, "
-        "${shipping['state'] ?? ''}, "
-        "${shipping['landmark'] ?? ''}";
+    String addressText =
+        "${shipping['name'] ?? ''}, ${shipping['phone'] ?? ''}, "
+        "${shipping['city'] ?? ''}, ${shipping['state'] ?? ''}, ${shipping['landmark'] ?? ''}";
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Shipping Address",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-            fontFamily: 'Urbanist',
-          ),
-        ),
+        const Text("Shipping Address",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
         const SizedBox(height: 4),
-        Text(
-          addressText,
-          style: const TextStyle(
-            fontSize: 14,
-            fontFamily: 'Urbanist',
-            color: Colors.black87,
-          ),
-        ),
+        Text(addressText,
+            style: const TextStyle(fontSize: 14, color: Colors.black87)),
       ],
     );
   }
@@ -350,24 +312,21 @@ class _PendingState extends State<Pending> {
           child: ElevatedButton(
             onPressed: () {
               updateOrderStatus(context, productId, 'intransit');
-              log("Accept Order button pressed for product ID: $productId");
+              log("Accept Order for product ID: $productId");
               showDialog(
                 context: context,
-                builder: (BuildContext context) {
-                  return OrderStatusDialog(
-                    statusMessage: 'Order Accepted Successfully',
-                    iconCircleColor: Colors.green,
-                    statusIcon: Icons.check,
-                  );
-                },
+                builder: (_) => OrderStatusDialog(
+                  statusMessage: 'Order Accepted Successfully',
+                  iconCircleColor: Colors.green,
+                  statusIcon: Icons.check,
+                ),
               );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF2B5C74),
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
+                  borderRadius: BorderRadius.circular(30)),
             ),
             child: const Text("Accept Order",
                 style: TextStyle(color: Colors.white)),
@@ -377,29 +336,26 @@ class _PendingState extends State<Pending> {
         Expanded(
           child: ElevatedButton(
             onPressed: () {
-              log("Decline Order button pressed for product ID: $productId");
+              log("Decline Order for product ID: $productId");
               showDialog(
                 context: context,
-                builder: (BuildContext context) {
-                  return OrderStatusDialog(
-                    statusMessage: 'Are you sure you want to reject the order?',
-                    iconCircleColor: Colors.red,
-                    statusIcon: Icons.close,
-                    showButtons: true,
-                    onOkPressed: () {
-                      updateOrderStatus(context, productId, 'rejected');
-                      Navigator.pop(context); // Close the dialog
-                    },
-                  );
-                },
+                builder: (_) => OrderStatusDialog(
+                  statusMessage: 'Are you sure you want to reject the order?',
+                  iconCircleColor: Colors.red,
+                  statusIcon: Icons.close,
+                  showButtons: true,
+                  onOkPressed: () {
+                    updateOrderStatus(context, productId, 'rejected');
+                    Navigator.pop(context);
+                  },
+                ),
               );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFF44236),
               padding: const EdgeInsets.symmetric(vertical: 12),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
+                  borderRadius: BorderRadius.circular(30)),
             ),
             child: const Text("Decline Order",
                 style: TextStyle(color: Colors.white)),
@@ -409,35 +365,16 @@ class _PendingState extends State<Pending> {
     );
   }
 
-  Widget _buildActionButton(
-    BuildContext context,
-    String label,
-    VoidCallback onPressed,
-    Color color,
-  ) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      ),
-      child: Text(label),
-    );
-  }
-
   Widget _buildContainer({required Widget child}) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: const Color(0xFFF4F4F4),
-      ),
+          borderRadius: BorderRadius.circular(10),
+          color: const Color(0xFFF4F4F4)),
       child: child,
     );
   }
 
-  Widget _buildDivider() {
-    return const Divider(color: Color(0xFFF4F4F4), height: 1);
-  }
+  Widget _buildDivider() => const Divider(color: Color(0xFFF4F4F4), height: 1);
 }
 
 class OrderStatusDialog extends StatelessWidget {
@@ -460,45 +397,29 @@ class OrderStatusDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Colors.white,
-      contentPadding: EdgeInsets.all(20),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            height: 80,
-            width: 80,
-            decoration: BoxDecoration(
-              color: iconCircleColor,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              statusIcon,
-              color: Colors.white,
-              size: 49,
-            ),
+          CircleAvatar(
+            backgroundColor: iconCircleColor,
+            radius: 40,
+            child: Icon(statusIcon, color: Colors.white, size: 48),
           ),
           const SizedBox(height: 20),
-          Text(
-            statusMessage,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          Text(statusMessage,
+              textAlign: TextAlign.center,
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 20),
           if (showButtons)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _button("OK", const Color(0xFF2B5C74), onOkPressed ?? () {}),
-                _button("Cancel", Colors.red, () {
-                  Navigator.pop(context); // Close the dialog
-                }),
+                _buildDialogButton(
+                    "OK", const Color(0xFF2B5C74), onOkPressed ?? () {}),
+                _buildDialogButton(
+                    "Cancel", Colors.red, () => Navigator.pop(context)),
               ],
             ),
         ],
@@ -506,20 +427,16 @@ class OrderStatusDialog extends StatelessWidget {
     );
   }
 
-  Widget _button(String label, Color color, VoidCallback onTap) {
+  Widget _buildDialogButton(String label, Color color, VoidCallback onTap) {
     return ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
         backgroundColor: color,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
-      child: Text(
-        label,
-        style: const TextStyle(color: Colors.white, fontSize: 16),
-      ),
+      child: Text(label,
+          style: const TextStyle(color: Colors.white, fontSize: 16)),
     );
   }
 }

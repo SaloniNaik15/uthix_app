@@ -206,6 +206,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
       debugPrint("❌ Error checking store: $e");
     }
   }
+
   Future<void> fetchVendorInfo() async {
     try {
       final response = await dio.get(
@@ -233,6 +234,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
       log("❌ Error fetching vendor info: $e");
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -337,16 +339,16 @@ class _SellerDashboardState extends State<SellerDashboard> {
         children: [
           vendorLogo != null
               ? CircleAvatar(
-            radius: 20,
-            backgroundImage: NetworkImage(
-              'https://admin.uthix.com/storage/images/logos/$vendorLogo',
-            ),
-          )
+                  radius: 20,
+                  backgroundImage: NetworkImage(
+                    'https://admin.uthix.com/storage/images/logos/$vendorLogo',
+                  ),
+                )
               : const CircleAvatar(
-            radius: 20,
-            backgroundColor: Colors.grey,
-            child: Icon(Icons.store, color: Colors.white),
-          ),
+                  radius: 20,
+                  backgroundColor: Colors.grey,
+                  child: Icon(Icons.store, color: Colors.white),
+                ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -488,7 +490,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
 
   void showSubcategoryMenu(BuildContext context, String parentCategoryId,
       String parentCategoryName) {
-    selectedSubcategory = null; // ✅ Reset subcategory selection before dialog
+    selectedSubcategory = null;
 
     showDialog(
       context: context,
@@ -496,6 +498,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
+              backgroundColor: Colors.white,
               title: const Text("Select a Subcategory"),
               content: SizedBox(
                 width: double.maxFinite,
