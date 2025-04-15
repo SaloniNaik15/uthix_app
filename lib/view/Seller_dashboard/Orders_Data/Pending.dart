@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uthix_app/view/Seller_dashboard/Orders_Data/InTransit.dart';
+import 'package:uthix_app/view/Seller_dashboard/Orders_Data/Rejected.dart';
 import 'OrderDetails.dart';
 
 class Pending extends StatefulWidget {
@@ -61,7 +63,8 @@ class _PendingState extends State<Pending> {
     }
   }
 
-  Future<void> updateOrderStatus(int productId, String status) async {
+  Future<void> updateOrderStatus(
+      BuildContext context, int productId, String status) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString("auth_token");
@@ -88,6 +91,23 @@ class _PendingState extends State<Pending> {
 
       if (response.statusCode == 200 && response.data['status'] == true) {
         log('✅ Order status updated successfully');
+
+        // Navigate to the appropriate screen based on status
+        if (status == 'intransit') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InTransit(status: 'in_transit'),
+            ),
+          );
+        } else if (status == 'rejected') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Rejected(status: 'rejected'),
+            ),
+          );
+        }
       } else {
         log('❌ Failed to update order status');
       }
@@ -329,7 +349,7 @@ class _PendingState extends State<Pending> {
         Expanded(
           child: ElevatedButton(
             onPressed: () {
-              updateOrderStatus(productId, 'intransit');
+              updateOrderStatus(context, productId, 'intransit');
               log("Accept Order button pressed for product ID: $productId");
               showDialog(
                 context: context,
@@ -367,7 +387,7 @@ class _PendingState extends State<Pending> {
                     statusIcon: Icons.close,
                     showButtons: true,
                     onOkPressed: () {
-                      updateOrderStatus(productId, 'rejected');
+                      updateOrderStatus(context, productId, 'rejected');
                       Navigator.pop(context); // Close the dialog
                     },
                   );

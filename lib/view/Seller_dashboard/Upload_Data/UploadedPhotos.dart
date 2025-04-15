@@ -7,14 +7,18 @@ import 'package:uthix_app/view/Seller_dashboard/Upload_Data/Book_Details.dart';
 
 class UploadedPhotos extends StatefulWidget {
   final String category;
+  final String categoryId;
   final List<File> imageFiles;
   final String subcategory;
+  final String? subcategoryId;
 
   const UploadedPhotos({
     super.key,
     required this.category,
+    required this.categoryId,
     required this.imageFiles,
     required this.subcategory,
+    this.subcategoryId,
   });
 
   @override
@@ -26,18 +30,23 @@ class _UploadedPhotosState extends State<UploadedPhotos> {
   File? thumbnailImage;
 
   @override
-  void initState() {
-    super.initState();
+ @override
+void initState() {
+  super.initState();
 
-    log("📌 Received category in photos: ${widget.subcategory}");
+  log("📌 Category Name: ${widget.category}");
+  log("📌 Category ID: ${widget.categoryId}");
+  log("📌 Subcategory Name: ${widget.subcategory}");
+  log("📌 Subcategory ID: ${widget.subcategoryId}");
 
-    if (widget.subcategory.isNotEmpty) {
-      categoryImages[widget.subcategory] = List.from(widget.imageFiles);
-      _updateThumbnail(widget.subcategory);
-    }
-
-    _loadSavedImages();
+  if (widget.subcategory.isNotEmpty) {
+    categoryImages[widget.subcategory] = List.from(widget.imageFiles);
+    _updateThumbnail(widget.subcategory);
   }
+
+  _loadSavedImages();
+}
+
 
   Future<void> _loadSavedImages() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -130,15 +139,20 @@ class _UploadedPhotosState extends State<UploadedPhotos> {
     });
     _saveImages();
   }
-
-  void navigateToNextPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BookDetails(subcategory: widget.subcategory),
+void navigateToNextPage() {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => BookDetails(
+        category: widget.category,
+        categoryId: widget.categoryId,
+        subcategory: widget.subcategory,
+        subcategoryId: widget.subcategoryId,
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {

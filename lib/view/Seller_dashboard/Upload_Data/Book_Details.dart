@@ -10,8 +10,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BookDetails extends StatefulWidget {
+  final String category;
+  final String categoryId;
   final String subcategory;
-  const BookDetails({super.key, required this.subcategory});
+  final String? subcategoryId;
+
+  const BookDetails({
+    super.key,
+    required this.category,
+    required this.categoryId,
+    required this.subcategory,
+    this.subcategoryId,
+  });
 
   @override
   State<BookDetails> createState() => _BookDetailsState();
@@ -35,6 +45,11 @@ class _BookDetailsState extends State<BookDetails> {
   void initState() {
     super.initState();
     _initializeData();
+    log("➡️ Navigated to BookDetails with:");
+    log("📌 Category Name: ${widget.category}");
+    log("📌 Category ID: ${widget.categoryId}");
+    log("📌 Subcategory Name: ${widget.subcategory}");
+    log("📌 Subcategory ID: ${widget.subcategoryId}");
   }
 
   Future<void> _initializeData() async {
@@ -80,21 +95,20 @@ class _BookDetailsState extends State<BookDetails> {
     }
   }
 
+  /// ✅ UPDATED SUBMIT FORM FUNCTION
   Future<void> _submitForm() async {
-    const url = 'https://admin.uthix.com/api/vendor/products';
-
     final prefs = await SharedPreferences.getInstance();
-    final categoryIdStr = prefs.getString('selectedCategoryId');
     final token = prefs.getString('auth_token');
 
-    if (categoryIdStr == null || categoryIdStr.isEmpty) {
+    if (widget.subcategoryId == null || widget.subcategoryId!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Select a category first.')),
+        const SnackBar(content: Text('Subcategory is missing.')),
       );
       return;
     }
 
-    final categoryId = int.tryParse(categoryIdStr) ?? 0;
+    final subcategoryId = widget.subcategoryId!;
+    final url = 'https://admin.uthix.com/api/vendor/products/$subcategoryId';
 
     try {
       final dio = Dio();
@@ -104,7 +118,7 @@ class _BookDetailsState extends State<BookDetails> {
         'title': _bookNameController.text,
         'author': _authorController.text,
         'description': _descriptionController.text,
-        'category_id': categoryId.toString(),
+        'category_id': widget.categoryId,
         'isbn': _isbnController.text,
         'language': _languageController.text,
         'pages': _pagesController.text,
@@ -143,7 +157,7 @@ class _BookDetailsState extends State<BookDetails> {
       if (response.statusCode == 201 || response.statusCode == 200) {
         log('✅ Product created: ${response.data['product']['id']}');
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Book uploaded successfully!')),
+          SnackBar(content: Text('${response.data['message']}')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -167,14 +181,14 @@ class _BookDetailsState extends State<BookDetails> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 22.0, vertical: 5),
       decoration: BoxDecoration(
-        color: Color(0xFFFCFCFC),
+        color: const Color(0xFFFCFCFC),
         borderRadius: BorderRadius.circular(40),
-        border: Border.all(color: Color(0xFFD2D2D2)),
+        border: Border.all(color: const Color(0xFFD2D2D2)),
       ),
       child: Row(
         children: [
           Icon(prefixIcon, color: Colors.grey),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           Expanded(
             child: TextFormField(
               controller: controller,
@@ -182,7 +196,7 @@ class _BookDetailsState extends State<BookDetails> {
                 labelText: label,
                 border: InputBorder.none,
                 filled: true,
-                fillColor: Color(0xFFFCFCFC),
+                fillColor: const Color(0xFFFCFCFC),
               ),
               textAlign: TextAlign.left,
               textAlignVertical: TextAlignVertical.top,
@@ -194,9 +208,7 @@ class _BookDetailsState extends State<BookDetails> {
   }
 
   Widget _buildTextFormFieldWithMultiline(
-    BuildContext context,
-    TextEditingController controller,
-  ) {
+      BuildContext context, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -209,7 +221,7 @@ class _BookDetailsState extends State<BookDetails> {
           ),
           child: TextFormField(
             controller: controller,
-            maxLines: 5, // Allows multiline input
+            maxLines: 5,
             keyboardType: TextInputType.multiline,
             decoration: const InputDecoration(
               hintText: 'Book description...',
@@ -224,7 +236,6 @@ class _BookDetailsState extends State<BookDetails> {
               fillColor: Color(0xFFFCFCFC),
             ),
             onChanged: (value) {
-              // Truncate if it exceeds 100 words
               List<String> words = value.trim().split(RegExp(r'\s+'));
               if (words.length > 100) {
                 controller.text = words.sublist(0, 100).join(' ');
@@ -275,7 +286,6 @@ class _BookDetailsState extends State<BookDetails> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top Back Arrow
               IconButton(
                 icon: const Icon(Icons.arrow_back_ios),
                 onPressed: () {
@@ -283,16 +293,13 @@ class _BookDetailsState extends State<BookDetails> {
                 },
               ),
               const SizedBox(height: 10),
-              // Book Details Title
               const Center(
                 child: Column(
                   children: [
                     Text(
                       'Book Details',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 6),
                     Text(
@@ -304,50 +311,32 @@ class _BookDetailsState extends State<BookDetails> {
                 ),
               ),
               const SizedBox(height: 20),
-              // All TextFields
-              // Name Field
               _buildTextFormField(
-                context,
-                'Book Name',
-                Icons.bookmark_add_outlined,
-                _bookNameController,
-              ),
+                  context, 'Book Name', Icons.book, _bookNameController),
               const SizedBox(height: 26),
-
-              // Phone No Field
-              _buildTextFormField(context, ' Language',
-                  Icons.bookmark_add_outlined, _languageController),
-              const SizedBox(height: 26),
-
-              // Gender Field
-              _buildTextFormField(context, 'ISBN Number',
-                  Icons.bookmark_add_outlined, _isbnController),
-              const SizedBox(height: 26),
-
-              // Calendar Field
-              _buildTextFormField(context, 'Pages',
-                  Icons.bookmark_border_outlined, _pagesController),
-              const SizedBox(height: 26),
-
-              // Location Field
               _buildTextFormField(
-                  context, 'Author', Icons.menu_book_sharp, _authorController),
+                  context, 'Language', Icons.language, _languageController),
               const SizedBox(height: 26),
-
-              // University Field
-              _buildTextFormField(context, 'Price',
-                  Icons.currency_rupee_rounded, _priceController),
-
-              SizedBox(height: 26),
               _buildTextFormField(
-                  context, 'Stock', Icons.price_check, _stockController),
-              SizedBox(height: 26),
+                  context, 'ISBN Number', Icons.numbers, _isbnController),
+              const SizedBox(height: 26),
               _buildTextFormField(
-                  context, 'Quantity', Icons.price_check, _minQtyController),
+                  context, 'Pages', Icons.menu_book, _pagesController),
+              const SizedBox(height: 26),
+              _buildTextFormField(
+                  context, 'Author', Icons.person, _authorController),
+              const SizedBox(height: 26),
+              _buildTextFormField(
+                  context, 'Price', Icons.currency_rupee, _priceController),
+              const SizedBox(height: 26),
+              _buildTextFormField(
+                  context, 'Stock', Icons.store, _stockController),
+              const SizedBox(height: 26),
+              _buildTextFormField(
+                  context, 'Quantity', Icons.shopping_cart, _minQtyController),
               const SizedBox(height: 26),
               _buildTextFormFieldWithMultiline(context, _descriptionController),
               const SizedBox(height: 20),
-              // Upload Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
