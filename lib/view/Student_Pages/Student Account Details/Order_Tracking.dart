@@ -2,10 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/UpcomingPage.dart';
-import 'Order_Processing.dart'; // Your order processing screen
+import 'Order_Processing.dart';
 
 class OrdersTrackingPage extends StatefulWidget {
-  final int? orderId; // Make it nullable if needed
+  final int? orderId;
 
   const OrdersTrackingPage({Key? key, this.orderId}) : super(key: key);
 
@@ -17,6 +17,7 @@ class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
   List orders = [];
   bool isLoading = true;
 
+  // Set the base URL for orders.
   final Dio _dio = Dio(BaseOptions(
     baseUrl: 'https://admin.uthix.com/api/orders',
   ));
@@ -29,8 +30,7 @@ class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
 
   Future<void> fetchOrders() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token =
-        prefs.getString('auth_token');
+    String? token = prefs.getString('auth_token');
 
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -44,7 +44,7 @@ class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
       final response = await _dio.get(
         '',
         options: Options(headers: {
-          'Authorization': 'Bearer $token', // ✅ Dynamic Token
+          'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         }),
@@ -53,7 +53,6 @@ class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
       if (response.statusCode == 200) {
         List fetchedOrders = response.data['orders'] ?? [];
 
-        //  Sort orders by latest first (Descending order based on created_at)
         fetchedOrders.sort((a, b) {
           DateTime dateA = DateTime.parse(a['created_at']);
           DateTime dateB = DateTime.parse(b['created_at']);
@@ -81,141 +80,144 @@ class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, size: 25,),
+          icon: const Icon(Icons.arrow_back_ios, size: 25),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           "Orders and Tracking",
           style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black
-          ),
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black),
         ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
-      ))
+          ? const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+        ),
+      )
           : orders.isEmpty
-              ? const Center(child: Text("No orders found."))
-              : SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Search bar (optional)
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: const TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "Search in orders",
-                                    prefixIcon: Icon(
-                                      Icons.search,
-                                      color: Color(0xFF605F5F),
-                                    ),
-                                    border: InputBorder.none,
-                                    contentPadding:
-                                        EdgeInsets.symmetric(vertical: 14),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: IconButton(
-                                icon: const Icon(Icons.tune,
-                                    color: Color(0xFF605F5F)),
-                                onPressed: () {
-                                  // Handle filter button tap if needed.
-                                },
-                              ),
-                            ),
-                          ],
+          ? const Center(child: Text("No orders found."))
+          : SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Optional search bar
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const TextField(
+                        decoration: InputDecoration(
+                          hintText: "Search in orders",
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Color(0xFF605F5F),
+                          ),
+                          border: InputBorder.none,
+                          contentPadding:
+                          EdgeInsets.symmetric(vertical: 14),
                         ),
-                        const SizedBox(height: 15),
-                        const Divider(color: Color(0xFF605F5F), thickness: 2),
-                        const SizedBox(height: 20),
-                        // List of orders.
-                        ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: orders.length,
-                          itemBuilder: (context, index) {
-                            final order = orders[index];
-
-                            // Extract order status and date.
-                            final orderStatus = order['status'] ?? 'In Process';
-                            final orderDate = order['created_at'] != null
-                                ? order['created_at'].substring(0, 10)
-                                : "N/A";
-
-                            // Extract details of the first order item.
-                            final items = order['order_items'] ?? [];
-                            final firstItem =
-                                items.isNotEmpty ? items[0] : null;
-                            final bookName = firstItem != null &&
-                                    firstItem['product'] != null
-                                ? firstItem['product']['title'] ?? 'Book Name'
-                                : 'Book Name';
-                            final description = firstItem != null &&
-                                    firstItem['product'] != null
-                                ? firstItem['product']['description'] ??
-                                    'Description'
-                                : 'Description';
-                            final price = "₹${order['total_amount'] ?? '0'}";
-
-                            return OrderCard(
-                              orderStatus: orderStatus,
-                              orderDate: orderDate,
-                              bookName: bookName,
-                              description: description,
-                              price: price,
-                              imagePath:
-                                  'assets/Seller_dashboard_images/book.jpg',
-                              onUpdateStatus: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                    OrderProcessing(
-                                      orderId: order['id'],
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
+                    child: IconButton(
+                      icon: const Icon(Icons.tune,
+                          color: Color(0xFF605F5F)),
+                      onPressed: () {
+                      },
+                    ),
                   ),
-                ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              const Divider(
+                  color: Color(0xFF605F5F), thickness: 2),
+              const SizedBox(height: 20),
+              // List of orders.
+              ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: orders.length,
+                itemBuilder: (context, index) {
+                  final order = orders[index];
+
+
+                  final orderStatus = order['status'] ?? 'In Process';
+                  final orderDate = order['created_at'] != null
+                      ? order['created_at'].substring(0, 10)
+                      : "N/A";
+
+                  // Extract details of the first order item.
+                  final items = order['order_items'] ?? [];
+                  final firstItem =
+                  items.isNotEmpty ? items[0] : null;
+                  final bookName = firstItem != null &&
+                      firstItem['product'] != null
+                      ? firstItem['product']['title'] ?? 'Book Name'
+                      : 'Book Name';
+                  final description = firstItem != null &&
+                      firstItem['product'] != null
+                      ? firstItem['product']['description'] ??
+                      'Description'
+                      : 'Description';
+                  final price =
+                      "₹${order['total_amount'] ?? '0'}";
+
+                  return OrderCard(
+                    orderStatus: orderStatus,
+                    orderDate: orderDate,
+                    bookName: bookName,
+                    description: description,
+                    price: price,
+                    imagePath:
+                    'assets/Seller_dashboard_images/book.jpg',
+                    onUpdateStatus: () {
+                      // When this button is tapped,
+                      // navigate to OrderProcessing page by passing the order id.
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OrderProcessing(
+                            orderId: order['id'],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -257,7 +259,7 @@ class OrderCard extends StatelessWidget {
                   orderStatus,
                   style: const TextStyle(
                     fontSize: 16,
-                    fontFamily: 'Urbanist',
+
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF2B5C74),
                   ),
@@ -266,7 +268,7 @@ class OrderCard extends StatelessWidget {
                   orderDate,
                   style: const TextStyle(
                     fontSize: 14,
-                    fontFamily: 'Urbanist',
+
                     fontWeight: FontWeight.w300,
                     color: Colors.black,
                   ),
@@ -323,7 +325,7 @@ class OrderCard extends StatelessWidget {
                               bookName,
                               style: const TextStyle(
                                 fontSize: 18,
-                                fontFamily: 'Urbanist',
+
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -332,7 +334,7 @@ class OrderCard extends StatelessWidget {
                               description,
                               style: TextStyle(
                                 color: Colors.grey[700],
-                                fontFamily: 'Urbanist',
+
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -341,7 +343,7 @@ class OrderCard extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'Urbanist',
+
                               ),
                             ),
                           ],
@@ -380,7 +382,7 @@ class OrderCard extends StatelessWidget {
                             "Return",
                             style: TextStyle(
                               color: Colors.black,
-                              fontFamily: "Urbanist",
+
                             ),
                           ),
                         ),
@@ -402,7 +404,7 @@ class OrderCard extends StatelessWidget {
                             "Exchange",
                             style: TextStyle(
                               color: Colors.black,
-                              fontFamily: "Urbanist",
+
                             ),
                           ),
                         ),
@@ -419,8 +421,8 @@ class OrderCard extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: List.generate(
                           5,
-                          (index) =>
-                              const Icon(Icons.star_border_outlined, size: 28),
+                              (index) =>
+                          const Icon(Icons.star_border_outlined, size: 28),
                         ),
                       ),
                       Row(
@@ -435,7 +437,6 @@ class OrderCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.black,
-                                fontFamily: "Urbanist",
                               ),
                             ),
                           ),
