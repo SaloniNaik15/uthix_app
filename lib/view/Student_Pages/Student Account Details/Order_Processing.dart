@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OrderProcessing extends StatefulWidget {
   final int orderId;
@@ -20,15 +20,10 @@ class _OrderProcessingState extends State<OrderProcessing> {
   bool isLoading = true;
   bool hasError = false;
 
-  final Dio _dio = Dio(
-    BaseOptions(
-      baseUrl: 'https://admin.uthix.com/api/orders',
-      headers: {
-        'Authorization':
-        'Bearer 9|BQsNwAXNQ9dGJfTdRg0gL2pPLp0BTcTG6aH4y83k49ae7d64',
-      },
-    ),
-  );
+  // Initialize Dio with a base URL only. Token will be injected per-request.
+  final Dio _dio = Dio(BaseOptions(
+    baseUrl: 'https://admin.uthix.com/api/orders',
+  ));
 
   @override
   void initState() {
@@ -38,10 +33,34 @@ class _OrderProcessingState extends State<OrderProcessing> {
 
   Future<void> _fetchOrderDetails() async {
     try {
-      // Example: GET /orders/<orderId>
+      // Retrieve the token dynamically from SharedPreferences.
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('auth_token');
+
+      if (token == null || token.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text("Authentication failed. Please log in again.")),
+        );
+        setState(() {
+          hasError = true;
+          isLoading = false;
+        });
+        return;
+      }
+
+      // Call the API using the relative URL and inject the token into the request headers.
       final response = await _dio.get(
-        'https://admin.uthix.com/api/orders/${widget.orderId}',
+        '/${widget.orderId}',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
       );
+
       if (response.statusCode == 200) {
         setState(() {
           orderDetails = response.data['order'];
@@ -83,9 +102,12 @@ class _OrderProcessingState extends State<OrderProcessing> {
         ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
-      ))
+          ? const Center(
+        child: CircularProgressIndicator(
+          valueColor:
+          AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+        ),
+      )
           : hasError || orderDetails == null
           ? const Center(
         child: Text("Failed to load order details."),
@@ -95,7 +117,7 @@ class _OrderProcessingState extends State<OrderProcessing> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Single Card containing Order + Tracking
+            // Single Card containing Order Details and Tracking
             OrderAndTrackingCard(
               orderDetails: orderDetails!,
             ),
@@ -116,8 +138,7 @@ class _OrderProcessingState extends State<OrderProcessing> {
   }
 }
 
-
-//  Single Card for Order Details + Tracking
+//  Single Card for Order Details and Tracking
 class OrderAndTrackingCard extends StatelessWidget {
   final Map<String, dynamic> orderDetails;
 
@@ -128,11 +149,11 @@ class OrderAndTrackingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Safely get items array
+    // Safely get items array from the order details.
     final items = orderDetails['order_items'] ?? [];
-    // Grab the first item if it exists
+    // Grab the first item if it exists.
     final firstItem = items.isNotEmpty ? items[0] : null;
-    // Product data
+    // Extract product data.
     final productTitle = firstItem?['product']?['title'] ?? 'N/A';
     final productAuthor = firstItem?['product']?['author'] ?? '';
     final productPrice = orderDetails['total_amount'] ?? '0';
@@ -148,23 +169,22 @@ class OrderAndTrackingCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Order ID (use the actual field from your API)
+            // Order ID displayed using data from your API.
             Text(
               "Order ID: ${orderDetails['id'] ?? 'N/A'}",
               style: const TextStyle(
                 fontSize: 14,
-                fontFamily: 'Urbanist',
+
                 color: Colors.black,
               ),
             ),
             const SizedBox(height: 10),
             const Divider(),
             const SizedBox(height: 12),
-
             // Order Summary
             Row(
               children: [
-                // Product Info
+                // Product Info section.
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,15 +193,13 @@ class OrderAndTrackingCard extends StatelessWidget {
                         productTitle,
                         style: const TextStyle(
                           fontSize: 14,
-                          fontFamily: 'Urbanist',
+
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        productAuthor.isNotEmpty
-                            ? "by $productAuthor"
-                            : "No Author",
+                        productAuthor.isNotEmpty ? "by $productAuthor" : "No Author",
                         style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 8),
@@ -189,15 +207,14 @@ class OrderAndTrackingCard extends StatelessWidget {
                         "₹$productPrice",
                         style: const TextStyle(
                           fontSize: 14,
-                          fontFamily: 'Urbanist',
+
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
                 ),
-
-                // Product Image (If you have an image URL, use Image.network)
+                // Product Image (using a local asset; update if using network image)
                 Card(
                   color: Colors.white,
                   shape: RoundedRectangleBorder(
@@ -207,13 +224,6 @@ class OrderAndTrackingCard extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      // Example: if your API provides an image URL:
-                      // child: Image.network(
-                      //   firstItem?['product']?['image_url'] ?? '',
-                      //   width: 80,
-                      //   height: 100,
-                      //   fit: BoxFit.cover,
-                      // ),
                       child: Image.asset(
                         'assets/Seller_dashboard_images/book.jpg',
                         width: 80,
@@ -228,8 +238,7 @@ class OrderAndTrackingCard extends StatelessWidget {
             const SizedBox(height: 16),
             const Divider(),
             const SizedBox(height: 12),
-
-            // Tracking Section (static example; adjust to match your real tracking data)
+            // Static Tracking Section (adjust this as per your real tracking data)
             TrackingStep(
               title: "Order Confirmed",
               date: "Thu Jan 23",
@@ -259,7 +268,7 @@ class OrderAndTrackingCard extends StatelessWidget {
   }
 }
 
-// Tracking Step Widget (unchanged)
+// Tracking Step Widget
 class TrackingStep extends StatelessWidget {
   final String title;
   final String? date;
@@ -316,7 +325,7 @@ class TrackingStep extends StatelessWidget {
   }
 }
 
-//  Separate Address Section
+// Separate Address Section
 class AddressSection extends StatelessWidget {
   final Map<String, dynamic> orderDetails;
 
@@ -324,14 +333,14 @@ class AddressSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Example usage, adjust based on your API structure:
+    // Retrieve the full address from the order details.
     final shippingAddress = orderDetails['address']?['full_address'] ?? 'N/A';
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        border: Border.all(color: Color(0xFFD9D9D9)),
-        color: Color(0xFFF6F6F6),
+        border: Border.all(color: const Color(0xFFD9D9D9)),
+        color: const Color(0xFFF6F6F6),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -340,7 +349,7 @@ class AddressSection extends StatelessWidget {
             "Deliver to: $shippingAddress",
             style: const TextStyle(
               fontSize: 14,
-              fontFamily: "Urbanist",
+
             ),
           ),
         ],
@@ -349,8 +358,7 @@ class AddressSection extends StatelessWidget {
   }
 }
 
-
-//  Separate Price Details Section
+// Separate Price Details Section
 class PriceDetailsSection extends StatelessWidget {
   final Map<String, dynamic> orderDetails;
 
@@ -359,7 +367,7 @@ class PriceDetailsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Example usage, adjust based on your API:
+    // Example data extracted from API response.
     final itemPrice = orderDetails['sub_total'] ?? 0;
     final shippingCost = orderDetails['shipping'] ?? 0;
     final total = orderDetails['total_amount'] ?? 0;
@@ -415,4 +423,3 @@ class PriceDetailsSection extends StatelessWidget {
     );
   }
 }
-

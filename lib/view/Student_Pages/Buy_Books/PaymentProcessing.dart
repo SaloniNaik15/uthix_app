@@ -291,7 +291,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ),
         title: Text(
           "Payment",
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
         ),
       ),
       body: isLoading
@@ -303,7 +303,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           children: [
             Text(
               "Choose your Payment Gateway",
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10.h),
             GridView.builder(
@@ -340,7 +340,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         children: [
                           Image.asset(paymentImages[index], height: 50.h),
                           SizedBox(height: 8.h),
-                          Text(paymentMethods[index], style: TextStyle(fontSize: 14.sp)),
+                          Text(paymentMethods[index], style: TextStyle(fontSize: 14)),
                         ],
                       ),
                     ),
@@ -351,7 +351,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             SizedBox(height: 40.h),
             Text(
               "Your Bill Amount",
-              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8.h),
             Divider(),
@@ -359,7 +359,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Item price", style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500)),
+                Text("Item price", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                 Text("₹${widget.totalPrice}")
               ],
             ),
@@ -369,8 +369,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Total", style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
-                Text("₹${widget.totalPrice}", style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                Text("Total", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text("₹${widget.totalPrice}", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ],
             ),
             Spacer(),
@@ -381,7 +381,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 minimumSize: Size(double.infinity, 50.h),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.r)),
               ),
-              child: Text("Check Out", style: TextStyle(fontSize: 16.sp, color: Colors.white)),
+              child: Text("Check Out", style: TextStyle(fontSize: 16, color: Colors.white)),
             ),
           ],
         ),
