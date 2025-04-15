@@ -163,6 +163,8 @@ class _StudentcartState extends State<Studentcart> {
         data: orderData,
       );
 
+
+
       if (response.statusCode == 201 && response.data['message'] == "Order placed successfully") {
         if (context.mounted) {
           Navigator.pushReplacement(
