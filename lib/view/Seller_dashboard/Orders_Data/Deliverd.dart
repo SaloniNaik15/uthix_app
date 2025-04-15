@@ -70,24 +70,27 @@ class _DeliverdState extends State<Deliverd> {
       backgroundColor: Colors.white,
       appBar: _buildAppBar(context),
       body: isLoading
-          ? const Center(child: Text("No orders found."))
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSearchBar(),
-                  const SizedBox(height: 15),
-                  _buildDivider(),
-                  const SizedBox(height: 20),
-                  ...orders
-                      .map((order) => _buildOrderCard(context, order))
-                      .toList(),
-                  const SizedBox(height: 15),
-                  _buildDivider(),
-                ],
-              ),
-            ),
+          ? const Center(
+              child: CircularProgressIndicator(color: Color(0xFF2B5C74)))
+          : orders.isEmpty
+              ? const Center(child: Text("No orders found."))
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSearchBar(),
+                      const SizedBox(height: 15),
+                      _buildDivider(),
+                      const SizedBox(height: 20),
+                      ...orders
+                          .map((order) => _buildOrderCard(context, order))
+                          .toList(),
+                      const SizedBox(height: 15),
+                      _buildDivider(),
+                    ],
+                  ),
+                ),
     );
   }
 
