@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Seller_dashboard/Orders_Data/MyOrders.dart';
 import 'Create_Store_Data/CreateStore.dart';
 import 'Inventory_data/Inventory.dart';
@@ -27,6 +28,8 @@ class _SellerDashboardState extends State<SellerDashboard> {
   String? email;
   String? password;
   String? accessToken;
+  String? vendorLogo;
+  String? storeName;
 
   @override
   void initState() {
@@ -49,7 +52,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
       });
       log("✅ Token Loaded: $accessToken");
 
-      // ✅ Only call fetchParentCategories after token is loaded
+      await fetchVendorInfo();
       await fetchParentCategories();
     } else {
       log("❌ Token is null or empty");
@@ -203,7 +206,33 @@ class _SellerDashboardState extends State<SellerDashboard> {
       debugPrint("❌ Error checking store: $e");
     }
   }
+  Future<void> fetchVendorInfo() async {
+    try {
+      final response = await dio.get(
+        'https://admin.uthix.com/api/vendor/profile',
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $accessToken",
+            "Accept": "application/json",
+          },
+        ),
+      );
 
+      if (response.statusCode == 200) {
+        final data = response.data['data'];
+        log("Full Vendor Response: ${response.data}");
+        setState(() {
+          vendorLogo = data['logo']; // e.g., "1744607932.jpg"
+          storeName = data['store_name']; // e.g., "sangeta books"
+        });
+        log("✅ Vendor Info - Store Name: $storeName | Logo: $vendorLogo");
+      } else {
+        log("❌ Vendor info fetch failed: ${response.statusCode}");
+      }
+    } catch (e) {
+      log("❌ Error fetching vendor info: $e");
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -301,33 +330,34 @@ class _SellerDashboardState extends State<SellerDashboard> {
   Widget buildTopBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10),
-      height: 50,
+      height: 60,
       color: Colors.white,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const YourAccount()));
-                },
-                child: Image.asset('assets/icons/Ellipse.png', height: 40),
+          vendorLogo != null
+              ? CircleAvatar(
+            radius: 20,
+            backgroundImage: NetworkImage(
+              'https://admin.uthix.com/storage/images/logos/$vendorLogo',
+            ),
+          )
+              : const CircleAvatar(
+            radius: 20,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.store, color: Colors.white),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              storeName ?? "Store Name",
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF605F5F),
               ),
-              const SizedBox(width: 5),
-              const Text(
-                "Revantaha Stationers",
-                style: TextStyle(
-                  fontSize: 16,
-
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF605F5F),
-                ),
-              ),
-            ],
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ],
       ),
