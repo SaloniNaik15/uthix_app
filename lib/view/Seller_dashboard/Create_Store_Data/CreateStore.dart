@@ -182,20 +182,20 @@ class _CreateStoreState extends State<CreateStore> {
           children: [
             const Divider(color: Colors.grey, thickness: 1),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Image.asset('assets/icons/Ellipse.png', height: 50),
-                const SizedBox(width: 7),
-                const Text(
-                  "Hi Revantaha",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF605F5F),
-                  ),
-                ),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     Image.asset('assets/icons/Ellipse.png', height: 50),
+            //     const SizedBox(width: 7),
+            //     const Text(
+            //       "Hi Revantaha",
+            //       style: TextStyle(
+            //         fontSize: 16,
+            //         fontWeight: FontWeight.w500,
+            //         color: Color(0xFF605F5F),
+            //       ),
+            //     ),
+            //   ],
+            // ),
             const SizedBox(height: 10),
             Card(
               color: const Color(0xFFFCFCFC),
@@ -219,7 +219,7 @@ class _CreateStoreState extends State<CreateStore> {
                     ),
                     const SizedBox(height: 10),
                     _buildTextField(
-                        "Store Name", "e.g., Class A", _storeNameController),
+                        "Store Name", "e.g., ABC books", _storeNameController),
                     _buildTextField(
                         "Address", "location", _addressController),
                     _buildTextField(
