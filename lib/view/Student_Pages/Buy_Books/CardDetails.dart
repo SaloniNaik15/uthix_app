@@ -27,7 +27,7 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
       _isProcessing = true;
     });
 
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(Duration(seconds: 1), () {
       setState(() {
         _isProcessing = false;
       });
@@ -57,10 +57,7 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
         ),
         title: Text(
           "Give your Card Details",
-          style: TextStyle(
-
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -74,9 +71,7 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
               children: [
                 Text("Credit Card / Debit Card",
                     style: TextStyle(
-                        fontSize: 16.sp,
-
-                        fontWeight: FontWeight.bold)),
+                        fontSize: 16.sp, fontWeight: FontWeight.bold)),
                 SizedBox(height: 10.h),
                 Row(
                   children: [
@@ -84,9 +79,7 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
                     SizedBox(width: 16.w),
                     Text("Total ₹3040",
                         style: TextStyle(
-
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14.sp)),
+                            fontWeight: FontWeight.bold, fontSize: 14.sp)),
                   ],
                 ),
                 SizedBox(height: 40.h),
@@ -95,7 +88,6 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
                     labelText: "Card Number",
                     labelStyle: TextStyle(
                         fontSize: 16.sp,
-
                         fontWeight: FontWeight.w500,
                         color: const Color(0xFF605F5F)),
                     border: OutlineInputBorder(
@@ -113,7 +105,6 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
                     labelText: "Card Holder Name",
                     labelStyle: TextStyle(
                         fontSize: 16.sp,
-
                         fontWeight: FontWeight.w500,
                         color: const Color(0xFF605F5F)),
                     border: OutlineInputBorder(
@@ -129,7 +120,6 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
                           labelText: "Expiry Date (MM/YY)",
                           labelStyle: TextStyle(
                               fontSize: 16.sp,
-
                               fontWeight: FontWeight.w500,
                               color: const Color(0xFF605F5F)),
                           border: OutlineInputBorder(
@@ -145,7 +135,6 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
                           labelText: "CVV",
                           labelStyle: TextStyle(
                               fontSize: 16.sp,
-
                               fontWeight: FontWeight.w500,
                               color: const Color(0xFF605F5F)),
                           border: OutlineInputBorder(
@@ -168,10 +157,7 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
                     ),
                   ),
                   child: Text("Pay",
-                      style: TextStyle(
-                          fontSize: 16.sp,
-
-                          color: Colors.white)),
+                      style: TextStyle(fontSize: 16.sp, color: Colors.white)),
                 ),
               ],
             ),
@@ -191,9 +177,7 @@ class _CardPaymentScreenState extends State<CardPaymentScreen> {
                     Text(
                       "Please wait until your payment is received",
                       style: TextStyle(
-                          fontSize: 16.sp,
-
-                          fontWeight: FontWeight.bold),
+                          fontSize: 16.sp, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),

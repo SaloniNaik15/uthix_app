@@ -39,8 +39,15 @@ class _OrderProcessingState extends State<OrderProcessing> {
 
       if (token == null || token.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text("Authentication failed. Please log in again.")),
+          SnackBar(
+            content: Text("Authentication failed. Please log in again."),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
         setState(() {
           hasError = true;
@@ -103,37 +110,36 @@ class _OrderProcessingState extends State<OrderProcessing> {
       ),
       body: isLoading
           ? const Center(
-        child: CircularProgressIndicator(
-          valueColor:
-          AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
-        ),
-      )
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+              ),
+            )
           : hasError || orderDetails == null
-          ? const Center(
-        child: Text("Failed to load order details."),
-      )
-          : SingleChildScrollView(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Single Card containing Order Details and Tracking
-            OrderAndTrackingCard(
-              orderDetails: orderDetails!,
-            ),
-            const SizedBox(height: 16),
-            // Separate Address Section
-            AddressSection(
-              orderDetails: orderDetails!,
-            ),
-            const SizedBox(height: 16),
-            // Separate Price Details Section
-            PriceDetailsSection(
-              orderDetails: orderDetails!,
-            ),
-          ],
-        ),
-      ),
+              ? const Center(
+                  child: Text("Failed to load order details."),
+                )
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Single Card containing Order Details and Tracking
+                      OrderAndTrackingCard(
+                        orderDetails: orderDetails!,
+                      ),
+                      const SizedBox(height: 16),
+                      // Separate Address Section
+                      AddressSection(
+                        orderDetails: orderDetails!,
+                      ),
+                      const SizedBox(height: 16),
+                      // Separate Price Details Section
+                      PriceDetailsSection(
+                        orderDetails: orderDetails!,
+                      ),
+                    ],
+                  ),
+                ),
     );
   }
 }
@@ -174,7 +180,6 @@ class OrderAndTrackingCard extends StatelessWidget {
               "Order ID: ${orderDetails['id'] ?? 'N/A'}",
               style: const TextStyle(
                 fontSize: 14,
-
                 color: Colors.black,
               ),
             ),
@@ -193,13 +198,14 @@ class OrderAndTrackingCard extends StatelessWidget {
                         productTitle,
                         style: const TextStyle(
                           fontSize: 14,
-
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        productAuthor.isNotEmpty ? "by $productAuthor" : "No Author",
+                        productAuthor.isNotEmpty
+                            ? "by $productAuthor"
+                            : "No Author",
                         style: const TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 8),
@@ -207,7 +213,6 @@ class OrderAndTrackingCard extends StatelessWidget {
                         "₹$productPrice",
                         style: const TextStyle(
                           fontSize: 14,
-
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -329,7 +334,8 @@ class TrackingStep extends StatelessWidget {
 class AddressSection extends StatelessWidget {
   final Map<String, dynamic> orderDetails;
 
-  const AddressSection({Key? key, required this.orderDetails}) : super(key: key);
+  const AddressSection({Key? key, required this.orderDetails})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -349,7 +355,6 @@ class AddressSection extends StatelessWidget {
             "Deliver to: $shippingAddress",
             style: const TextStyle(
               fontSize: 14,
-
             ),
           ),
         ],

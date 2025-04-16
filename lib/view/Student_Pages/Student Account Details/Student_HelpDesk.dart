@@ -21,7 +21,15 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
 
     if (subject.isEmpty || description.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in all fields")),
+        SnackBar(
+          content: Text("Please fill in all fields"),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
       return;
     }
@@ -53,7 +61,15 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Query submitted successfully!")),
+          SnackBar(
+            content: Text("Query submitted successfully!"),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
         _subjectController.clear();
         _descriptionController.clear();
@@ -64,7 +80,15 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Submission failed: $e")),
+        SnackBar(
+          content: Text("Submission failed: $e"),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
     } finally {
       setState(() {
@@ -142,8 +166,7 @@ class _StudentHelpdeskState extends State<StudentHelpdesk> {
               const Divider(height: 1),
               SizedBox(height: 20.h),
               Text("Raise a Query",
-                  style:
-                      TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
               SizedBox(height: 20.h),
               const Divider(height: 1),
               SizedBox(height: 20.h),
