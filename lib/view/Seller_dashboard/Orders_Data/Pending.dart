@@ -121,8 +121,8 @@ class _PendingState extends State<Pending> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      _buildSearchBar(),
-                      const SizedBox(height: 15),
+                     // _buildSearchBar(),
+                      //const SizedBox(height: 15),
                       _buildDivider(),
                       const SizedBox(height: 20),
                       ...orders

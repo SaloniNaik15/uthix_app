@@ -99,8 +99,8 @@ class _InTransitState extends State<InTransit> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildSearchBar(),
-                      const SizedBox(height: 15),
+                    //  _buildSearchBar(),
+                     // const SizedBox(height: 15),
                       _buildDivider(),
                       const SizedBox(height: 20),
                       ...orders

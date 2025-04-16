@@ -128,7 +128,7 @@ class _ViewdetailsState extends State<Viewdetails> {
       if (response.statusCode == 200) {
         var jsonResponse = response.data;
 
-        log("✅ Full API Response: ${jsonEncode(jsonResponse)}");
+        log("✅ Saloniiii  Full API Response: ${jsonEncode(jsonResponse)}");
 
         List<dynamic> fetchedProducts = jsonResponse['products'];
 
@@ -321,7 +321,6 @@ class _ViewdetailsState extends State<Viewdetails> {
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
-
                               ),
                             ),
                             const SizedBox(
@@ -340,7 +339,6 @@ class _ViewdetailsState extends State<Viewdetails> {
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
-
                               ),
                             ),
                             const SizedBox(width: 4),
@@ -358,7 +356,6 @@ class _ViewdetailsState extends State<Viewdetails> {
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
-
                               ),
                             ),
                           ],
@@ -371,7 +368,6 @@ class _ViewdetailsState extends State<Viewdetails> {
                         productDetails['description'],
                         style: const TextStyle(
                           fontSize: 14,
-
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -477,7 +473,6 @@ Widget reviewAndRating(dynamic rating, dynamic review) {
         'Reviews & Ratings',
         style: TextStyle(
           fontSize: 16,
-
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -758,7 +753,6 @@ class StatItemVenodr extends StatelessWidget {
             title,
             style: const TextStyle(
               fontSize: 14,
-
               fontWeight: FontWeight.w500,
               color: Colors.black87,
             ),
@@ -768,7 +762,6 @@ class StatItemVenodr extends StatelessWidget {
             value,
             style: const TextStyle(
               fontSize: 15,
-
               fontWeight: FontWeight.w700,
               color: Colors.black,
             ),
