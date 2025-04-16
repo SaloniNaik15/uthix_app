@@ -77,7 +77,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) async {
-    print("Payment failed with code: ${response.code}, message: ${response.message}");
+    print(
+        "Payment failed with code: ${response.code}, message: ${response.message}");
     await _updatePaymentStatus("failed", response.code.toString());
 
     SnackbarHelper.showMessage(
@@ -109,9 +110,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
         return;
       }
 
-      print("Updating payment status: status=$status, transactionId=$transactionId, orderId=${widget.orderId}");
+      print(
+          "Updating payment status: status=$status, transactionId=$transactionId, orderId=${widget.orderId}");
 
-      final response = await http.post(
+      final response = await http
+          .post(
         Uri.parse('https://admin.uthix.com/api/update-payment-status'),
         headers: {
           'Content-Type': 'application/json',
@@ -122,16 +125,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
           'status': status,
           'transaction_id': transactionId,
         }),
-      ).timeout(
+      )
+          .timeout(
         const Duration(seconds: 5),
         onTimeout: () {
-          throw Exception("Connection timed out while updating payment status.");
+          throw Exception(
+              "Connection timed out while updating payment status.");
         },
       );
 
       print("Update Payment Status Response: ${response.body}");
       if (response.statusCode != 201) {
-        print("Error updating payment status. Status code: ${response.statusCode}");
+        print(
+            "Error updating payment status. Status code: ${response.statusCode}");
       }
     } catch (e) {
       print("Error updating payment status: $e");
@@ -161,7 +167,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         return;
       }
 
-      print("Starting payment request for order ID: ${widget.orderId}, amount: ${widget.totalPrice}");
+      print(
+          "Starting payment request for order ID: ${widget.orderId}, amount: ${widget.totalPrice}");
 
       final requestPayload = {
         'order_id': widget.orderId,
@@ -174,17 +181,20 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
       print("Request Payload: $requestPayload");
 
-      final response = await http.post(
+      final response = await http
+          .post(
         Uri.parse('https://admin.uthix.com/api/create-payment'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
         body: jsonEncode(requestPayload),
-      ).timeout(
+      )
+          .timeout(
         const Duration(seconds: 5),
         onTimeout: () {
-          throw Exception("Connection timed out. Please check your internet connection and try again.");
+          throw Exception(
+              "Connection timed out. Please check your internet connection and try again.");
         },
       );
 
@@ -221,7 +231,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
           SnackbarHelper.showMessage(
             context,
-            message: "Failed to create Razorpay order: ${responseData['message']}",
+            message:
+                "Failed to create Razorpay order: ${responseData['message']}",
             backgroundColor: const Color(0xFF2B5C74),
           );
         }
@@ -229,7 +240,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         throw Exception("Authentication failed. Please check your API key.");
       } else if (response.statusCode == 400) {
         final errorData = jsonDecode(response.body);
-        throw Exception("Invalid request: ${errorData['message'] ?? 'Unknown error'}");
+        throw Exception(
+            "Invalid request: ${errorData['message'] ?? 'Unknown error'}");
       } else {
         throw Exception("Server returned status code: ${response.statusCode}");
       }
