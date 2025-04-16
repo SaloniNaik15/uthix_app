@@ -139,12 +139,12 @@ class _InventoryDataState extends State<InventoryData> {
             const SizedBox(height: 10),
             const Divider(color: Colors.grey, thickness: 1),
             const SizedBox(height: 15),
-            buildFilterChips(filters, selectedFilter, (filter) {
-              setState(() {
-                selectedFilter = filter;
-              });
-              print("Selected: $filter");
-            }),
+            // buildFilterChips(filters, selectedFilter, (filter) {
+            //   setState(() {
+            //     selectedFilter = filter;
+            //   });
+            //   print("Selected: $filter");
+            // }),
             const SizedBox(height: 10),
             Builder(
               builder: (context) {
