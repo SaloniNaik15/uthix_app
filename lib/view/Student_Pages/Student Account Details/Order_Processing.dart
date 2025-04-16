@@ -20,7 +20,6 @@ class _OrderProcessingState extends State<OrderProcessing> {
   bool isLoading = true;
   bool hasError = false;
 
-  // Initialize Dio with a base URL only. Token will be injected per-request.
   final Dio _dio = Dio(BaseOptions(
     baseUrl: 'https://admin.uthix.com/api/orders',
   ));

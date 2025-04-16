@@ -207,7 +207,7 @@ class _WishlistState extends State<Wishlist> {
                       style: TextStyle(
                         color: selectedIndex == index ? Colors.white : Colors.grey,
                         fontWeight: FontWeight.w600,
-                        fontSize: 14.sp,
+                        fontSize: 14,
                       ),
                     ),
                   ),
@@ -308,7 +308,7 @@ class _WishlistState extends State<Wishlist> {
                     Text(
                       book['rating']?.toString() ?? "N/A",
                       style: TextStyle(
-                        fontSize: 12.sp,
+                        fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -327,7 +327,7 @@ class _WishlistState extends State<Wishlist> {
           book['title'],
           textAlign: TextAlign.left,
           style: TextStyle(
-            fontSize: 14.sp,
+            fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
           maxLines: 2,
@@ -339,7 +339,7 @@ class _WishlistState extends State<Wishlist> {
           "₹${book['price']}",
           textAlign: TextAlign.left,
           style: TextStyle(
-            fontSize: 14.sp,
+            fontSize: 14,
             fontWeight: FontWeight.w600,
             color: Colors.black,
           ),
@@ -352,7 +352,7 @@ class _WishlistState extends State<Wishlist> {
           },
           icon: Icon(Icons.shopping_bag_outlined, size: 16.sp, color: Colors.black),
           label: Text('Move to Bag',
-              style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold)),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           style: OutlinedButton.styleFrom(
             foregroundColor: const Color(0xFF605F5F),
             side: const BorderSide(color: Color(0xFFAFAFAF)),

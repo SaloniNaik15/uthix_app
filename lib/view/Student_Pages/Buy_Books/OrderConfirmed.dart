@@ -55,7 +55,7 @@ class _OrderConfirmedState extends State<OrderConfirmed> {
                 "Payment Successful",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 14.sp,
+                  fontSize: 14,
                 ),
               ),
               SizedBox(height: 20.h),
@@ -66,7 +66,7 @@ class _OrderConfirmedState extends State<OrderConfirmed> {
                     "Order Confirmed",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 24.sp,
+                      fontSize: 22,
                       color: const Color(0xFF2B5C74),
                     ),
                   ),
@@ -88,13 +88,13 @@ class _OrderConfirmedState extends State<OrderConfirmed> {
               SizedBox(height: 20.h),
               Text(
                 "Order Number: ${widget.orderNumber}",
-                style: TextStyle(fontSize: 16.sp),
+                style: TextStyle(fontSize: 16),
               ),
               SizedBox(height: 10.h),
               Text(
                 "Redirecting to order tracking...",
                 style: TextStyle(
-                  fontSize: 16.sp,
+                  fontSize: 16,
                   fontStyle: FontStyle.italic,
                 ),
               ),
