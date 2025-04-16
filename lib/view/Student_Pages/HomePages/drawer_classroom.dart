@@ -160,7 +160,7 @@ class _MyDrawerState extends State<MyDrawer> {
         page = ProgressTracking();
         break;
       case 3:
-        page = UnderConstructionScreen();
+        page = OrdersTrackingPage();
         break;
       case 4:
         page = StudFiles();
@@ -169,7 +169,7 @@ class _MyDrawerState extends State<MyDrawer> {
         page = StudRecording();
         break;
       case 6:
-        page = UnderConstructionScreen();
+        page = BuyTextBooks();
         break;
       case 7:
         page = Attendance();

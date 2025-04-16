@@ -261,7 +261,7 @@ class BookList extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(top: 6.h),
               child: Text(
-                '\$${product['price'] ?? '0'}',
+                '\₹${product['price'] ?? '0'}',
                 style: TextStyle(
                   fontSize: 12.sp,
 
