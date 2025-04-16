@@ -106,7 +106,6 @@ class _ReturnedState extends State<Returned> {
           "Returned",
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Urbanist',
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -173,7 +172,6 @@ class _ReturnedState extends State<Returned> {
                           product['title'] ?? "Unknown Product",
                           style: const TextStyle(
                             fontSize: 18,
-                            fontFamily: 'Urbanist',
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -182,7 +180,6 @@ class _ReturnedState extends State<Returned> {
                           product['description'] ?? "No description available",
                           style: TextStyle(
                             color: Colors.grey[700],
-                            fontFamily: 'Urbanist',
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -191,7 +188,6 @@ class _ReturnedState extends State<Returned> {
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'Urbanist',
                           ),
                         ),
                       ],
@@ -222,7 +218,6 @@ class _ReturnedState extends State<Returned> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 14,
-            fontFamily: 'Urbanist',
           ),
         ),
         const SizedBox(height: 4),
@@ -230,7 +225,6 @@ class _ReturnedState extends State<Returned> {
           "${address['street_address'] ?? ''} ${address['landmark'] ?? ''}, ${address['city'] ?? ''}, ${address['state'] ?? ''} ${address['pincode'] ?? ''}",
           style: const TextStyle(
             fontSize: 14,
-            fontFamily: 'Urbanist',
             color: Colors.black87,
           ),
         ),

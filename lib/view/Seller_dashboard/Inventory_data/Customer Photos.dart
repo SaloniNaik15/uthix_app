@@ -26,7 +26,6 @@ class _CustomerPhotosState extends State<CustomerPhotos> {
           "Customer Photos",
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Urbanist',
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),

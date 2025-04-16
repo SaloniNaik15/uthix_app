@@ -106,7 +106,6 @@ class _RejectedState extends State<Rejected> {
         "Rejected",
         style: TextStyle(
           fontSize: 20,
-          fontFamily: 'Urbanist',
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
@@ -178,7 +177,6 @@ class _RejectedState extends State<Rejected> {
         "Shipping Address: Not available",
         style: TextStyle(
           fontSize: 14,
-          fontFamily: 'Urbanist',
           color: Colors.black87,
         ),
       );
@@ -197,7 +195,6 @@ class _RejectedState extends State<Rejected> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 14,
-            fontFamily: 'Urbanist',
           ),
         ),
         const SizedBox(height: 4),
@@ -205,7 +202,6 @@ class _RejectedState extends State<Rejected> {
           "$name, $landmark, $city, $state",
           style: const TextStyle(
             fontSize: 14,
-            fontFamily: 'Urbanist',
             color: Colors.black87,
           ),
         ),
@@ -236,7 +232,6 @@ class _RejectedState extends State<Rejected> {
                 title,
                 style: const TextStyle(
                   fontSize: 18,
-                  fontFamily: 'Urbanist',
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -245,7 +240,6 @@ class _RejectedState extends State<Rejected> {
                 description,
                 style: TextStyle(
                   color: Colors.grey[700],
-                  fontFamily: 'Urbanist',
                 ),
               ),
               const SizedBox(height: 8),
@@ -254,7 +248,6 @@ class _RejectedState extends State<Rejected> {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Urbanist',
                 ),
               ),
             ],

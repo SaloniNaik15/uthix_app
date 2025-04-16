@@ -46,7 +46,14 @@ class _MailidpageState extends State<Mailidpage> {
   Future<void> _registerUser() async {
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passwords do not match")),
+        SnackBar(
+          content: Text("Passwords do not match"),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
       return;
     }
@@ -78,7 +85,14 @@ class _MailidpageState extends State<Mailidpage> {
         final data = response.data;
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Registration Successful!")),
+          SnackBar(
+            content: Text("Registration Successful!"),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
 
         Navigator.pushReplacement(
@@ -89,8 +103,13 @@ class _MailidpageState extends State<Mailidpage> {
         log("Error: ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content:
-                  Text("Registration Failed: ${response.data['message']}")),
+            content: Text("Registration Failed: ${response.data['message']}"),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
       }
     } on DioException catch (e) {
@@ -98,8 +117,13 @@ class _MailidpageState extends State<Mailidpage> {
       log("Full error response: ${e.response?.data}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(
-                "Registration Failed: ${e.response?.data['message'] ?? 'Something went wrong'}")),
+          content: Text("Registration Failed: ${e.response?.data['message'] ?? 'Something went wrong'}"),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
     }
   }

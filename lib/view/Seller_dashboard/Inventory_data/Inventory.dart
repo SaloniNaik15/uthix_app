@@ -116,7 +116,6 @@ class _InventoryDataState extends State<InventoryData> {
                 "My Catalogue",
                 style: TextStyle(
                   fontSize: 20,
-                  fontFamily: 'Urbanist',
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
@@ -254,7 +253,7 @@ class BookList extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12.sp,
-                  fontFamily: 'Urbanist',
+
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -265,7 +264,7 @@ class BookList extends StatelessWidget {
                 '\$${product['price'] ?? '0'}',
                 style: TextStyle(
                   fontSize: 12.sp,
-                  fontFamily: 'Urbanist',
+
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),

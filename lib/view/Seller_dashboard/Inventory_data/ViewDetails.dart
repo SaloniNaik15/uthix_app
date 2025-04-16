@@ -244,7 +244,6 @@ class _ViewdetailsState extends State<Viewdetails> {
                     productDetails['title'] ?? 'Product Details',
                     style: TextStyle(
                       fontSize: 14,
-                      fontFamily: 'Urbanist',
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -260,7 +259,6 @@ class _ViewdetailsState extends State<Viewdetails> {
                         "5",
                         style: TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Urbanist',
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -291,7 +289,6 @@ class _ViewdetailsState extends State<Viewdetails> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.blue,
-                                  fontFamily: 'Urbanist',
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -324,7 +321,7 @@ class _ViewdetailsState extends State<Viewdetails> {
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
-                                fontFamily: 'Urbanist',
+
                               ),
                             ),
                             const SizedBox(
@@ -343,7 +340,7 @@ class _ViewdetailsState extends State<Viewdetails> {
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
-                                fontFamily: 'Urbanist',
+
                               ),
                             ),
                             const SizedBox(width: 4),
@@ -361,7 +358,7 @@ class _ViewdetailsState extends State<Viewdetails> {
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey,
-                                fontFamily: 'Urbanist',
+
                               ),
                             ),
                           ],
@@ -374,7 +371,7 @@ class _ViewdetailsState extends State<Viewdetails> {
                         productDetails['description'],
                         style: const TextStyle(
                           fontSize: 14,
-                          fontFamily: 'Urbanist',
+
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -480,7 +477,7 @@ Widget reviewAndRating(dynamic rating, dynamic review) {
         'Reviews & Ratings',
         style: TextStyle(
           fontSize: 16,
-          fontFamily: 'Urbanist',
+
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -524,7 +521,6 @@ Widget reviewAndRating(dynamic rating, dynamic review) {
             review ?? "No review available", // ✅ Handle null reviews
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Urbanist',
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -554,7 +550,6 @@ Widget CustomerReview() {
                 fontSize: 14,
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'Urbanist',
               ),
             ),
           );
@@ -594,7 +589,6 @@ Widget CustomerReview() {
             'Customer Reviews ',
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Urbanist',
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -636,7 +630,6 @@ Widget CustomerReview() {
                 '2 month ago',
                 style: TextStyle(
                   fontSize: 14,
-                  fontFamily: 'Urbanist',
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -649,7 +642,6 @@ Widget CustomerReview() {
             'Books are in good condition and got them on time, happy with the packaging',
             style: TextStyle(
               fontSize: 14,
-              fontFamily: 'Urbanist',
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -673,7 +665,6 @@ Widget CustomerReview() {
                       'View all 12 reviews',
                       style: TextStyle(
                         fontSize: 14,
-                        fontFamily: 'Urbanist',
                         color: Colors.black,
                         fontWeight: FontWeight.w400,
                       ),
@@ -732,7 +723,6 @@ Widget _buildDeliveryRow({required String imagePath, required String text}) {
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Urbanist',
         ),
       ),
     ],
@@ -768,7 +758,7 @@ class StatItemVenodr extends StatelessWidget {
             title,
             style: const TextStyle(
               fontSize: 14,
-              fontFamily: 'Urbanist',
+
               fontWeight: FontWeight.w500,
               color: Colors.black87,
             ),
@@ -778,7 +768,7 @@ class StatItemVenodr extends StatelessWidget {
             value,
             style: const TextStyle(
               fontSize: 15,
-              fontFamily: 'Urbanist',
+
               fontWeight: FontWeight.w700,
               color: Colors.black,
             ),

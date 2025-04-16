@@ -180,7 +180,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: const Text("Store Already Created"),
-                duration: const Duration(seconds: 3),
+                duration: const Duration(seconds: 1),
                 backgroundColor: Color(0xFF2B5C74),
                 behavior: SnackBarBehavior.floating,
                 margin:

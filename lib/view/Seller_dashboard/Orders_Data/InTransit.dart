@@ -126,7 +126,6 @@ class _InTransitState extends State<InTransit> {
           "In Transit",
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Urbanist',
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -199,7 +198,6 @@ class _InTransitState extends State<InTransit> {
         style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 14,
-          fontFamily: 'Urbanist',
         ),
       );
     }
@@ -212,7 +210,6 @@ class _InTransitState extends State<InTransit> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 14,
-            fontFamily: 'Urbanist',
           ),
         ),
         const SizedBox(height: 4),
@@ -220,7 +217,6 @@ class _InTransitState extends State<InTransit> {
           "${shippingAddress['landmark'] ?? 'No landmark available'}, ${shippingAddress['city'] ?? 'No city available'}, ${shippingAddress['state'] ?? 'No state available'}",
           style: const TextStyle(
             fontSize: 14,
-            fontFamily: 'Urbanist',
             color: Colors.black87,
           ),
         ),
@@ -255,7 +251,6 @@ class _InTransitState extends State<InTransit> {
                     product['title'] ?? "Unknown Product",
                     style: const TextStyle(
                       fontSize: 18,
-                      fontFamily: 'Urbanist',
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -264,7 +259,6 @@ class _InTransitState extends State<InTransit> {
                     product['description'] ?? "No description available",
                     style: TextStyle(
                       color: Colors.grey[700],
-                      fontFamily: 'Urbanist',
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -273,7 +267,6 @@ class _InTransitState extends State<InTransit> {
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      fontFamily: 'Urbanist',
                     ),
                   ),
                 ],
