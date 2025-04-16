@@ -40,7 +40,15 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     int? userId = prefs.getInt('user_id');
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("User data missing. Please log in again.")),
+        SnackBar(
+          content: Text("User data missing. Please log in again."),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
       // Optionally, redirect to login:
       // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => StartLogin()));
@@ -59,13 +67,29 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Authentication failed. Please log in again.")),
+        SnackBar(
+          content: Text("Authentication failed. Please log in again."),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
       return;
     }
     if (_userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("User not found. Please log in again.")),
+        SnackBar(
+          content: Text("User not found. Please log in again."),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
       return;
     }
@@ -106,12 +130,29 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       if (response.statusCode == 201) {
         if (response.data["status"] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Address saved successfully")),
+            SnackBar(
+              content: Text("Address saved successfully"),
+              duration: const Duration(seconds: 1),
+              backgroundColor: Color(0xFF2B5C74),
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
           );
           Navigator.pop(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Failed to save address: ${response.data["message"]}")),
+            SnackBar(
+              content:
+                  Text("Failed to save address: ${response.data["message"]}"),
+              duration: const Duration(seconds: 1),
+              backgroundColor: Color(0xFF2B5C74),
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
           );
         }
       } else if (response.statusCode == 401) {
@@ -122,10 +163,19 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       } else if (response.statusCode == 302) {
         print("Redirection detected to: ${response.headers['location']}");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Unexpected redirection. Try again later.")),
+          SnackBar(
+            content: Text("Unexpected redirection. Try again later."),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
       } else {
-        print("Unexpected error: ${response.statusCode}, Response: ${response.data}");
+        print(
+            "Unexpected error: ${response.statusCode}, Response: ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error: ${response.data.toString()}")),
         );
@@ -133,14 +183,23 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     } catch (e) {
       print("Dio error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Network error. Please try again.")),
+        SnackBar(
+          content: Text("Network error. Please try again."),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
     }
   }
 
   // Fetch city and state from your existing API based on the entered pin code.
   Future<void> _fetchCityAndState(String pinCode) async {
-    final String url = "https://admin.uthix.com/api/getCityState"; // Replace with your endpoint
+    final String url =
+        "https://admin.uthix.com/api/getCityState"; // Replace with your endpoint
     try {
       final response = await Dio().get(url, queryParameters: {"pin": pinCode});
       if (response.statusCode == 200) {
@@ -199,30 +258,30 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               _buildTextField("Name*", controller: _nameController),
               SizedBox(height: 10),
               _buildTextField("Mobile Number*",
-                  keyboardType: TextInputType.phone, controller: _phoneController),
+                  keyboardType: TextInputType.phone,
+                  controller: _phoneController),
               SizedBox(height: 10),
               _buildTextField("Alternate Phone",
-                  keyboardType: TextInputType.phone, controller: _altPhoneController),
+                  keyboardType: TextInputType.phone,
+                  controller: _altPhoneController),
               SizedBox(height: 10),
               _buildTextField("Pin Code*",
                   keyboardType: TextInputType.number,
-                  controller: _postalCodeController,
-                  onChanged: (value) {
-                    if (value.length == 6) {
-                      _fetchCityAndState(value);
-                    } else {
-                      // Clear error if not 6 digits
-                      setState(() {
-                        _pinError = null;
-                      });
-                    }
-                  },
-                  errorText: _pinError),
+                  controller: _postalCodeController, onChanged: (value) {
+                if (value.length == 6) {
+                  _fetchCityAndState(value);
+                } else {
+                  // Clear error if not 6 digits
+                  setState(() {
+                    _pinError = null;
+                  });
+                }
+              }, errorText: _pinError),
               SizedBox(height: 10),
               _buildTextField("Address (House No, Building, Street, Area)*",
                   controller: _areaController,
                   helperText:
-                  "Please update flat/house no. and society/apartment details",
+                      "Please update flat/house no. and society/apartment details",
                   helperStyle: TextStyle(
                     color: Color(0xFFF99608),
                     fontSize: 12,
@@ -240,7 +299,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   ),
                   SizedBox(width: 10),
                   Expanded(
-                    child: _buildTextField("State*", controller: _stateController),
+                    child:
+                        _buildTextField("State*", controller: _stateController),
                   ),
                 ],
               ),
@@ -295,8 +355,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                         side: BorderSide(color: Colors.grey, width: 1),
                       ),
                       child: Text("Cancel",
-                          style:
-                          TextStyle(color: Colors.black, fontSize: 14)),
+                          style: TextStyle(color: Colors.black, fontSize: 14)),
                     ),
                   ),
                   SizedBox(width: 10),
@@ -320,11 +379,11 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
   Widget _buildTextField(String label,
       {TextInputType keyboardType = TextInputType.text,
-        TextEditingController? controller,
-        String? helperText,
-        TextStyle? helperStyle,
-        Function(String)? onChanged,
-        String? errorText}) {
+      TextEditingController? controller,
+      String? helperText,
+      TextStyle? helperStyle,
+      Function(String)? onChanged,
+      String? errorText}) {
     return TextFormField(
       controller: controller,
       onChanged: onChanged,
@@ -340,12 +399,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(color: Color(0xFF2B5C74), width: 1),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.red, width: 1),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.red, width: 1),
         ),
         fillColor: Colors.white38,
         filled: label == "City / District*" || label == "State*" ? true : false,

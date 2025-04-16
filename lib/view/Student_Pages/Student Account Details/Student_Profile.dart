@@ -127,7 +127,15 @@ class _StudentProfileState extends State<StudentProfile> {
         userClass.isEmpty ||
         stream.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill all fields.")),
+        SnackBar(
+          content: Text("Please fill all fields."),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
       return;
     }
@@ -175,7 +183,15 @@ class _StudentProfileState extends State<StudentProfile> {
         log("🔄 Server Response: ${response.data}");
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Profile updated successfully!")),
+          SnackBar(
+            content: Text("Profile updated successfully!"),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
 
         // Cache updated profile
@@ -189,13 +205,29 @@ class _StudentProfileState extends State<StudentProfile> {
         log("❌ Failed to submit profile: ${response.statusCode}");
         log("Response body: ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Failed to update profile.")),
+          SnackBar(
+            content: Text("Failed to update profile."),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
       }
     } catch (e) {
       log("❌ Error submitting profile: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("An error occurred.")),
+        SnackBar(
+          content: Text("An error occurred."),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
     }
   }
@@ -235,7 +267,7 @@ class _StudentProfileState extends State<StudentProfile> {
 
           if (user["image"] != null && user["image"].toString().isNotEmpty) {
             networkImageUrl =
-            "https://admin.uthix.com/storage/images/student/${user["image"]}";
+                "https://admin.uthix.com/storage/images/student/${user["image"]}";
           } else {
             networkImageUrl = null;
           }

@@ -22,7 +22,7 @@ class _BookdetailsState extends State<Bookdetails> {
   late Future<Map<String, dynamic>> productFuture;
   final Dio _dio = Dio();
   Map<String, dynamic>? _productData; // Save product details
-  bool _isWishlisted = false;         // Wishlist state (unused in bottom nav now)
+  bool _isWishlisted = false; // Wishlist state (unused in bottom nav now)
 
   @override
   void initState() {
@@ -48,8 +48,8 @@ class _BookdetailsState extends State<Bookdetails> {
   /// Fetch product details from the API.
   Future<Map<String, dynamic>> fetchProduct() async {
     try {
-      final response = await _dio.get(
-          "https://admin.uthix.com/api/products/view/${widget.productId}");
+      final response = await _dio
+          .get("https://admin.uthix.com/api/products/view/${widget.productId}");
       if (response.statusCode == 200) {
         final product = response.data["product"];
         setState(() {
@@ -81,7 +81,8 @@ class _BookdetailsState extends State<Bookdetails> {
     String? token = prefs.getString('auth_token');
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please login to add product to wishlist.")),
+        const SnackBar(
+            content: Text("Please login to add product to wishlist.")),
       );
       return;
     }
@@ -89,7 +90,7 @@ class _BookdetailsState extends State<Bookdetails> {
     if (product["first_image"] != null &&
         product["first_image"]["image_path"] != null) {
       imageUrl =
-      "https://admin.uthix.com/storage/image/products/${product["first_image"]["image_path"]}";
+          "https://admin.uthix.com/storage/image/products/${product["first_image"]["image_path"]}";
     } else {
       imageUrl = "https://via.placeholder.com/150";
     }
@@ -131,12 +132,14 @@ class _BookdetailsState extends State<Bookdetails> {
             context, MaterialPageRoute(builder: (context) => const Wishlist()));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to add to wishlist: ${response.data["message"]}")),
+          SnackBar(
+              content: Text(
+                  "Failed to add to wishlist: ${response.data["message"]}")),
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Error adding to wishlist: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error adding to wishlist: $e")));
     }
   }
 
@@ -145,7 +148,8 @@ class _BookdetailsState extends State<Bookdetails> {
     String? token = prefs.getString('auth_token');
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please login to remove product from wishlist.")),
+        const SnackBar(
+            content: Text("Please login to remove product from wishlist.")),
       );
       return;
     }
@@ -169,12 +173,14 @@ class _BookdetailsState extends State<Bookdetails> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to remove from wishlist: ${response.data["message"]}")),
+          SnackBar(
+              content: Text(
+                  "Failed to remove from wishlist: ${response.data["message"]}")),
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Error removing from wishlist: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error removing from wishlist: $e")));
     }
   }
 
@@ -183,8 +189,8 @@ class _BookdetailsState extends State<Bookdetails> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Please login to add product to cart.")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Please login to add product to cart.")));
       return;
     }
     final product = _productData;
@@ -211,12 +217,29 @@ class _BookdetailsState extends State<Bookdetails> {
       );
       if ((response.statusCode == 200 || response.statusCode == 201) &&
           response.data["status"] == true) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Product added to cart!")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text("Product added to cart!"),
+            duration: const Duration(seconds: 1),
+            backgroundColor: const Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text("Failed to add to cart: ${response.data["message"] ?? "Unknown error"}")),
+            content: Text(
+                "Failed to add to cart: ${response.data["message"] ?? "Unknown error"}"),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
       }
     } catch (e) {
@@ -240,16 +263,22 @@ class _BookdetailsState extends State<Bookdetails> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          _iconButton(Icons.search,
-                  () => Navigator.push(context, MaterialPageRoute(builder: (context) => StudentSearch(categoryId: null)))),
+          _iconButton(
+              Icons.search,
+              () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => StudentSearch(categoryId: null)))),
           _iconButton(
               Icons.favorite_border,
-                  () => Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => const Wishlist()))),
+              () => Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Wishlist()))),
           _iconButton(
               Icons.shopping_bag_outlined,
-                  () => Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Studentcart(cartItems: [])))),
+              () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Studentcart(cartItems: [])))),
         ],
       ),
       body: FutureBuilder<Map<String, dynamic>>(
@@ -258,10 +287,12 @@ class _BookdetailsState extends State<Bookdetails> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
                 child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(const Color(0xFF2B5C74))));
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        const Color(0xFF2B5C74))));
           } else if (snapshot.hasError) {
             return Center(
-                child: Text("Error: ${snapshot.error}", style: TextStyle(fontSize: 14)));
+                child: Text("Error: ${snapshot.error}",
+                    style: TextStyle(fontSize: 14)));
           } else if (snapshot.hasData) {
             var product = snapshot.data!;
             List<dynamic> imagesData = product["images"] ?? [];
@@ -311,14 +342,21 @@ class _BookdetailsState extends State<Bookdetails> {
                     ),
                     SizedBox(height: 15.h),
                     // Title and ISBN.
-                    Text(product["title"] ?? "No title", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                    Text(product["isbn"] ?? "", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
+                    Text(product["title"] ?? "No title",
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold)),
+                    Text(product["isbn"] ?? "",
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w400)),
                     SizedBox(height: 8.h),
                     // Rating.
-                    if (product.containsKey("rating") && product["rating"] != null)
+                    if (product.containsKey("rating") &&
+                        product["rating"] != null)
                       Row(
                         children: [
-                          Text(product["rating"].toString(), style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                          Text(product["rating"].toString(),
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.bold)),
                           SizedBox(width: 5.w),
                           Icon(Icons.star, color: Colors.amber, size: 14),
                           Icon(Icons.star, color: Colors.amber, size: 14),
@@ -331,7 +369,11 @@ class _BookdetailsState extends State<Bookdetails> {
                     // Price, language, pages, author info.
                     Row(
                       children: [
-                        Text(product["price"].toString(), style: TextStyle(fontSize: 18, color: Colors.blue, fontWeight: FontWeight.bold)),
+                        Text(product["price"].toString(),
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold)),
                       ],
                     ),
                     SizedBox(height: 5.h),
@@ -341,21 +383,40 @@ class _BookdetailsState extends State<Bookdetails> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("by ${product["author"] ?? ""}", style: TextStyle(fontSize: 14, color: const Color(0xFF605F5F))),
+                          Text("by ${product["author"] ?? ""}",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: const Color(0xFF605F5F))),
                           SizedBox(width: 4.w),
-                          Text("|", style: TextStyle(fontSize: 16, color: const Color(0xFF605F5F), fontWeight: FontWeight.bold)),
+                          Text("|",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: const Color(0xFF605F5F),
+                                  fontWeight: FontWeight.bold)),
                           SizedBox(width: 10.w),
-                          Text(product["language"] ?? "", style: TextStyle(fontSize: 14, color: const Color(0xFF605F5F))),
+                          Text(product["language"] ?? "",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: const Color(0xFF605F5F))),
                           SizedBox(width: 4.w),
-                          Text("|", style: TextStyle(fontSize: 16, color: const Color(0xFF605F5F), fontWeight: FontWeight.bold)),
+                          Text("|",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: const Color(0xFF605F5F),
+                                  fontWeight: FontWeight.bold)),
                           SizedBox(width: 10.w),
-                          Text("${product["pages"]} pages", style: TextStyle(fontSize: 14, color: const Color(0xFF605F5F))),
+                          Text("${product["pages"]} pages",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: const Color(0xFF605F5F))),
                         ],
                       ),
                     ),
                     SizedBox(height: 10.h),
                     // Description.
-                    Text(product["description"] ?? "", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    Text(product["description"] ?? "",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w700)),
                     SizedBox(height: 20.h),
                     // Delivery Instructions.
                     deliveryInstructions(deliveryText),
@@ -363,15 +424,24 @@ class _BookdetailsState extends State<Bookdetails> {
                     // Optionally display Reviews & Customer Photos.
                     if (reviews.isNotEmpty || customerPhotos.isNotEmpty) ...[
                       if (reviews.isNotEmpty) ...[
-                        reviewAndRating(product["rating"]?.toString() ?? "N/A", reviews.length),
+                        reviewAndRating(product["rating"]?.toString() ?? "N/A",
+                            reviews.length),
                         SizedBox(height: 10.h),
                       ],
                       if (customerPhotos.isNotEmpty) ...[
                         TextButton(
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => StudentCustomerPhotos()));
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        StudentCustomerPhotos()));
                           },
-                          child: Text("Customer Photos", style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold)),
+                          child: Text("Customer Photos",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold)),
                         ),
                         SizedBox(height: 8.h),
                       ],
@@ -386,7 +456,9 @@ class _BookdetailsState extends State<Bookdetails> {
               ),
             );
           } else {
-            return Center(child: Text("No data available", style: TextStyle(fontSize: 18)));
+            return Center(
+                child:
+                    Text("No data available", style: TextStyle(fontSize: 18)));
           }
         },
       ),
@@ -399,21 +471,23 @@ class _BookdetailsState extends State<Bookdetails> {
           onPressed: () {
             addToCart();
           },
-          icon: Icon(Icons.shopping_bag_outlined, size: 20.sp, color: Colors.white),
+          icon: Icon(Icons.shopping_bag_outlined,
+              size: 20.sp, color: Colors.white),
           label: Text(
             'Add to Bag',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
           ),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF305C78),
-            minimumSize: Size(double.infinity, 50), // Makes the button full width
+            minimumSize:
+                Size(double.infinity, 50), // Makes the button full width
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.r),
             ),
           ),
         ),
       ),
-
     );
   }
 }
@@ -425,9 +499,11 @@ Widget deliveryInstructions(String instructions) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Delivery Instructions", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text("Delivery Instructions",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         SizedBox(height: 5.h),
-        Text(instructions, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        Text(instructions,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
       ],
     ),
   );
@@ -439,7 +515,8 @@ Widget reviewAndRating(String rating, int numberOfReviews) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Reviews & Ratings', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text('Reviews & Ratings',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         SizedBox(height: 5.h),
         Row(
           children: [
@@ -457,13 +534,17 @@ Widget reviewAndRating(String rating, int numberOfReviews) {
                     Icon(Icons.star, color: Colors.white, size: 16.sp),
                     SizedBox(width: 4.w),
                     Text(rating,
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14)),
                   ],
                 ),
               ),
             ),
             SizedBox(width: 12.w),
-            Text('$numberOfReviews Ratings & ${numberOfReviews > 0 ? (numberOfReviews / 2).floor() : 0} reviews',
+            Text(
+                '$numberOfReviews Ratings & ${numberOfReviews > 0 ? (numberOfReviews / 2).floor() : 0} reviews',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
           ],
         ),
@@ -483,7 +564,8 @@ class CustomerReview extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Customer Reviews', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text('Customer Reviews',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           SizedBox(height: 8.h),
           if (reviews.isNotEmpty)
             Row(
@@ -502,27 +584,39 @@ class CustomerReview extends StatelessWidget {
                         Icon(Icons.star, color: Colors.white, size: 16.sp),
                         SizedBox(width: 4.w),
                         Text('3',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14)),
                       ],
                     ),
                   ),
                 ),
                 SizedBox(width: 12.w),
-                Text('2 months ago', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                Text('2 months ago',
+                    style:
+                        TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
               ],
             ),
           SizedBox(height: 8.h),
-          Text('Books are in good condition and I received them on time. Packaging was excellent.',
+          Text(
+              'Books are in good condition and I received them on time. Packaging was excellent.',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
           SizedBox(height: 10.h),
           Row(
             children: [
               TextButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => StudentPageCustomerReview()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => StudentPageCustomerReview()));
                 },
                 child: Text('View all ${reviews.length} reviews',
-                    style: TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.w500)),
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500)),
               ),
               Icon(Icons.arrow_forward_ios, size: 10.sp),
             ],
