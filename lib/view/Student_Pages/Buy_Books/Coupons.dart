@@ -109,7 +109,7 @@ class _CouponsScreenState extends State<CouponsScreen> {
                 icon: Icon(
                   Icons.arrow_back_ios_outlined,
                   color: Colors.black,
-                  size: 20.sp,
+                  size: 20,
                 ),
                 onPressed: () {
                   Navigator.pop(context);
@@ -117,14 +117,14 @@ class _CouponsScreenState extends State<CouponsScreen> {
               ),
             ),
             Positioned(
-              top: 100.h,
-              left: 20.w,
+              top: 100,
+              left: 20,
               child: Text(
                 "Coupons",
                 style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
-                  fontSize: 18.sp,
+                  fontSize: 18,
                 ),
               ),
             ),
@@ -141,7 +141,7 @@ class _CouponsScreenState extends State<CouponsScreen> {
         ),
       ),
       body: Container(
-        padding: EdgeInsets.only(top: 2.h),
+        padding: EdgeInsets.only(top: 2),
         color: const Color(0xFFEFEFEF),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,7 +184,7 @@ class _CouponsScreenState extends State<CouponsScreen> {
                                 ? Colors.white
                                 : Colors.grey,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14.sp,
+                            fontSize: 14,
                           ),
                         ),
                       ),
@@ -249,7 +249,7 @@ class CouponCard extends StatelessWidget {
                     Text(
                       "${coupon["discount_value"]}% off ",
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -259,7 +259,7 @@ class CouponCard extends StatelessWidget {
                         Text(
                           "Code: ${coupon["code"]} ",
                           style: TextStyle(
-                            fontSize: 14.sp,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -270,7 +270,7 @@ class CouponCard extends StatelessWidget {
                           icon: Icon(
                             Icons.copy,
                             color: Colors.grey,
-                            size: 18.sp,
+                            size: 18,
                           ),
                         ),
                       ],
@@ -279,7 +279,7 @@ class CouponCard extends StatelessWidget {
                     Text(
                       "Expiry: ${coupon["expiration_date"]}",
                       style: TextStyle(
-                        fontSize: 14.sp,
+                        fontSize: 14,
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
@@ -332,15 +332,15 @@ class DottedDividerWithIcon extends StatelessWidget {
           Container(
             width: 2.w,
             height: 5.h,
-            margin: EdgeInsets.symmetric(vertical: 2.h),
+            margin: EdgeInsets.symmetric(vertical: 2),
             color: color,
           ),
-        Icon(icon, color: color, size: 20.sp),
+        Icon(icon, color: color, size: 20),
         for (int i = 0; i < 8; i++)
           Container(
             width: 2.w,
             height: 5.h,
-            margin: EdgeInsets.symmetric(vertical: 2.h),
+            margin: EdgeInsets.symmetric(vertical: 2),
             color: color,
           ),
       ],

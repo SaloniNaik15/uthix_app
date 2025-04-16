@@ -234,7 +234,48 @@ class _SellerDashboardState extends State<SellerDashboard> {
       log("❌ Error fetching vendor info: $e");
     }
   }
+  Future<void> checkStoreAndUpload(BuildContext context) async {
+    try {
+      final response = await dio.get(
+        'https://admin.uthix.com/api/vendor-store-status',
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $accessToken",
+            "Accept": "application/json",
+          },
+        ),
+      );
 
+      if (response.statusCode == 200) {
+        final data = response.data;
+
+        if (data["status"] == true) {
+          // ✅ Store exists — proceed to upload
+          showUploadMenu(context);
+        } else {
+          // ❌ Store doesn't exist — show snackbar
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text("Please create your store first."),
+                duration: const Duration(seconds: 1),
+                backgroundColor: Color(0xFF2B5C74),
+                behavior: SnackBarBehavior.floating,
+                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            );
+          }
+        }
+      } else {
+        log("❌ Store check failed: ${response.statusCode}");
+      }
+    } catch (e) {
+      log("❌ Error during store check: $e");
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -371,7 +412,7 @@ class _SellerDashboardState extends State<SellerDashboard> {
     return GestureDetector(
       onTap: () {
         if (title == 'Upload') {
-          showUploadMenu(context);
+          checkStoreAndUpload(context);
         } else if (title == 'Create Store') {
           checkStoreAndNavigate(context);
         } else if (nextScreen != null) {
