@@ -42,7 +42,13 @@ class _StudentcartState extends State<Studentcart> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text("Authentication failed. Please login again.",
-                style: TextStyle(fontSize: 14))),
+                style: TextStyle(fontSize: 14)),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
       );
       return;
     }
@@ -116,7 +122,13 @@ class _StudentcartState extends State<Studentcart> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text("⚠️ Cart is empty. Please add items to proceed.",
-                style: TextStyle(fontSize: 14))),
+                style: TextStyle(fontSize: 14)),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
       );
       return;
     }
@@ -125,7 +137,13 @@ class _StudentcartState extends State<Studentcart> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text("⚠️ Please select a valid delivery address.",
-                style: TextStyle(fontSize: 14))),
+                style: TextStyle(fontSize: 14)),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
       );
       return;
     }
@@ -190,14 +208,26 @@ class _StudentcartState extends State<Studentcart> {
           SnackBar(
               content: Text(
                   "❌ Failed to place order: ${response.data['message'] ?? 'Unknown error'}",
-                  style: TextStyle(fontSize: 14))),
+                  style: TextStyle(fontSize: 14)),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text("❌ Error placing order: ${e.toString()}",
-                style: TextStyle(fontSize: 14))),
+                style: TextStyle(fontSize: 14)),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
       );
     }
   }
@@ -236,14 +266,26 @@ class _StudentcartState extends State<Studentcart> {
           SnackBar(
               content: Text(
                   "Failed to remove item: ${response.data['message']}",
-                  style: TextStyle(fontSize: 14))),
+                  style: TextStyle(fontSize: 14)),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content:
-                Text("Error: ${e.toString()}", style: TextStyle(fontSize: 14))),
+                Text("Error: ${e.toString()}", style: TextStyle(fontSize: 14)),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
       );
     }
   }
@@ -256,7 +298,13 @@ class _StudentcartState extends State<Studentcart> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text("Authentication failed. Please login again.",
-                style: TextStyle(fontSize: 14))),
+                style: TextStyle(fontSize: 14)),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
       );
       return;
     }

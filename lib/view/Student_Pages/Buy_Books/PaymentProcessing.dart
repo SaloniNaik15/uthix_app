@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
+import '../../../UpcomingPage.dart';
 import 'OrderConfirmed.dart';
 import 'CardDetails.dart';
 
@@ -314,11 +315,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => CardPaymentScreen(
-            orderId: widget.orderId,
-            orderNumber: widget.orderNumber,
-            totalPrice: widget.totalPrice,
-          ),
+          builder: (context) => UnderConstructionScreen(),
         ),
       );
     }
