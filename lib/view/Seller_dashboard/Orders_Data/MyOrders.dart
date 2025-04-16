@@ -25,8 +25,8 @@ class _MyOrdersState extends State<MyOrders> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSearchBar(),
-            const SizedBox(height: 20),
+           // _buildSearchBar(),
+           // const SizedBox(height: 20),
             _buildDivider(),
             const SizedBox(height: 20),
             _buildGridContainers(context),
