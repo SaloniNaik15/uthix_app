@@ -60,8 +60,13 @@ class _UploadDataState extends State<UploadData> {
   void navigateToUploadedPhotos(List<File> imageFiles) {
     if (widget.categoryName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text("Please select a category before uploading."),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
       return;

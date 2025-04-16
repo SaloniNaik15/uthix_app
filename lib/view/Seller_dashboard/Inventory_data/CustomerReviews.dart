@@ -25,7 +25,6 @@ class _CustomerreviewsState extends State<Customerreviews> {
           "Customer Reviews",
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Urbanist',
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
@@ -51,7 +50,6 @@ class _CustomerreviewsState extends State<Customerreviews> {
                     "4.1",
                     style: TextStyle(
                       fontSize: 30,
-                      fontFamily: 'Urbanist',
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -74,7 +72,6 @@ class _CustomerreviewsState extends State<Customerreviews> {
                   fontSize: 14,
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Urbanist',
                 ),
               ),
               const SizedBox(height: 10),
@@ -158,7 +155,7 @@ class ReviewCard extends StatelessWidget {
                     fontSize: 14,
                     color: Colors.black,
                     fontWeight: FontWeight.w500,
-                    fontFamily: 'Urbanist',
+
                   ),
                 ),
                 Text(
@@ -167,7 +164,7 @@ class ReviewCard extends StatelessWidget {
                     fontSize: 12,
                     color: Colors.black,
                     fontWeight: FontWeight.w500,
-                    fontFamily: 'Urbanist',
+
                   ),
                 ),
               ],
@@ -201,7 +198,6 @@ class ReviewCard extends StatelessWidget {
             fontSize: 12,
             color: Colors.black,
             fontWeight: FontWeight.w500,
-            fontFamily: 'Urbanist',
           ),
         ),
       ],

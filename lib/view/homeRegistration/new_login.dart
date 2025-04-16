@@ -46,8 +46,13 @@ class _NewLoginState extends State<NewLogin> {
         SnackBar(
           content: Text(
             "Please enter email and password",
-            style: GoogleFonts.urbanist(),
           ),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
       return;
@@ -104,8 +109,13 @@ class _NewLoginState extends State<NewLogin> {
           SnackBar(
             content: Text(
               data['message'] ?? "Invalid email or password",
-              style: GoogleFonts.urbanist(),
             ),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -126,8 +136,13 @@ class _NewLoginState extends State<NewLogin> {
             SnackBar(
               content: Text(
                 data?['message'] ?? "Invalid email or password",
-                style: GoogleFonts.urbanist(),
               ),
+              duration: const Duration(seconds: 1),
+              backgroundColor: Color(0xFF2B5C74),
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
           );
         }
@@ -137,8 +152,12 @@ class _NewLoginState extends State<NewLogin> {
           SnackBar(
             content: Text(
               "Network error. Please check your connection.",
-              style: GoogleFonts.urbanist(),
             ),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -149,8 +168,12 @@ class _NewLoginState extends State<NewLogin> {
         SnackBar(
           content: Text(
             "An unexpected error occurred. Please try again.",
-            style: GoogleFonts.urbanist(),
           ),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
     }

@@ -106,7 +106,6 @@ class _DeliverdState extends State<Deliverd> {
           "Delivered",
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Urbanist',
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -181,7 +180,6 @@ class _DeliverdState extends State<Deliverd> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 14,
-            fontFamily: 'Urbanist',
           ),
         ),
         const SizedBox(height: 4),
@@ -189,7 +187,6 @@ class _DeliverdState extends State<Deliverd> {
           '${address['name']}, ${address['landmark']}, ${address['city']}, ${address['state']}',
           style: const TextStyle(
             fontSize: 14,
-            fontFamily: 'Urbanist',
             color: Colors.black87,
           ),
         ),
@@ -244,7 +241,6 @@ class _DeliverdState extends State<Deliverd> {
                 product['title'] ?? "Unknown Product",
                 style: const TextStyle(
                   fontSize: 18,
-                  fontFamily: 'Urbanist',
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -253,7 +249,6 @@ class _DeliverdState extends State<Deliverd> {
                 product['description'] ?? "No description available",
                 style: TextStyle(
                   color: Colors.grey[700],
-                  fontFamily: 'Urbanist',
                 ),
               ),
               const SizedBox(height: 8),
@@ -262,7 +257,6 @@ class _DeliverdState extends State<Deliverd> {
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Urbanist',
                 ),
               ),
             ],

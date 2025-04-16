@@ -60,7 +60,6 @@ class _RegisterProfileState extends State<RegisterProfile> {
           style: TextStyle(
             color: Colors.white,
             fontSize: 25,
-            fontFamily: "Urbanist",
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -148,7 +147,6 @@ class _RegisterProfileState extends State<RegisterProfile> {
               "Mahima (You)",
               style: TextStyle(
                 fontSize: 16,
-                fontFamily: "Urbanist",
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -223,7 +221,7 @@ class _ProfileFieldState extends State<ProfileField> {
                   border: InputBorder.none,
                 ),
                 style: TextStyle(
-                    fontSize: 16, fontFamily: "Urbanist", color: Colors.black),
+                    fontSize: 16,  color: Colors.black),
               ),
             ),
             if (isPasswordField)

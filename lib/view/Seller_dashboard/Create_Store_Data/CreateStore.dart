@@ -129,7 +129,7 @@ class _CreateStoreState extends State<CreateStore> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text(" Store created successfully "),
-            duration: const Duration(seconds: 3),
+            duration: const Duration(seconds: 1),
             backgroundColor: Color(0xFF2B5C74),
             behavior: SnackBarBehavior.floating,
             margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

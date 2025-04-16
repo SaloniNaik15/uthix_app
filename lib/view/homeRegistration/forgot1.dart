@@ -19,7 +19,14 @@ class _Forgot1State extends State<Forgot1> {
 
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter your email")),
+        SnackBar(
+          content: Text("Please enter your email"),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
       return;
     }
@@ -42,7 +49,14 @@ class _Forgot1State extends State<Forgot1> {
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${response.statusMessage}")),
+          SnackBar(
+            content: Text("Error: ${response.statusMessage}"),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
       }
     } on DioException catch (dioError) {
@@ -53,11 +67,25 @@ class _Forgot1State extends State<Forgot1> {
         errorMessage = "Error: ${dioError.message}";
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
+        SnackBar(
+          content: Text(errorMessage),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("An unexpected error occurred: $e")),
+        SnackBar(
+          content: Text("An unexpected error occurred: $e"),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
     }
   }

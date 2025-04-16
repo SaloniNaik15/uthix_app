@@ -9,6 +9,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Inventory_data/Inventory.dart';
+
 class BookDetails extends StatefulWidget {
   final String category;
   final String categoryId;
@@ -102,7 +104,14 @@ class _BookDetailsState extends State<BookDetails> {
 
     if (widget.subcategoryId == null || widget.subcategoryId!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Subcategory is missing.')),
+        SnackBar(
+          content: const Text("Subcategory is missing."),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
       return;
     }
@@ -157,17 +166,44 @@ class _BookDetailsState extends State<BookDetails> {
       if (response.statusCode == 201 || response.statusCode == 200) {
         log('✅ Product created: ${response.data['product']['id']}');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${response.data['message']}')),
+          SnackBar(
+            content:   Text('${response.data['message']}'),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
+        Future.delayed(Duration(seconds: 1), () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => InventoryData()), // Replace with your target screen
+          );
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed: ${response.statusCode}')),
+          SnackBar(
+            content: Text('Failed: ${response.statusCode}'),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
       }
     } catch (e) {
       log('❌ Upload error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error occurred while uploading.')),
+        SnackBar(
+          content: Text('Error occurred while uploading.'),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
     }
   }

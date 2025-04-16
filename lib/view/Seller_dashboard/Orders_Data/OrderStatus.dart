@@ -26,7 +26,6 @@ class _OrderStatusState extends State<OrderStatus> {
           "Orders Details",
           style: TextStyle(
             fontSize: 20,
-            fontFamily: 'Urbanist',
             fontWeight: FontWeight.bold,
             color: Color(0xFF605F5F),
           ),

@@ -48,7 +48,6 @@ class _MyOrdersState extends State<MyOrders> {
           "Orders and Tracking",
           style: TextStyle(
             fontSize: 18,
-            fontFamily: 'Urbanist',
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
