@@ -235,13 +235,16 @@ class _PendingState extends State<Pending> {
                 product['title'] ?? "Unknown Product",
                 style: const TextStyle(
                     fontSize: 18,
+
                     fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 4),
               Text(
                 product['description'] ?? "No description available",
                 style:
+
                     TextStyle(color: Colors.grey[700], ),
+
               ),
               const SizedBox(height: 8),
               Text(

@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,7 +22,7 @@ class _StudentcartState extends State<Studentcart> {
   // Default values if no address saved.
   String selectedAddress = "home";
   int selectedAddressId = 0;
-  String? authToken; // Store token
+  String? authToken;
 
   final Dio dio = Dio();
 
@@ -42,8 +41,8 @@ class _StudentcartState extends State<Studentcart> {
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content:
-            Text("Authentication failed. Please login again.", style: TextStyle(fontSize: 14))),
+            content: Text("Authentication failed. Please login again.",
+                style: TextStyle(fontSize: 14))),
       );
       return;
     }
@@ -84,7 +83,8 @@ class _StudentcartState extends State<Studentcart> {
 
       if (response.statusCode == 200 && response.data["status"] == true) {
         setState(() {
-          cartItems = List<Map<String, dynamic>>.from(response.data['cart']['items'] ?? []);
+          cartItems = List<Map<String, dynamic>>.from(
+              response.data['cart']['items'] ?? []);
           isLoading = false;
         });
       } else {
@@ -99,7 +99,9 @@ class _StudentcartState extends State<Studentcart> {
 
   double get totalAmount {
     double total = cartItems.fold(0.0, (sum, item) {
-      double price = ((item['product']['price'] ?? item['product']['discount_price']) as num).toDouble();
+      double price = ((item['product']['price'] ??
+              item['product']['discount_price']) as num)
+          .toDouble();
       int quantity = item['quantity'];
       return sum + (quantity * price);
     });
@@ -113,7 +115,8 @@ class _StudentcartState extends State<Studentcart> {
     if (cartItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("⚠️ Cart is empty. Please add items to proceed.", style: TextStyle(fontSize: 14))),
+            content: Text("⚠️ Cart is empty. Please add items to proceed.",
+                style: TextStyle(fontSize: 14))),
       );
       return;
     }
@@ -121,13 +124,16 @@ class _StudentcartState extends State<Studentcart> {
     if (selectedAddressId == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("⚠️ Please select a valid delivery address.", style: TextStyle(fontSize: 14))),
+            content: Text("⚠️ Please select a valid delivery address.",
+                style: TextStyle(fontSize: 14))),
       );
       return;
     }
 
     List<Map<String, dynamic>> orderItems = cartItems.map((item) {
-      double price = (item['product']['discount_price'] ?? item['product']['price']).toDouble();
+      double price =
+          (item['product']['discount_price'] ?? item['product']['price'])
+              .toDouble();
       int quantity = item['quantity'];
       return {
         "product_id": item['product']['id'],
@@ -138,7 +144,9 @@ class _StudentcartState extends State<Studentcart> {
     }).toList();
 
     double subtotal = cartItems.fold(0.0, (sum, item) {
-      double price = (item['product']['discount_price'] ?? item['product']['price']).toDouble();
+      double price =
+          (item['product']['discount_price'] ?? item['product']['price'])
+              .toDouble();
       return sum + (item['quantity'] * price);
     });
 
@@ -155,17 +163,15 @@ class _StudentcartState extends State<Studentcart> {
     try {
       final response = await dio.post(
         orderApiUrl,
-        options: Options(
-            headers: {
-              "Authorization": "Bearer $authToken",
-              "Content-Type": "application/json"
-            }),
+        options: Options(headers: {
+          "Authorization": "Bearer $authToken",
+          "Content-Type": "application/json"
+        }),
         data: orderData,
       );
 
-
-
-      if (response.statusCode == 201 && response.data['message'] == "Order placed successfully") {
+      if (response.statusCode == 201 &&
+          response.data['message'] == "Order placed successfully") {
         if (context.mounted) {
           Navigator.pushReplacement(
             context,
@@ -182,21 +188,24 @@ class _StudentcartState extends State<Studentcart> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text("❌ Failed to place order: ${response.data['message'] ?? 'Unknown error'}",
+              content: Text(
+                  "❌ Failed to place order: ${response.data['message'] ?? 'Unknown error'}",
                   style: TextStyle(fontSize: 14))),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("❌ Error placing order: ${e.toString()}", style: TextStyle(fontSize: 14))),
+            content: Text("❌ Error placing order: ${e.toString()}",
+                style: TextStyle(fontSize: 14))),
       );
     }
   }
 
   // Remove Item from Cart API Call
   void removeFromCart(int cartId) async {
-    final String apiUrl = "https://admin.uthix.com/api/remove-from-cart/$cartId";
+    final String apiUrl =
+        "https://admin.uthix.com/api/remove-from-cart/$cartId";
 
     try {
       final response = await dio.delete(
@@ -210,17 +219,31 @@ class _StudentcartState extends State<Studentcart> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text("Item removed from cart!", style: TextStyle(fontSize: 14))),
+            content: Text(
+              "Item removed from cart!",
+              style: TextStyle(fontSize: 14),
+            ),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text("Failed to remove item: ${response.data['message']}", style: TextStyle(fontSize: 14))),
+              content: Text(
+                  "Failed to remove item: ${response.data['message']}",
+                  style: TextStyle(fontSize: 14))),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}", style: TextStyle(fontSize: 14))),
+        SnackBar(
+            content:
+                Text("Error: ${e.toString()}", style: TextStyle(fontSize: 14))),
       );
     }
   }
@@ -232,7 +255,8 @@ class _StudentcartState extends State<Studentcart> {
     if (token == null || token.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("Authentication failed. Please login again.", style: TextStyle(fontSize: 14))),
+            content: Text("Authentication failed. Please login again.",
+                style: TextStyle(fontSize: 14))),
       );
       return;
     }
@@ -279,8 +303,7 @@ class _StudentcartState extends State<Studentcart> {
         title: Text(
           "My Cart",
           style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,fontSize: 18),
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -296,181 +319,181 @@ class _StudentcartState extends State<Studentcart> {
         ),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
-      ))
-          : cartItems.isEmpty
           ? Center(
-        child: Text(
-          "Cart is Empty",
-          style: TextStyle(fontSize: 18,),
-        ),
-      )
-          : Container(
-        color: Colors.white,
-        child: Padding(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            children: <Widget>[
-              // Address Section
-              Container(
-                padding: EdgeInsets.all(5.w),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Color(0xFFD9D9D9)),
-                    color: Color(0xFFF6F6F6)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Deliver to this address:",
-                            style: TextStyle(
-                                fontSize: 14,
-                               ),
-                          ),
-                          SizedBox(width: 5.w),
-                          Text(
-                            selectedAddress,
-                            style: TextStyle(
-                                fontSize: 14,
-
-                                fontWeight: FontWeight.normal),
-                          ),
-                        ],
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: showAddressBottomSheet,
-                      child: Text(
-                        "Change",
-                        style: TextStyle(
-                            fontSize: 14,
-
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2B5C74)),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 10.h),
-              // Cart Items List
-              Expanded(
-                child: ListView.builder(
-                  itemCount: cartItems.length,
-                  itemBuilder: (context, index) {
-                    final item = cartItems[index];
-                    final product = item['product'];
-                    final int cartId = item['id'];
-                    int quantity = (item['quantity'] != null)
-                        ? (item['quantity'] as num).toInt()
-                        : 1;
-                    final String title = product['title'];
-                    final double price = (product['price']).toDouble();
-                    final String imageUrl =
-                    (product['first_image'] != null &&
-                        product['first_image']
-                        ['image_path'] !=
-                            null)
-                        ? 'https://admin.uthix.com/storage/image/products/${product['first_image']['image_path']}'
-                        : "https://via.placeholder.com/150";
-
-                    return buildCartItem(
-                        cartId,
-                        title,
-                        product['description'] ??
-                            "No description available",
-                        imageUrl,
-                        price,
-                        quantity,
-                        index);
-                  },
-                ),
-              ),
-              // Discount Code Section
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: "Discount Code or Gift Card",
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(
-                            vertical: 12.h, horizontal: 10.w),
-                      ),
+              child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+            ))
+          : cartItems.isEmpty
+              ? Center(
+                  child: Text(
+                    "Cart is Empty",
+                    style: TextStyle(
+                      fontSize: 18,
                     ),
                   ),
-                  SizedBox(width: 15.w),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() => discount = 100); // Example discount
-                    },
-                    style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 15.w, vertical: 12.h),
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.circular(5.r)),
-                        backgroundColor: Color(0xFFD9D9D9)),
-                    child: Text(
-                      "Apply",
-                      style: TextStyle(
-                          color: Colors.black,
+                )
+              : Container(
+                  color: Colors.white,
+                  child: Padding(
+                    padding: EdgeInsets.all(16.w),
+                    child: Column(
+                      children: <Widget>[
+                        // Address Section
+                        Container(
+                          padding: EdgeInsets.all(5.w),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Color(0xFFD9D9D9)),
+                              color: Color(0xFFF6F6F6)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Deliver to this address:",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    SizedBox(width: 5.w),
+                                    Text(
+                                      selectedAddress,
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: showAddressBottomSheet,
+                                child: Text(
+                                  "Change",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF2B5C74)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 10.h),
+                        // Cart Items List
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: cartItems.length,
+                            itemBuilder: (context, index) {
+                              final item = cartItems[index];
+                              final product = item['product'];
+                              final int cartId = item['id'];
+                              int quantity = (item['quantity'] != null)
+                                  ? (item['quantity'] as num).toInt()
+                                  : 1;
+                              final String title = product['title'];
+                              final double price =
+                                  (product['price']).toDouble();
+                              final String imageUrl = (product['first_image'] !=
+                                          null &&
+                                      product['first_image']['image_path'] !=
+                                          null)
+                                  ? 'https://admin.uthix.com/storage/image/products/${product['first_image']['image_path']}'
+                                  : "https://via.placeholder.com/150";
 
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14),
+                              return buildCartItem(
+                                  cartId,
+                                  title,
+                                  product['description'] ??
+                                      "No description available",
+                                  imageUrl,
+                                  price,
+                                  quantity,
+                                  index);
+                            },
+                          ),
+                        ),
+                        // Discount Code Section
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  hintText: "Discount Code or Gift Card",
+                                  border: OutlineInputBorder(),
+                                  contentPadding: EdgeInsets.symmetric(
+                                      vertical: 12.h, horizontal: 10.w),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 15.w),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(
+                                    () => discount = 100); // Example discount
+                              },
+                              style: ElevatedButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 15.w, vertical: 12.h),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5.r)),
+                                  backgroundColor: Color(0xFFD9D9D9)),
+                              child: Text(
+                                "Apply",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10.h),
+                        // Price Details
+                        Divider(),
+                        buildPriceRow("Subtotal",
+                            "₹${(totalAmount - shippingCost + discount).toStringAsFixed(2)}"),
+                        buildPriceRow(
+                            "Shipping", "₹${shippingCost.toStringAsFixed(2)}"),
+                        buildPriceRow(
+                            "Discount", "- ₹${discount.toStringAsFixed(2)}"),
+                        Divider(),
+                        buildPriceRow(
+                            "Total", "₹${totalAmount.toStringAsFixed(2)}",
+                            isBold: true),
+                        Divider(),
+                        SizedBox(height: 8.h),
+                        // Proceed to Payment Button
+                        ElevatedButton(
+                          onPressed: () => placeOrder(),
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: Size(double.infinity, 50.h),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5.r)),
+                            backgroundColor: Color(0xFF2B5C74),
+                            elevation: 5,
+                            shadowColor: Colors.black54,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.payment,
+                                  color: Colors.white, size: 18.sp),
+                              SizedBox(width: 10.w),
+                              Text("Proceed to Payment",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  )),
+                            ],
+                          ),
+                        )
+                      ],
                     ),
                   ),
-                ],
-              ),
-              SizedBox(height: 10.h),
-              // Price Details
-              Divider(),
-              buildPriceRow("Subtotal",
-                  "₹${(totalAmount - shippingCost + discount).toStringAsFixed(2)}"),
-              buildPriceRow("Shipping",
-                  "₹${shippingCost.toStringAsFixed(2)}"),
-              buildPriceRow("Discount",
-                  "- ₹${discount.toStringAsFixed(2)}"),
-              Divider(),
-              buildPriceRow(
-                  "Total", "₹${totalAmount.toStringAsFixed(2)}",
-                  isBold: true),
-              Divider(),
-              SizedBox(height: 8.h),
-              // Proceed to Payment Button
-              ElevatedButton(
-                onPressed: () => placeOrder(),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(double.infinity, 50.h),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.r)),
-                  backgroundColor: Color(0xFF2B5C74),
-                  elevation: 5,
-                  shadowColor: Colors.black54,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.payment, color: Colors.white, size: 18.sp),
-                    SizedBox(width: 10.w),
-                    Text("Proceed to Payment",
-                        style: TextStyle(
-                          color: Colors.white,
-
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        )),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -552,8 +575,8 @@ class _StudentcartState extends State<Studentcart> {
                     ),
                     Text(
                       "${cartItems[index]['quantity']}",
-                      style: TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                     ),
                     IconButton(
                       icon: Icon(Icons.add_circle_outline,
@@ -582,9 +605,7 @@ class _StudentcartState extends State<Studentcart> {
               ),
               Text(
                 "₹${price.toInt()}",
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -601,14 +622,14 @@ class _StudentcartState extends State<Studentcart> {
         children: [
           Text(title,
               style: TextStyle(
-                  fontSize: isBold ? 16 : 14,
-                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-                  )),
+                fontSize: isBold ? 16 : 14,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              )),
           Text(value,
               style: TextStyle(
-                  fontSize: isBold ? 16 : 14,
-                  fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-                  )),
+                fontSize: isBold ? 16 : 14,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              )),
         ],
       ),
     );

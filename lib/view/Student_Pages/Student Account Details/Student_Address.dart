@@ -40,7 +40,15 @@ class _StudentAddressState extends State<StudentAddress> {
   Future<void> _fetchAddresses() async {
     if (_authToken == null || _authToken!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Authentication failed. Please log in again.")),
+        SnackBar(
+          content: Text("Authentication failed. Please log in again."),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
       handle401Error();
       return;
@@ -65,19 +73,44 @@ class _StudentAddressState extends State<StudentAddress> {
       } else if (response.statusCode == 401) {
         log("⛔ Unauthorized: Token is invalid or expired.");
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Session expired. Please log in again.")),
+          SnackBar(
+            content: Text("Session expired. Please log in again."),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
         handle401Error();
       } else {
         log("⛔ Failed to fetch addresses: ${response.data}");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("❌ Error fetching addresses: ${response.data.toString()}")),
+          SnackBar(
+            content:
+                Text("❌ Error fetching addresses: ${response.data.toString()}"),
+            duration: const Duration(seconds: 1),
+            backgroundColor: Color(0xFF2B5C74),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
       }
     } catch (e) {
       log("⛔ Error fetching addresses: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("❌ Network error. Please try again.")),
+        SnackBar(
+          content: Text("❌ Network error. Please try again."),
+          duration: const Duration(seconds: 1),
+          backgroundColor: Color(0xFF2B5C74),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       );
     }
   }
@@ -149,109 +182,116 @@ class _StudentAddressState extends State<StudentAddress> {
           ),
           Expanded(
             child: addresses.isEmpty
-                ? Center(child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
-            ))
+                ? Center(
+                    child: CircularProgressIndicator(
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+                  ))
                 : ListView.builder(
-              itemCount: addresses.length,
-              itemBuilder: (context, index) {
-                final address = addresses[index];
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (index == 0 ||
-                        addresses[index - 1]["address_type"] != address["address_type"])
-                      Padding(
-                        padding: EdgeInsets.all(16.w),
-                        child: Text(
-                          address["address_type"] ?? "Other Addresses",
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    // Address Card
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedAddressIndex = index;
-                        });
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(16.w),
-                        decoration: BoxDecoration(
-                          color: selectedAddressIndex == index
-                              ? Colors.white
-                              : const Color(0xFFF6F6F6),
-                          border: Border.all(
-                            color: Colors.grey.shade300,
-                            width: 1.w,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              address["name"] ?? "N/A",
-                              style: TextStyle(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            SizedBox(height: 4.h),
-                            Text(address["area"] ?? "N/A"),
-                            Text(address["street"] ?? ""),
-                            Text(address["city"] ?? ""),
-                            Text(address["postal_code"] ?? ""),
-                            Text("Mobile Number: ${address["phone"] ?? "N/A"}"),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Edit Button (Visible only if selected)
-                    if (selectedAddressIndex == index)
-                      Container(
-                        padding: EdgeInsets.all(8.w),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border(
-                            top: BorderSide(
-                              color: Colors.grey.shade300,
-                              width: 1.w,
-                            ),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                // Handle Edit Address
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                side: BorderSide(color: Colors.grey, width: 1.w),
-                                padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 10.h),
-                              ),
+                    itemCount: addresses.length,
+                    itemBuilder: (context, index) {
+                      final address = addresses[index];
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (index == 0 ||
+                              addresses[index - 1]["address_type"] !=
+                                  address["address_type"])
+                            Padding(
+                              padding: EdgeInsets.all(16.w),
                               child: Text(
-                                "Edit",
+                                address["address_type"] ?? "Other Addresses",
                                 style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14.sp,
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
-                            // "Remove" button has been removed as requested.
-                          ],
-                        ),
-                      ),
-                    SizedBox(height: 16.h),
-                  ],
-                );
-              },
-            ),
+                          // Address Card
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedAddressIndex = index;
+                              });
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(16.w),
+                              decoration: BoxDecoration(
+                                color: selectedAddressIndex == index
+                                    ? Colors.white
+                                    : const Color(0xFFF6F6F6),
+                                border: Border.all(
+                                  color: Colors.grey.shade300,
+                                  width: 1.w,
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    address["name"] ?? "N/A",
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  Text(address["area"] ?? "N/A"),
+                                  Text(address["street"] ?? ""),
+                                  Text(address["city"] ?? ""),
+                                  Text(address["postal_code"] ?? ""),
+                                  Text(
+                                      "Mobile Number: ${address["phone"] ?? "N/A"}"),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // Edit Button (Visible only if selected)
+                          if (selectedAddressIndex == index)
+                            Container(
+                              padding: EdgeInsets.all(8.w),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border(
+                                  top: BorderSide(
+                                    color: Colors.grey.shade300,
+                                    width: 1.w,
+                                  ),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      // Handle Edit Address
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      side: BorderSide(
+                                          color: Colors.grey, width: 1.w),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 30.w, vertical: 10.h),
+                                    ),
+                                    child: Text(
+                                      "Edit",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14.sp,
+                                      ),
+                                    ),
+                                  ),
+                                  // "Remove" button has been removed as requested.
+                                ],
+                              ),
+                            ),
+                          SizedBox(height: 16.h),
+                        ],
+                      );
+                    },
+                  ),
           ),
         ],
       ),
