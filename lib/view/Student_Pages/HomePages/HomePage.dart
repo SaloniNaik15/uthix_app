@@ -48,30 +48,26 @@ class _HomePagesState extends State<HomePages> {
 
   Future<void> _initializeData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-    String? imageUrl = prefs.getString('student_profile_image_url');
-    log("Retrieved Token: $token");
-    log("Retrieved Image URL: $imageUrl");
-
-    setState(() {
-      accessLoginToken = token;
-      profileImageUrl = imageUrl;
-    });
-
-    // Load cached profile first
+    accessLoginToken = prefs.getString('auth_token');
+    // load previously cached
     await _loadProfileFromCache();
-
-    _fetchUserProfile();
+    // fetch fresh
+    await _fetchUserProfile();
+    setState(() {});
   }
 
   Future<void> _loadProfileFromCache() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? cachedProfile = prefs.getString("cached_profile");
-    if (cachedProfile != null) {
+    String? cached = prefs.getString("cached_profile");
+    if (cached != null) {
       try {
-        final data = jsonDecode(cachedProfile);
+        final data = jsonDecode(cached) as Map<String, dynamic>;
         setState(() {
-          userName = data["name"];
+          userName = data["name"] as String?;
+          String? imgFile = data["image"] as String?;
+          profileImageUrl = (imgFile != null && imgFile.isNotEmpty)
+              ? "https://admin.uthix.com/storage/images/student/$imgFile"
+              : null;
         });
         log("Loaded profile from cache.");
       } catch (e) {
@@ -81,9 +77,9 @@ class _HomePagesState extends State<HomePages> {
   }
 
   Future<void> _fetchUserProfile() async {
+    if (accessLoginToken == null) return;
     try {
       final dio = Dio();
-      // Replace with your actual API endpoint.
       final response = await dio.get(
         "https://admin.uthix.com/api/profile",
         options: Options(
@@ -92,13 +88,20 @@ class _HomePagesState extends State<HomePages> {
       );
 
       if (response.statusCode == 200) {
-        final data = response.data;
+        final data = response.data as Map<String, dynamic>;
+        String? imageFileName = data["image"] as String?;
+        String? fullImageUrl = (imageFileName != null && imageFileName.isNotEmpty)
+            ? "https://admin.uthix.com/storage/images/student/$imageFileName"
+            : null;
+
         setState(() {
-          userName = data["name"];
+          userName = data["name"] as String?;
+          profileImageUrl = fullImageUrl;
         });
-        // Cache the fetched profile data.
+
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString("cached_profile", jsonEncode(data));
+        prefs.setString("student_profile_image_url", imageFileName ?? "");
         log("Profile updated from API and cached.");
       } else {
         log("Failed to fetch user profile: ${response.statusMessage}");
