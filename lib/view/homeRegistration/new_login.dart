@@ -6,17 +6,10 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
 import 'package:uthix_app/view/homeRegistration/forgot1.dart';
-import 'package:uthix_app/view/homeRegistration/mailIdPage.dart';
 import 'package:uthix_app/view/homeRegistration/registration.dart';
-// import 'package:uthix_app/view/homeRegistration/successfulregister.dart';
-
 import 'package:uthix_app/view/instructor_dashboard/panding.dart';
-
-// import 'package:uthix_app/view/login/start_login.dart';
-
 import '../Seller_dashboard/dashboard.dart';
 import '../Student_Pages/Student Account Details/Student_Profile.dart';
-import '../instructor_dashboard/Dashboard/instructor_dashboard.dart';
 import '../instructor_dashboard/Profile/detail_profile.dart';
 
 class NewLogin extends StatefulWidget {
@@ -29,151 +22,106 @@ class NewLogin extends StatefulWidget {
 class _NewLoginState extends State<NewLogin> {
   final TextEditingController _emailIdController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool ispassword = true;
+  bool isPasswordHidden = true;
 
   Future<void> saveUserSession(String token, String role) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     await prefs.setString('auth_token', token);
     await prefs.setString('user_role', role);
   }
 
-  void _login() async {
-    String email = _emailIdController.text.trim().toLowerCase();
-    String password = _passwordController.text.trim();
+  Future<Object?> _login() async {
+    final email = _emailIdController.text.trim().toLowerCase();
+    final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Please enter email and password",
-          ),
-          duration: const Duration(seconds: 1),
+        const SnackBar(
+          content: Text("Please enter email and password"),
           backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
-      return;
     }
 
     try {
-      final Dio dio = Dio();
-
-      final response = await dio.post(
+      final dio = Dio();
+      final loginResp = await dio.post(
         'https://admin.uthix.com/api/login',
         options: Options(headers: {"Content-Type": "application/json"}),
         data: {"email": email, "password": password},
       );
 
-      log("API Response: ${response.data}");
+      final loginData = loginResp.data as Map<String, dynamic>;
 
-      final data = response.data;
-      if (response.statusCode == 403 &&
-          data['status']?.toLowerCase() == 'pending') {
-        Navigator.pushReplacement(
+      // Pending
+      if (loginResp.statusCode == 403 &&
+          (loginData['status'] as String).toLowerCase() == 'pending') {
+        return Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => panding()),
+          MaterialPageRoute(builder: (_) => const panding()),
         );
-        return;
       }
 
-      if (response.statusCode == 200 &&
-          data['status']?.toLowerCase() == 'approved' &&
-          data.containsKey('access_token')) {
-        String token = data['access_token'];
-        String role = data['role'] ?? 'student';
+      // Approved + token
+      if (loginResp.statusCode == 200 &&
+          (loginData['status'] as String).toLowerCase() == 'approved' &&
+          loginData.containsKey('access_token')) {
+        final token = loginData['access_token'] as String;
+        final role = (loginData['role'] as String?) ?? 'student';
 
         await saveUserSession(token, role);
+        log("Stored Token: $token, Role: $role");
 
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        log("Stored Token: ${prefs.getString('auth_token')}, Role: ${prefs.getString('user_role')}");
+        dio.options.headers['Authorization'] = 'Bearer $token';
 
         Widget nextScreen;
-
         if (role == 'seller') {
-          nextScreen = SellerDashboard();
+          nextScreen = const SellerDashboard();
         } else if (role == 'instructor') {
-          nextScreen = DetailProfile();
+          nextScreen = const DetailProfile();
         } else {
-          nextScreen = StudentProfile();
+          // Student: fetch profile and check classroom_id
+          final profResp = await dio.get('https://admin.uthix.com/api/student-profile');
+          if (profResp.statusCode == 200 && profResp.data['status'] == true) {
+            final profData = profResp.data['data'] as Map<String, dynamic>;
+            final int? classId = profData['classroom_id'] as int?;
+            nextScreen = (classId == null)
+                ? const StudentProfile()
+                : const HomePages();
+          } else {
+            // Fallback if profile call fails
+            nextScreen = const StudentProfile();
+          }
         }
 
-        Navigator.pushReplacement(
+        return Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => nextScreen),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              data['message'] ?? "Invalid email or password",
-            ),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+          MaterialPageRoute(builder: (_) => nextScreen),
         );
       }
-    } on DioException catch (dioError) {
-      // 👇 Handle specific API failure
-      if (dioError.response != null) {
-        log("Dio Error Response: ${dioError.response?.data}");
-        final data = dioError.response?.data;
 
-        if (dioError.response?.statusCode == 403 &&
-            data?['status']?.toLowerCase() == 'pending') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => panding()),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                data?['message'] ?? "Invalid email or password",
-              ),
-              duration: const Duration(seconds: 1),
-              backgroundColor: Color(0xFF2B5C74),
-              behavior: SnackBarBehavior.floating,
-              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
-          );
-        }
-      } else {
-        // 👇 Network error / timeout
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Network error. Please check your connection.",
-            ),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        );
-      }
-    } catch (e) {
-      // 👇 Fallback for any other unexpected errors
-      log("Unexpected Error: $e");
+      // Invalid credentials
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            "An unexpected error occurred. Please try again.",
-          ),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          content: Text(loginData['message'] ?? "Invalid email or password"),
+          backgroundColor: const Color(0xFF2B5C74),
+        ),
+      );
+    } on DioException catch (dioError) {
+      // API or network error
+      final msg = dioError.response?.data['message'] ??
+          "Network error. Please try again.";
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          backgroundColor: const Color(0xFF2B5C74),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Unexpected error: $e"),
+          backgroundColor: const Color(0xFF2B5C74),
         ),
       );
     }
@@ -185,13 +133,13 @@ class _NewLoginState extends State<NewLogin> {
       onWillPop: () async {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Registration()),
+          MaterialPageRoute(builder: (_) => const Registration()),
         );
         return false;
       },
       child: ScreenUtilInit(
         designSize: const Size(320, 812),
-        builder: (_, child) => Scaffold(
+        builder: (_, __) => Scaffold(
           backgroundColor: Colors.white,
           resizeToAvoidBottomInset: false,
           body: SingleChildScrollView(
@@ -201,46 +149,40 @@ class _NewLoginState extends State<NewLogin> {
                 height: MediaQuery.of(context).size.height,
                 child: Stack(
                   children: [
-                    // Background image
                     Positioned.fill(
                       child: Opacity(
-                        opacity: 0.30,
+                        opacity: 0.3,
                         child: Image.asset(
                           "assets/registration/splash.png",
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
-                    // Centered content with scroll capability
                     Center(
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 20.w),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Image.asset(
                               "assets/registration/book.png",
                               width: 90.w,
                               height: 114.h,
-                              fit: BoxFit.cover,
                             ),
                             SizedBox(height: 20.h),
                             Text(
                               "Welcome BACK!",
-                              style: TextStyle(
+                              style: GoogleFonts.openSans(
                                 fontSize: 26,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.black,
                               ),
                             ),
                             SizedBox(height: 20.h),
                             Text(
                               "Login to your account",
-                              style: TextStyle(
+                              style: GoogleFonts.openSans(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.black,
                               ),
                             ),
                             SizedBox(height: 20.h),
@@ -254,9 +196,7 @@ class _NewLoginState extends State<NewLogin> {
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Forgot1(),
-                                  ),
+                                  MaterialPageRoute(builder: (_) => const Forgot1()),
                                 );
                               },
                               child: Align(
@@ -265,16 +205,15 @@ class _NewLoginState extends State<NewLogin> {
                                   padding: EdgeInsets.only(right: 10.w),
                                   child: Text(
                                     "Forgot Password",
-                                    style: TextStyle(
+                                    style: GoogleFonts.openSans(
                                       fontSize: 12,
-                                      fontWeight: FontWeight.w400,
                                       color: Colors.blue,
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            SizedBox(height: 25.h),
+                            SizedBox(height: 25),
                             GestureDetector(
                               onTap: _login,
                               child: Container(
@@ -282,48 +221,38 @@ class _NewLoginState extends State<NewLogin> {
                                 width: MediaQuery.of(context).size.width / 1.5,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(25.r),
-                                  color: Color.fromRGBO(27, 97, 122, 1),
+                                  color: const Color(0xFF2B5C74),
                                 ),
                                 child: Center(
                                   child: Text(
                                     "Login",
-                                    style: TextStyle(
+                                    style: GoogleFonts.openSans(
                                       fontSize: 18,
-                                      fontWeight: FontWeight.w400,
                                       color: Colors.white,
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                            SizedBox(height: 45.h),
+                            SizedBox(height: 45),
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Registration(),
-                                  ),
+                                  MaterialPageRoute(builder: (_) => const Registration()),
                                 );
                               },
                               child: Text.rich(
                                 TextSpan(
-                                  text: "Already have an account? ",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black,
-                                  ),
+                                  text: "Don't have an account? ",
+                                  style: GoogleFonts.openSans(fontSize: 14),
                                   children: [
                                     TextSpan(
                                       text: "Register",
-                                      style: TextStyle(
+                                      style: GoogleFonts.openSans(
                                         fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                        color: Color.fromRGBO(27, 97, 122, 1),
+                                        color: const Color(0xFF1B617A),
                                         decoration: TextDecoration.underline,
-                                        decorationColor:
-                                            Color.fromRGBO(27, 97, 122, 1),
                                       ),
                                     ),
                                   ],
@@ -346,32 +275,56 @@ class _NewLoginState extends State<NewLogin> {
     );
   }
 
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+  }) {
+    return Container(
+      height: 45,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF6F6F6),
+        borderRadius: BorderRadius.circular(50),
+        border: Border.all(color: const Color(0xFFD2D2D2)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: TextField(
+          controller: controller,
+          keyboardType: TextInputType.emailAddress,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: hint,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildPasswordField() {
     return Container(
       height: 45,
-      width: double.infinity,
       decoration: BoxDecoration(
-        color: Color.fromRGBO(246, 246, 246, 1),
+        color: const Color(0xFFF6F6F6),
         borderRadius: BorderRadius.circular(50),
-        border: Border.all(color: Color.fromRGBO(210, 210, 210, 1)),
+        border: Border.all(color: const Color(0xFFD2D2D2)),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: TextField(
           controller: _passwordController,
-          obscureText: ispassword,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+          obscureText: isPasswordHidden,
           decoration: InputDecoration(
             border: InputBorder.none,
             hintText: "Enter your Password",
-            hintStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
             suffixIcon: IconButton(
-              icon: Icon(ispassword
-                  ? Icons.visibility_off_outlined
-                  : Icons.visibility_outlined),
+              icon: Icon(
+                isPasswordHidden
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
+              ),
               onPressed: () {
                 setState(() {
-                  ispassword = !ispassword;
+                  isPasswordHidden = !isPasswordHidden;
                 });
               },
             ),
@@ -380,32 +333,4 @@ class _NewLoginState extends State<NewLogin> {
       ),
     );
   }
-}
-
-Widget _buildTextField({
-  required TextEditingController controller,
-  required String hint,
-}) {
-  return Container(
-    height: 45,
-    width: double.infinity,
-    decoration: BoxDecoration(
-      color: Color.fromRGBO(246, 246, 246, 1),
-      borderRadius: BorderRadius.circular(50),
-      border: Border.all(color: Color.fromRGBO(210, 210, 210, 1)),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: TextField(
-        controller: controller,
-        keyboardType: TextInputType.emailAddress,
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: hint,
-          hintStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
-        ),
-      ),
-    ),
-  );
 }

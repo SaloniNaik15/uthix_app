@@ -40,6 +40,9 @@ dependencies:
   http_parser: ^4.1.2
   image: ^4.5.4
   razorpay_flutter: ^1.4.0
+  youtube_player_flutter: ^9.1.1
+  youtube_player_iframe: ^5.2.1
+  another_flushbar: ^1.12.30
 
 
 dev_dependencies:
