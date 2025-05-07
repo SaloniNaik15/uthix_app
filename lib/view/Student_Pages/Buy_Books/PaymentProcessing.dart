@@ -217,7 +217,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         if (responseData['status'] == true) {
           var options = {
             'key':
-                'your_razorpay_key_here', // Replace with your actual Razorpay key
+                'rzp_test_hZpYcGhumUM4Z2', // Replace with your actual Razorpay key
             // Multiply by 100 if the backend returns rupees but Razorpay expects paise
             'amount': responseData[
                 'amount'], // Consider: responseData['amount'] * 100,
