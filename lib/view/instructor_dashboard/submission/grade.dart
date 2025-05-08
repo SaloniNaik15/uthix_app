@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../modal/Snackbar.dart';
+
 class Grade extends StatefulWidget {
   final String uploadId;
   const Grade({Key? key, required this.uploadId}) : super(key: key);
@@ -69,56 +71,59 @@ class _GradeState extends State<Grade> {
   // Submit the grades using the Dio package.
   Future<void> _submitGrades() async {
     if (token == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Not Authenticated")),
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Not Authenticated',
       );
       return;
     }
 
     final grades = selectedGrades.entries.map((entry) {
       return {
-        "criterion": entry.key,
-        "grade": entry.value,
+        'criterion': entry.key,
+        'grade': entry.value,
       };
     }).toList();
 
     final payload = {
-      "grades": grades,
-      "feedback_note": feedbackController.text,
+      'grades': grades,
+      'feedback_note': feedbackController.text,
     };
 
-    final url =
-        'https://admin.uthix.com/api/instructor/grade/${widget.uploadId}';
+    final url = 'https://admin.uthix.com/api/instructor/grade/${widget.uploadId}';
     try {
       final response = await dio.post(
         url,
         data: payload,
         options: Options(
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer $token",
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
           },
         ),
       );
+
       if (response.statusCode == 201) {
         // Save the current grade data locally after a successful submission.
         await _storeGrades();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Grades submitted")),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Grades submitted successfully!',
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  "Failed to submit grades. Error: ${response.statusCode}")),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Failed to submit grades. Error: ${response.statusCode}',
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("An error occurred: $e")),
+      SnackbarHelper.showMessage(
+        context,
+        message: 'An error occurred: $e',
       );
     }
   }
+
 
   // Widget that creates a row for a specific grading criterion.
   Widget gradeRow(String criteria, List<String> ratings) {

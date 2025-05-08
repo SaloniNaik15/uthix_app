@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dio/dio.dart';
 import 'package:uthix_app/view/homeRegistration/forgot2.dart';
 
+import '../../modal/Snackbar.dart';
+
 class Forgot1 extends StatefulWidget {
   const Forgot1({super.key});
 
@@ -18,77 +20,50 @@ class _Forgot1State extends State<Forgot1> {
     final email = _emailIdController.text.trim();
 
     if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Please enter your email"),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Please enter your email",
       );
       return;
     }
 
     final dio = Dio();
-    // Replace with your actual API endpoint
     const String apiUrl = "https://admin.uthix.com/api/forgot-password";
 
     try {
       final response = await dio.post(apiUrl, data: {"email": email});
 
       if (response.statusCode == 200) {
-        // Show a success SnackBar and then navigate after it is closed
-        final snackBar = SnackBar(content: Text("Code sent successfully"));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar).closed.then((_) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const Forgot2()),
-          );
-        });
+        SnackbarHelper.showMessage(
+          context,
+          message: "Code sent successfully!",
+        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const Forgot2()),
+        );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error: ${response.statusMessage}"),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Error: ${response.statusMessage}",
         );
       }
     } on DioException catch (dioError) {
-      String errorMessage = "An error occurred";
-      if (dioError.response != null) {
-        errorMessage = "Error: ${dioError.response?.statusMessage}";
-      } else {
-        errorMessage = "Error: ${dioError.message}";
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMessage),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      final errorMessage = dioError.response != null
+          ? "Error: ${dioError.response?.statusMessage}"
+          : "Error: ${dioError.message}";
+      SnackbarHelper.showMessage(
+        context,
+        message: errorMessage,
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("An unexpected error occurred: $e"),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: "An unexpected error occurred: $e",
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

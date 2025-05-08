@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../modal/Snackbar.dart';
 import 'new_login.dart';
 
 class Mailidpage extends StatefulWidget {
@@ -45,15 +46,9 @@ class _MailidpageState extends State<Mailidpage> {
   }
   Future<void> _registerUser() async {
     if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Passwords do not match"),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Passwords do not match",
       );
       return;
     }
@@ -66,7 +61,7 @@ class _MailidpageState extends State<Mailidpage> {
       "email": _emailIdController.text,
       "password": _passwordController.text,
       "role": _selectedRole,
-      'fcm_token': fcmToken,
+      "fcm_token": fcmToken,
     };
 
     try {
@@ -82,51 +77,31 @@ class _MailidpageState extends State<Mailidpage> {
       log("Response Body: ${response.data}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Registration Successful!"),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Registration Successful!",
         );
-
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => NewLogin()),
+          MaterialPageRoute(builder: (_) => const NewLogin()),
         );
       } else {
         log("Error: ${response.data}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Registration Failed: ${response.data['message']}"),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Registration Failed: ${response.data['message']}",
         );
       }
     } on DioException catch (e) {
       log("Dio Error: $e");
       log("Full error response: ${e.response?.data}");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Registration Failed: ${e.response?.data['message'] ?? 'Something went wrong'}"),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Registration Failed: ${e.response?.data['message'] ?? 'Something went wrong'}",
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

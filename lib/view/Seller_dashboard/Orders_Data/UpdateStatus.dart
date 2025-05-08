@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../modal/Snackbar.dart';
+
 class UpdateStatus extends StatefulWidget {
   final int productId;
 
@@ -200,27 +202,15 @@ class _UpdateStatusState extends State<UpdateStatus> {
                           setState(() {
                             selectedStatus = tempStatus;
                           });
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Status updated to $selectedStatus'),
-                              duration: const Duration(seconds: 1),
-                              backgroundColor: Color(0xFF2B5C74),
-                              behavior: SnackBarBehavior.floating,
-                              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
+                          SnackbarHelper.showMessage(
+                            context,
+                            message: 'Status updated to $selectedStatus',
                           );
                         } else {
                           log("❌ Invalid product ID");
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Invalid product ID.'),
-                              duration: const Duration(seconds: 1),
-                              backgroundColor: Color(0xFF2B5C74),
-                              behavior: SnackBarBehavior.floating,
-                              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
+                          SnackbarHelper.showMessage(
+                            context,
+                            message: 'Invalid product ID.',
                           );
                         }
                       },
@@ -235,7 +225,8 @@ class _UpdateStatusState extends State<UpdateStatus> {
                         style: TextStyle(fontSize: 15.sp, color: Colors.white),
                       ),
                     ),
-                  ),
+                  )
+
                 ],
               ),
             ),

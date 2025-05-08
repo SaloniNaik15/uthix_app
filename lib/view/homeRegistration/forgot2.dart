@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dio/dio.dart';
 import 'package:uthix_app/view/homeRegistration/forgot3.dart';
 
+import '../../modal/Snackbar.dart';
+
 class Forgot2 extends StatefulWidget {
   const Forgot2({super.key});
 
@@ -44,8 +46,9 @@ class _Forgot2State extends State<Forgot2> {
     final digit4 = _digit4Controller.text.trim();
 
     if (digit1.isEmpty || digit2.isEmpty || digit3.isEmpty || digit4.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter the complete code")),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Please enter the complete code",
       );
       return;
     }
@@ -58,40 +61,40 @@ class _Forgot2State extends State<Forgot2> {
       final response = await dio.post(apiUrl, data: {"code": code});
 
       if (response.statusCode == 200) {
-        final isValid = response.data["valid"] ?? true;
+        final isValid = response.data["valid"] ?? false;
         if (isValid) {
-          // Code is correct: show success message and navigate
-          final snackBar = SnackBar(content: Text("Code sent successfully"));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar).closed.then((_) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Forgot3()),
-            );
-          });
+          SnackbarHelper.showMessage(
+            context,
+            message: "Code verified successfully!",
+          );
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const Forgot3()),
+          );
         } else {
-          // Code is incorrect
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Code is incorrect")),
+          SnackbarHelper.showMessage(
+            context,
+            message: "Code is incorrect",
           );
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Code is incorrect")),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Code is incorrect",
         );
       }
     } on DioException catch (dioError) {
-      String errorMessage = "An error occurred";
-      if (dioError.response != null) {
-        errorMessage = "Error: ${dioError.response?.statusMessage}";
-      } else {
-        errorMessage = "Error: ${dioError.message}";
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
+      final errorMessage = dioError.response != null
+          ? "Error: ${dioError.response?.statusMessage}"
+          : "Error: ${dioError.message}";
+      SnackbarHelper.showMessage(
+        context,
+        message: errorMessage,
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("An unexpected error occurred: $e")),
+      SnackbarHelper.showMessage(
+        context,
+        message: "An unexpected error occurred: $e",
       );
     }
   }

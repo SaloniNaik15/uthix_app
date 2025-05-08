@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Customerreviews extends StatefulWidget {
-  const Customerreviews({super.key});
+  const Customerreviews({super.key, required List reviews});
 
   @override
   State<Customerreviews> createState() => _CustomerreviewsState();
