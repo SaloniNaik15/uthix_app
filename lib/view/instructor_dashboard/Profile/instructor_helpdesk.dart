@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../modal/Snackbar.dart';
+
 class InstructorHelpdesk extends StatefulWidget {
   const InstructorHelpdesk({super.key});
 
@@ -20,8 +22,9 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
     final description = _descriptionController.text.trim();
 
     if (subject.isEmpty || description.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in all fields")),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Please fill in all fields",
       );
       return;
     }
@@ -51,19 +54,22 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Query submitted successfully!")),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Query submitted successfully!",
         );
         _subjectController.clear();
         _descriptionController.clear();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${response.statusMessage}")),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Error: ${response.statusMessage}",
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Submission failed: $e")),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Submission failed: $e",
       );
     } finally {
       setState(() {
@@ -71,6 +77,7 @@ class _InstructorHelpdeskState extends State<InstructorHelpdesk> {
       });
     }
   }
+
 
   @override
   void dispose() {

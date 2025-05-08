@@ -11,6 +11,8 @@ import 'package:path/path.dart' as p;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 
+import '../../../modal/Snackbar.dart';
+
 class CreateStore extends StatefulWidget {
   const CreateStore({super.key});
 
@@ -74,16 +76,15 @@ class _CreateStoreState extends State<CreateStore> {
   }
 
   Future<void> _createStore() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
-    Map<String, dynamic> storeData = {
+    final storeData = {
       "store_name": _storeNameController.text,
       "store_address": _addressController.text,
       "counter": _counterController.text,
       "school": _schoolController.text,
     };
-
-    FormData formData = FormData.fromMap(storeData);
+    final formData = FormData.fromMap(storeData);
 
     if (_selectedImage != null && await _selectedImage!.exists()) {
       formData.files.add(MapEntry(
@@ -98,23 +99,24 @@ class _CreateStoreState extends State<CreateStore> {
       formData.fields.add(MapEntry("logo", ""));
     }
 
-    String jsonData = json.encode(storeData);
+    // Cache locally
+    final jsonData = json.encode(storeData);
     await prefs.setString("storeData", jsonData);
     log("Stored Data: $jsonData");
 
-    String? token = prefs.getString("auth_token");
+    final token = prefs.getString("auth_token");
     if (token == null || token.isEmpty) {
       log("⚠️ Authentication token is missing.");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("Authentication failed. Please log in again.")),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Authentication failed. Please log in again.",
       );
       return;
     }
 
     try {
-      Dio dio = Dio();
-      Response response = await dio.post(
+      final dio = Dio();
+      final response = await dio.post(
         "https://admin.uthix.com/api/vendor-store",
         data: formData,
         options: Options(
@@ -126,35 +128,35 @@ class _CreateStoreState extends State<CreateStore> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(" Store created successfully "),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        );
         log("✅ Store created successfully: ${response.data}");
+        SnackbarHelper.showMessage(
+          context,
+          message: "Store created successfully!",
+        );
       } else {
         log("❌ Store creation failed: ${response.statusCode}, ${response.data}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to create store: ${response.data}")),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Failed to create store: ${response.data}",
         );
       }
     } catch (e) {
       if (e is DioException && e.response != null) {
         log("❌ Dio error: ${e.response?.statusCode} - ${e.response?.data}");
+        SnackbarHelper.showMessage(
+          context,
+          message: "Error: ${e.response?.data}",
+        );
       } else {
         log("❌ Unexpected error: $e");
+        SnackbarHelper.showMessage(
+          context,
+          message: "Network error. Please try again. Error: $e",
+        );
       }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Network error. Please try again. Error: $e")),
-      );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

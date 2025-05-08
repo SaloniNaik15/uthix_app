@@ -13,6 +13,7 @@ import 'package:uthix_app/view/instructor_dashboard/Profile/profile_account.dart
 import 'package:uthix_app/view/instructor_dashboard/calender/calender.dart';
 import 'package:uthix_app/view/instructor_dashboard/files/files.dart';
 
+import '../../../modal/Snackbar.dart';
 import '../Profile/detail_profile.dart';
 import 'ClassData.dart';
 
@@ -124,18 +125,24 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
   // Create a new classroom by posting classroom_id and subject_id.
   Future<void> _createClass() async {
     if (selectedSubjectId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select a subject!")));
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Please select a subject',
+      );
       return;
     }
     if (selectedClassId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Please select a class!")));
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Please select a class',
+      );
       return;
     }
     if (token == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("User not logged in. Please log in.")));
+      SnackbarHelper.showMessage(
+        context,
+        message: 'User not logged in! Please login.',
+      );
       return;
     }
 
@@ -145,7 +152,7 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
     };
 
     try {
-      Response response = await _dio.post(
+      final response = await _dio.post(
         apiUrl,
         options: Options(
           headers: {
@@ -156,35 +163,49 @@ class _InstructorDashboardState extends State<InstructorDashboard> {
         ),
         data: requestData,
       );
-      final responseData = response.data;
+      final responseData = response.data as Map<String, dynamic>;
+
       if (response.statusCode == 201 && responseData["status"] == true) {
-        // Extract the classroom details from the response.
         final classroom = responseData["classroom"];
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("classroom_id", classroom["classroom_id"].toString());
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(responseData["message"])));
+        await prefs.setString(
+          "classroom_id",
+          classroom["classroom_id"].toString(),
+        );
+
+        SnackbarHelper.showMessage(
+          context,
+          message: responseData["message"],
+        );
+
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ClassData()),
+          MaterialPageRoute(builder: (_) => ClassData()),
         );
       } else {
         debugPrint("Failed: ${responseData["errors"]}");
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Failed")));
+        SnackbarHelper.showMessage(
+          context,
+          message: "Failed to create class.",
+        );
       }
     } catch (e) {
       if (e is DioException) {
         debugPrint("Dio Error Code: ${e.response?.statusCode}");
         debugPrint("Error Data: ${e.response?.data}");
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Error: ${e.response?.data}")));
+        SnackbarHelper.showMessage(
+          context,
+          message: "Error: ${e.response?.data}",
+        );
       } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Unexpected Error: ${e.toString()}")));
+        SnackbarHelper.showMessage(
+          context,
+          message: "Unexpected Error: ${e.toString()}",
+        );
       }
     }
   }
+
 
   // Navigation callback for bottom navbar.
   void onItemTapped(int index) {

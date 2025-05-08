@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../modal/Snackbar.dart';
+
 class HelpDesk extends StatefulWidget {
   const HelpDesk({super.key});
 
@@ -20,16 +22,11 @@ class _HelpdeskState extends State<HelpDesk> {
     final description = _descriptionController.text.trim();
 
     if (subject.isEmpty || description.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Please fill in all fields"),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Please fill on all details.",
       );
+
       return;
     }
 
@@ -59,41 +56,26 @@ class _HelpdeskState extends State<HelpDesk> {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Query submitted successfully!"),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Query Submitted Succesfully!",
         );
+
         _subjectController.clear();
         _descriptionController.clear();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error: ${response.statusMessage}"),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Error: ${response.statusMessage}",
         );
+
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Submission failed: $e"),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Submission failed: $e",
       );
+
     } finally {
       setState(() {
         isLoading = false;

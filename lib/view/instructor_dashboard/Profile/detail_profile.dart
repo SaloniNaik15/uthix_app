@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../modal/Snackbar.dart';
 import '../Dashboard/instructor_dashboard.dart';
 
 class DetailProfile extends StatefulWidget {
@@ -230,8 +231,9 @@ class _DetailProfileState extends State<DetailProfile> {
 
       if ((response.statusCode == 200 || response.statusCode == 201) &&
           response.data['status'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Profile submitted!")),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Profile submitted!',
         );
         setState(() {
           editable.updateAll((key, value) => false);

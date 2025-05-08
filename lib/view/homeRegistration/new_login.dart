@@ -8,6 +8,7 @@ import 'package:uthix_app/view/Student_Pages/HomePages/HomePage.dart';
 import 'package:uthix_app/view/homeRegistration/forgot1.dart';
 import 'package:uthix_app/view/homeRegistration/registration.dart';
 import 'package:uthix_app/view/instructor_dashboard/panding.dart';
+import '../../modal/Snackbar.dart';
 import '../Seller_dashboard/dashboard.dart';
 import '../Student_Pages/Student Account Details/Student_Profile.dart';
 import '../instructor_dashboard/Profile/detail_profile.dart';
@@ -35,12 +36,11 @@ class _NewLoginState extends State<NewLogin> {
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter email and password"),
-          backgroundColor: Color(0xFF2B5C74),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Please enter email and password",
       );
+      return null;
     }
 
     try {
@@ -101,29 +101,25 @@ class _NewLoginState extends State<NewLogin> {
       }
 
       // Invalid credentials
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(loginData['message'] ?? "Invalid email or password"),
-          backgroundColor: const Color(0xFF2B5C74),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: loginData['message'] ?? "Invalid email or password",
       );
+      return null;
     } on DioException catch (dioError) {
-      // API or network error
       final msg = dioError.response?.data['message'] ??
           "Network error. Please try again.";
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(msg),
-          backgroundColor: const Color(0xFF2B5C74),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: msg,
       );
+      return null;
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Unexpected error: $e"),
-          backgroundColor: const Color(0xFF2B5C74),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Unexpected error: $e",
       );
+      return null;
     }
   }
 
