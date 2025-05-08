@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../modal/Snackbar.dart';
 import 'grade.dart';
 
 class AllSubmissionsScreen extends StatefulWidget {
@@ -202,8 +203,9 @@ class PdfTagButton extends StatelessWidget {
         if (await canLaunchUrl(uri)) {
           await launchUrl(uri, mode: LaunchMode.externalApplication);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not open file')),
+          SnackbarHelper.showMessage(
+            context,
+            message: 'Could not open file',
           );
         }
       },

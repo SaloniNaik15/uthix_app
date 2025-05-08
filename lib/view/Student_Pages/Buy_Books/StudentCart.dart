@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../modal/Snackbar.dart';
 import '../Student Account Details/Student_Add_Address.dart';
 import '../Student Account Details/Student_Address.dart';
 import 'AdressSelection.dart';
@@ -39,16 +40,10 @@ class _StudentcartState extends State<Studentcart> {
     String? token = prefs.getString('auth_token');
 
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("Authentication failed. Please login again.",
-                style: TextStyle(fontSize: 14)),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Authentication failed. Please login again.",
+        backgroundColor: const Color(0xFF2B5C74),
       );
       return;
     }
@@ -119,31 +114,19 @@ class _StudentcartState extends State<Studentcart> {
     const String orderApiUrl = "https://admin.uthix.com/api/orders";
 
     if (cartItems.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("⚠️ Cart is empty. Please add items to proceed.",
-                style: TextStyle(fontSize: 14)),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
+      SnackbarHelper.showMessage(
+        context,
+        message: "⚠️ Cart is empty. Please add items to proceed.",
+        backgroundColor: const Color(0xFF2B5C74),
       );
       return;
     }
 
     if (selectedAddressId == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("⚠️ Please select a valid delivery address.",
-                style: TextStyle(fontSize: 14)),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
+      SnackbarHelper.showMessage(
+        context,
+        message: "⚠️ Please select a valid delivery address.",
+        backgroundColor: const Color(0xFF2B5C74),
       );
       return;
     }
@@ -204,38 +187,25 @@ class _StudentcartState extends State<Studentcart> {
           );
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  "❌ Failed to place order: ${response.data['message'] ?? 'Unknown error'}",
-                  style: TextStyle(fontSize: 14)),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
+        SnackbarHelper.showMessage(
+          context,
+          message:
+          "❌ Failed to place order: ${response.data['message'] ?? 'Unknown error'}",
+          backgroundColor: const Color(0xFF2B5C74),
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("❌ Error placing order: ${e.toString()}",
-                style: TextStyle(fontSize: 14)),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
+      SnackbarHelper.showMessage(
+        context,
+        message: "❌ Error placing order: ${e.toString()}",
+        backgroundColor: const Color(0xFF2B5C74),
       );
     }
   }
 
   // Remove Item from Cart API Call
   void removeFromCart(int cartId) async {
-    final String apiUrl =
-        "https://admin.uthix.com/api/remove-from-cart/$cartId";
+    final String apiUrl = "https://admin.uthix.com/api/remove-from-cart/$cartId";
 
     try {
       final response = await dio.delete(
@@ -247,45 +217,24 @@ class _StudentcartState extends State<Studentcart> {
         setState(() {
           cartItems.removeWhere((item) => item["id"] == cartId);
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Item removed from cart!",
-              style: TextStyle(fontSize: 14),
-            ),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Item removed from cart!",
+          backgroundColor: const Color(0xFF2B5C74),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  "Failed to remove item: ${response.data['message']}",
-                  style: TextStyle(fontSize: 14)),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
+        SnackbarHelper.showMessage(
+          context,
+          message:
+          "Failed to remove item: ${response.data['message'] ?? 'Unknown error'}",
+          backgroundColor: const Color(0xFF2B5C74),
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content:
-                Text("Error: ${e.toString()}", style: TextStyle(fontSize: 14)),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Error: ${e.toString()}",
+        backgroundColor: const Color(0xFF2B5C74),
       );
     }
   }
@@ -295,19 +244,14 @@ class _StudentcartState extends State<Studentcart> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("Authentication failed. Please login again.",
-                style: TextStyle(fontSize: 14)),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Authentication failed. Please login again.",
+        backgroundColor: const Color(0xFF2B5C74),
       );
       return;
     }
+
     await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -325,7 +269,6 @@ class _StudentcartState extends State<Studentcart> {
             );
           },
           onChangeAddress: (address) {
-            // Store only the address_type
             String displayAddress = address['address_type'] ?? "Home";
 
             setState(() {
@@ -333,7 +276,6 @@ class _StudentcartState extends State<Studentcart> {
               selectedAddressId = address["id"];
             });
 
-            // Save selected address type persistently
             saveSelectedAddress(displayAddress, address["id"]);
 
             print("✅ Address Selected: $selectedAddress");

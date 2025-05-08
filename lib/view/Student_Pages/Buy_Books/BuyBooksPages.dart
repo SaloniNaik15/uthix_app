@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../modal/Snackbar.dart';
 import 'BookDetails.dart';
 import 'StudentCart.dart';
 import 'StudentSearch.dart';
@@ -41,8 +42,9 @@ class _BuybookspagesState extends State<Buybookspages> {
     if (authToken != null) {
       fetchProducts(widget.categoryId);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User not authenticated. Please login.")),
+      SnackbarHelper.showMessage(
+        context,
+        message: 'User not authenticated. Please login.',
       );
     }
   }
@@ -83,9 +85,9 @@ class _BuybookspagesState extends State<Buybookspages> {
   Future<void> addToCart(
       BuildContext context, Map<String, dynamic> product, int quantity) async {
     if (authToken == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("Authentication failed. Please login again.")),
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Authentication failed. Please login again.',
       );
       return;
     }
@@ -111,29 +113,21 @@ class _BuybookspagesState extends State<Buybookspages> {
       );
 
       if (response.statusCode == 201 && response.data["status"] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text("Product added to cart"),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Product added to cart',
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                "Failed to add to cart: ${response.data['message'] ?? 'Unknown error'}"),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Failed to add to cart: ${response.data['message'] ?? 'Unknown error'}',
         );
       }
     } catch (e) {
       print("API Exception: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong: ${e.toString()}")),
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Something went wrong: ${e.toString()}',
       );
     }
   }
@@ -327,16 +321,9 @@ class _BookItemsListState extends State<BookItemsList> {
     String? token = prefs.getString('auth_token');
 
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text("Authentication failed. Please login again."),
-          duration: const Duration(seconds: 1),
-          backgroundColor: const Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Authentication failed. Please login again.',
       );
       return;
     }
@@ -375,38 +362,29 @@ class _BookItemsListState extends State<BookItemsList> {
           }
         });
         await updateWishlist();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(isInWishlist
-                ? "Book removed from wishlist!"
-                : "Book added to wishlist!"),
-            backgroundColor: isInWishlist
-                ? const Color(0xFF2B5C74)
-                : const Color(0xFF2B5C50),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: isInWishlist
+              ? "Book removed from wishlist!"
+              : "Book added to wishlist!",
+          backgroundColor: isInWishlist
+              ? const Color(0xFF2B5C74)
+              : const Color(0xFF2B5C50),
         );
       } else if (response.statusCode == 401) {
         print("⛔ Unauthorized: Token is invalid or expired.");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text("Session expired. Please log in again."),
-            duration: const Duration(seconds: 1),
-            backgroundColor: const Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Session expired. Please log in again.',
         );
       } else {
         throw Exception(
             "Failed to update wishlist. Response: ${response.data}");
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text("Error: ${e.toString()}"),
-            backgroundColor: Colors.red),
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Error: ${e.toString()}',
       );
     }
   }
@@ -589,18 +567,9 @@ class _BookItemsListState extends State<BookItemsList> {
                               if (book.isNotEmpty) {
                                 await widget.addToCart(context, book, quantity);
                               } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text("Book data is missing!"),
-                                    duration: const Duration(seconds: 1),
-                                    backgroundColor: Color(0xFF2B5C74),
-                                    behavior: SnackBarBehavior.floating,
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 10),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                  ),
+                                SnackbarHelper.showMessage(
+                                  context,
+                                  message: 'Book data is missing!',
                                 );
                               }
                             },

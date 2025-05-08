@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import '../../../modal/Snackbar.dart';
 import '../../homeRegistration/new_login.dart';
 import 'BookDetails.dart';
 import 'StudentCart.dart';
@@ -17,7 +18,13 @@ class Wishlist extends StatefulWidget {
 
 class _WishlistState extends State<Wishlist> {
   int selectedIndex = 0;
-  final List<String> filters = ['All', 'Oldest', 'Science', 'Maths', 'Practical'];
+  final List<String> filters = [
+    'All',
+    'Oldest',
+    'Science',
+    'Maths',
+    'Practical'
+  ];
   String? authToken;
   List<Map<String, dynamic>> books = [];
   bool isLoading = true;
@@ -39,12 +46,16 @@ class _WishlistState extends State<Wishlist> {
   Future<void> loadAuthToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
+
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Authentication failed. Please login again.")),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Authentication failed. Please login again.",
+        backgroundColor: const Color(0xFF2B5C74),
       );
       return;
     }
+
     setState(() {
       authToken = token;
     });
@@ -101,9 +112,12 @@ class _WishlistState extends State<Wishlist> {
     await prefs.remove('auth_token');
     await prefs.remove('user_role');
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Session expired. Please log in again.")),
+    SnackbarHelper.showMessage(
+      context,
+      message: "Session expired. Please log in again.",
+      backgroundColor: const Color(0xFF2B5C74),
     );
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => NewLogin()),
@@ -111,20 +125,26 @@ class _WishlistState extends State<Wishlist> {
   }
 
   /// Add the selected book to cart using the API.
-  Future<void> addToCart(BuildContext context, Map<String, dynamic> product, int quantity) async {
+  Future<void> addToCart(
+      BuildContext context, Map<String, dynamic> product, int quantity) async {
     if (authToken == null || authToken!.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Authentication failed. Please login again.")),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Authentication failed. Please login again.",
+        backgroundColor: const Color(0xFF2B5C74),
       );
       return;
     }
+
     const String apiUrl = "https://admin.uthix.com/api/add-to-cart";
+
     try {
       final requestData = {
         "product_id": product["id"],
         "quantity": quantity,
         "price": product["price"],
       };
+
       final response = await _dio.post(
         apiUrl,
         options: Options(
@@ -135,19 +155,27 @@ class _WishlistState extends State<Wishlist> {
         ),
         data: requestData,
       );
+
       if (response.statusCode == 201 && response.data["status"] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Product added to cart!")),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Product added to cart!",
+          backgroundColor: const Color(0xFF2B5C74),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to add to cart: ${response.data['message'] ?? 'Unknown error'}")),
+        SnackbarHelper.showMessage(
+          context,
+          message:
+              "Failed to add to cart: ${response.data['message'] ?? 'Unknown error'}",
+          backgroundColor: const Color(0xFF2B5C74),
         );
       }
     } catch (e) {
       print("API Exception: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Something went wrong: ${e.toString()}")),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Something went wrong: ${e.toString()}",
+        backgroundColor: const Color(0xFF2B5C74),
       );
     }
   }
@@ -159,20 +187,24 @@ class _WishlistState extends State<Wishlist> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: const Color(0xFF605F5F), size: 25),
+          icon: Icon(Icons.arrow_back_ios,
+              color: const Color(0xFF605F5F), size: 25),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           "Wishlist",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(
+              fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.shopping_bag_outlined, color: Colors.black, size: 25),
+            icon: const Icon(Icons.shopping_bag_outlined,
+                color: Colors.black, size: 25),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Studentcart(cartItems: [])),
+                MaterialPageRoute(
+                    builder: (context) => Studentcart(cartItems: [])),
               );
             },
           ),
@@ -200,12 +232,15 @@ class _WishlistState extends State<Wishlist> {
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(20.r),
-                      color: selectedIndex == index ? const Color(0xFF2B5C74) : Colors.transparent,
+                      color: selectedIndex == index
+                          ? const Color(0xFF2B5C74)
+                          : Colors.transparent,
                     ),
                     child: Text(
                       filters[index],
                       style: TextStyle(
-                        color: selectedIndex == index ? Colors.white : Colors.grey,
+                        color:
+                            selectedIndex == index ? Colors.white : Colors.grey,
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
@@ -226,41 +261,41 @@ class _WishlistState extends State<Wishlist> {
   Widget buildBookGrid() {
     return isLoading
         ? const Center(
-      child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
-      ),
-    )
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+            ),
+          )
         : books.isEmpty
-        ? const Center(child: Text("No books found in wishlist"))
-        : Padding(
-      padding: EdgeInsets.all(20.w),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 20.w,
-          mainAxisSpacing: 10.h,
-          childAspectRatio: 0.6,
-        ),
-        itemCount: books.length,
-        itemBuilder: (context, index) {
-          final book = books[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      Bookdetails(productId: book['id']),
+            ? const Center(child: Text("No books found in wishlist"))
+            : Padding(
+                padding: EdgeInsets.all(20.w),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 20.w,
+                    mainAxisSpacing: 10.h,
+                    childAspectRatio: 0.6,
+                  ),
+                  itemCount: books.length,
+                  itemBuilder: (context, index) {
+                    final book = books[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                Bookdetails(productId: book['id']),
+                          ),
+                        );
+                      },
+                      child: buildBookItem(book),
+                    );
+                  },
                 ),
               );
-            },
-            child: buildBookItem(book),
-          );
-        },
-      ),
-    );
   }
 
   Widget buildBookItem(Map<String, dynamic> book) {
@@ -281,15 +316,18 @@ class _WishlistState extends State<Wishlist> {
                   height: 150.h,
                   width: double.infinity,
                   color: Colors.grey.shade300,
-                  child: const Center(child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
+                  child: const Center(
+                      child: CircularProgressIndicator(
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(Color(0xFF2B5C74)),
                   )),
                 ),
                 errorWidget: (context, url, error) => Container(
                   height: 150.h,
                   width: double.infinity,
                   color: Colors.grey,
-                  child: Icon(Icons.image_not_supported, size: 100.sp, color: Colors.white),
+                  child: Icon(Icons.image_not_supported,
+                      size: 100.sp, color: Colors.white),
                 ),
               ),
             ),
@@ -350,7 +388,8 @@ class _WishlistState extends State<Wishlist> {
           onPressed: () {
             addToCart(context, book, 1);
           },
-          icon: Icon(Icons.shopping_bag_outlined, size: 16.sp, color: Colors.black),
+          icon: Icon(Icons.shopping_bag_outlined,
+              size: 16.sp, color: Colors.black),
           label: Text('Move to Bag',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           style: OutlinedButton.styleFrom(
