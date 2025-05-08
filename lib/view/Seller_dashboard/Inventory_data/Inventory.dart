@@ -204,7 +204,7 @@ class BookList extends StatelessWidget {
     String? imageUrl;
     if (product['images'] != null && product['images'].isNotEmpty) {
       imageUrl =
-          'https://admin.uthix.com/storage/image/products/${product['images'][0]['image_path']}';
+      'https://admin.uthix.com/storage/image/products/${product['images'][0]['image_path']}';
     }
 
     return GestureDetector(
@@ -221,7 +221,7 @@ class BookList extends StatelessWidget {
               padding: EdgeInsets.all(5.w),
               decoration: BoxDecoration(
                 border:
-                    Border.all(color: Colors.grey.withOpacity(0.5), width: 2.w),
+                Border.all(color: Colors.grey.withOpacity(0.5), width: 2.w),
                 borderRadius: BorderRadius.circular(10.r),
                 color: Colors.white,
                 boxShadow: [
@@ -236,13 +236,13 @@ class BookList extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.r),
                 child: imageUrl != null
                     ? Image.network(
-                        imageUrl,
-                        fit: BoxFit
-                            .cover, // Ensures the image fills the container
-                      )
+                  imageUrl,
+                  fit: BoxFit
+                      .cover, // Ensures the image fills the container
+                )
                     : Container(
-                        color: Colors.grey[200],
-                      ),
+                  color: Colors.grey[200],
+                ),
               ),
             ),
             Padding(

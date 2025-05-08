@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Seller_dashboard/Orders_Data/MyOrders.dart';
+import '../../modal/Snackbar.dart';
 import 'Create_Store_Data/CreateStore.dart';
 import 'Inventory_data/Inventory.dart';
 import 'Manage_store_Data/ManageStores.dart';
@@ -177,18 +178,11 @@ class _SellerDashboardState extends State<SellerDashboard> {
         if (data["status"] == true) {
           // Store already exists
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text("Store Already Created"),
-                duration: const Duration(seconds: 1),
-                backgroundColor: Color(0xFF2B5C74),
-                behavior: SnackBarBehavior.floating,
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-              ),
+            SnackbarHelper.showMessage(
+              context,
+              message: "Store Already Created",
             );
+
           }
         } else {
           // Store doesn't exist, navigate to CreateStore
@@ -255,18 +249,11 @@ class _SellerDashboardState extends State<SellerDashboard> {
         } else {
           // ❌ Store doesn't exist — show snackbar
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text("Please create your store first."),
-                duration: const Duration(seconds: 1),
-                backgroundColor: Color(0xFF2B5C74),
-                behavior: SnackBarBehavior.floating,
-                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
+            SnackbarHelper.showMessage(
+              context,
+              message: "Please create your store first.",
             );
+
           }
         }
       } else {
@@ -449,9 +436,11 @@ class _SellerDashboardState extends State<SellerDashboard> {
     final parentContext = context;
 
     if (categories.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No categories available")),
+      SnackbarHelper.showMessage(
+        context,
+        message: "No categories available!",
       );
+
       return;
     }
 

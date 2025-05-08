@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../modal/Snackbar.dart';
+
 class Newclass extends StatefulWidget {
   final String classroomId;
 
@@ -51,24 +53,25 @@ class _NewclassState extends State<Newclass> {
     if (titleController.text.trim().isEmpty ||
         _selectdate == null ||
         _selectTime == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill all required fields.")),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Please fill all required fields.",
       );
       return;
     }
 
-    final Map<String, dynamic> requestData = {
+    final requestData = {
       "title": titleController.text.trim(),
       "date": DateFormat('yyyy-MM-dd').format(_selectdate!),
       "time":
-          "${_selectTime!.hour.toString().padLeft(2, '0')}:${_selectTime!.minute.toString().padLeft(2, '0')}:00",
+      "${_selectTime!.hour.toString().padLeft(2, '0')}:${_selectTime!.minute.toString().padLeft(2, '0')}:00",
       "timezone": "IST",
       "description": descriptionController.text.trim(),
     };
 
     debugPrint("Request Data: ${jsonEncode(requestData)}");
 
-    final String endpoint =
+    final endpoint =
         "https://admin.uthix.com/api/class-chapter/${widget.classroomId}";
 
     try {
@@ -86,38 +89,42 @@ class _NewclassState extends State<Newclass> {
       debugPrint("Response Code: ${response.statusCode}");
       debugPrint("Response Data: ${response.data}");
 
-      if (response.statusCode == 201 && response.data["status"]) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Chapter created successfully!")),
+      if (response.statusCode == 201 && response.data["status"] == true) {
+        SnackbarHelper.showMessage(
+          context,
+          message: "Chapter created successfully!",
         );
-        // Clear input fields after successful creation.
+        // Clear inputs
         titleController.clear();
         descriptionController.clear();
         setState(() {
           _selectdate = null;
           _selectTime = null;
         });
-        // After creating a chapter, re-fetch the list of chapters.
         _fetchChapters();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Failed to create chapter.")),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Failed to create chapter.",
         );
       }
     } catch (e) {
       if (e is DioException) {
         debugPrint("Dio Error Code: ${e.response?.statusCode}");
         debugPrint("Dio Response Data: ${e.response?.data}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${e.response?.data}")),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Error: ${e.response?.data}",
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Unexpected Error: ${e.toString()}")),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Unexpected Error: ${e.toString()}",
         );
       }
     }
   }
+
 
   // Fetch chapters for this classroom using the classroomId.
   Future<void> _fetchChapters() async {

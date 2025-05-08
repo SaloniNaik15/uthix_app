@@ -26,6 +26,9 @@ class Viewdetails extends StatefulWidget {
 }
 
 class _ViewdetailsState extends State<Viewdetails> {
+  late PageController _pageController;
+  int _currentPage = 0;
+
   String? accessToken;
   late Map<String, dynamic> productDetails;
   List<String> allImageUrls = [];
@@ -43,7 +46,9 @@ class _ViewdetailsState extends State<Viewdetails> {
   void initState() {
     super.initState();
     productDetails = widget.product;
-    _initializeData(); // Call the async function
+    _pageController = PageController();
+    _initializeData();
+
   }
 
   Future<void> _initializeData() async {
@@ -51,6 +56,13 @@ class _ViewdetailsState extends State<Viewdetails> {
     await fetchReviewAndRating();
     await fetchProducts();
   }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
 
   Future<void> fetchReviewAndRating() async {
     final String url =
@@ -112,55 +124,55 @@ class _ViewdetailsState extends State<Viewdetails> {
   }
 
   Future<void> fetchProducts() async {
-    const String url = 'https://admin.uthix.com/api/get/vendor/products';
+    if (productDetails == null) return;
+
+    final productId = productDetails['id'];
+    const baseUrl = 'https://admin.uthix.com/api/get/vendor/products';
 
     try {
       final response = await dio.get(
-        url,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $accessToken',
-            'Accept': 'application/json',
-          },
-        ),
+        baseUrl,
+        options: Options(headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Accept': 'application/json',
+        }),
       );
 
       if (response.statusCode == 200) {
-        var jsonResponse = response.data;
+        final List<dynamic> fetchedProducts = response.data['products'];
 
-        log("✅ Saloniiii  Full API Response: ${jsonEncode(jsonResponse)}");
+        // find only the one product matching our ID
+        final matched = fetchedProducts.firstWhere(
+              (p) => p['id'] == productId,
+          orElse: () => null,
+        );
 
-        List<dynamic> fetchedProducts = jsonResponse['products'];
+        if (matched != null) {
+          final images = matched['images'] as List<dynamic>;
+          final imageUrls = images.map((img) {
+            return 'https://admin.uthix.com/storage/image/products/${img['image_path']}';
+          }).toList();
 
-        // Extract all image URLs from all products
-        List<String> imageUrls = [];
-
-        for (var product in fetchedProducts) {
-          if (product['images'] != null && product['images'].isNotEmpty) {
-            for (var image in product['images']) {
-              final imageUrl =
-                  'https://admin.uthix.com/storage/image/products/${image['image_path']}';
-              imageUrls.add(imageUrl);
-            }
-          }
+          setState(() {
+            allImageUrls = imageUrls;
+          });
+        } else {
+          log('⚠️ No product found with ID $productId');
         }
-
-        log("✅ Total images fetched: ${imageUrls.length}");
-
-        setState(() {
-          allImageUrls = imageUrls;
-        });
       } else {
-        log("❌ Failed to fetch products: ${response.statusCode}");
-        log("❌ Response body: ${response.data}");
+        log('❌ Failed to fetch products: ${response.statusCode}');
       }
     } catch (e) {
-      log("❌ Error fetching products: $e");
+      log('❌ Error fetching products: $e');
+
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemWidth = screenWidth * 0.7;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -181,61 +193,51 @@ class _ViewdetailsState extends State<Viewdetails> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
+                  // 1) PageView for images:
                   SizedBox(
                     height: 300,
-                    child: GridView.builder(
-                      scrollDirection: Axis.horizontal,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 1, // square container (1:1 ratio)
-                      ),
+                    child: PageView.builder(
+                      controller: _pageController,
                       itemCount: allImageUrls.length,
-                      itemBuilder: (context, index) {
-                        return Stack(
-                          children: [
-                            Container(
-                              height: 140, // fixed height
-                              width: 140, // fixed width
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: Colors.grey[200],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  allImageUrls[index],
-                                  fit: BoxFit
-                                      .contain, // scales proportionally, no cropping
-                                ),
-                              ),
+                      onPageChanged: (idx) {
+                        setState(() => _currentPage = idx);
+                      },
+                      itemBuilder: (_, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              allImageUrls[index],
+                              width: itemWidth,
+                              height: 280,
+                              fit: BoxFit.cover,
                             ),
-                            Positioned(
-                              top: 6,
-                              right: 6,
-                              child: GestureDetector(
-                                onTap: () {
-                                  print('Remove image at index $index');
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.8),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.close,
-                                    size: 18,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         );
                       },
                     ),
+                  ),
+
+                  // 2) Dot indicator:
+                  const SizedBox(height: 15),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(allImageUrls.length, (i) {
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                        width: _currentPage == i ? 12 : 8,
+                        height: _currentPage == i ? 12 : 8,
+                        decoration: BoxDecoration(
+                          color: _currentPage == i
+                              ? const Color(0xFF2B5C74)
+                              : Colors.grey[400],
+                          shape: BoxShape.circle,
+                        ),
+                      );
+                    }),
                   ),
 
                   const SizedBox(height: 20),
@@ -247,6 +249,7 @@ class _ViewdetailsState extends State<Viewdetails> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+
 
                   SizedBox(
                     height: 10,
@@ -314,7 +317,8 @@ class _ViewdetailsState extends State<Viewdetails> {
                             vertical: 8), // Padding for spacing
                         child: Row(
                           mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween, // Center content
+                          MainAxisAlignment.spaceBetween, // Center content
+
                           children: [
                             Text(
                               productDetails['author'],
@@ -653,7 +657,8 @@ Widget CustomerReview() {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => Customerreviews()),
+                            builder: (context) => Customerreviews(reviews: [],)),
+
                       );
                     },
                     child: Text(
