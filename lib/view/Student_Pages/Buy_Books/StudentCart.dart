@@ -190,7 +190,7 @@ class _StudentcartState extends State<Studentcart> {
         SnackbarHelper.showMessage(
           context,
           message:
-              "❌ Failed to place order: ${response.data['message'] ?? 'Unknown error'}",
+          "❌ Failed to place order: ${response.data['message'] ?? 'Unknown error'}",
           backgroundColor: const Color(0xFF2B5C74),
         );
       }
@@ -205,8 +205,7 @@ class _StudentcartState extends State<Studentcart> {
 
   // Remove Item from Cart API Call
   void removeFromCart(int cartId) async {
-    final String apiUrl =
-        "https://admin.uthix.com/api/remove-from-cart/$cartId";
+    final String apiUrl = "https://admin.uthix.com/api/remove-from-cart/$cartId";
 
     try {
       final response = await dio.delete(
@@ -227,7 +226,7 @@ class _StudentcartState extends State<Studentcart> {
         SnackbarHelper.showMessage(
           context,
           message:
-              "Failed to remove item: ${response.data['message'] ?? 'Unknown error'}",
+          "Failed to remove item: ${response.data['message'] ?? 'Unknown error'}",
           backgroundColor: const Color(0xFF2B5C74),
         );
       }
