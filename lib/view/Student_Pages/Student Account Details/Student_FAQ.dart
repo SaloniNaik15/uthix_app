@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../modal/Snackbar.dart';
+
 class StudentFaq extends StatefulWidget {
   const StudentFaq({super.key});
 
@@ -27,8 +29,9 @@ class _StudentFaqState extends State<StudentFaq> {
       final token = prefs.getString('auth_token');
 
       if (token == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Auth token not found. Please login.")),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Authentication failed. Please log in again.',
         );
         return;
       }
@@ -59,8 +62,9 @@ class _StudentFaqState extends State<StudentFaq> {
       setState(() {
         isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error fetching FAQs: $e")),
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Error fetching FAQs: $e',
       );
     }
   }

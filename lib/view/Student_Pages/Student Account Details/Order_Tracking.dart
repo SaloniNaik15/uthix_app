@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/UpcomingPage.dart';
+import '../../../modal/Snackbar.dart';
 import 'Order_Processing.dart';
 
 class OrdersTrackingPage extends StatefulWidget {
@@ -33,9 +34,9 @@ class _OrdersTrackingPageState extends State<OrdersTrackingPage> {
     String? token = prefs.getString('auth_token');
 
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("Authentication failed. Please log in again.")),
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Authentication failed. Please log in again.',
       );
       return;
     }

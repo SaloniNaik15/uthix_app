@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../modal/Snackbar.dart';
+
 class OrderProcessing extends StatefulWidget {
   final int orderId;
 
@@ -37,16 +39,9 @@ class _OrderProcessingState extends State<OrderProcessing> {
       String? token = prefs.getString('auth_token');
 
       if (token == null || token.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Authentication failed. Please log in again."),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Authentication failed. Please log in again.',
         );
         setState(() {
           hasError = true;

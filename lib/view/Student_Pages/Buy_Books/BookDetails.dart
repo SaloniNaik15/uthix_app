@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../modal/Snackbar.dart';
 import 'CustomerPhotosPage.dart';
 import 'CustomerReviewPage.dart';
 import 'Wishlist.dart';
@@ -23,12 +24,27 @@ class _BookdetailsState extends State<Bookdetails> {
   final Dio _dio = Dio();
   Map<String, dynamic>? _productData; // Save product details
   bool _isWishlisted = false; // Wishlist state (unused in bottom nav now)
+  PageController _pageController = PageController(viewportFraction: 0.7);
+  int _currentPage = 0;
 
   @override
   void initState() {
     super.initState();
     productFuture = fetchProduct();
     loadWishlistStatus();
+    _pageController.addListener(() {
+      int next = _pageController.page!.round();
+      if (_currentPage != next) {
+        setState(() {
+          _currentPage = next;
+        });
+      }
+    });
+  }
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   /// Helper function to create AppBar icon buttons.
@@ -80,9 +96,9 @@ class _BookdetailsState extends State<Bookdetails> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("Please login to add product to wishlist.")),
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Please login to add product to wishlist.',
       );
       return;
     }
@@ -125,21 +141,23 @@ class _BookdetailsState extends State<Bookdetails> {
         setState(() {
           _isWishlisted = true;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Product added to wishlist!")),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Product added to wishlist!',
         );
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => const Wishlist()));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  "Failed to add to wishlist: ${response.data["message"]}")),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Failed to add to wishlist: ${response.data["message"]}',
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error adding to wishlist: $e")));
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Error adding to wishlist: $e',
+      );
     }
   }
 
@@ -147,9 +165,9 @@ class _BookdetailsState extends State<Bookdetails> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("Please login to remove product from wishlist.")),
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Please login to remove product from wishlist.',
       );
       return;
     }
@@ -168,19 +186,21 @@ class _BookdetailsState extends State<Bookdetails> {
         setState(() {
           _isWishlisted = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Product removed from wishlist.")),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Product removed from wishlist.',
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  "Failed to remove from wishlist: ${response.data["message"]}")),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Failed to remove from wishlist: ${response.data["message"]}',
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error removing from wishlist: $e")));
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Error removing from wishlist: $e',
+      );
     }
   }
 
@@ -189,8 +209,10 @@ class _BookdetailsState extends State<Bookdetails> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text("Please login to add product to cart.")));
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Please login to add product to cart.',
+      );
       return;
     }
     final product = _productData;
@@ -217,34 +239,21 @@ class _BookdetailsState extends State<Bookdetails> {
       );
       if ((response.statusCode == 200 || response.statusCode == 201) &&
           response.data["status"] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text("Product added to cart!"),
-            duration: const Duration(seconds: 1),
-            backgroundColor: const Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Product added to cart!',
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                "Failed to add to cart: ${response.data["message"] ?? "Unknown error"}"),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'Failed to add to cart: ${response.data["message"] ?? "Unknown error"}',
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("Error adding to cart: $e")));
+      SnackbarHelper.showMessage(
+        context,
+        message: '"Error adding to cart: $e"',
+      );
     }
   }
 
@@ -312,32 +321,51 @@ class _BookdetailsState extends State<Bookdetails> {
                   children: [
                     // Image Carousel.
                     SizedBox(
-                      height: 200.h,
-                      child: GridView.builder(
-                        scrollDirection: Axis.horizontal,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 1,
-                          crossAxisSpacing: 20.w,
-                          mainAxisSpacing: 10.h,
-                          childAspectRatio: 0.55,
-                        ),
-                        itemCount: images.length,
-                        itemBuilder: (context, index) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(10.r),
-                            child: Center(
-                              child: Image.network(
-                                images[index],
-                                fit: BoxFit.cover,
-                                alignment: Alignment.center,
-                                width: 0.5.sw,
-                                height: 200.h,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Icon(Icons.broken_image, size: 50.sp),
-                              ),
+                      height: 220.h,
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 200.h,
+                            child: PageView.builder(
+                              controller: _pageController,
+                              itemCount: images.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 8.w),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10.r),
+                                    child: Image.network(
+                                      images[index],
+                                      fit: BoxFit.cover,
+                                      width: 0.6.sw,
+                                      height: 200.h,
+                                      errorBuilder: (context, error, stackTrace) =>
+                                          Icon(Icons.broken_image, size: 50.sp),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
+                          ),
+                          SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(images.length, (index) {
+                              return AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                width: _currentPage == index ? 12.w : 8.w,
+                                height: 8.h,
+                                decoration: BoxDecoration(
+                                  color: _currentPage == index
+                                      ? const Color(0xFF2B5C74)
+                                      : Colors.grey,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              );
+                            }),
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(height: 15.h),

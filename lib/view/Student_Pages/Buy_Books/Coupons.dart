@@ -3,8 +3,11 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../modal/Snackbar.dart';
 
 class CouponsScreen extends StatefulWidget {
   const CouponsScreen({super.key});
@@ -129,8 +132,8 @@ class _CouponsScreenState extends State<CouponsScreen> {
               ),
             ),
             Positioned(
-              top: 40.h,
-              right: -10.w,
+              top: 40,
+              right: -10,
               child: Image.asset(
                 'assets/Student_Home_icons/student_cupon.png',
                 width: 90.w,
@@ -149,7 +152,8 @@ class _CouponsScreenState extends State<CouponsScreen> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Container(
-                height: 60.h,
+                width: MediaQuery.sizeOf(context).width,
+                height: 60,
                 color: Colors.white,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -218,7 +222,7 @@ class CouponCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Colors.white,
-      margin: EdgeInsets.all(8.w),
+      margin: EdgeInsets.all(8),
       elevation: 2,
       child: Padding(
         padding: EdgeInsets.all(15.w),
@@ -229,19 +233,19 @@ class CouponCard extends StatelessWidget {
               ClipRRect(
                 child: Image.asset(
                   "assets/Student_Home_icons/couponBook.png",
-                  width: 100.w,
-                  height: 100.h,
+                  width: 100,
+                  height: 100,
                   fit: BoxFit.cover,
                 ),
               ),
 
-              SizedBox(width: 10.w),
+              SizedBox(width: 10),
                DottedDividerWithIcon(
-                height: 50,
+                height: 30,
 
                 color: Colors.grey,
               ),
-              SizedBox(width: 10.w),
+              SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,8 +268,21 @@ class CouponCard extends StatelessWidget {
                           ),
                         ),
                         IconButton(
-                          onPressed: () {
-                            // You could implement copying the code to clipboard
+                          onPressed: () async {
+                            try {
+                              await Clipboard.setData(ClipboardData(text: coupon["code"] ?? ""));
+                              SnackbarHelper.showMessage(
+                                context,
+                                message: "Coupon code copied to clipboard!",
+                                backgroundColor: const Color(0xFF2B5C74),
+                              );
+                            } catch (e) {
+                              SnackbarHelper.showMessage(
+                                context,
+                                message: "Error copying coupon code.",
+                                backgroundColor: Colors.redAccent,
+                              );
+                            }
                           },
                           icon: Icon(
                             Icons.copy,
@@ -315,32 +332,37 @@ class DottedDividerWithIcon extends StatelessWidget {
   final Color color;
   final IconData icon;
 
-   DottedDividerWithIcon({
+  const DottedDividerWithIcon({
     super.key,
     this.height = 50,
     this.color = Colors.grey,
-    this.icon = CupertinoIcons.scissors_alt,
+    this.icon = Icons.content_cut, // Material scissors icon
   });
 
   @override
   Widget build(BuildContext context) {
-    // We create a simple dotted line with a scissors icon in the middle
+    int dotCount = (height ~/ 2.5);
+    int half = dotCount ~/ 2;
+
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < half; i++)
           Container(
-            width: 2.w,
-            height: 5.h,
-            margin: EdgeInsets.symmetric(vertical: 2),
+            width: 2,
+            height: 5,
+            margin: const EdgeInsets.symmetric(vertical: 1),
             color: color,
           ),
-        Icon(icon, color: color, size: 20),
-        for (int i = 0; i < 8; i++)
+        Transform.rotate(
+          angle: 1.55, // Rotate 180 degrees (π radians)
+          child: Icon(icon, size: 18, color: color),
+        ),
+        for (int i = 0; i < half; i++)
           Container(
-            width: 2.w,
-            height: 5.h,
-            margin: EdgeInsets.symmetric(vertical: 2),
+            width: 2,
+            height: 5,
+            margin: const EdgeInsets.symmetric(vertical: 1),
             color: color,
           ),
       ],
