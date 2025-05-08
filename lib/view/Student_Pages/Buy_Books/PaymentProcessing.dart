@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import '../../../UpcomingPage.dart';
+import '../../../modal/Snackbar.dart';
 import 'OrderConfirmed.dart';
 import 'CardDetails.dart';
 
@@ -76,82 +77,72 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) async {
-    print(
-        "Payment failed with code: ${response.code}, message: ${response.message}");
-    // Update payment status as failed if Razorpay reports an error.
+    print("Payment failed with code: ${response.code}, message: ${response.message}");
     await _updatePaymentStatus("failed", response.code.toString());
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Payment failed: ${response.message}"),
-        duration: const Duration(seconds: 3),
-        backgroundColor: Color(0xFF2B5C74),
-        behavior: SnackBarBehavior.floating,
-        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
+
+    SnackbarHelper.showMessage(
+      context,
+      message: "Payment failed: ${response.message}",
+      backgroundColor: const Color(0xFF2B5C74),
     );
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
     print("External wallet selected: ${response.walletName}");
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("External Wallet: ${response.walletName}")),
+
+    SnackbarHelper.showMessage(
+      context,
+      message: "External Wallet: ${response.walletName}",
     );
   }
 
-  // This method posts the payment status update to your API.
   Future<void> _updatePaymentStatus(String status, String transactionId) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? token =
-          prefs.getString('auth_token'); // Retrieve token dynamically
+      String? token = prefs.getString('auth_token');
 
       if (token == null || token.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text("Authentication failed. Please log in again.")),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Authentication failed. Please log in again.",
         );
         return;
       }
 
-      print(
-          "Updating payment status: status=$status, transactionId=$transactionId, orderId=${widget.orderId}");
+      print("Updating payment status: status=$status, transactionId=$transactionId, orderId=${widget.orderId}");
 
-      final response = await http
-          .post(
+      final response = await http.post(
         Uri.parse('https://admin.uthix.com/api/update-payment-status'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Dynamic Token
+          'Authorization': 'Bearer $token',
         },
         body: jsonEncode({
           'order_id': widget.orderId,
           'status': status,
           'transaction_id': transactionId,
         }),
-      )
-          .timeout(
+      ).timeout(
         const Duration(seconds: 5),
         onTimeout: () {
-          throw Exception(
-              "Connection timed out while updating payment status.");
+          throw Exception("Connection timed out while updating payment status.");
         },
       );
 
       print("Update Payment Status Response: ${response.body}");
       if (response.statusCode != 201) {
-        print(
-            "Error updating payment status. Status code: ${response.statusCode}");
+        print("Error updating payment status. Status code: ${response.statusCode}");
       }
     } catch (e) {
       print("Error updating payment status: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error updating payment: $e")),
+
+      SnackbarHelper.showMessage(
+        context,
+        message: "Error updating payment: $e",
       );
     }
   }
 
-  // This method creates the Razorpay order by calling your API and then opens the Razorpay checkout.
   Future<void> _startPayment() async {
     setState(() {
       isLoading = true;
@@ -162,28 +153,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
       String? token = prefs.getString('auth_token');
 
       if (token == null || token.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Authentication failed. Please log in again."),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Authentication failed. Please log in again.",
+          backgroundColor: const Color(0xFF2B5C74),
         );
         return;
       }
 
-      print(
-          "Starting payment request for order ID: ${widget.orderId}, amount: ${widget.totalPrice}");
+      print("Starting payment request for order ID: ${widget.orderId}, amount: ${widget.totalPrice}");
 
-      // If your backend expects the amount in rupees, use widget.totalPrice.
-      // If it expects paise then multiply it by 100.
       final requestPayload = {
         'order_id': widget.orderId,
-        'amount': widget.totalPrice, // or widget.totalPrice * 100
+        'amount': widget.totalPrice,
         'currency': 'INR',
         'payment_method': (paymentMethods[selectedPaymentIndex] == "Google Pay")
             ? "UPI"
@@ -192,20 +174,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
       print("Request Payload: $requestPayload");
 
-      final response = await http
-          .post(
+      final response = await http.post(
         Uri.parse('https://admin.uthix.com/api/create-payment'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
         body: jsonEncode(requestPayload),
-      )
-          .timeout(
+      ).timeout(
         const Duration(seconds: 5),
         onTimeout: () {
-          throw Exception(
-              "Connection timed out. Please check your internet connection and try again.");
+          throw Exception("Connection timed out. Please check your internet connection and try again.");
         },
       );
 
@@ -216,11 +195,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         final responseData = jsonDecode(response.body);
         if (responseData['status'] == true) {
           var options = {
-            'key':
-                'rzp_test_hZpYcGhumUM4Z2', // Replace with your actual Razorpay key
-            // Multiply by 100 if the backend returns rupees but Razorpay expects paise
-            'amount': responseData[
-                'amount'], // Consider: responseData['amount'] * 100,
+            'key': 'rzp_test_hZpYcGhumUM4Z2',
+            'amount': responseData['amount'],
             'currency': responseData['currency'],
             'name': 'BuyBooks',
             'description': 'Order Payment',
@@ -228,59 +204,42 @@ class _PaymentScreenState extends State<PaymentScreen> {
           };
 
           print("Opening Razorpay with options: $options");
+
           try {
             _razorpay.open(options);
           } catch (e) {
             print('Error opening Razorpay: $e');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("Error opening Razorpay: $e"),
-                duration: const Duration(seconds: 1),
-                backgroundColor: Color(0xFF2B5C74),
-                behavior: SnackBarBehavior.floating,
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-              ),
+
+            SnackbarHelper.showMessage(
+              context,
+              message: "Error opening Razorpay: $e",
+              backgroundColor: const Color(0xFF2B5C74),
             );
           }
         } else {
           print("Failed to create Razorpay order: ${responseData['message']}");
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  "Failed to create Razorpay order: ${responseData['message']}"),
-              duration: const Duration(seconds: 1),
-              backgroundColor: Color(0xFF2B5C74),
-              behavior: SnackBarBehavior.floating,
-              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
+
+          SnackbarHelper.showMessage(
+            context,
+            message: "Failed to create Razorpay order: ${responseData['message']}",
+            backgroundColor: const Color(0xFF2B5C74),
           );
         }
       } else if (response.statusCode == 401) {
         throw Exception("Authentication failed. Please check your API key.");
       } else if (response.statusCode == 400) {
         final errorData = jsonDecode(response.body);
-        throw Exception(
-            "Invalid request: ${errorData['message'] ?? 'Unknown error'}");
+        throw Exception("Invalid request: ${errorData['message'] ?? 'Unknown error'}");
       } else {
         throw Exception("Server returned status code: ${response.statusCode}");
       }
     } catch (e) {
       print("Payment request error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error connecting to payment server: $e"),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+
+      SnackbarHelper.showMessage(
+        context,
+        message: "Error connecting to payment server: $e",
+        backgroundColor: const Color(0xFF2B5C74),
       );
     } finally {
       setState(() {

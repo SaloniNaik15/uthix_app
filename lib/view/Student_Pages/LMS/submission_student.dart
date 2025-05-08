@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uthix_app/view/Student_Pages/LMS/live_student.dart';
-import 'package:uthix_app/view/Student_Pages/LMS/submission_student.dart'; // For navigation if needed
+import 'package:uthix_app/view/Student_Pages/LMS/submission_student.dart';
+
+import '../../../modal/Snackbar.dart'; // For navigation if needed
 
 // SubmissionStudent page that receives announcementId and chapterId.
 class SubmissionStudent extends StatefulWidget {
@@ -209,8 +211,9 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
 
   Future<void> _uploadAssignment() async {
     if (_selectedFilePath == null) {
-      ScaffoldMessenger.of(widget.parentContext).showSnackBar(
-        SnackBar(content: Text("Please choose a file to upload.")),
+      SnackbarHelper.showMessage(
+        context,
+        message: 'Please choose a file to upload.',
       );
       return;
     }
@@ -259,22 +262,25 @@ class _UploadBottomSheetState extends State<UploadBottomSheet> {
               .toLowerCase()
               .contains("successfully")) {
         // Show the success SnackBar on the parent's context.
-        ScaffoldMessenger.of(widget.parentContext).showSnackBar(
-          SnackBar(content: Text("File uploaded successfully")),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'File uploaded successfully',
         );
         // Close the bottom sheet.
         Navigator.pop(context);
         // Then, navigate back to the previous page.
         Navigator.pop(widget.parentContext);
       } else {
-        ScaffoldMessenger.of(widget.parentContext).showSnackBar(
-          SnackBar(content: Text("File upload failed")),
+        SnackbarHelper.showMessage(
+          context,
+          message: 'File upload failed',
         );
       }
     } catch (e) {
       log("Upload failed: $e");
-      ScaffoldMessenger.of(widget.parentContext).showSnackBar(
-        SnackBar(content: Text("File upload failed")),
+      SnackbarHelper.showMessage(
+        context,
+        message: 'File upload failed',
       );
     } finally {
       setState(() {

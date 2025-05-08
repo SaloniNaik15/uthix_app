@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../modal/Snackbar.dart';
 import '../../homeRegistration/new_login.dart';
 import 'Student_Add_Address.dart';
 
@@ -38,7 +39,11 @@ class _StudentAddressState extends State<StudentAddress> {
     if (_authToken != null) {
       await _fetchAddresses();
     } else {
-      _showSnackBar("Authentication failed. Please log in again.");
+      SnackbarHelper.showMessage(
+        context,
+        message: "Authentication failed. Please log in again.",
+        backgroundColor: const Color(0xFF2B5C74),
+      );
       handle401Error();
     }
   }
@@ -62,31 +67,28 @@ class _StudentAddressState extends State<StudentAddress> {
         });
       } else if (response.statusCode == 401) {
         log("⛔ Unauthorized: Token is invalid or expired.");
-        _showSnackBar("Session expired. Please log in again.");
+        SnackbarHelper.showMessage(
+          context,
+          message: "Session expired. Please log in again.",
+          backgroundColor: const Color(0xFF2B5C74),
+        );
         handle401Error();
       } else {
         log("⛔ Failed to fetch addresses: ${response.data}");
-        _showSnackBar("❌ Error fetching addresses: ${response.data.toString()}");
+        SnackbarHelper.showMessage(
+          context,
+          message: "❌ Error fetching addresses: ${response.data.toString()}",
+          backgroundColor: const Color(0xFF2B5C74),
+        );
       }
     } catch (e) {
       log("⛔ Error fetching addresses: $e");
-      _showSnackBar("❌ Network error. Please try again.");
-    }
-  }
-
-  void _showSnackBar(String message) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          duration: const Duration(seconds: 2),
-          backgroundColor: const Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: "❌ Network error. Please try again.",
+        backgroundColor: const Color(0xFF2B5C74),
       );
-    });
+    }
   }
 
   Future<void> handle401Error() async {

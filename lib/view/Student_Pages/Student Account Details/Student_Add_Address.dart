@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../modal/Snackbar.dart';
 import '../Student Account Details/Student_Add_Address.dart';
 
 class AddAddressScreen extends StatefulWidget {
@@ -36,21 +37,15 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
   Future<void> _loadUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    // Assume user_id is stored as an integer
     int? userId = prefs.getInt('user_id');
+
     if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("User data missing. Please log in again."),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: "User data missing. Please log in again.",
+        backgroundColor: const Color(0xFF2B5C74),
       );
-      // Optionally, redirect to login:
+      // Optionally, navigate to login screen
       // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => StartLogin()));
     } else {
       setState(() {
@@ -66,36 +61,25 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     String? token = prefs.getString('auth_token');
 
     if (token == null || token.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Authentication failed. Please log in again."),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Authentication failed. Please log in again.",
+        backgroundColor: const Color(0xFF2B5C74),
       );
       return;
     }
+
     if (_userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("User not found. Please log in again."),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: "User not found. Please log in again.",
+        backgroundColor: const Color(0xFF2B5C74),
       );
       return;
     }
 
     final Map<String, dynamic> addressData = {
-      "user_id": _userId, // Fetched dynamically
+      "user_id": _userId,
       "name": _nameController.text,
       "phone": _phoneController.text,
       "alt_phone": _altPhoneController.text,
@@ -109,7 +93,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       "country": "India"
     };
 
-    BaseOptions options = BaseOptions(
+    Dio dio = Dio(BaseOptions(
       headers: {
         "Authorization": "Bearer $token",
         "Content-Type": "application/json",
@@ -117,9 +101,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       },
       followRedirects: false,
       validateStatus: (status) => status! < 500,
-    );
-
-    Dio dio = Dio(options);
+    ));
 
     try {
       final response = await dio.post(
@@ -127,71 +109,41 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         data: addressData,
       );
 
-      if (response.statusCode == 201) {
-        if (response.data["status"] == true) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Address saved successfully"),
-              duration: const Duration(seconds: 1),
-              backgroundColor: Color(0xFF2B5C74),
-              behavior: SnackBarBehavior.floating,
-              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
-          );
-          Navigator.pop(context);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content:
-                  Text("Failed to save address: ${response.data["message"]}"),
-              duration: const Duration(seconds: 1),
-              backgroundColor: Color(0xFF2B5C74),
-              behavior: SnackBarBehavior.floating,
-              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
-          );
-        }
+      if (response.statusCode == 201 && response.data["status"] == true) {
+        SnackbarHelper.showMessage(
+          context,
+          message: "Address saved successfully",
+          backgroundColor: const Color(0xFF2B5C74),
+        );
+        Navigator.pop(context);
       } else if (response.statusCode == 401) {
         print("Unauthorized: Invalid Token");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Session expired. Please log in again.")),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Session expired. Please log in again.",
+          backgroundColor: const Color(0xFF2B5C74),
         );
       } else if (response.statusCode == 302) {
         print("Redirection detected to: ${response.headers['location']}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Unexpected redirection. Try again later."),
-            duration: const Duration(seconds: 1),
-            backgroundColor: Color(0xFF2B5C74),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        SnackbarHelper.showMessage(
+          context,
+          message: "Unexpected redirection. Try again later.",
+          backgroundColor: const Color(0xFF2B5C74),
         );
       } else {
-        print(
-            "Unexpected error: ${response.statusCode}, Response: ${response.data}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: ${response.data.toString()}")),
+        print("Unexpected error: ${response.statusCode}, Response: ${response.data}");
+        SnackbarHelper.showMessage(
+          context,
+          message: "Error: ${response.data.toString()}",
+          backgroundColor: const Color(0xFF2B5C74),
         );
       }
     } catch (e) {
       print("Dio error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Network error. Please try again."),
-          duration: const Duration(seconds: 1),
-          backgroundColor: Color(0xFF2B5C74),
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+      SnackbarHelper.showMessage(
+        context,
+        message: "Network error. Please try again.",
+        backgroundColor: const Color(0xFF2B5C74),
       );
     }
   }
