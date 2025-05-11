@@ -202,7 +202,7 @@ class _ClassesState extends State<Classes> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => LiveStudent(),
+                              builder: (context) => LiveStudent(chapterId: widget.chapterId),
                             ),
                           );
                         },

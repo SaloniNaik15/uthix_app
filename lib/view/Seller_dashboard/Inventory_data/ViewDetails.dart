@@ -48,13 +48,17 @@ class _ViewdetailsState extends State<Viewdetails> {
     productDetails = widget.product;
     _pageController = PageController();
     _initializeData();
-
   }
 
   Future<void> _initializeData() async {
     await _loadUserCredentials();
     await fetchReviewAndRating();
     await fetchProducts();
+  }
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -164,7 +168,6 @@ class _ViewdetailsState extends State<Viewdetails> {
       }
     } catch (e) {
       log('❌ Error fetching products: $e');
-
     }
   }
 
@@ -193,7 +196,6 @@ class _ViewdetailsState extends State<Viewdetails> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   // 1) PageView for images:
                   SizedBox(
                     height: 300,
@@ -658,7 +660,6 @@ Widget CustomerReview() {
                         context,
                         MaterialPageRoute(
                             builder: (context) => Customerreviews(reviews: [],)),
-
                       );
                     },
                     child: Text(

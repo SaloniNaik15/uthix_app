@@ -1,253 +1,109 @@
-// ignore_for_file: deprecated_member_use
+import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zego_uikit_prebuilt_live_streaming/zego_uikit_prebuilt_live_streaming.dart';
 
-import 'package:uthix_app/view/Student_Pages/LMS/query_student.dart';
-import 'package:uthix_app/view/instructor_dashboard/Class/announcement.dart';
 class LiveStudent extends StatefulWidget {
-  const LiveStudent({super.key});
+  final int chapterId;
+  const LiveStudent({super.key, required this.chapterId});
 
   @override
   State<LiveStudent> createState() => _LiveStudentState();
 }
 
 class _LiveStudentState extends State<LiveStudent> {
-  final TextEditingController _queryController = TextEditingController();
+  late Future<Map<String, dynamic>> _liveDataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _liveDataFuture = fetchLiveStreamData(widget.chapterId);
+  }
+
+  Future<Map<String, dynamic>> fetchLiveStreamData(int chapterId) async {
+    try {
+      Dio dio = Dio();
+
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+
+      if (token == null) {
+        throw Exception("Auth token is missing. Please login again.");
+      }
+
+      dio.options.headers['Authorization'] = 'Bearer $token';
+
+      final response = await dio.post(
+        'https://admin.uthix.com/api/class/join',
+        data: {
+          'chapter_id': chapterId.toString(), // ✅ Ensure string
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      print("Status code: ${response.statusCode}");
+      print("Response: ${response.data}");
+
+      if (response.statusCode == 200) {
+        debugPrint("Live stream data: ${response.data}");
+        return response.data;
+      } else {
+        throw Exception("Failed to load student live stream");
+      }
+    } catch (e) {
+      print("Error fetching live stream data: $e");
+      throw Exception("Error fetching live stream data: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
+        title: const Text("Live Class - Student ",
+            style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
-        elevation: 2,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_outlined,
-            size: 25,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Teacher image (simulating a "live class" view)
-            Container(
-              width: double.infinity,
-              height: 230,
-              margin: const EdgeInsets.only(top: 20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(7),
-                border: Border.all(
-                  color: const Color.fromRGBO(11, 159, 167, 1),
-                  width: 1,
-                ),
-                image: const DecorationImage(
-                  image: AssetImage("assets/teacher_sample.jpg"),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              // You can place overlay icons or controls on the image if needed.
-            ),
-            SizedBox(height: 20.h,),
-
-            // Example message bubble for user queries
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                height: 150,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: const Color.fromRGBO(246, 246, 246, 1),
-                  borderRadius: BorderRadius.circular(7),
-                  border: Border.all(
-                    color: const Color.fromRGBO(217, 217, 217, 1),
-                    width: 1,
-                  ),
-                ),
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Row with user avatar + placeholder text
-                    Row(
-                      children: [
-                        Container(
-                          width: 45,
-                          height: 45,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              "assets/login/profile.jpeg",
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        const Text(
-                          "You can type your queries here!",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    const Divider(
-                      thickness: 1,
-                      color: Color.fromRGBO(217, 217, 217, 1),
-                    ),
-                    // "Send" button
-                    Container(
-                      height: 30,
-                      width: 80,
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(217, 217, 217, 1),
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      alignment: Alignment.center,
-                      child: const Text(
-                        "Send",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: Color.fromRGBO(43, 92, 116, 1),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            // Example chat/announcement messages
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  _buildChatBubble(
-                    name: "Co Mentor",
-                    time: "Just Now | 12 Aug 2025",
-                    message: "New Assignment: Submit your report here",
-                  ),
-                  _buildChatBubble(
-                    name: "Your new query",
-                    time: "10:00 | 12 Aug 2025",
-                    message:
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et ?",
-                    isUser: true,
-                  ),
-                  _buildChatBubble(
-                    name: "Co Mentor",
-                    time: "1 hour ago | 12 Aug 2025",
-                    message: "New Assignment: Submit your homework",
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 30),
-          ],
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-    );
-  }
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _liveDataFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
+          if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          }
 
-  // Helper for chat-like announcement bubbles
-  Widget _buildChatBubble({
-    required String name,
-    required String time,
-    required String message,
-    bool isUser = false,
-  }) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 15),
-      decoration: BoxDecoration(
-        color: const Color.fromRGBO(246, 246, 246, 1),
-        borderRadius: BorderRadius.circular(7),
-        border: Border.all(
-          color: const Color.fromRGBO(217, 217, 217, 1),
-          width: 1,
-        ),
-      ),
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Top row with avatar, name, time, and a 3-dot menu icon
-          Row(
-            children: [
-              ClipOval(
-                child: Image.asset(
-                  "assets/login/profile.jpeg",
-                  width: 45,
-                  height: 45,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Text(
-                      time,
-                      style: const TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(Icons.more_vert),
-            ],
-          ),
-          const SizedBox(height: 8),
-          // Message content
-          Text(
-            message,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 10),
-          // "Add Comment" text
-          const Text(
-            "Add Comment",
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Color.fromRGBO(142, 140, 140, 1),
-            ),
-          ),
-        ],
+          final liveData = snapshot.data!;
+          final String userID = liveData['user_id'].toString();
+          final String userName = liveData['teacher_name'] ?? "Student";
+          final String liveID = liveData['chapter_id'];
+          final int appID = 753250804;
+          final String appSign =
+              '1346744a4d030550c13e5f924fcef9be48a6cc399a80ed4c577bb2d8deb60f63';
+
+          return ZegoUIKitPrebuiltLiveStreaming(
+            appID: appID,
+            appSign: appSign,
+            userID: userID,
+            userName: userName,
+            liveID: liveID,
+            config: ZegoUIKitPrebuiltLiveStreamingConfig.audience(),
+          );
+        },
       ),
     );
   }
