@@ -61,6 +61,13 @@ class _ViewdetailsState extends State<Viewdetails> {
     super.dispose();
   }
 
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+
   Future<void> fetchReviewAndRating() async {
     final String url =
         'https://admin.uthix.com/api/vendor/review/${productDetails['id']}';
@@ -245,6 +252,7 @@ class _ViewdetailsState extends State<Viewdetails> {
                     ),
                   ),
 
+
                   SizedBox(
                     height: 10,
                   ),
@@ -312,6 +320,7 @@ class _ViewdetailsState extends State<Viewdetails> {
                         child: Row(
                           mainAxisAlignment:
                           MainAxisAlignment.spaceBetween, // Center content
+
                           children: [
                             Text(
                               productDetails['author'],
