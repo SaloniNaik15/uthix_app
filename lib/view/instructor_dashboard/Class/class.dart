@@ -173,7 +173,7 @@ class _InstructorClassState extends State<InstructorClass> {
           GestureDetector(
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const LiveClasses()),
+              MaterialPageRoute(builder: (context) =>  LiveClasses(classId: widget.classId)),
             ),
             child: Container(
               width: 70.w,
